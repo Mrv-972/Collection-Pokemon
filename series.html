@@ -173,6 +173,18 @@ async function loadSets(){
   }
 }
 
+// Si le logo TCGdex d'une extension est manquant ou ne charge pas, on
+// retente avec l'ancienne API pokemontcg.io avant d'abandonner.
+function setLogoFallback(img){
+  const fallback = img.dataset.fallback;
+  if(fallback){
+    img.removeAttribute('data-fallback');
+    img.src = fallback;
+    return;
+  }
+  img.replaceWith(document.createTextNode(''));
+}
+
 function groupBySeries(sets){
   const groups = {};
   const order = [];
@@ -199,8 +211,8 @@ function renderSets(sets){
       return `
       <a class="set-card" href="extension.html?set=${s.id}">
         <div class="set-logo">${s.logo
-          ? `<img src="${s.logo}.png" alt="${s.name}" loading="lazy" onerror="this.replaceWith(document.createTextNode(''))">`
-          : ''}</div>
+          ? `<img src="${s.logo}.png" alt="${s.name}" loading="lazy" data-fallback="https://images.pokemontcg.io/${s.id}/logo.png" onerror="setLogoFallback(this)">`
+          : `<img src="https://images.pokemontcg.io/${s.id}/logo.png" alt="${s.name}" loading="lazy" onerror="setLogoFallback(this)">`}</div>
         <div class="set-name">${s.name}</div>
         <div class="set-meta">
           <span>${year}</span>

@@ -236,18 +236,42 @@ async function init(){
   }
 }
 
+function setLogoFallback(img){
+  const fallback = img.dataset.fallback;
+  if(fallback){
+    img.removeAttribute('data-fallback');
+    img.src = fallback;
+    return;
+  }
+  img.style.display = 'none';
+}
+
 function renderHead(set){
   if(!set) return;
   const year = set.releaseDate ? new Date(set.releaseDate).getFullYear() : '';
   const total = set.cardCount?.official ?? set.cardCount?.total ?? '?';
   const serie = set.serie?.name || '';
+  const logoSrc = set.logo ? set.logo + '.png' : `https://images.pokemontcg.io/${setId}/logo.png`;
   document.getElementById('page-head').innerHTML = `
-    <img src="${set.logo ? set.logo + '.png' : ''}" alt="${set.name}" onerror="this.style.display='none'">
+    <img src="${logoSrc}" alt="${set.name}" data-fallback="${set.logo ? `https://images.pokemontcg.io/${setId}/logo.png` : ''}" onerror="setLogoFallback(this)">
     <div>
       <h1>${set.name}</h1>
       <div class="meta">${[serie, year, total + ' cartes'].filter(Boolean).join(' · ')}</div>
     </div>
   `;
+}
+
+// Si l'image TCGdex d'une carte est manquante ou ne charge pas, on retente
+// avec l'ancienne API pokemontcg.io (dont les identifiants d'extensions
+// classiques coïncident souvent avec ceux de TCGdex) avant d'abandonner.
+function cardImgFallback(img){
+  const fallback = img.dataset.fallback;
+  if(fallback){
+    img.removeAttribute('data-fallback');
+    img.src = fallback;
+    return;
+  }
+  img.replaceWith(Object.assign(document.createElement('span'), { className: 'glyph', textContent: '···' }));
 }
 
 function renderCards(cards){
@@ -262,8 +286,8 @@ function renderCards(cards){
       <div class="card-tile">
         <div class="card-img-wrap">
           ${c.image
-            ? `<img src="${c.image}/low.webp" alt="${c.name}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'), {className: 'glyph', textContent: '···'}))">`
-            : `<span class="glyph">···</span>`}
+            ? `<img src="${c.image}/low.webp" alt="${c.name}" loading="lazy" data-fallback="https://images.pokemontcg.io/${setId}/${c.localId}.png" onerror="cardImgFallback(this)">`
+            : `<img src="https://images.pokemontcg.io/${setId}/${c.localId}.png" alt="${c.name}" loading="lazy" onerror="cardImgFallback(this)">`}
         </div>
         <div class="card-num"><span>#${c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
         <div class="card-name">${c.name}</div>
