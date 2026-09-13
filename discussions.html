@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Discussions — PokéClasseur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B; --ink-soft:#20232A; --teal:#1F6F63; --teal-deep:#123F38;
+    --rust:#A8431C; --gold:#C9A227; --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2,h3{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a.active{color:var(--text-on-ink)}
+  .navlinks a:hover{color:var(--text-on-ink)}
+  @media(max-width:720px){.navlinks{display:none}}
+
+  .page-head{padding:48px 0 26px;}
+  .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
+  .page-head h1{font-size:36px;}
+
+  .messagerie{display:grid;grid-template-columns:280px 1fr;gap:20px;padding-bottom:70px;align-items:start;}
+  @media(max-width:800px){.messagerie{grid-template-columns:1fr}}
+
+  .liste{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;overflow:hidden;}
+  .conv{display:block;width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid rgba(237,234,224,0.06);padding:14px 16px;cursor:pointer;font-family:inherit;color:inherit;}
+  .conv:last-child{border-bottom:none}
+  .conv:hover{background:rgba(237,234,224,0.03)}
+  .conv.on{background:rgba(201,162,39,0.1)}
+  .conv .qui{font-size:14px;font-weight:500;}
+  .conv .apercu{font-size:12px;color:var(--text-on-ink-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;}
+  .liste .vide{padding:18px 16px;font-size:13px;color:var(--text-on-ink-dim);}
+
+  .fil{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;display:flex;flex-direction:column;min-height:460px;}
+  .fil-tete{padding:16px 20px;border-bottom:1px solid rgba(237,234,224,0.08);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .fil-tete h2{font-size:19px;}
+  .fil-tete a{font-size:12.5px;color:var(--text-on-ink-dim);text-decoration:underline;text-underline-offset:3px;}
+  .fil-tete a:hover{color:var(--text-on-ink)}
+
+  .fil-corps{flex:1;overflow-y:auto;max-height:52vh;padding:20px;display:flex;flex-direction:column;gap:10px;}
+  .bulle{max-width:74%;padding:9px 13px;border-radius:12px;font-size:14px;word-wrap:break-word;overflow-wrap:anywhere;white-space:pre-wrap;}
+  .bulle .heure{display:block;font-size:10.5px;opacity:.6;margin-top:4px;}
+  .bulle.moi{align-self:flex-end;background:var(--teal-deep);color:#EDF5F3;border-bottom-right-radius:4px;}
+  .bulle.lui{align-self:flex-start;background:rgba(237,234,224,0.07);border-bottom-left-radius:4px;}
+
+  .fil-pied{padding:14px 16px;border-top:1px solid rgba(237,234,224,0.08);display:flex;gap:10px;}
+  .fil-pied textarea{flex:1;resize:none;background:var(--ink);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:10px 13px;border-radius:4px;font-size:14px;font-family:inherit;line-height:1.4;max-height:120px;}
+  .fil-pied textarea:focus{outline:none;border-color:rgba(201,162,39,0.5)}
+  .fil-pied button{background:var(--teal);border:none;color:#EDF5F3;padding:0 18px;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}
+  .fil-pied button:hover{background:var(--teal-deep)}
+  .fil-pied button:disabled{opacity:.5;cursor:default}
+
+  .status-msg{color:var(--text-on-ink-dim);font-size:15px;padding:28px 0;}
+  .status-msg.err{color:#E08862}
+  .cta-btn{display:inline-block;margin-top:16px;background:var(--teal);color:#EDF5F3;padding:11px 20px;border-radius:3px;font-size:14px;font-weight:500;}
+  .cta-btn:hover{background:var(--teal-deep)}
+  .avis{font-size:12.5px;color:var(--text-on-ink-dim);padding:0 0 26px;max-width:70ch;}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="index.html">Poké<span>Classeur</span></a>
+    <div class="navlinks">
+      <a href="series.html">Par extension</a>
+      <a href="pokemon.html">Par Pokémon</a>
+      <a href="echanges.html">Échanges</a>
+      <a href="discussions.html" class="active">Discussions</a>
+    </div>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
+  </nav>
+
+  <div class="page-head">
+    <div class="kicker">Messagerie</div>
+    <h1>Mes discussions</h1>
+  </div>
+
+  <div id="content"></div>
+
+  <footer>PokéClasseur — les discussions ne sont lisibles que par leurs deux participants.</footer>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="tags.js"></script>
+<script src="compte.js"></script>
+<script src="messagerie.js"></script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const membreDemande = params.get('membre'); // conversation à ouvrir d'emblée
+
+let conversations = [];
+let conversationOuverte = null;  // { conversation_id, autre_id, pseudo }
+let dernierMessageId = 0;
+let arreterSuivi = null;
+
+function rendreSquelette(){
+  document.getElementById('content').innerHTML = `
+    <p class="avis">Les discussions restent entre leurs deux participants. Reste prudent : ne communique pas d'informations personnelles (adresse, téléphone) à quelqu'un que tu ne connais pas, et conviens d'un mode d'envoi sûr avant d'expédier des cartes.</p>
+    <div class="messagerie">
+      <div class="liste" id="liste"></div>
+      <div class="fil" id="fil"></div>
+    </div>
+  `;
+}
+
+function rendreListe(){
+  const liste = document.getElementById('liste');
+  if(conversations.length === 0){
+    liste.innerHTML = `<p class="vide">Aucune discussion pour l'instant. Ouvre-en une depuis la page Échanges.</p>`;
+    return;
+  }
+  liste.innerHTML = conversations.map(c => `
+    <button class="conv ${conversationOuverte?.conversation_id === c.conversation_id ? 'on' : ''}" data-id="${c.conversation_id}">
+      <div class="qui">${texteEchappe(c.pseudo)}</div>
+      <div class="apercu">${c.dernier_message ? texteEchappe(c.dernier_message) : 'Discussion ouverte, rien d\'envoyé'}</div>
+    </button>
+  `).join('');
+}
+
+function rendreFil(){
+  const fil = document.getElementById('fil');
+  if(!conversationOuverte){
+    fil.innerHTML = `<p class="status-msg" style="padding:28px 20px">Choisis une discussion à gauche, ou lances-en une depuis la page Échanges.</p>`;
+    return;
+  }
+  fil.innerHTML = `
+    <div class="fil-tete">
+      <h2>${texteEchappe(conversationOuverte.pseudo)}</h2>
+      <a href="echanges.html">Voir les échanges possibles</a>
+    </div>
+    <div class="fil-corps" id="fil-corps"></div>
+    <div class="fil-pied">
+      <textarea id="saisie" rows="1" placeholder="Écris ton message…"></textarea>
+      <button id="btn-envoyer">Envoyer</button>
+    </div>
+  `;
+  document.getElementById('btn-envoyer').addEventListener('click', envoyer);
+  const saisie = document.getElementById('saisie');
+  saisie.addEventListener('keydown', (e) => {
+    // Entrée envoie, Maj+Entrée passe à la ligne.
+    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); envoyer(); }
+  });
+  saisie.addEventListener('input', () => {
+    saisie.style.height = 'auto';
+    saisie.style.height = Math.min(saisie.scrollHeight, 120) + 'px';
+  });
+  saisie.focus();
+}
+
+function ajouterMessages(messages){
+  const corps = document.getElementById('fil-corps');
+  if(!corps) return;
+  const enBas = corps.scrollHeight - corps.scrollTop - corps.clientHeight < 60;
+  corps.insertAdjacentHTML('beforeend', messages.map(m => `
+    <div class="bulle ${m.auteur_id === membre.id ? 'moi' : 'lui'}">${texteEchappe(m.texte)}<span class="heure">${heureLisible(m.envoye_le)}</span></div>
+  `).join(''));
+  // On ne repositionne la vue que si le lecteur était déjà en bas : sinon
+  // il est en train de relire, et on ne lui arrache pas sa lecture.
+  if(enBas || messages.some(m => m.auteur_id === membre.id)){
+    corps.scrollTop = corps.scrollHeight;
+  }
+}
+
+async function ouvrirFil(conversation){
+  conversationOuverte = conversation;
+  dernierMessageId = 0;
+  rendreListe();
+  rendreFil();
+  const messages = await lireMessages(conversation.conversation_id);
+  if(messages.length) dernierMessageId = messages[messages.length - 1].id;
+  ajouterMessages(messages);
+}
+
+async function envoyer(){
+  const saisie = document.getElementById('saisie');
+  const bouton = document.getElementById('btn-envoyer');
+  const texte = saisie.value.trim();
+  if(!texte || !conversationOuverte) return;
+
+  bouton.disabled = true;
+  try{
+    const message = await envoyerMessage(conversationOuverte.conversation_id, texte);
+    dernierMessageId = Math.max(dernierMessageId, message.id);
+    ajouterMessages([message]);
+    saisie.value = '';
+    saisie.style.height = 'auto';
+    await rafraichirListe();
+  }catch(err){
+    console.warn('Envoi impossible', err);
+    alert("Le message n'est pas parti : " + (err.message ?? err));
+  }finally{
+    bouton.disabled = false;
+    saisie.focus();
+  }
+}
+
+async function rafraichirListe(){
+  conversations = await listerConversations();
+  rendreListe();
+}
+
+// Va chercher ce qui est arrivé depuis le dernier message connu.
+async function rafraichir(){
+  if(conversationOuverte){
+    const nouveaux = await lireMessages(conversationOuverte.conversation_id, dernierMessageId);
+    if(nouveaux.length){
+      dernierMessageId = nouveaux[nouveaux.length - 1].id;
+      ajouterMessages(nouveaux);
+    }
+  }
+  await rafraichirListe();
+}
+
+async function init(){
+  const content = document.getElementById('content');
+  loadTags();
+  await initCompte();
+  afficherEtatCompte();
+
+  if(CONFIG_MANQUANTE){
+    content.innerHTML = `<p class="status-msg err">La base en ligne n'est pas encore configurée.</p>`;
+    return;
+  }
+  if(!estConnecte()){
+    content.innerHTML = `<p class="status-msg">Les discussions sont réservées aux membres.
+      <br><a class="cta-btn" href="connexion.html">Se connecter ou créer un compte</a></p>`;
+    return;
+  }
+
+  rendreSquelette();
+  try{
+    await rafraichirListe();
+
+    // Arrivée depuis la page Échanges : on ouvre directement la discussion
+    // avec ce membre, en la créant si c'est la première fois.
+    if(membreDemande){
+      const idConv = await ouvrirConversation(membreDemande);
+      await rafraichirListe();
+      const conv = conversations.find(c => c.conversation_id === idConv);
+      if(conv) await ouvrirFil(conv);
+    }else{
+      rendreFil();
+    }
+
+    arreterSuivi = suivreEnContinu(rafraichir);
+  }catch(err){
+    console.warn('Discussions indisponibles', err);
+    content.innerHTML = `<p class="status-msg err">Impossible de charger les discussions.<br>
+      <span style="font-size:12px;opacity:.7">${err.message ?? err}</span></p>`;
+  }
+}
+
+document.addEventListener('click', (e) => {
+  const bouton = e.target.closest('.conv');
+  if(!bouton) return;
+  const conv = conversations.find(c => c.conversation_id === bouton.dataset.id);
+  if(conv) ouvrirFil(conv);
+});
+
+init();
+</script>
+
+</body>
+</html>

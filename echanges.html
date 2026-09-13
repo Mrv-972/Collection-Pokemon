@@ -45,7 +45,10 @@
   .badge{font-size:11.5px;padding:3px 10px;border-radius:20px;font-weight:500;}
   .badge.equilibre{background:rgba(201,162,39,0.16);color:#E3C766}
   .badge.simple{background:rgba(237,234,224,0.06);color:var(--text-on-ink-dim)}
-  .contact{color:var(--text-on-ink-dim);font-size:13.5px;margin-bottom:20px;}
+  .contact{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
+  .contact .discuter{background:var(--teal);color:#EDF5F3;padding:8px 16px;border-radius:3px;font-size:13px;font-weight:500;}
+  .contact .discuter:hover{background:var(--teal-deep)}
+  .contact .ailleurs{color:var(--text-on-ink-dim);font-size:13px;}
   .contact strong{color:var(--text-on-ink);font-weight:500;}
 
   .colonnes{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
@@ -86,6 +89,7 @@
       <a href="series.html">Par extension</a>
       <a href="pokemon.html">Par Pokémon</a>
       <a href="echanges.html" class="active">Échanges</a>
+      <a href="discussions.html">Discussions</a>
     </div>
     <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
   </nav>
@@ -111,6 +115,7 @@
 <script src="tags.js"></script>
 <script src="cards.js"></script>
 <script src="compte.js"></script>
+<script src="messagerie.js"></script>
 <script>
 let correspondances = [];
 let equilibresSeulement = false;
@@ -194,15 +199,14 @@ function rendre(){
   content.innerHTML = liste.map(m => `
     <div class="membre ${estEquilibre(m) ? 'equilibre' : ''}">
       <div class="membre-tete">
-        <h2>${m.pseudo}</h2>
+        <h2>${texteEchappe(m.pseudo)}</h2>
         <span class="badge ${estEquilibre(m) ? 'equilibre' : 'simple'}">
           ${estEquilibre(m) ? 'Échange équilibré' : 'Échange à sens unique'}
         </span>
       </div>
       <div class="contact">
-        ${m.contact
-          ? `Pour le contacter : <strong>${m.contact}</strong>`
-          : `Ce membre n'a pas indiqué comment le joindre.`}
+        <a class="discuter" href="discussions.html?membre=${m.membre_id}">Lui écrire</a>
+        ${m.contact ? `<span class="ailleurs">ou le joindre sur <strong>${texteEchappe(m.contact)}</strong></span>` : ''}
       </div>
       <div class="colonnes">
         ${colonne('recoit', `↓ Ce qu'il peut te donner (${m.il_me_donne.length})`, m.il_me_donne,

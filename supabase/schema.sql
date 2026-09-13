@@ -114,3 +114,112 @@ as $$
   where p.id <> auth.uid()
     and (d.cartes is not null or r.cartes is not null);
 $$;
+
+-- ------------------------------------------------------- messagerie --
+-- Une conversation relie exactement deux membres. Les identifiants sont
+-- rangés dans un ordre fixe (le plus petit d'abord) pour qu'une même paire
+-- ne puisse pas ouvrir deux conversations en double.
+create table if not exists conversations (
+  id       uuid primary key default gen_random_uuid(),
+  membre_a uuid not null references auth.users on delete cascade,
+  membre_b uuid not null references auth.users on delete cascade,
+  cree_le  timestamptz not null default now(),
+  unique (membre_a, membre_b),
+  check (membre_a < membre_b)
+);
+
+create table if not exists messages (
+  id              bigint generated always as identity primary key,
+  conversation_id uuid not null references conversations on delete cascade,
+  auteur_id       uuid not null references auth.users on delete cascade,
+  texte           text not null check (length(btrim(texte)) between 1 and 2000),
+  envoye_le       timestamptz not null default now()
+);
+
+create index if not exists messages_par_conversation on messages (conversation_id, envoye_le);
+
+alter table conversations enable row level security;
+alter table messages      enable row level security;
+
+-- Une conversation, et son contenu, ne regardent que ses deux participants.
+drop policy if exists "mes conversations" on conversations;
+create policy "mes conversations"
+  on conversations for select to authenticated
+  using (auth.uid() in (membre_a, membre_b));
+
+drop policy if exists "ouvrir une conversation" on conversations;
+create policy "ouvrir une conversation"
+  on conversations for insert to authenticated
+  with check (auth.uid() in (membre_a, membre_b));
+
+drop policy if exists "lire mes messages" on messages;
+create policy "lire mes messages"
+  on messages for select to authenticated
+  using (exists (
+    select 1 from conversations c
+    where c.id = conversation_id and auth.uid() in (c.membre_a, c.membre_b)
+  ));
+
+-- On ne peut écrire que sous son propre nom, et que dans une conversation
+-- dont on fait partie.
+drop policy if exists "écrire dans mes conversations" on messages;
+create policy "écrire dans mes conversations"
+  on messages for insert to authenticated
+  with check (auth.uid() = auteur_id and exists (
+    select 1 from conversations c
+    where c.id = conversation_id and auth.uid() in (c.membre_a, c.membre_b)
+  ));
+
+-- Retrouve la conversation avec un membre, ou l'ouvre si elle n'existe pas.
+create or replace function ouvrir_conversation(autre uuid)
+returns uuid
+language plpgsql
+as $$
+declare
+  a       uuid := least(auth.uid(), autre);
+  b       uuid := greatest(auth.uid(), autre);
+  id_conv uuid;
+begin
+  if auth.uid() is null or autre is null or autre = auth.uid() then
+    raise exception 'Conversation impossible';
+  end if;
+  select id into id_conv from conversations where membre_a = a and membre_b = b;
+  if id_conv is null then
+    insert into conversations (membre_a, membre_b) values (a, b) returning id into id_conv;
+  end if;
+  return id_conv;
+end;
+$$;
+
+-- La liste des conversations, avec de quoi dresser un aperçu : qui est en
+-- face, et le dernier message échangé.
+create or replace function mes_conversations()
+returns table (
+  conversation_id uuid,
+  autre_id        uuid,
+  pseudo          text,
+  dernier_message text,
+  dernier_envoi   timestamptz
+)
+language sql
+stable
+as $$
+  select
+    c.id,
+    case when c.membre_a = auth.uid() then c.membre_b else c.membre_a end,
+    p.pseudo,
+    m.texte,
+    m.envoye_le
+  from conversations c
+  join profils p
+    on p.id = case when c.membre_a = auth.uid() then c.membre_b else c.membre_a end
+  left join lateral (
+    select texte, envoye_le
+    from messages
+    where conversation_id = c.id
+    order by envoye_le desc
+    limit 1
+  ) m on true
+  where auth.uid() in (c.membre_a, c.membre_b)
+  order by coalesce(m.envoye_le, c.cree_le) desc;
+$$;
