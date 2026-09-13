@@ -46,6 +46,10 @@
   .filter-btn.on.rech{color:#E08862;border-color:rgba(168,67,28,0.5);background:rgba(168,67,28,0.1)}
   .filter-btn.on.ech{color:#5FBAAA;border-color:rgba(31,111,99,0.5);background:rgba(31,111,99,0.12)}
 
+  .bulk-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:-14px;padding-bottom:28px;font-size:12.5px;color:var(--text-on-ink-dim);}
+  .bulk-btn{font-size:14px;line-height:1.2;padding:4px 12px;border-radius:3px;cursor:pointer;border:1px solid rgba(237,234,224,0.14);background:transparent;font-family:inherit;transition:.12s;}
+  .bulk-btn:hover{border-color:rgba(237,234,224,0.35);background:rgba(237,234,224,0.04)}
+
   .card-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;padding-bottom:60px;}
   @media(max-width:960px){.card-grid{grid-template-columns:repeat(4,1fr)}}
   @media(max-width:640px){.card-grid{grid-template-columns:repeat(3,1fr)}}
@@ -103,6 +107,13 @@
     <button class="filter-btn rech" id="btn-rech">❤️ Recherchées</button>
     <button class="filter-btn ech" id="btn-ech">🔁 Échangeables</button>
     <span id="save-status" style="font-size:12px;color:var(--text-on-ink-dim);opacity:0;transition:opacity .3s;">Enregistré ✓</span>
+  </div>
+
+  <div class="bulk-row">
+    <span>Marquer d'un coup <span id="bulk-count">toutes les cartes</span> :</span>
+    <button class="bulk-btn" data-bulk="obt" title="Marquer comme obtenues (recliquer pour tout décocher)">✅</button>
+    <button class="bulk-btn" data-bulk="rech" title="Marquer comme recherchées (recliquer pour tout décocher)">❤️</button>
+    <button class="bulk-btn" data-bulk="ech" title="Marquer comme échangeables (recliquer pour tout décocher)">🔁</button>
   </div>
 
   <div id="content">
@@ -277,6 +288,17 @@ function applyRarities(byCardId){
 async function init(){
   document.getElementById('content').innerHTML = `<div class="card-grid">${Array(12).fill('<div class="skeleton"></div>').join('')}</div>`;
 
+  // Tags déjà posés sur cette extension, à charger avant le premier rendu
+  // pour que les cartes s'affichent d'emblée avec leurs marques. Ils vivent
+  // dans la mémoire du navigateur : ils tiennent dans le temps, mais restent
+  // propres à cet appareil tant qu'il n'y a pas de comptes utilisateurs.
+  try{
+    const saved = localStorage.getItem(tagStorageKey);
+    if(saved) Object.assign(tagState, JSON.parse(saved));
+  }catch(err){
+    // Navigation privée ou stockage refusé : on continue sans tags sauvegardés.
+  }
+
   // Cache local : ré-ouvrir la même extension est instantané, on revérifie en arrière-plan.
   const cacheKey = `reliure_ext_${setId}`;
   const cached = sessionStorage.getItem(cacheKey);
@@ -285,17 +307,7 @@ async function init(){
     renderHead(data.set);
     allCards = data.cards;
     populateRarityFilter(allCards);
-    renderCards(allCards);
-  }
-
-  // Tags déjà posés sur cette extension. Ils vivent dans la mémoire du
-  // navigateur : ils tiennent dans le temps, mais restent propres à cet
-  // appareil tant qu'il n'y a pas de comptes utilisateurs.
-  try{
-    const saved = localStorage.getItem(tagStorageKey);
-    if(saved) Object.assign(tagState, JSON.parse(saved));
-  }catch(err){
-    // Navigation privée ou stockage refusé : on continue sans tags sauvegardés.
+    applyFilters();
   }
 
   try{
@@ -307,7 +319,7 @@ async function init(){
     renderHead(set);
     allCards = cards;
     populateRarityFilter(allCards);
-    renderCards(allCards);
+    applyFilters();
     sessionStorage.setItem(cacheKey, JSON.stringify({ set, cards: allCards }));
     // Les raretés arrivent après coup : les cartes restent affichées pendant ce temps.
     loadRarities().catch(err => console.warn('Impossible de charger les raretés', err));
@@ -391,14 +403,18 @@ document.getElementById('content').addEventListener('click', (e) => {
   if(!tagState[id]) tagState[id] = emptyTagState();
   tagState[id][tag] = !tagState[id][tag];
   applyFilters();
+  saveTags();
+});
+
+function saveTags(){
   try{
     localStorage.setItem(tagStorageKey, JSON.stringify(tagState));
     showSaveStatus('saved');
   }catch(err){
-    console.warn('Échec de la sauvegarde du tag', err);
+    console.warn('Échec de la sauvegarde des tags', err);
     showSaveStatus('error');
   }
-});
+}
 
 function showSaveStatus(state){
   const el = document.getElementById('save-status');
@@ -411,18 +427,44 @@ function showSaveStatus(state){
   el._t = setTimeout(() => { el.style.opacity = '0'; }, 1500);
 }
 
-function applyFilters(){
+function filteredCards(){
   const q = document.getElementById('filter-input').value.trim().toLowerCase();
   const rarity = document.getElementById('rarity-filter').value;
   let filtered = allCards;
   if(q) filtered = filtered.filter(c => c.name.toLowerCase().includes(q) || (c.localId || '').includes(q));
   if(rarity) filtered = filtered.filter(c => c.rarity === rarity);
   if(activeFilter) filtered = filtered.filter(c => tagState[c.id]?.[activeFilter]);
+  return filtered;
+}
+
+function applyFilters(){
+  const filtered = filteredCards();
   renderCards(filtered);
+  const count = filtered.length;
+  document.getElementById('bulk-count').textContent =
+    count === allCards.length ? `les ${count} cartes` : `les ${count} cartes affichées`;
+}
+
+// Applique un tag à toutes les cartes affichées — ou le retire si elles le
+// portent déjà toutes, pour pouvoir revenir en arrière en un clic.
+function bulkToggle(tag){
+  const cards = filteredCards();
+  if(cards.length === 0) return;
+  const allTagged = cards.every(c => tagState[c.id]?.[tag]);
+  cards.forEach(c => {
+    if(!tagState[c.id]) tagState[c.id] = emptyTagState();
+    tagState[c.id][tag] = !allTagged;
+  });
+  saveTags();
+  applyFilters();
 }
 
 document.getElementById('filter-input').addEventListener('input', applyFilters);
 document.getElementById('rarity-filter').addEventListener('change', applyFilters);
+
+document.querySelectorAll('.bulk-btn').forEach(btn => {
+  btn.addEventListener('click', () => bulkToggle(btn.dataset.bulk));
+});
 
 // Les trois filtres s'excluent : en activer un désactive les autres.
 TAGS.forEach(tag => {
