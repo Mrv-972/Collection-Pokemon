@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Extension — Reliure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.pokemontcg.io">
+<link rel="preconnect" href="https://images.pokemontcg.io">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B; --ink-soft:#20232A; --paper:#F1EBDC; --paper-line:#D9CFB6;
+    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227;
+    --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2,h3{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a.active{color:var(--text-on-ink)}
+  @media(max-width:720px){.navlinks{display:none}}
+
+  .breadcrumb{padding:24px 0 0;font-size:13px;color:var(--text-on-ink-dim);}
+  .breadcrumb a:hover{color:var(--text-on-ink)}
+
+  .page-head{padding:18px 0 30px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
+  .page-head img{height:56px;object-fit:contain;}
+  .page-head h1{font-size:30px;}
+  .page-head .meta{color:var(--text-on-ink-dim);font-size:14px;margin-top:6px;}
+
+  .toolbar{display:flex;gap:10px;padding-bottom:30px;flex-wrap:wrap;align-items:center;}
+  .toolbar input{flex:1;min-width:180px;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  .toolbar input::placeholder{color:var(--text-on-ink-dim)}
+  .toolbar select{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:10px 14px;border-radius:4px;font-size:13px;font-family:inherit;}
+  .filter-btn{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
+  .filter-btn.on.rech{color:#E08862;border-color:rgba(168,67,28,0.5);background:rgba(168,67,28,0.1)}
+  .filter-btn.on.ech{color:#5FBAAA;border-color:rgba(31,111,99,0.5);background:rgba(31,111,99,0.12)}
+
+  .card-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;padding-bottom:60px;}
+  @media(max-width:960px){.card-grid{grid-template-columns:repeat(4,1fr)}}
+  @media(max-width:640px){.card-grid{grid-template-columns:repeat(3,1fr)}}
+
+  .card-tile{display:flex;flex-direction:column;gap:8px;}
+  .card-img-wrap{position:relative;aspect-ratio:2.5/3.5;border-radius:6px;overflow:hidden;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);}
+  .card-img-wrap img{width:100%;height:100%;object-fit:cover;}
+  .card-num{font-size:11px;color:var(--text-on-ink-dim);display:flex;justify-content:space-between;align-items:center;}
+  .rarity-symbol{color:var(--gold);letter-spacing:1px;}
+  .card-name{font-size:13px;font-weight:500;}
+
+  .tag-row{display:flex;gap:6px;}
+  .tag-toggle{flex:1;font-size:10.5px;padding:5px 0;border-radius:3px;text-align:center;cursor:pointer;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);background:transparent;font-family:inherit;transition:.12s;}
+  .tag-toggle.rech.active{background:rgba(168,67,28,0.16);color:#E08862;border-color:rgba(168,67,28,0.5)}
+  .tag-toggle.ech.active{background:rgba(31,111,99,0.18);color:#5FBAAA;border-color:rgba(31,111,99,0.5)}
+  .tag-toggle:hover{border-color:rgba(237,234,224,0.3)}
+
+  .skeleton{aspect-ratio:2.5/3.5;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;position:relative;overflow:hidden;}
+  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(237,234,224,0.06),transparent);animation:shine 1.4s infinite;}
+  @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+  .status-msg{color:var(--text-on-ink-dim);font-size:14px;padding:20px 0;}
+  .status-msg.err{color:#E08862}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="pokecollection-prototype.html">Reli<span>ure</span></a>
+    <div class="navlinks">
+      <a href="series.html" class="active">Extensions</a>
+      <a href="#">Échanges</a>
+      <a href="#">Comment ça marche</a>
+    </div>
+    <a class="brand" style="font-size:14px;font-style:normal" href="#">Mon classeur →</a>
+  </nav>
+
+  <div class="breadcrumb"><a href="series.html">← Toutes les séries</a></div>
+
+  <div class="page-head" id="page-head">
+    <h1 id="set-title">Chargement de l'extension…</h1>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="filter-input" placeholder="Filtrer par nom ou numéro...">
+    <select id="rarity-filter"><option value="">Toutes les raretés</option></select>
+    <button class="filter-btn rech" id="btn-rech">Recherchées</button>
+    <button class="filter-btn ech" id="btn-ech">Échangeables</button>
+    <span id="save-status" style="font-size:12px;color:var(--text-on-ink-dim);opacity:0;transition:opacity .3s;">Enregistré ✓</span>
+  </div>
+
+  <div id="content">
+    <div class="card-grid">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+  </div>
+
+  <footer>Reliure — cartes et images fournies en direct par l'API pokemontcg.io. Tes tags sont sauvegardés pour de vrai, tant que tu ouvres cette page dans Claude.</footer>
+</div>
+
+<script>
+// Récupère les cartes d'une extension depuis l'API pokemontcg.io, à partir de l'id
+// passé dans l'URL (?set=sv3pt5). Les images restent hébergées par pokemontcg.io.
+const params = new URLSearchParams(window.location.search);
+const setId = params.get('set') || 'sv3pt5'; // "151" par défaut si aucune extension choisie
+
+let allCards = [];
+const tagState = {}; // { [cardId]: { rech: bool, ech: bool } }
+let activeFilter = null; // 'rech' | 'ech' | null
+
+// Symboles officiels (ou les plus proches équivalents) utilisés sur les cartes imprimées.
+// Certaines raretés récentes (Illustration Rare, Hyper Rare...) n'ont pas de symbole
+// unique standardisé : on leur attribue le nombre d'étoiles le plus proche de l'usage courant.
+const RARITY_SYMBOLS = {
+  'Common': '●',
+  'Uncommon': '◆',
+  'Rare': '★',
+  'Rare Holo': '★',
+  'Rare Holo EX': '★★',
+  'Rare Holo GX': '★★',
+  'Rare Holo V': '★★',
+  'Rare Holo VMAX': '★★',
+  'Rare Holo VSTAR': '★★',
+  'Rare BREAK': '★★',
+  'Rare Prime': '★★',
+  'Amazing Rare': '★★',
+  'Radiant Rare': '★★',
+  'Double Rare': '★★',
+  'Ultra Rare': '★★★',
+  'Rare Ultra': '★★★',
+  'Illustration Rare': '★★★',
+  'Special Illustration Rare': '★★★★',
+  'Hyper Rare': '★★★★',
+  'Rare Rainbow': '★★★★',
+  'Rare Secret': '★★★★',
+  'Rare Shiny': '★★',
+  'Rare Shiny GX': '★★★',
+  'Shiny Rare': '★★',
+  'Shiny Ultra Rare': '★★★',
+  'ACE SPEC Rare': '★★★',
+  'Classic Collection': '★★',
+  'LEGEND': '★★',
+  'Promo': '✦',
+};
+function raritySymbol(rarity){
+  if(!rarity) return '';
+  if(RARITY_SYMBOLS[rarity]) return RARITY_SYMBOLS[rarity];
+  if(/secret|rainbow|hyper/i.test(rarity)) return '★★★★';
+  if(/ultra|illustration/i.test(rarity)) return '★★★';
+  if(/holo|rare/i.test(rarity)) return '★';
+  if(/uncommon/i.test(rarity)) return '◆';
+  if(/common/i.test(rarity)) return '●';
+  return '✦';
+}
+
+function populateRarityFilter(cards){
+  const select = document.getElementById('rarity-filter');
+  const seen = new Set();
+  const rarities = [];
+  cards.forEach(c => { if(c.rarity && !seen.has(c.rarity)){ seen.add(c.rarity); rarities.push(c.rarity); } });
+  // Trie du plus commun au plus rare, en s'appuyant sur le nombre de symboles.
+  rarities.sort((a, b) => raritySymbol(a).length - raritySymbol(b).length);
+  select.innerHTML = '<option value="">Toutes les raretés</option>' +
+    rarities.map(r => `<option value="${r}">${raritySymbol(r)} ${r}</option>`).join('');
+}
+
+async function fetchJson(url, retries = 1){
+  const res = await fetch(url);
+  const text = await res.text();
+  if(!res.ok || !text){
+    if(retries > 0){
+      await new Promise(r => setTimeout(r, 1200));
+      return fetchJson(url, retries - 1);
+    }
+    throw new Error(`Réponse vide ou erreur HTTP ${res.status} — probablement la limite de débit de l'API publique (sans clé) temporairement atteinte.`);
+  }
+  return JSON.parse(text);
+}
+
+async function init(){
+  document.getElementById('content').innerHTML = `<div class="card-grid">${Array(12).fill('<div class="skeleton"></div>').join('')}</div>`;
+
+  // Cache local : ré-ouvrir la même extension est instantané, on revérifie en arrière-plan.
+  const cacheKey = `reliure_ext_${setId}`;
+  const cached = sessionStorage.getItem(cacheKey);
+  if(cached){
+    const data = JSON.parse(cached);
+    renderHead(data.set);
+    allCards = data.cards;
+    populateRarityFilter(allCards);
+    renderCards(allCards);
+  }
+
+  // Charge les tags sauvegardés EN PARALLÈLE du reste, sans jamais pouvoir bloquer
+  // ou interrompre l'affichage des cartes, même si window.storage est indisponible.
+  (async () => {
+    try{
+      if(!window.storage) return;
+      const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
+      const saved = await Promise.race([window.storage.get(`tags:${setId}`, false), timeout(3000)]);
+      if(saved){ Object.assign(tagState, JSON.parse(saved.value)); applyFilters(); }
+    }catch(err){
+      // Rien de sauvegardé encore, stockage indisponible, ou lecture trop lente — sans conséquence.
+    }
+  })();
+
+  try{
+    const [setJson, cardsJson] = await Promise.all([
+      fetchJson(`https://api.pokemontcg.io/v2/sets/${setId}`),
+      fetchJson(`https://api.pokemontcg.io/v2/cards?q=set.id:${setId}&orderBy=number&pageSize=250`)
+    ]);
+    renderHead(setJson.data);
+    allCards = cardsJson.data || [];
+    populateRarityFilter(allCards);
+    renderCards(allCards);
+    sessionStorage.setItem(cacheKey, JSON.stringify({ set: setJson.data, cards: allCards }));
+  }catch(err){
+    console.warn("Impossible de charger l'extension", err);
+    if(!cached){
+      document.getElementById('page-head').innerHTML = '<h1>Extension introuvable</h1>';
+      document.getElementById('content').innerHTML = `<p class="status-msg err">Impossible de charger cette extension pour le moment.<br><span style="font-size:12px;opacity:.7">${err.message}</span><br><br><button onclick="init()" class="filter-btn" style="margin-top:8px">Réessayer</button></p>`;
+    }
+  }
+}
+
+function renderHead(set){
+  if(!set) return;
+  document.getElementById('page-head').innerHTML = `
+    <img src="${set.images?.logo || ''}" alt="${set.name}" onerror="this.style.display='none'">
+    <div>
+      <h1>${set.name}</h1>
+      <div class="meta">${set.series} · ${new Date(set.releaseDate).getFullYear()} · ${set.total} cartes</div>
+    </div>
+  `;
+}
+
+function renderCards(cards){
+  const content = document.getElementById('content');
+  if(cards.length === 0){
+    content.innerHTML = '<p class="status-msg">Aucune carte ne correspond à ce filtre.</p>';
+    return;
+  }
+  content.innerHTML = `<div class="card-grid">${cards.map(c => {
+    const state = tagState[c.id] || { rech:false, ech:false };
+    return `
+      <div class="card-tile">
+        <div class="card-img-wrap">
+          <img src="${c.images.small}" alt="${c.name}" loading="lazy">
+        </div>
+        <div class="card-num"><span>#${c.number}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
+        <div class="card-name">${c.name}</div>
+        <div class="tag-row">
+          <button class="tag-toggle rech ${state.rech ? 'active' : ''}" data-id="${c.id}" data-tag="rech">Recherchée</button>
+          <button class="tag-toggle ech ${state.ech ? 'active' : ''}" data-id="${c.id}" data-tag="ech">Échangeable</button>
+        </div>
+      </div>
+    `;
+  }).join('')}</div>`;
+}
+
+document.getElementById('content').addEventListener('click', async (e) => {
+  const btn = e.target.closest('.tag-toggle');
+  if(!btn) return;
+  const id = btn.dataset.id;
+  const tag = btn.dataset.tag;
+  if(!tagState[id]) tagState[id] = { rech:false, ech:false };
+  tagState[id][tag] = !tagState[id][tag];
+  applyFilters();
+  showSaveStatus('saving');
+  try{
+    if(!window.storage) throw new Error('storage indisponible');
+    await window.storage.set(`tags:${setId}`, JSON.stringify(tagState), false);
+    showSaveStatus('saved');
+  }catch(err){
+    console.warn('Échec de la sauvegarde du tag', err);
+    showSaveStatus('error');
+  }
+});
+
+function showSaveStatus(state){
+  const el = document.getElementById('save-status');
+  if(!el) return;
+  if(state === 'saving') el.textContent = 'Enregistrement…';
+  if(state === 'saved') el.textContent = 'Enregistré ✓';
+  if(state === 'error') el.textContent = "Échec de l'enregistrement";
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; }, 1500);
+}
+
+function applyFilters(){
+  const q = document.getElementById('filter-input').value.trim().toLowerCase();
+  const rarity = document.getElementById('rarity-filter').value;
+  let filtered = allCards;
+  if(q) filtered = filtered.filter(c => c.name.toLowerCase().includes(q) || c.number.includes(q));
+  if(rarity) filtered = filtered.filter(c => c.rarity === rarity);
+  if(activeFilter) filtered = filtered.filter(c => tagState[c.id]?.[activeFilter]);
+  renderCards(filtered);
+}
+
+document.getElementById('filter-input').addEventListener('input', applyFilters);
+document.getElementById('rarity-filter').addEventListener('change', applyFilters);
+
+document.getElementById('btn-rech').addEventListener('click', () => {
+  activeFilter = activeFilter === 'rech' ? null : 'rech';
+  document.getElementById('btn-rech').classList.toggle('on', activeFilter === 'rech');
+  document.getElementById('btn-ech').classList.remove('on');
+  applyFilters();
+});
+document.getElementById('btn-ech').addEventListener('click', () => {
+  activeFilter = activeFilter === 'ech' ? null : 'ech';
+  document.getElementById('btn-ech').classList.toggle('on', activeFilter === 'ech');
+  document.getElementById('btn-rech').classList.remove('on');
+  applyFilters();
+});
+
+init();
+</script>
+
+</body>
+</html>

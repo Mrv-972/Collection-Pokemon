@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reliure — le classeur qui échange pour toi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.pokemontcg.io">
+<link rel="preconnect" href="https://images.pokemontcg.io">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B;
+    --ink-soft:#20232A;
+    --paper:#F1EBDC;
+    --paper-line:#D9CFB6;
+    --teal:#1F6F63;
+    --teal-deep:#123F38;
+    --rust:#A8431C;
+    --gold:#C9A227;
+    --text-on-ink:#EDEAE0;
+    --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2,h3{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  /* nav */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;letter-spacing:0.3px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a:hover{color:var(--text-on-ink)}
+  .cta-btn{background:var(--teal);color:#EDF5F3;padding:10px 20px;border-radius:3px;font-size:14px;text-decoration:none;font-weight:500;}
+  .cta-btn:hover{background:var(--teal-deep)}
+  @media(max-width:720px){.navlinks{display:none}}
+
+  /* hero */
+  .hero{padding:88px 0 64px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:56px;align-items:center;}
+  @media(max-width:860px){.hero{grid-template-columns:1fr;padding:56px 0}}
+  .hero h1{font-size:52px;line-height:1.08;letter-spacing:-0.5px;}
+  @media(max-width:640px){.hero h1{font-size:38px}}
+  .hero p{color:var(--text-on-ink-dim);font-size:17px;max-width:44ch;margin:22px 0 30px;}
+  .hero-actions{display:flex;gap:16px;align-items:center;}
+  .link-quiet{font-size:14px;color:var(--text-on-ink-dim);text-decoration:underline;text-underline-offset:3px;}
+
+  /* binder illustration */
+  .binder{background:var(--paper);border-radius:6px;padding:22px;position:relative;box-shadow:0 24px 60px rgba(0,0,0,0.35);}
+  .binder-tabs{position:absolute;left:-14px;top:24px;display:flex;flex-direction:column;gap:10px;}
+  .tab{background:var(--teal-deep);color:#EDF5F3;font-size:11px;padding:5px 10px 5px 8px;border-radius:0 3px 3px 0;writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:0.5px;}
+  .tab.active{background:var(--rust)}
+  .slots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .slot{aspect-ratio:2.5/3.5;background:#fff;border:1px solid var(--paper-line);border-radius:4px;position:relative;display:flex;align-items:center;justify-content:center;}
+  .slot::before{content:'';position:absolute;inset:6px;border:1px dashed #C6BC9F;border-radius:2px;}
+  .slot img{width:100%;height:100%;object-fit:cover;border-radius:4px;position:relative;z-index:1;}
+  .slot.loaded::before{display:none}
+  .stamp{position:absolute;bottom:6px;left:6px;right:6px;font-size:9px;text-align:center;padding:3px 0;border-radius:2px;letter-spacing:0.4px;font-weight:600;}
+  .stamp.rech{background:rgba(168,67,28,0.12);color:var(--rust);border:1px solid rgba(168,67,28,0.35)}
+  .stamp.ech{background:rgba(31,111,99,0.1);color:var(--teal-deep);border:1px solid rgba(31,111,99,0.3)}
+  .glyph{font-family:'Newsreader',serif;font-style:italic;color:#B7AD90;font-size:22px;}
+
+  /* sections */
+  section{padding:72px 0;border-top:1px solid rgba(237,234,224,0.08);}
+  .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
+  .section-head{max-width:56ch;margin-bottom:44px;}
+  .section-head h2{font-size:32px;}
+  .section-head p{color:var(--text-on-ink-dim);margin-top:14px;font-size:16px;}
+
+  /* how it works — real sequence, numbered legitimately */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;}
+  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+  .step{border-left:1px solid rgba(237,234,224,0.15);padding-left:20px;}
+  .step .num{font-family:'Newsreader',serif;font-style:italic;color:var(--gold);font-size:26px;}
+  .step h3{font-size:18px;margin:10px 0 8px;}
+  .step p{color:var(--text-on-ink-dim);font-size:14.5px;}
+
+  /* extensions grid */
+  .ext-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  @media(max-width:760px){.ext-grid{grid-template-columns:repeat(2,1fr)}}
+  .ext-card{display:block;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:20px 18px;transition:border-color .15s;}
+  .ext-card:hover{border-color:rgba(237,234,224,0.25)}
+  .ext-card .count{font-size:13px;color:var(--text-on-ink-dim);}
+  .ext-card h3{font-size:17px;margin:6px 0 4px;font-weight:500;}
+  .ext-card .bar{height:3px;background:rgba(237,234,224,0.08);border-radius:2px;margin-top:14px;overflow:hidden;}
+  .ext-card .fill{height:100%;background:var(--teal);}
+
+  /* matching */
+  .match-wrap{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;}
+  @media(max-width:700px){.match-wrap{grid-template-columns:1fr}}
+  .match-col{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:22px;}
+  .match-col .who{font-size:13px;color:var(--text-on-ink-dim);margin-bottom:12px;}
+  .match-card{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid rgba(237,234,224,0.06);font-size:14.5px;}
+  .match-card:first-of-type{border-top:none}
+  .badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:500;}
+  .badge.rech{background:rgba(168,67,28,0.14);color:#E08862}
+  .badge.ech{background:rgba(31,111,99,0.16);color:#5FBAAA}
+  .swap-icon{font-family:'Newsreader',serif;font-style:italic;font-size:28px;color:var(--gold);text-align:center;}
+
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;display:flex;justify-content:space-between;}
+  @media(max-width:640px){footer{flex-direction:column;gap:10px}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <div class="brand">Reli<span>ure</span></div>
+    <div class="navlinks">
+      <a href="series.html">Extensions</a>
+      <a href="#">Échanges</a>
+      <a href="#">Comment ça marche</a>
+    </div>
+    <a class="cta-btn" href="series.html">Créer mon classeur</a>
+  </nav>
+
+  <div class="hero">
+    <div>
+      <h1>Ton classeur de cartes, prêt à être échangé.</h1>
+      <p>Range ta collection Pokémon extension par extension, marque ce que tu cherches et ce que tu peux céder — Reliure trouve les collectionneurs avec qui échanger, automatiquement.</p>
+      <div class="hero-actions">
+        <a class="cta-btn" href="series.html">Créer mon classeur</a>
+        <a class="link-quiet" href="extension.html?set=sv3pt5">Voir une collection type</a>
+      </div>
+    </div>
+    <div class="binder">
+      <div class="binder-tabs">
+        <div class="tab active">151</div>
+        <div class="tab">EV</div>
+        <div class="tab">OBF</div>
+      </div>
+      <div class="slots" id="hero-slots">
+        <div class="slot"><span class="glyph">···</span></div>
+        <div class="slot"><span class="glyph">···</span></div>
+        <div class="slot"><span class="glyph">···</span></div>
+        <div class="slot"><span class="glyph">···</span></div>
+        <div class="slot"><span class="glyph">···</span></div>
+        <div class="slot"><span class="glyph">···</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Comment ça marche</div>
+      <h2>Trois étapes, un classeur qui travaille pour toi</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Range ta collection</h3>
+        <p>Ajoute tes cartes par extension, comme dans un vrai classeur — recherche rapide par nom ou numéro.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>Marque tes intentions</h3>
+        <p>Tague chaque carte en recherchée ou échangeable. Une carte peut être les deux à la fois.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>Reçois tes matchs</h3>
+        <p>Dès qu'un échange équilibré existe entre deux collectionneurs, Reliure vous met en relation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Parcourir</div>
+      <h2>Toutes les extensions, classées comme sur l'étagère</h2>
+      <p>Chaque extension a sa propre page de classeur, avec l'avancement de ta collection en un coup d'œil.</p>
+    </div>
+    <div class="ext-grid">
+      <a class="ext-card" href="extension.html?set=sv3pt5"><div class="count">142 / 165</div><h3>151</h3><div class="bar"><div class="fill" style="width:86%"></div></div></a>
+      <a class="ext-card" href="extension.html?set=sv1"><div class="count">58 / 197</div><h3>Écarlate et Violet</h3><div class="bar"><div class="fill" style="width:29%"></div></div></a>
+      <a class="ext-card" href="extension.html?set=sv3"><div class="count">91 / 197</div><h3>Obsidian Flames</h3><div class="bar"><div class="fill" style="width:46%"></div></div></a>
+      <a class="ext-card" href="extension.html?set=sv2"><div class="count">12 / 165</div><h3>Évolutions à Paldea</h3><div class="bar"><div class="fill" style="width:7%"></div></div></a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div class="kicker">Mise en relation</div>
+      <h2>L'échange se prépare tout seul</h2>
+      <p>Reliure croise les classeurs de tous les collectionneurs et propose des échanges où les deux parties sortent gagnantes.</p>
+    </div>
+    <div class="match-wrap">
+      <div class="match-col">
+        <div class="who">Ton classeur</div>
+        <div class="match-card">Dracaufeu ex <span class="badge rech">recherchée</span></div>
+        <div class="match-card">Pikachu VMAX <span class="badge ech">échangeable</span></div>
+      </div>
+      <div class="swap-icon">⇄</div>
+      <div class="match-col">
+        <div class="who">Classeur de Léa_92</div>
+        <div class="match-card">Dracaufeu ex <span class="badge ech">échangeable</span></div>
+        <div class="match-card">Pikachu VMAX <span class="badge rech">recherchée</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>Reliure — projet de prototype, non affilié à The Pokémon Company.</span>
+    <span>Fait pour les collectionneurs.</span>
+  </footer>
+</div>
+
+<script>
+// Charge de vraies cartes depuis l'API publique pokemontcg.io (images hébergées par eux,
+// pas par ce prototype — voir https://pokemontcg.io). Aucune image n'est stockée ici.
+async function loadHeroCards(){
+  const slotsEl = document.getElementById('hero-slots');
+  const tags = ['rech', null, 'ech', null, 'ech', 'rech']; // démo de tagging
+  const cached = sessionStorage.getItem('reliure_hero_cards');
+  if(cached){ renderHeroCards(JSON.parse(cached), tags); return; }
+  try{
+    const res = await fetch('https://api.pokemontcg.io/v2/cards?q=set.id:sv3pt5&pageSize=6&orderBy=number');
+    const json = await res.json();
+    const cards = json.data || [];
+    sessionStorage.setItem('reliure_hero_cards', JSON.stringify(cards));
+    renderHeroCards(cards, tags);
+  }catch(err){
+    // Si l'API est injoignable (ex: hors-ligne), on garde les emplacements vides plutôt que planter.
+    console.warn('Impossible de charger les cartes depuis pokemontcg.io', err);
+  }
+}
+function renderHeroCards(cards, tags){
+  const slotsEl = document.getElementById('hero-slots');
+  slotsEl.innerHTML = cards.map((card, i) => {
+    const tag = tags[i];
+    const stamp = tag ? `<div class="stamp ${tag}">${tag === 'rech' ? 'recherchée' : 'échangeable'}</div>` : '';
+    return `<div class="slot loaded">
+      <img src="${card.images.small}" alt="${card.name}" loading="lazy">
+      ${stamp}
+    </div>`;
+  }).join('');
+}
+loadHeroCards();
+</script>
+
+</body>
+</html>
