@@ -150,9 +150,11 @@ async function loadSets(){
   }
 }
 
-// Les sigles d'extension ne sont pas tous disponibles au même format : on
-// tente le PNG, puis le WebP, avant d'abandonner. Un sigle absent disparaît
-// sans laisser de trou, contrairement au logo qui, lui, est signalé.
+// L'API range les sigles sous un segment "univ", mais les fichiers ne s'y
+// trouvent que pour les extensions les plus récentes : partout ailleurs ils
+// sont rangés par langue. On tente donc la version française, puis l'adresse
+// telle que fournie. Un sigle absent disparaît sans laisser de trou,
+// contrairement au logo qui, lui, est signalé.
 function symbolFallback(img){
   const fallback = img.dataset.fallback;
   if(fallback){
@@ -205,7 +207,7 @@ function renderSets(sets){
             ? `<img class="logo" src="${s.logo}.png" alt="${s.name}" loading="lazy" data-fallback="images/sets/${s.id}.png" onerror="setLogoFallback(this)">`
             : `<img class="logo" src="images/sets/${s.id}.png" alt="${s.name}" loading="lazy" onerror="setLogoFallback(this)">`}
           ${s.symbol
-            ? `<img class="symbol" src="${s.symbol}.png" data-fallback="${s.symbol}.webp" alt="Symbole de ${s.name}" title="Symbole de l'extension" loading="lazy" onerror="symbolFallback(this)">`
+            ? `<img class="symbol" src="${s.symbol.replace('/univ/', '/fr/')}.png" data-fallback="${s.symbol}.png" alt="Symbole de ${s.name}" title="Symbole de l'extension" loading="lazy" onerror="symbolFallback(this)">`
             : ''}
         </div>
         <div class="set-name">${s.name}</div>
