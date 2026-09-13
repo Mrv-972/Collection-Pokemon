@@ -1,4 +1,4 @@
--- Schéma de la base Reliure.
+-- Schéma de la base PokéClasseur.
 -- À coller dans l'éditeur SQL de Supabase, puis exécuter (bouton "Run").
 -- Le script peut être relancé sans risque : il ne détruit rien.
 

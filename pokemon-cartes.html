@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pokémon — Reliure</title>
+<title>Pokémon — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -89,7 +89,7 @@
 
 <div class="wrap">
   <nav>
-    <a class="brand" href="pokecollection-prototype.html">Reli<span>ure</span></a>
+    <a class="brand" href="pokecollection-prototype.html">Poké<span>Classeur</span></a>
     <div class="navlinks">
       <a href="series.html">Par extension</a>
       <a href="pokemon.html" class="active">Par Pokémon</a>
@@ -127,7 +127,7 @@
     </div>
   </div>
 
-  <footer>Reliure — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
+  <footer>PokéClasseur — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
 </div>
 
 <script src="pokedex-fr.js"></script>
@@ -171,7 +171,7 @@ function generationOf(dexId){
 function renderHead(cardCount){
   const name = POKEDEX_FR[dexId - 1] || `Pokémon n°${dexId}`;
   const generation = generationOf(dexId);
-  document.title = `${name} — Reliure`;
+  document.title = `${name} — PokéClasseur`;
   const meta = [
     `N°${String(dexId).padStart(4, '0')}`,
     generation ? `Génération ${generation.gen} — ${generation.region}` : '',
@@ -193,7 +193,7 @@ function renderHead(cardCount){
 // nom de leur extension. Il se déduit de l'identifiant de la carte, croisé
 // avec le catalogue des extensions.
 async function loadSetNames(){
-  const cacheKey = 'reliure_sets_tcgdex';
+  const cacheKey = 'pokeclasseur_sets_tcgdex';
   let sets;
   try{
     const cached = sessionStorage.getItem(cacheKey);
@@ -243,7 +243,7 @@ function applyFilters(){
 }
 
 async function loadRarities(){
-  const byCardId = await probeRarities(`dexId=eq:${dexId}`, `reliure_rar_dex_${dexId}`, allCards);
+  const byCardId = await probeRarities(`dexId=eq:${dexId}`, `pokeclasseur_rar_dex_${dexId}`, allCards);
   if(!byCardId) return;
   allCards.forEach(c => { c.rarity = byCardId[c.id]; });
   populateRarityFilter(allCards);

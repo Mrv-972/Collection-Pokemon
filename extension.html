@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Extension — Reliure</title>
+<title>Extension — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -86,7 +86,7 @@
 
 <div class="wrap">
   <nav>
-    <a class="brand" href="pokecollection-prototype.html">Reli<span>ure</span></a>
+    <a class="brand" href="pokecollection-prototype.html">Poké<span>Classeur</span></a>
     <div class="navlinks">
       <a href="series.html" class="active">Par extension</a>
       <a href="pokemon.html">Par Pokémon</a>
@@ -125,7 +125,7 @@
     </div>
   </div>
 
-  <footer>Reliure — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
+  <footer>PokéClasseur — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
 </div>
 
 <script src="supabase-config.js"></script>
@@ -147,7 +147,7 @@ let activeFilter = null; // un des FILTERS, ou null
 const FILTERS = ['obt', 'manq', 'rech', 'ech'];
 
 async function loadRarities(){
-  const byCardId = await probeRarities(`set.id=eq:${setId}`, `reliure_rar_${setId}`, allCards);
+  const byCardId = await probeRarities(`set.id=eq:${setId}`, `pokeclasseur_rar_${setId}`, allCards);
   if(!byCardId) return;
   allCards.forEach(c => { c.rarity = byCardId[c.id]; });
   populateRarityFilter(allCards);
@@ -175,7 +175,7 @@ async function init(){
   });
 
   // Cache local : ré-ouvrir la même extension est instantané, on revérifie en arrière-plan.
-  const cacheKey = `reliure_ext_${setId}`;
+  const cacheKey = `pokeclasseur_ext_${setId}`;
   const cached = sessionStorage.getItem(cacheKey);
   if(cached){
     const data = JSON.parse(cached);

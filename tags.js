@@ -10,7 +10,7 @@ const TAG_META = {
   ech:  { emoji: '🔁', label: 'Échangeable' },
 };
 
-const TAG_STORAGE_KEY = 'reliure_tags';
+const TAG_STORAGE_KEY = 'pokeclasseur_tags';
 const tagState = {}; // { [cardId]: { obt: bool, rech: bool, ech: bool } }
 
 const emptyTagState = () => ({ obt:false, rech:false, ech:false });
@@ -19,29 +19,9 @@ function loadTags(){
   try{
     const saved = localStorage.getItem(TAG_STORAGE_KEY);
     if(saved) Object.assign(tagState, JSON.parse(saved));
-    adoptTagsStoredByExtension();
   }catch(err){
     // Navigation privée ou stockage refusé : on continue sans tags sauvegardés.
   }
-}
-
-// Les tags étaient d'abord rangés extension par extension. On les rapatrie
-// une bonne fois dans le stockage commun pour ne rien perdre.
-function adoptTagsStoredByExtension(){
-  const oldKeys = Object.keys(localStorage).filter(k => k.startsWith(TAG_STORAGE_KEY + '_'));
-  if(oldKeys.length === 0) return;
-  oldKeys.forEach(key => {
-    try{
-      const byCardId = JSON.parse(localStorage.getItem(key));
-      Object.entries(byCardId).forEach(([cardId, state]) => {
-        if(!tagState[cardId]) tagState[cardId] = { ...emptyTagState(), ...state };
-      });
-    }catch(err){
-      // Entrée illisible : on l'ignore plutôt que d'interrompre le chargement.
-    }
-    localStorage.removeItem(key);
-  });
-  saveTags();
 }
 
 function saveTags(){

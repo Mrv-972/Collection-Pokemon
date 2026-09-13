@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Échanges — Reliure</title>
+<title>Échanges — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -81,7 +81,7 @@
 
 <div class="wrap">
   <nav>
-    <a class="brand" href="pokecollection-prototype.html">Reli<span>ure</span></a>
+    <a class="brand" href="pokecollection-prototype.html">Poké<span>Classeur</span></a>
     <div class="navlinks">
       <a href="series.html">Par extension</a>
       <a href="pokemon.html">Par Pokémon</a>
@@ -93,7 +93,7 @@
   <div class="page-head">
     <div class="kicker">Mise en relation</div>
     <h1>Les échanges possibles</h1>
-    <p>Reliure croise ton classeur avec celui des autres membres : dès que quelqu'un propose une carte que tu cherches, ou cherche une carte que tu proposes, il apparaît ici.</p>
+    <p>PokéClasseur croise ton classeur avec celui des autres membres : dès que quelqu'un propose une carte que tu cherches, ou cherche une carte que tu proposes, il apparaît ici.</p>
   </div>
 
   <div class="filtres" id="filtres" hidden>
@@ -103,7 +103,7 @@
 
   <div id="content"></div>
 
-  <footer>Reliure — cartes et images fournies en direct par l'API TCGdex. Projet non affilié à The Pokémon Company.</footer>
+  <footer>PokéClasseur — cartes et images fournies en direct par l'API TCGdex. Projet non affilié à The Pokémon Company.</footer>
 </div>
 
 <script src="supabase-config.js"></script>
@@ -142,7 +142,7 @@ async function chargerInfosCartes(idsCartes){
   }));
 
   try{
-    const cached = sessionStorage.getItem('reliure_sets_tcgdex');
+    const cached = sessionStorage.getItem('pokeclasseur_sets_tcgdex');
     const sets = cached ? JSON.parse(cached) : await fetchJson('https://api.tcgdex.net/v2/fr/sets');
     sets.forEach(s => { nomsExtensions[s.id] = s.name; });
   }catch(err){

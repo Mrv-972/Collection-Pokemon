@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Par extension — Reliure</title>
+<title>Par extension — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -72,7 +72,7 @@
 
 <div class="wrap">
   <nav>
-    <a class="brand" href="pokecollection-prototype.html">Reli<span>ure</span></a>
+    <a class="brand" href="pokecollection-prototype.html">Poké<span>Classeur</span></a>
     <div class="navlinks">
       <a href="#" class="active">Par extension</a>
       <a href="pokemon.html">Par Pokémon</a>
@@ -98,7 +98,7 @@
     </div>
   </div>
 
-  <footer>Reliure — données d'extensions fournies en direct par l'API TCGdex. Projet non affilié à The Pokémon Company.</footer>
+  <footer>PokéClasseur — données d'extensions fournies en direct par l'API TCGdex. Projet non affilié à The Pokémon Company.</footer>
 </div>
 
 <script src="supabase-config.js"></script>
@@ -129,7 +129,7 @@ async function loadSets(){
 
   // Affichage instantané depuis le cache local si on l'a déjà chargé une fois,
   // pendant qu'on vérifie en arrière-plan s'il y a du nouveau.
-  const cached = sessionStorage.getItem('reliure_sets_tcgdex');
+  const cached = sessionStorage.getItem('pokeclasseur_sets_tcgdex');
   if(cached){
     allSets = JSON.parse(cached);
     renderSets(allSets);
@@ -144,7 +144,7 @@ async function loadSets(){
     // L'API renvoie les extensions de la plus ancienne à la plus récente ;
     // on inverse pour afficher les plus récentes en premier.
     allSets = physicalOnly.reverse();
-    sessionStorage.setItem('reliure_sets_tcgdex', JSON.stringify(allSets));
+    sessionStorage.setItem('pokeclasseur_sets_tcgdex', JSON.stringify(allSets));
     renderSets(allSets);
   }catch(err){
     console.warn('Impossible de charger les extensions', err);

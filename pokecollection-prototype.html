@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reliure — le classeur qui échange pour toi</title>
+<title>PokéClasseur — le classeur qui échange pour toi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -108,7 +108,7 @@
 
 <div class="wrap">
   <nav>
-    <div class="brand">Reli<span>ure</span></div>
+    <div class="brand">Poké<span>Classeur</span></div>
     <div class="navlinks">
       <a href="series.html">Par extension</a>
       <a href="pokemon.html">Par Pokémon</a>
@@ -120,7 +120,7 @@
   <div class="hero">
     <div>
       <h1>Ton classeur de cartes, prêt à être échangé.</h1>
-      <p>Range ta collection Pokémon extension par extension, marque ce que tu cherches et ce que tu peux céder — Reliure trouve les collectionneurs avec qui échanger, automatiquement.</p>
+      <p>Range ta collection Pokémon extension par extension, marque ce que tu cherches et ce que tu peux céder — PokéClasseur trouve les collectionneurs avec qui échanger, automatiquement.</p>
       <div class="hero-actions">
         <a class="cta-btn" href="series.html">Créer mon classeur</a>
         <a class="link-quiet" href="extension.html?set=sv03.5">Voir une collection type</a>
@@ -164,7 +164,7 @@
       <div class="step">
         <div class="num">3</div>
         <h3>Reçois tes matchs</h3>
-        <p>Dès qu'un échange équilibré existe entre deux collectionneurs, Reliure vous met en relation.</p>
+        <p>Dès qu'un échange équilibré existe entre deux collectionneurs, PokéClasseur vous met en relation.</p>
       </div>
     </div>
   </div>
@@ -191,7 +191,7 @@
     <div class="section-head">
       <div class="kicker">Mise en relation</div>
       <h2>L'échange se prépare tout seul</h2>
-      <p>Reliure croise les classeurs de tous les collectionneurs et propose des échanges où les deux parties sortent gagnantes.</p>
+      <p>PokéClasseur croise les classeurs de tous les collectionneurs et propose des échanges où les deux parties sortent gagnantes.</p>
     </div>
     <div class="match-wrap">
       <div class="match-col">
@@ -211,7 +211,7 @@
 
 <div class="wrap">
   <footer>
-    <span>Reliure — projet de prototype, non affilié à The Pokémon Company.</span>
+    <span>PokéClasseur — projet de prototype, non affilié à The Pokémon Company.</span>
     <span>Fait pour les collectionneurs.</span>
   </footer>
 </div>
@@ -224,12 +224,12 @@
 async function loadHeroCards(){
   const slotsEl = document.getElementById('hero-slots');
   const tags = ['rech', null, 'ech', null, 'ech', 'rech']; // démo de tagging
-  const cached = sessionStorage.getItem('reliure_hero_cards');
+  const cached = sessionStorage.getItem('pokeclasseur_hero_cards');
   if(cached){ renderHeroCards(JSON.parse(cached), tags); return; }
   try{
     const res = await fetch('https://api.tcgdex.net/v2/fr/cards?set.id=eq:sv03.5');
     const cards = (await res.json()).slice(0, 6);
-    sessionStorage.setItem('reliure_hero_cards', JSON.stringify(cards));
+    sessionStorage.setItem('pokeclasseur_hero_cards', JSON.stringify(cards));
     renderHeroCards(cards, tags);
   }catch(err){
     // Si l'API est injoignable (ex: hors-ligne), on garde les emplacements vides plutôt que planter.
