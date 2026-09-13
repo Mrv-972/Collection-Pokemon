@@ -150,6 +150,19 @@ async function loadSets(){
   }
 }
 
+// Les sigles d'extension ne sont pas tous disponibles au même format : on
+// tente le PNG, puis le WebP, avant d'abandonner. Un sigle absent disparaît
+// sans laisser de trou, contrairement au logo qui, lui, est signalé.
+function symbolFallback(img){
+  const fallback = img.dataset.fallback;
+  if(fallback){
+    img.removeAttribute('data-fallback');
+    img.src = fallback;
+    return;
+  }
+  img.remove();
+}
+
 // Quand TCGdex n'a pas le logo français d'une extension, on retombe sur une
 // image ajoutée à la main dans le dépôt (images/sets/<id de l'extension>.png).
 function setLogoFallback(img){
@@ -192,7 +205,7 @@ function renderSets(sets){
             ? `<img class="logo" src="${s.logo}.png" alt="${s.name}" loading="lazy" data-fallback="images/sets/${s.id}.png" onerror="setLogoFallback(this)">`
             : `<img class="logo" src="images/sets/${s.id}.png" alt="${s.name}" loading="lazy" onerror="setLogoFallback(this)">`}
           ${s.symbol
-            ? `<img class="symbol" src="${s.symbol}.png" alt="Symbole de ${s.name}" title="Symbole de l'extension" loading="lazy" onerror="this.remove()">`
+            ? `<img class="symbol" src="${s.symbol}.png" data-fallback="${s.symbol}.webp" alt="Symbole de ${s.name}" title="Symbole de l'extension" loading="lazy" onerror="symbolFallback(this)">`
             : ''}
         </div>
         <div class="set-name">${s.name}</div>
