@@ -131,6 +131,7 @@
 </div>
 
 <script src="pokedex-fr.js"></script>
+<script src="sets.js"></script>
 <script src="tags.js"></script>
 <script src="cards.js"></script>
 <script>
@@ -266,10 +267,13 @@ async function init(){
   loadTags();
 
   try{
-    const [cards] = await Promise.all([
+    const [allResults] = await Promise.all([
       fetchJson(`https://api.tcgdex.net/v2/fr/cards?dexId=eq:${dexId}`),
       loadSetNames(),
     ]);
+    // La recherche par numéro de Pokédex ramène aussi les cartes du jeu
+    // mobile Pokémon TCG Pocket, hors périmètre pour l'instant.
+    const cards = allResults.filter(c => !isPocketSet(setIdOfCard(c.id)));
     // De la carte la plus récente à la plus ancienne.
     cards.sort((a, b) =>
       (setOrder[setIdOfCard(b.id)] ?? -1) - (setOrder[setIdOfCard(a.id)] ?? -1)

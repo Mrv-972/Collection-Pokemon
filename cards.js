@@ -101,7 +101,11 @@ async function probeRarities(scopeQuery, cacheKey, cards){
   if(cached) return JSON.parse(cached);
 
   const byCardId = {};
-  let remaining = cards.length;
+  // La recherche peut renvoyer des cartes absentes de la grille (celles de
+  // Pokémon TCG Pocket, par exemple) : on ne compte que celles affichées,
+  // sinon on s'arrêterait avant d'avoir la rareté de toutes.
+  const wanted = new Set(cards.map(c => c.id));
+  let remaining = wanted.size;
   // Par lots, pour ne pas saturer le navigateur ni l'API.
   for(let i = 0; i < RARITIES_TO_PROBE.length && remaining > 0; i += 5){
     const batch = RARITIES_TO_PROBE.slice(i, i + 5);
@@ -122,7 +126,7 @@ async function probeRarities(scopeQuery, cacheKey, cards){
     }
     results.forEach(({ rarity, cards: matched }) => {
       matched.forEach(c => {
-        if(!byCardId[c.id]){ byCardId[c.id] = rarity; remaining--; }
+        if(wanted.has(c.id) && !byCardId[c.id]){ byCardId[c.id] = rarity; remaining--; }
       });
     });
   }
