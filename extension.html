@@ -52,7 +52,7 @@
   .card-tile{display:flex;flex-direction:column;gap:8px;}
   .card-img-wrap{position:relative;aspect-ratio:2.5/3.5;border-radius:6px;overflow:hidden;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);display:flex;align-items:center;justify-content:center;}
   .card-img-wrap img{width:100%;height:100%;object-fit:cover;}
-  .card-img-wrap .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:20px;}
+  .card-img-wrap .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:44px;line-height:1;}
   .card-num{font-size:11px;color:var(--text-on-ink-dim);display:flex;justify-content:space-between;align-items:center;}
   .rarity-symbol{color:var(--gold);letter-spacing:1px;}
   .card-name{font-size:13px;font-weight:500;}
@@ -271,7 +271,7 @@ function cardImgFallback(img){
     img.src = fallback;
     return;
   }
-  img.replaceWith(Object.assign(document.createElement('span'), { className: 'glyph', textContent: '···' }));
+  img.replaceWith(Object.assign(document.createElement('span'), { className: 'glyph', textContent: '?', title: 'Image non disponible' }));
 }
 
 function renderCards(cards){
