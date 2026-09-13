@@ -6,8 +6,8 @@
 <title>Toutes les séries — Reliure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://api.pokemontcg.io">
-<link rel="preconnect" href="https://images.pokemontcg.io">
+<link rel="preconnect" href="https://api.tcgdex.net">
+<link rel="preconnect" href="https://assets.tcgdex.net">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -96,48 +96,27 @@
     </div>
   </div>
 
-  <footer>Reliure — données d'extensions fournies en direct par l'API pokemontcg.io. Projet non affilié à The Pokémon Company.</footer>
+  <footer>Reliure — données d'extensions fournies en direct par l'API TCGdex. Projet non affilié à The Pokémon Company.</footer>
 </div>
 
 <script>
-// Récupère la liste complète des extensions depuis l'API publique pokemontcg.io,
-// puis les regroupe par série (Écarlate et Violet, Épée et Bouclier, etc.)
-// Les logos/symboles affichés sont hébergés par pokemontcg.io, rien n'est stocké ici.
+// Récupère la liste complète des extensions depuis l'API publique et gratuite
+// TCGdex (aucune clé requise), puis les regroupe par série (Écarlate et
+// Violet, Épée et Bouclier, etc.). Les logos affichés sont hébergés par
+// TCGdex, rien n'est stocké ici.
 let allSets = [];
 
-// Clé API pokemontcg.io (facultative). Sans clé, l'API limite le nombre de
-// requêtes par minute ; avec une clé gratuite (https://pokemontcg.io/), la
-// limite est beaucoup plus haute. Colle ta clé entre les guillemets si tu en as une.
-const API_KEY = '';
-
 async function fetchJson(url, retries = 1){
-  const res = await fetch(url, API_KEY ? { headers: { 'X-Api-Key': API_KEY } } : undefined);
+  const res = await fetch(url);
   const text = await res.text();
   if(!res.ok || !text){
     if(retries > 0){
       await new Promise(r => setTimeout(r, 1200));
       return fetchJson(url, retries - 1);
     }
-    throw new Error(`Réponse vide ou erreur HTTP ${res.status} — probablement la limite de débit de l'API publique (sans clé) temporairement atteinte.`);
+    throw new Error(`Réponse vide ou erreur HTTP ${res.status}.`);
   }
   return JSON.parse(text);
-}
-
-// Récupère TOUTES les pages de résultats (l'API en pokemontcg.io limite chaque
-// réponse à 250 éléments) pour être sûr de ne jamais manquer une extension.
-async function fetchAllPages(baseUrl){
-  const pageSize = 250;
-  let page = 1;
-  let all = [];
-  while(true){
-    const sep = baseUrl.includes('?') ? '&' : '?';
-    const json = await fetchJson(`${baseUrl}${sep}page=${page}&pageSize=${pageSize}`);
-    const data = json.data || [];
-    all = all.concat(data);
-    if(data.length < pageSize) break;
-    page++;
-  }
-  return all;
 }
 
 async function loadSets(){
@@ -145,15 +124,18 @@ async function loadSets(){
 
   // Affichage instantané depuis le cache local si on l'a déjà chargé une fois,
   // pendant qu'on vérifie en arrière-plan s'il y a du nouveau.
-  const cached = sessionStorage.getItem('reliure_sets');
+  const cached = sessionStorage.getItem('reliure_sets_tcgdex');
   if(cached){
     allSets = JSON.parse(cached);
     renderSets(allSets);
   }
 
   try{
-    allSets = await fetchAllPages('https://api.pokemontcg.io/v2/sets?orderBy=-releaseDate');
-    sessionStorage.setItem('reliure_sets', JSON.stringify(allSets));
+    const sets = await fetchJson('https://api.tcgdex.net/v2/fr/sets');
+    // Tri du plus récent au plus ancien, quand la date de sortie est fournie.
+    sets.sort((a, b) => (b.releaseDate || '').localeCompare(a.releaseDate || ''));
+    allSets = sets;
+    sessionStorage.setItem('reliure_sets_tcgdex', JSON.stringify(allSets));
     renderSets(allSets);
   }catch(err){
     console.warn('Impossible de charger les extensions', err);
@@ -165,8 +147,9 @@ function groupBySeries(sets){
   const groups = {};
   const order = [];
   sets.forEach(s => {
-    if(!groups[s.series]){ groups[s.series] = []; order.push(s.series); }
-    groups[s.series].push(s);
+    const seriesName = s.serie?.name || 'Autres';
+    if(!groups[seriesName]){ groups[seriesName] = []; order.push(seriesName); }
+    groups[seriesName].push(s);
   });
   return { groups, order };
 }
@@ -180,16 +163,20 @@ function renderSets(sets){
   const { groups, order } = groupBySeries(sets);
   content.innerHTML = order.map(seriesName => {
     const setsInSeries = groups[seriesName];
-    const cards = setsInSeries.map(s => `
+    const cards = setsInSeries.map(s => {
+      const year = s.releaseDate ? new Date(s.releaseDate).getFullYear() : '';
+      const total = s.cardCount?.official ?? s.cardCount?.total ?? '?';
+      return `
       <a class="set-card" href="extension.html?set=${s.id}">
-        <div class="set-logo"><img src="${s.images?.logo || ''}" alt="${s.name}" loading="lazy" onerror="this.style.display='none'"></div>
+        <div class="set-logo"><img src="${s.logo ? s.logo + '.png' : ''}" alt="${s.name}" loading="lazy" onerror="this.style.display='none'"></div>
         <div class="set-name">${s.name}</div>
         <div class="set-meta">
-          <span>${new Date(s.releaseDate).getFullYear()}</span>
-          <span class="tag-count">${s.total} cartes</span>
+          <span>${year}</span>
+          <span class="tag-count">${total} cartes</span>
         </div>
       </a>
-    `).join('');
+    `;
+    }).join('');
     return `
       <div class="series-block">
         <div class="series-title">

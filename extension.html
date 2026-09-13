@@ -6,8 +6,8 @@
 <title>Extension — Reliure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://api.pokemontcg.io">
-<link rel="preconnect" href="https://images.pokemontcg.io">
+<link rel="preconnect" href="https://api.tcgdex.net">
+<link rel="preconnect" href="https://assets.tcgdex.net">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -105,23 +105,19 @@
     </div>
   </div>
 
-  <footer>Reliure — cartes et images fournies en direct par l'API pokemontcg.io. Tes tags sont sauvegardés pour de vrai, tant que tu ouvres cette page dans Claude.</footer>
+  <footer>Reliure — cartes et images fournies en direct par l'API TCGdex. Tes tags sont sauvegardés pour de vrai, tant que tu ouvres cette page dans Claude.</footer>
 </div>
 
 <script>
-// Récupère les cartes d'une extension depuis l'API pokemontcg.io, à partir de l'id
-// passé dans l'URL (?set=sv3pt5). Les images restent hébergées par pokemontcg.io.
+// Récupère les cartes d'une extension depuis l'API publique et gratuite
+// TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
+// Les images restent hébergées par TCGdex.
 const params = new URLSearchParams(window.location.search);
 const setId = params.get('set') || 'sv3pt5'; // "151" par défaut si aucune extension choisie
 
 let allCards = [];
 const tagState = {}; // { [cardId]: { rech: bool, ech: bool } }
 let activeFilter = null; // 'rech' | 'ech' | null
-
-// Clé API pokemontcg.io (facultative). Sans clé, l'API limite le nombre de
-// requêtes par minute ; avec une clé gratuite (https://pokemontcg.io/), la
-// limite est beaucoup plus haute. Colle ta clé entre les guillemets si tu en as une.
-const API_KEY = '';
 
 // Symboles officiels (ou les plus proches équivalents) utilisés sur les cartes imprimées.
 // Certaines raretés récentes (Illustration Rare, Hyper Rare...) n'ont pas de symbole
@@ -163,8 +159,8 @@ function raritySymbol(rarity){
   if(/secret|rainbow|hyper/i.test(rarity)) return '★★★★';
   if(/ultra|illustration/i.test(rarity)) return '★★★';
   if(/holo|rare/i.test(rarity)) return '★';
-  if(/uncommon/i.test(rarity)) return '◆';
-  if(/common/i.test(rarity)) return '●';
+  if(/peu commune|uncommon/i.test(rarity)) return '◆';
+  if(/commune|common/i.test(rarity)) return '●';
   return '✦';
 }
 
@@ -180,34 +176,16 @@ function populateRarityFilter(cards){
 }
 
 async function fetchJson(url, retries = 1){
-  const res = await fetch(url, API_KEY ? { headers: { 'X-Api-Key': API_KEY } } : undefined);
+  const res = await fetch(url);
   const text = await res.text();
   if(!res.ok || !text){
     if(retries > 0){
       await new Promise(r => setTimeout(r, 1200));
       return fetchJson(url, retries - 1);
     }
-    throw new Error(`Réponse vide ou erreur HTTP ${res.status} — probablement la limite de débit de l'API publique (sans clé) temporairement atteinte.`);
+    throw new Error(`Réponse vide ou erreur HTTP ${res.status}.`);
   }
   return JSON.parse(text);
-}
-
-// Récupère TOUTES les pages de résultats (l'API limite chaque réponse à 250
-// éléments) pour être sûr de charger toutes les cartes, même sur les très
-// grosses extensions.
-async function fetchAllPages(baseUrl){
-  const pageSize = 250;
-  let page = 1;
-  let all = [];
-  while(true){
-    const sep = baseUrl.includes('?') ? '&' : '?';
-    const json = await fetchJson(`${baseUrl}${sep}page=${page}&pageSize=${pageSize}`);
-    const data = json.data || [];
-    all = all.concat(data);
-    if(data.length < pageSize) break;
-    page++;
-  }
-  return all;
 }
 
 async function init(){
@@ -238,15 +216,16 @@ async function init(){
   })();
 
   try{
-    const [setJson, cards] = await Promise.all([
-      fetchJson(`https://api.pokemontcg.io/v2/sets/${setId}`),
-      fetchAllPages(`https://api.pokemontcg.io/v2/cards?q=set.id:${setId}&orderBy=number`)
+    const [set, cards] = await Promise.all([
+      fetchJson(`https://api.tcgdex.net/v2/fr/sets/${setId}`),
+      fetchJson(`https://api.tcgdex.net/v2/fr/cards?set.id=eq:${setId}`)
     ]);
-    renderHead(setJson.data);
+    cards.sort((a, b) => (a.localId || '').localeCompare(b.localId || '', undefined, { numeric: true }));
+    renderHead(set);
     allCards = cards;
     populateRarityFilter(allCards);
     renderCards(allCards);
-    sessionStorage.setItem(cacheKey, JSON.stringify({ set: setJson.data, cards: allCards }));
+    sessionStorage.setItem(cacheKey, JSON.stringify({ set, cards: allCards }));
   }catch(err){
     console.warn("Impossible de charger l'extension", err);
     if(!cached){
@@ -258,11 +237,14 @@ async function init(){
 
 function renderHead(set){
   if(!set) return;
+  const year = set.releaseDate ? new Date(set.releaseDate).getFullYear() : '';
+  const total = set.cardCount?.official ?? set.cardCount?.total ?? '?';
+  const serie = set.serie?.name || '';
   document.getElementById('page-head').innerHTML = `
-    <img src="${set.images?.logo || ''}" alt="${set.name}" onerror="this.style.display='none'">
+    <img src="${set.logo ? set.logo + '.png' : ''}" alt="${set.name}" onerror="this.style.display='none'">
     <div>
       <h1>${set.name}</h1>
-      <div class="meta">${set.series} · ${new Date(set.releaseDate).getFullYear()} · ${set.total} cartes</div>
+      <div class="meta">${[serie, year, total + ' cartes'].filter(Boolean).join(' · ')}</div>
     </div>
   `;
 }
@@ -278,9 +260,9 @@ function renderCards(cards){
     return `
       <div class="card-tile">
         <div class="card-img-wrap">
-          <img src="${c.images.small}" alt="${c.name}" loading="lazy">
+          <img src="${c.image ? c.image + '/low.webp' : ''}" alt="${c.name}" loading="lazy">
         </div>
-        <div class="card-num"><span>#${c.number}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
+        <div class="card-num"><span>#${c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
         <div class="card-name">${c.name}</div>
         <div class="tag-row">
           <button class="tag-toggle rech ${state.rech ? 'active' : ''}" data-id="${c.id}" data-tag="rech">Recherchée</button>
@@ -325,7 +307,7 @@ function applyFilters(){
   const q = document.getElementById('filter-input').value.trim().toLowerCase();
   const rarity = document.getElementById('rarity-filter').value;
   let filtered = allCards;
-  if(q) filtered = filtered.filter(c => c.name.toLowerCase().includes(q) || c.number.includes(q));
+  if(q) filtered = filtered.filter(c => c.name.toLowerCase().includes(q) || (c.localId || '').includes(q));
   if(rarity) filtered = filtered.filter(c => c.rarity === rarity);
   if(activeFilter) filtered = filtered.filter(c => tagState[c.id]?.[activeFilter]);
   renderCards(filtered);
