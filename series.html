@@ -158,9 +158,13 @@ async function loadSets(){
 
   try{
     const sets = await fetchJson('https://api.tcgdex.net/v2/fr/sets');
+    // On exclut pour l'instant les extensions de Pokémon TCG Pocket (le jeu
+    // mobile, distinct du jeu de cartes physique) — à réintroduire plus tard
+    // dans une page dédiée séparée.
+    const physicalOnly = sets.filter(s => guessSeriesName(s.id) !== 'Pokémon TCG Pocket');
     // L'API renvoie les extensions de la plus ancienne à la plus récente ;
     // on inverse pour afficher les plus récentes en premier.
-    allSets = sets.reverse();
+    allSets = physicalOnly.reverse();
     sessionStorage.setItem('reliure_sets_tcgdex', JSON.stringify(allSets));
     renderSets(allSets);
   }catch(err){
