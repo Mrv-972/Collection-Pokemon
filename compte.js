@@ -45,29 +45,57 @@ async function chargerProfil(){
   return profil;
 }
 
+// Le pseudo choisi à l'inscription est mis de côté : si Supabase exige une
+// confirmation par e-mail, le profil ne pourra être créé qu'au retour du
+// membre, une fois sa session ouverte.
+const PSEUDO_EN_ATTENTE = 'pokeclasseur_profil_en_attente';
+
 async function sInscrire(email, motDePasse, pseudo, contact){
   const db = await clientSupabase();
 
   const { data, error } = await db.auth.signUp({ email, password: motDePasse });
   if(error) throw error;
-  membre = data.user;
-  if(!membre) throw new Error("Inscription enregistrée, mais la session n'a pas démarré.");
 
-  const { error: erreurProfil } = await db.from('profils').insert({
-    id: membre.id,
-    pseudo: pseudo.trim(),
-    contact: contact.trim() || null,
-  });
-  // Un pseudo déjà pris est le seul cas courant : on le dit clairement
-  // plutôt que de laisser un message technique.
-  if(erreurProfil){
-    if(erreurProfil.code === '23505') throw new Error('Ce pseudo est déjà utilisé.');
-    throw erreurProfil;
+  const profilVoulu = { pseudo: pseudo.trim(), contact: contact.trim() || null };
+
+  // Sans session, aucune écriture n'est possible : la base ne saurait pas
+  // qui écrit.
+  if(!data.session){
+    try{ localStorage.setItem(PSEUDO_EN_ATTENTE, JSON.stringify(profilVoulu)); }catch(err){}
+    throw new Error("Compte créé. Confirme ton adresse dans l'e-mail que tu viens de recevoir, puis reviens te connecter.");
   }
 
-  await chargerProfil();
+  membre = data.user;
+  await creerProfil(profilVoulu);
   await envoyerCollectionLocale();
   return membre;
+}
+
+async function creerProfil({ pseudo, contact }){
+  const db = await clientSupabase();
+  const { error } = await db.from('profils').insert({ id: membre.id, pseudo, contact });
+  // Un pseudo déjà pris est le seul cas courant : on le dit clairement
+  // plutôt que de laisser remonter un message technique.
+  if(error){
+    if(error.code === '23505') throw new Error('Ce pseudo est déjà utilisé.');
+    throw error;
+  }
+  try{ localStorage.removeItem(PSEUDO_EN_ATTENTE); }catch(err){}
+  await chargerProfil();
+}
+
+// Vrai quand le membre est connecté mais n'a pas encore de profil : cela
+// arrive après une inscription passée par la confirmation d'e-mail.
+function profilAcreer(){
+  return estConnecte() && !profil;
+}
+
+function pseudoEnAttente(){
+  try{
+    return JSON.parse(localStorage.getItem(PSEUDO_EN_ATTENTE)) ?? null;
+  }catch(err){
+    return null;
+  }
 }
 
 async function seConnecter(email, motDePasse){
@@ -76,6 +104,13 @@ async function seConnecter(email, motDePasse){
   if(error) throw error;
   membre = data.user;
   await chargerProfil();
+
+  // Reprise d'une inscription qui attendait la confirmation de l'e-mail.
+  const enAttente = pseudoEnAttente();
+  if(!profil && enAttente){
+    try{ await creerProfil(enAttente); }catch(err){ console.warn('Profil à reprendre', err); }
+  }
+
   await fusionnerCollection();
   return membre;
 }

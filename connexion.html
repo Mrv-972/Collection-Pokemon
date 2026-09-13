@@ -101,6 +101,31 @@ function rendre(){
     return;
   }
 
+  // Connecté mais sans profil : il reste à choisir un pseudo, ce qui arrive
+  // quand l'inscription est passée par une confirmation d'e-mail.
+  if(profilAcreer()){
+    const attendu = pseudoEnAttente() ?? {};
+    panel.innerHTML = `
+      <div class="kicker">Compte</div>
+      <h1>Choisis ton pseudo</h1>
+      <p class="intro">Dernière étape : c'est le nom que verront les autres collectionneurs.</p>
+
+      <label for="pseudo">Pseudo</label>
+      <input id="pseudo" type="text" value="${attendu.pseudo ?? ''}">
+
+      <label for="contact">Comment te joindre (facultatif)</label>
+      <input id="contact" type="text" value="${attendu.contact ?? ''}" placeholder="Pseudo Discord, e-mail...">
+      <div class="aide">Affiché uniquement aux membres avec qui un échange est possible.</div>
+
+      <button class="principal" id="btn-creer-profil">Terminer</button>
+      <button class="discret" id="btn-deconnexion">Se déconnecter</button>
+      <div id="message"></div>
+    `;
+    document.getElementById('btn-creer-profil').addEventListener('click', terminerProfil);
+    document.getElementById('btn-deconnexion').addEventListener('click', deconnexion);
+    return;
+  }
+
   if(estConnecte()){
     panel.innerHTML = `
       <div class="kicker">Compte</div>
@@ -210,6 +235,23 @@ function messageLisible(err){
   if(/Unable to validate email/i.test(texte) || /invalid format/i.test(texte)) return "L'adresse e-mail ne semble pas valide.";
   if(/Email not confirmed/i.test(texte)) return "Ton adresse e-mail n'a pas encore été confirmée : regarde tes e-mails.";
   return texte;
+}
+
+async function terminerProfil(){
+  const pseudo = document.getElementById('pseudo').value.trim();
+  if(!pseudo){
+    afficherMessage('Choisis un pseudo pour continuer.', 'err');
+    return;
+  }
+  try{
+    await creerProfil({ pseudo, contact: document.getElementById('contact').value.trim() || null });
+    await fusionnerCollection();
+    afficherEtatCompte();
+    rendre();
+    afficherMessage('Te voilà membre. Ta collection est enregistrée en ligne.', 'ok');
+  }catch(err){
+    afficherMessage(messageLisible(err), 'err');
+  }
 }
 
 async function enregistrerProfil(){
