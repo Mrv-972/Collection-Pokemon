@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Extension — Reliure</title>
+<title>Pokémon — Reliure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -27,13 +27,15 @@
   .brand span{color:var(--gold)}
   .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
   .navlinks a.active{color:var(--text-on-ink)}
+  .navlinks a:hover{color:var(--text-on-ink)}
   @media(max-width:720px){.navlinks{display:none}}
 
   .breadcrumb{padding:24px 0 0;font-size:13px;color:var(--text-on-ink-dim);}
   .breadcrumb a:hover{color:var(--text-on-ink)}
 
   .page-head{padding:18px 0 30px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
-  .page-head img{height:56px;object-fit:contain;}
+  .page-head .sprite{width:84px;height:84px;display:flex;align-items:center;justify-content:center;}
+  .page-head .sprite img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;}
   .page-head h1{font-size:30px;}
   .page-head .meta{color:var(--text-on-ink-dim);font-size:14px;margin-top:6px;}
 
@@ -59,8 +61,9 @@
   .card-img-wrap{position:relative;aspect-ratio:2.5/3.5;border-radius:6px;overflow:hidden;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);display:flex;align-items:center;justify-content:center;}
   .card-img-wrap img{width:100%;height:100%;object-fit:cover;}
   .card-img-wrap .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:44px;line-height:1;}
-  .card-num{font-size:11px;color:var(--text-on-ink-dim);display:flex;justify-content:space-between;align-items:center;}
-  .rarity-symbol{color:var(--gold);letter-spacing:1px;}
+  .card-num{font-size:11px;color:var(--text-on-ink-dim);display:flex;justify-content:space-between;align-items:center;gap:6px;}
+  .card-num span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rarity-symbol{color:var(--gold);letter-spacing:1px;flex-shrink:0;}
   .card-name{font-size:13px;font-weight:500;}
 
   .tag-row{display:flex;gap:5px;}
@@ -88,21 +91,21 @@
   <nav>
     <a class="brand" href="pokecollection-prototype.html">Reli<span>ure</span></a>
     <div class="navlinks">
-      <a href="series.html" class="active">Extensions</a>
-      <a href="pokemon.html">Pokémon</a>
+      <a href="series.html">Extensions</a>
+      <a href="pokemon.html" class="active">Pokémon</a>
       <a href="#">Échanges</a>
     </div>
     <a class="brand" style="font-size:14px;font-style:normal" href="#">Mon classeur →</a>
   </nav>
 
-  <div class="breadcrumb"><a href="series.html">← Toutes les séries</a></div>
+  <div class="breadcrumb"><a href="pokemon.html">← Tous les Pokémon</a></div>
 
   <div class="page-head" id="page-head">
-    <h1 id="set-title">Chargement de l'extension…</h1>
+    <h1>Chargement…</h1>
   </div>
 
   <div class="toolbar">
-    <input type="text" id="filter-input" placeholder="Filtrer par nom ou numéro...">
+    <input type="text" id="filter-input" placeholder="Filtrer par nom de carte ou extension...">
     <select id="rarity-filter"><option value="">Toutes les raretés</option></select>
     <button class="filter-btn obt" id="btn-obt">✅ Obtenues</button>
     <button class="filter-btn manq" id="btn-manq">⬜ Manquantes</button>
@@ -121,101 +124,90 @@
   <div id="content">
     <div class="card-grid">
       <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
-      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
     </div>
   </div>
 
   <footer>Reliure — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
 </div>
 
+<script src="pokedex-fr.js"></script>
 <script src="tags.js"></script>
 <script src="cards.js"></script>
 <script>
-// Récupère les cartes d'une extension depuis l'API publique et gratuite
-// TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
-// Les images restent hébergées par TCGdex.
+// Toutes les cartes d'un Pokémon, toutes extensions confondues, à partir de
+// son numéro du Pokédex national passé dans l'URL (?dex=25).
 const params = new URLSearchParams(window.location.search);
-const setId = params.get('set') || 'sv03.5'; // "151" par défaut si aucune extension choisie
+const dexId = Number(params.get('dex')) || 25; // Pikachu par défaut
 
 let allCards = [];
 let activeFilter = null; // un des FILTERS, ou null
+let setNames = {}; // { [id d'extension]: nom lisible }
+let setOrder = {}; // { [id d'extension]: rang chronologique }
 
 // Filtres de la barre d'outils. "manq" n'est pas un tag : c'est l'absence
 // du tag "obt", donc rien à cocher sur les cartes.
 const FILTERS = ['obt', 'manq', 'rech', 'ech'];
 
-async function loadRarities(){
-  const byCardId = await probeRarities(`set.id=eq:${setId}`, `reliure_rar_${setId}`, allCards);
-  if(!byCardId) return;
-  allCards.forEach(c => { c.rarity = byCardId[c.id]; });
-  populateRarityFilter(allCards);
-  applyFilters();
+// Bornes officielles du Pokédex national pour chaque génération.
+const GENERATIONS = [
+  { gen: 1, region: 'Kanto',  from: 1,   to: 151 },
+  { gen: 2, region: 'Johto',  from: 152, to: 251 },
+  { gen: 3, region: 'Hoenn',  from: 252, to: 386 },
+  { gen: 4, region: 'Sinnoh', from: 387, to: 493 },
+  { gen: 5, region: 'Unys',   from: 494, to: 649 },
+  { gen: 6, region: 'Kalos',  from: 650, to: 721 },
+  { gen: 7, region: 'Alola',  from: 722, to: 809 },
+  { gen: 8, region: 'Galar',  from: 810, to: 905 },
+  { gen: 9, region: 'Paldea', from: 906, to: 1025 },
+];
+
+function generationOf(dexId){
+  return GENERATIONS.find(g => dexId >= g.from && dexId <= g.to);
 }
 
-async function init(){
-  document.getElementById('content').innerHTML = `<div class="card-grid">${Array(12).fill('<div class="skeleton"></div>').join('')}</div>`;
+function renderHead(cardCount){
+  const name = POKEDEX_FR[dexId - 1] || `Pokémon n°${dexId}`;
+  const generation = generationOf(dexId);
+  document.title = `${name} — Reliure`;
+  const meta = [
+    `N°${String(dexId).padStart(4, '0')}`,
+    generation ? `Génération ${generation.gen} — ${generation.region}` : '',
+    cardCount === null ? '' : `${cardCount} carte${cardCount > 1 ? 's' : ''}`,
+  ].filter(Boolean).join(' · ');
 
-  // Avant le premier rendu, pour que les cartes s'affichent d'emblée avec
-  // leurs marques.
-  loadTags();
-
-  // Cache local : ré-ouvrir la même extension est instantané, on revérifie en arrière-plan.
-  const cacheKey = `reliure_ext_${setId}`;
-  const cached = sessionStorage.getItem(cacheKey);
-  if(cached){
-    const data = JSON.parse(cached);
-    renderHead(data.set);
-    allCards = data.cards;
-    populateRarityFilter(allCards);
-    applyFilters();
-  }
-
-  try{
-    const [set, cards] = await Promise.all([
-      fetchJson(`https://api.tcgdex.net/v2/fr/sets/${setId}`),
-      fetchJson(`https://api.tcgdex.net/v2/fr/cards?set.id=eq:${setId}`)
-    ]);
-    cards.sort((a, b) => (a.localId || '').localeCompare(b.localId || '', undefined, { numeric: true }));
-    renderHead(set);
-    allCards = cards;
-    populateRarityFilter(allCards);
-    applyFilters();
-    sessionStorage.setItem(cacheKey, JSON.stringify({ set, cards: allCards }));
-    // Les raretés arrivent après coup : les cartes restent affichées pendant ce temps.
-    loadRarities().catch(err => console.warn('Impossible de charger les raretés', err));
-  }catch(err){
-    console.warn("Impossible de charger l'extension", err);
-    if(!cached){
-      document.getElementById('page-head').innerHTML = '<h1>Extension introuvable</h1>';
-      document.getElementById('content').innerHTML = `<p class="status-msg err">Impossible de charger cette extension pour le moment.<br><span style="font-size:12px;opacity:.7">${err.message}</span><br><br><button onclick="init()" class="filter-btn" style="margin-top:8px">Réessayer</button></p>`;
-    }
-  }
-}
-
-function setLogoFallback(img){
-  const fallback = img.dataset.fallback;
-  if(fallback){
-    img.removeAttribute('data-fallback');
-    img.src = fallback;
-    return;
-  }
-  img.style.display = 'none';
-}
-
-function renderHead(set){
-  if(!set) return;
-  const year = set.releaseDate ? new Date(set.releaseDate).getFullYear() : '';
-  const total = set.cardCount?.official ?? set.cardCount?.total ?? '?';
-  const serie = set.serie?.name || '';
   document.getElementById('page-head').innerHTML = `
-    ${set.logo
-      ? `<img src="${set.logo}.png" alt="${set.name}" data-fallback="images/sets/${setId}.png" onerror="setLogoFallback(this)">`
-      : `<img src="images/sets/${setId}.png" alt="${set.name}" onerror="setLogoFallback(this)">`}
+    <div class="sprite">
+      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexId}.png" alt="${name}" onerror="this.remove()">
+    </div>
     <div>
-      <h1>${set.name}</h1>
-      <div class="meta">${[serie, year, total + ' cartes'].filter(Boolean).join(' · ')}</div>
+      <h1>${name}</h1>
+      <div class="meta">${meta}</div>
     </div>
   `;
+}
+
+// Les cartes venant de partout, leur numéro seul ne dit rien : on affiche le
+// nom de leur extension. Il se déduit de l'identifiant de la carte, croisé
+// avec le catalogue des extensions.
+async function loadSetNames(){
+  const cacheKey = 'reliure_sets_tcgdex';
+  let sets;
+  try{
+    const cached = sessionStorage.getItem(cacheKey);
+    sets = cached ? JSON.parse(cached) : await fetchJson('https://api.tcgdex.net/v2/fr/sets');
+  }catch(err){
+    console.warn('Impossible de charger le nom des extensions', err);
+    return;
+  }
+  sets.forEach((s, index) => {
+    setNames[s.id] = s.name;
+    setOrder[s.id] = index;
+  });
+}
+
+function cardSubtitle(c){
+  const setId = setIdOfCard(c.id);
+  return `${setNames[setId] || setId} · #${c.localId}`;
 }
 
 function renderCards(cards){
@@ -224,32 +216,15 @@ function renderCards(cards){
     content.innerHTML = '<p class="status-msg">Aucune carte ne correspond à ce filtre.</p>';
     return;
   }
-  content.innerHTML = `<div class="card-grid">${cards.map(c => cardTile(c)).join('')}</div>`;
-}
-
-document.getElementById('content').addEventListener('click', (e) => {
-  const btn = e.target.closest('.tag-toggle');
-  if(!btn) return;
-  toggleTag(btn.dataset.id, btn.dataset.tag);
-  applyFilters();
-});
-
-function showSaveStatus(state){
-  const el = document.getElementById('save-status');
-  if(!el) return;
-  if(state === 'saving') el.textContent = 'Enregistrement…';
-  if(state === 'saved') el.textContent = 'Enregistré ✓';
-  if(state === 'error') el.textContent = "Échec de l'enregistrement";
-  el.style.opacity = '1';
-  clearTimeout(el._t);
-  el._t = setTimeout(() => { el.style.opacity = '0'; }, 1500);
+  content.innerHTML = `<div class="card-grid">${cards.map(c => cardTile(c, cardSubtitle(c))).join('')}</div>`;
 }
 
 function filteredCards(){
   const q = document.getElementById('filter-input').value.trim().toLowerCase();
   const rarity = document.getElementById('rarity-filter').value;
   let filtered = allCards;
-  if(q) filtered = filtered.filter(c => c.name.toLowerCase().includes(q) || (c.localId || '').includes(q));
+  if(q) filtered = filtered.filter(c =>
+    c.name.toLowerCase().includes(q) || cardSubtitle(c).toLowerCase().includes(q));
   if(rarity) filtered = filtered.filter(c => c.rarity === rarity);
   if(activeFilter === 'manq') filtered = filtered.filter(c => !tagState[c.id]?.obt);
   else if(activeFilter) filtered = filtered.filter(c => tagState[c.id]?.[activeFilter]);
@@ -263,6 +238,60 @@ function applyFilters(){
   document.getElementById('bulk-count').textContent =
     count === allCards.length ? `les ${count} cartes` : `les ${count} cartes affichées`;
 }
+
+async function loadRarities(){
+  const byCardId = await probeRarities(`dexId=eq:${dexId}`, `reliure_rar_dex_${dexId}`, allCards);
+  if(!byCardId) return;
+  allCards.forEach(c => { c.rarity = byCardId[c.id]; });
+  populateRarityFilter(allCards);
+  applyFilters();
+}
+
+function showSaveStatus(state){
+  const el = document.getElementById('save-status');
+  if(!el) return;
+  if(state === 'saved') el.textContent = 'Enregistré ✓';
+  if(state === 'error') el.textContent = "Échec de l'enregistrement";
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; }, 1500);
+}
+
+async function init(){
+  renderHead(null);
+  document.getElementById('content').innerHTML = `<div class="card-grid">${Array(12).fill('<div class="skeleton"></div>').join('')}</div>`;
+
+  // Avant le premier rendu, pour que les cartes s'affichent d'emblée avec
+  // leurs marques.
+  loadTags();
+
+  try{
+    const [cards] = await Promise.all([
+      fetchJson(`https://api.tcgdex.net/v2/fr/cards?dexId=eq:${dexId}`),
+      loadSetNames(),
+    ]);
+    // De la carte la plus récente à la plus ancienne.
+    cards.sort((a, b) =>
+      (setOrder[setIdOfCard(b.id)] ?? -1) - (setOrder[setIdOfCard(a.id)] ?? -1)
+      || (a.localId || '').localeCompare(b.localId || '', undefined, { numeric: true }));
+    allCards = cards;
+    renderHead(cards.length);
+    populateRarityFilter(allCards);
+    applyFilters();
+    // Les raretés arrivent après coup : les cartes restent affichées pendant ce temps.
+    loadRarities().catch(err => console.warn('Impossible de charger les raretés', err));
+  }catch(err){
+    console.warn('Impossible de charger les cartes de ce Pokémon', err);
+    document.getElementById('content').innerHTML = `<p class="status-msg err">Impossible de charger les cartes pour le moment.<br><span style="font-size:12px;opacity:.7">${err.message}</span><br><br><button onclick="init()" class="filter-btn" style="margin-top:8px">Réessayer</button></p>`;
+  }
+}
+
+document.getElementById('content').addEventListener('click', (e) => {
+  const btn = e.target.closest('.tag-toggle');
+  if(!btn) return;
+  toggleTag(btn.dataset.id, btn.dataset.tag);
+  applyFilters();
+});
 
 document.getElementById('filter-input').addEventListener('input', applyFilters);
 document.getElementById('rarity-filter').addEventListener('change', applyFilters);

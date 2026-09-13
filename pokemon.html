@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokémon — Reliure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://raw.githubusercontent.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B; --ink-soft:#20232A; --paper:#F1EBDC; --paper-line:#D9CFB6;
+    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227;
+    --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2,h3{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a.active{color:var(--text-on-ink)}
+  .navlinks a:hover{color:var(--text-on-ink)}
+  @media(max-width:720px){.navlinks{display:none}}
+
+  .page-head{padding:56px 0 30px;}
+  .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
+  .page-head h1{font-size:40px;}
+  .page-head p{color:var(--text-on-ink-dim);margin-top:14px;font-size:16px;max-width:60ch;}
+
+  .toolbar{display:flex;gap:10px;padding-bottom:22px;flex-wrap:wrap;align-items:center;}
+  .toolbar input{flex:1;min-width:200px;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  .toolbar input::placeholder{color:var(--text-on-ink-dim)}
+
+  .gen-tabs{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:34px;}
+  .gen-tab{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:9px 14px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;transition:.12s;}
+  .gen-tab:hover{border-color:rgba(237,234,224,0.3)}
+  .gen-tab.on{color:var(--text-on-ink);border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
+  .gen-tab .region{color:var(--text-on-ink-dim);font-size:11.5px;display:block;}
+  .gen-tab.on .region{color:#E3C766}
+
+  .gen-title{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;}
+  .gen-title h2{font-size:22px;}
+  .gen-title .count{font-size:13px;color:var(--text-on-ink-dim);}
+
+  .dex-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding-bottom:60px;}
+  @media(max-width:900px){.dex-grid{grid-template-columns:repeat(4,1fr)}}
+  @media(max-width:560px){.dex-grid{grid-template-columns:repeat(3,1fr)}}
+
+  .dex-card{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color .15s;}
+  .dex-card:hover{border-color:rgba(237,234,224,0.28)}
+  .dex-sprite{width:72px;height:72px;display:flex;align-items:center;justify-content:center;}
+  .dex-sprite img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;}
+  .dex-num{font-size:11px;color:var(--text-on-ink-dim);}
+  .dex-name{font-size:13px;font-weight:500;text-align:center;line-height:1.25;}
+
+  .status-msg{color:var(--text-on-ink-dim);font-size:14px;padding:20px 0;}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="pokecollection-prototype.html">Reli<span>ure</span></a>
+    <div class="navlinks">
+      <a href="series.html">Extensions</a>
+      <a href="pokemon.html" class="active">Pokémon</a>
+      <a href="#">Échanges</a>
+    </div>
+    <a class="brand" style="font-size:14px;font-style:normal" href="#">Mon classeur →</a>
+  </nav>
+
+  <div class="page-head">
+    <div class="kicker">Pokédex</div>
+    <h1>Tous les Pokémon, génération par génération</h1>
+    <p>Plutôt que de chercher extension par extension, pars du Pokémon : choisis-en un pour voir toutes ses cartes, toutes extensions confondues.</p>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="search-input" placeholder="Chercher un Pokémon par nom ou par numéro...">
+  </div>
+
+  <div class="gen-tabs" id="gen-tabs"></div>
+
+  <div class="gen-title" id="gen-title"></div>
+  <div id="content"></div>
+
+  <footer>Reliure — noms des Pokémon issus du paquet npm « pokemon » (MIT). Projet non affilié à The Pokémon Company.</footer>
+</div>
+
+<script src="pokedex-fr.js"></script>
+<script>
+// Bornes officielles du Pokédex national pour chaque génération.
+const GENERATIONS = [
+  { gen: 1, region: 'Kanto',  from: 1,   to: 151 },
+  { gen: 2, region: 'Johto',  from: 152, to: 251 },
+  { gen: 3, region: 'Hoenn',  from: 252, to: 386 },
+  { gen: 4, region: 'Sinnoh', from: 387, to: 493 },
+  { gen: 5, region: 'Unys',   from: 494, to: 649 },
+  { gen: 6, region: 'Kalos',  from: 650, to: 721 },
+  { gen: 7, region: 'Alola',  from: 722, to: 809 },
+  { gen: 8, region: 'Galar',  from: 810, to: 905 },
+  { gen: 9, region: 'Paldea', from: 906, to: 1025 },
+];
+
+let activeGen = 1;
+
+function spriteUrl(dexId){
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexId}.png`;
+}
+
+function pokemonIn(generation){
+  const list = [];
+  for(let dexId = generation.from; dexId <= generation.to; dexId++){
+    list.push({ dexId, name: POKEDEX_FR[dexId - 1] });
+  }
+  return list;
+}
+
+function renderTabs(){
+  document.getElementById('gen-tabs').innerHTML = GENERATIONS.map(g => `
+    <button class="gen-tab ${g.gen === activeGen ? 'on' : ''}" data-gen="${g.gen}">
+      Génération ${g.gen}<span class="region">${g.region}</span>
+    </button>
+  `).join('');
+}
+
+function renderPokemon(list, title, subtitle){
+  document.getElementById('gen-title').innerHTML =
+    `<h2>${title}</h2><span class="count">${subtitle}</span>`;
+
+  const content = document.getElementById('content');
+  if(list.length === 0){
+    content.innerHTML = '<p class="status-msg">Aucun Pokémon ne correspond à ta recherche.</p>';
+    return;
+  }
+  content.innerHTML = `<div class="dex-grid">${list.map(p => `
+    <a class="dex-card" href="pokemon-cartes.html?dex=${p.dexId}">
+      <div class="dex-sprite">
+        <img src="${spriteUrl(p.dexId)}" alt="${p.name}" loading="lazy" onerror="this.remove()">
+      </div>
+      <div class="dex-num">N°${String(p.dexId).padStart(4, '0')}</div>
+      <div class="dex-name">${p.name}</div>
+    </a>
+  `).join('')}</div>`;
+}
+
+function showGeneration(gen){
+  activeGen = gen;
+  renderTabs();
+  const generation = GENERATIONS.find(g => g.gen === gen);
+  const list = pokemonIn(generation);
+  renderPokemon(list, `Génération ${gen} — ${generation.region}`, `${list.length} Pokémon · n°${generation.from} à ${generation.to}`);
+}
+
+function showSearch(query){
+  const q = query.trim().toLowerCase();
+  const matches = [];
+  POKEDEX_FR.forEach((name, index) => {
+    const dexId = index + 1;
+    if(name.toLowerCase().includes(q) || String(dexId) === q){
+      matches.push({ dexId, name });
+    }
+  });
+  document.querySelectorAll('.gen-tab').forEach(t => t.classList.remove('on'));
+  renderPokemon(matches, `Recherche « ${query.trim()} »`, `${matches.length} Pokémon trouvé${matches.length > 1 ? 's' : ''}`);
+}
+
+document.getElementById('gen-tabs').addEventListener('click', (e) => {
+  const tab = e.target.closest('.gen-tab');
+  if(!tab) return;
+  document.getElementById('search-input').value = '';
+  showGeneration(Number(tab.dataset.gen));
+});
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+  const query = e.target.value;
+  if(query.trim()) showSearch(query);
+  else showGeneration(activeGen);
+});
+
+showGeneration(1);
+</script>
+
+</body>
+</html>
