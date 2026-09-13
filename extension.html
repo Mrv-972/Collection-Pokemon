@@ -58,12 +58,15 @@
   .rarity-symbol{color:var(--gold);letter-spacing:1px;}
   .card-name{font-size:13px;font-weight:500;}
 
-  .tag-row{display:flex;flex-direction:column;gap:4px;}
-  .tag-toggle{font-size:10.5px;padding:5px 0;border-radius:3px;text-align:center;cursor:pointer;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);background:transparent;font-family:inherit;transition:.12s;}
-  .tag-toggle.obt.active{background:rgba(201,162,39,0.16);color:#E3C766;border-color:rgba(201,162,39,0.5)}
-  .tag-toggle.rech.active{background:rgba(168,67,28,0.16);color:#E08862;border-color:rgba(168,67,28,0.5)}
-  .tag-toggle.ech.active{background:rgba(31,111,99,0.18);color:#5FBAAA;border-color:rgba(31,111,99,0.5)}
-  .tag-toggle:hover{border-color:rgba(237,234,224,0.3)}
+  .tag-row{display:flex;gap:5px;}
+  /* Les symboles sont des emojis : leur couleur ne se pilote pas en CSS.
+     L'état inactif est donc signalé en les désaturant. */
+  .tag-toggle{flex:1;font-size:14px;line-height:1.2;padding:5px 0;border-radius:3px;text-align:center;cursor:pointer;border:1px solid rgba(237,234,224,0.14);background:transparent;font-family:inherit;transition:.12s;}
+  .tag-toggle:not(.active){filter:grayscale(1);opacity:.45}
+  .tag-toggle.obt.active{background:rgba(201,162,39,0.16);border-color:rgba(201,162,39,0.5)}
+  .tag-toggle.rech.active{background:rgba(168,67,28,0.16);border-color:rgba(168,67,28,0.5)}
+  .tag-toggle.ech.active{background:rgba(31,111,99,0.18);border-color:rgba(31,111,99,0.5)}
+  .tag-toggle:hover{border-color:rgba(237,234,224,0.35);opacity:1}
 
   .skeleton{aspect-ratio:2.5/3.5;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;position:relative;overflow:hidden;}
   .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(237,234,224,0.06),transparent);animation:shine 1.4s infinite;}
@@ -96,9 +99,9 @@
   <div class="toolbar">
     <input type="text" id="filter-input" placeholder="Filtrer par nom ou numéro...">
     <select id="rarity-filter"><option value="">Toutes les raretés</option></select>
-    <button class="filter-btn obt" id="btn-obt">Obtenues</button>
-    <button class="filter-btn rech" id="btn-rech">Recherchées</button>
-    <button class="filter-btn ech" id="btn-ech">Échangeables</button>
+    <button class="filter-btn obt" id="btn-obt">✅ Obtenues</button>
+    <button class="filter-btn rech" id="btn-rech">❤️ Recherchées</button>
+    <button class="filter-btn ech" id="btn-ech">🔁 Échangeables</button>
     <span id="save-status" style="font-size:12px;color:var(--text-on-ink-dim);opacity:0;transition:opacity .3s;">Enregistré ✓</span>
   </div>
 
@@ -124,6 +127,11 @@ const tagState = {}; // { [cardId]: { obt: bool, rech: bool, ech: bool } }
 let activeFilter = null; // un des TAGS, ou null
 
 const TAGS = ['obt', 'rech', 'ech'];
+const TAG_META = {
+  obt:  { emoji: '✅', label: 'Obtenue' },
+  rech: { emoji: '❤️', label: 'Recherchée' },
+  ech:  { emoji: '🔁', label: 'Échangeable' },
+};
 const emptyTagState = () => ({ obt:false, rech:false, ech:false });
 const tagStorageKey = `reliure_tags_${setId}`;
 
@@ -368,9 +376,7 @@ function renderCards(cards){
         <div class="card-num"><span>#${c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
         <div class="card-name">${c.name}</div>
         <div class="tag-row">
-          <button class="tag-toggle obt ${state.obt ? 'active' : ''}" data-id="${c.id}" data-tag="obt">Obtenue</button>
-          <button class="tag-toggle rech ${state.rech ? 'active' : ''}" data-id="${c.id}" data-tag="rech">Recherchée</button>
-          <button class="tag-toggle ech ${state.ech ? 'active' : ''}" data-id="${c.id}" data-tag="ech">Échangeable</button>
+          ${TAGS.map(tag => `<button class="tag-toggle ${tag} ${state[tag] ? 'active' : ''}" data-id="${c.id}" data-tag="${tag}" title="${TAG_META[tag].label}" aria-label="${TAG_META[tag].label}">${TAG_META[tag].emoji}</button>`).join('')}
         </div>
       </div>
     `;
