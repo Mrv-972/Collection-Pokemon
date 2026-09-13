@@ -255,7 +255,35 @@ function afficherEtatCompte(){
   }
   lien.textContent = estConnecte() ? `${profil?.pseudo ?? 'Mon compte'} →` : 'Se connecter →';
   lien.href = 'connexion.html';
-  if(estConnecte()) afficherNonLus();
+  if(estConnecte()){
+    afficherNonLus();
+    suivreLesNonLus();
+  }
+}
+
+// La pastille se tient à jour d'elle-même, sans qu'on ait à changer de page.
+//
+// Le rythme est lent à dessein : c'est une pastille de notification, pas une
+// conversation. Vérifier plus souvent depuis chaque onglet ouvert
+// solliciterait la base sans rien apporter — la page Discussions, elle, a
+// son propre rythme rapide pour les messages eux-mêmes.
+const DELAI_PASTILLE = 25000;
+let suiviPastilleLance = false;
+
+function suivreLesNonLus(){
+  if(suiviPastilleLance) return;
+  suiviPastilleLance = true;
+
+  setInterval(() => {
+    // Rien à faire pour un onglet que personne ne regarde.
+    if(document.visibilityState === 'visible' && estConnecte()) afficherNonLus();
+  }, DELAI_PASTILLE);
+
+  // Au retour sur l'onglet, on rafraîchit tout de suite : c'est le moment
+  // précis où le membre regarde.
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible' && estConnecte()) afficherNonLus();
+  });
 }
 
 // Styles de la pastille, embarqués ici pour que toutes les pages en
