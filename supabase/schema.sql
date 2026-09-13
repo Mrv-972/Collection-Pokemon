@@ -223,3 +223,268 @@ as $$
   where auth.uid() in (c.membre_a, c.membre_b)
   order by coalesce(m.envoye_le, c.cree_le) desc;
 $$;
+
+-- ------------------------------------------------------------ âge --
+-- L'âge est déclaré, jamais vérifié : n'importe qui peut saisir une fausse
+-- date. Ce que la règle apporte, c'est un cadre (celui qui ment enfreint les
+-- conditions) et un garde-fou contre les inscriptions trop jeunes.
+--
+-- Le seuil de 15 ans est celui en dessous duquel, en France, le consentement
+-- des parents est requis pour traiter les données d'un mineur — un accord
+-- qu'un site comme celui-ci ne peut pas recueillir sérieusement.
+alter table profils add column if not exists ne_le date;
+
+-- La règle vit dans la base, et pas seulement dans le formulaire : une
+-- vérification côté navigateur se contourne en quelques secondes.
+-- Elle est portée par les règles d'accès plutôt que par une contrainte de
+-- table, car une contrainte ne peut pas consulter la date du jour.
+drop policy if exists "chacun crée son profil" on profils;
+create policy "chacun crée son profil"
+  on profils for insert to authenticated
+  with check (
+    auth.uid() = id
+    and ne_le is not null
+    and ne_le <= current_date - interval '15 years'
+  );
+
+drop policy if exists "chacun modifie son profil" on profils;
+create policy "chacun modifie son profil"
+  on profils for update to authenticated
+  using (auth.uid() = id)
+  with check (
+    auth.uid() = id
+    and ne_le is not null
+    and ne_le <= current_date - interval '15 years'
+  );
+
+-- ------------------------------------------------------- blocages --
+create table if not exists blocages (
+  bloqueur_id uuid not null references auth.users on delete cascade,
+  bloque_id   uuid not null references auth.users on delete cascade,
+  cree_le     timestamptz not null default now(),
+  primary key (bloqueur_id, bloque_id),
+  check (bloqueur_id <> bloque_id)
+);
+
+alter table blocages enable row level security;
+
+drop policy if exists "je gère mes blocages" on blocages;
+create policy "je gère mes blocages"
+  on blocages for all to authenticated
+  using (auth.uid() = bloqueur_id)
+  with check (auth.uid() = bloqueur_id);
+
+-- Un blocage doit produire ses effets pour les deux personnes, or chacun ne
+-- voit que les blocages qu'il a posés. Cette fonction, exécutée avec les
+-- droits de son propriétaire, répond seulement « oui » ou « non » : elle ne
+-- révèle donc jamais qui a bloqué qui.
+create or replace function est_bloque(a uuid, b uuid)
+returns boolean
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select exists (
+    select 1 from blocages
+    where (bloqueur_id = a and bloque_id = b)
+       or (bloqueur_id = b and bloque_id = a)
+  );
+$$;
+
+-- Écrire à quelqu'un suppose qu'aucun blocage ne sépare les deux membres.
+drop policy if exists "écrire dans mes conversations" on messages;
+create policy "écrire dans mes conversations"
+  on messages for insert to authenticated
+  with check (auth.uid() = auteur_id and exists (
+    select 1 from conversations c
+    where c.id = conversation_id
+      and auth.uid() in (c.membre_a, c.membre_b)
+      and not est_bloque(c.membre_a, c.membre_b)
+  ));
+
+-- --------------------------------------------------- signalements --
+-- Les signalements se lisent depuis le tableau de bord Supabase : à cette
+-- échelle, une page d'administration serait disproportionnée.
+create table if not exists signalements (
+  id           bigint generated always as identity primary key,
+  signaleur_id uuid not null references auth.users on delete cascade,
+  signale_id   uuid not null references auth.users on delete cascade,
+  message_id   bigint references messages on delete set null,
+  motif        text not null check (length(btrim(motif)) between 1 and 1000),
+  cree_le      timestamptz not null default now()
+);
+
+alter table signalements enable row level security;
+
+drop policy if exists "je signale" on signalements;
+create policy "je signale"
+  on signalements for insert to authenticated
+  with check (auth.uid() = signaleur_id and signale_id <> auth.uid());
+
+drop policy if exists "je relis mes signalements" on signalements;
+create policy "je relis mes signalements"
+  on signalements for select to authenticated
+  using (auth.uid() = signaleur_id);
+
+-- ------------------- prise en compte des blocages dans l'existant --
+-- Un membre bloqué disparaît des correspondances, dans les deux sens.
+create or replace function echanges_possibles()
+returns table (
+  membre_id    uuid,
+  pseudo       text,
+  contact      text,
+  il_me_donne  text[],
+  je_lui_donne text[]
+)
+language sql
+stable
+as $$
+  with moi as (
+    select carte_id, recherchee, echangeable
+    from cartes
+    where utilisateur_id = auth.uid()
+  ),
+  il_me_donne as (
+    select c.utilisateur_id, array_agg(c.carte_id order by c.carte_id) as cartes
+    from cartes c
+    join moi on moi.carte_id = c.carte_id
+    where c.utilisateur_id <> auth.uid()
+      and c.echangeable
+      and moi.recherchee
+    group by c.utilisateur_id
+  ),
+  je_lui_donne as (
+    select c.utilisateur_id, array_agg(c.carte_id order by c.carte_id) as cartes
+    from cartes c
+    join moi on moi.carte_id = c.carte_id
+    where c.utilisateur_id <> auth.uid()
+      and c.recherchee
+      and moi.echangeable
+    group by c.utilisateur_id
+  )
+  select
+    p.id,
+    p.pseudo,
+    p.contact,
+    coalesce(d.cartes, '{}'::text[]),
+    coalesce(r.cartes, '{}'::text[])
+  from profils p
+  left join il_me_donne  d on d.utilisateur_id = p.id
+  left join je_lui_donne r on r.utilisateur_id = p.id
+  where p.id <> auth.uid()
+    and (d.cartes is not null or r.cartes is not null)
+    and not est_bloque(auth.uid(), p.id);
+$$;
+
+-- Une conversation avec un membre bloqué n'apparaît plus dans la liste.
+create or replace function mes_conversations()
+returns table (
+  conversation_id uuid,
+  autre_id        uuid,
+  pseudo          text,
+  dernier_message text,
+  dernier_envoi   timestamptz
+)
+language sql
+stable
+as $$
+  select
+    c.id,
+    case when c.membre_a = auth.uid() then c.membre_b else c.membre_a end,
+    p.pseudo,
+    m.texte,
+    m.envoye_le
+  from conversations c
+  join profils p
+    on p.id = case when c.membre_a = auth.uid() then c.membre_b else c.membre_a end
+  left join lateral (
+    select texte, envoye_le
+    from messages
+    where conversation_id = c.id
+    order by envoye_le desc
+    limit 1
+  ) m on true
+  where auth.uid() in (c.membre_a, c.membre_b)
+    and not est_bloque(c.membre_a, c.membre_b)
+  order by coalesce(m.envoye_le, c.cree_le) desc;
+$$;
+
+-- ------------------------------------------------- messages non lus --
+-- On retient, pour chaque membre et chaque conversation, le dernier message
+-- qu'il a vu. Tout ce qui est arrivé après est non lu.
+create table if not exists lectures (
+  utilisateur_id     uuid not null references auth.users on delete cascade,
+  conversation_id    uuid not null references conversations on delete cascade,
+  dernier_message_lu bigint not null default 0,
+  primary key (utilisateur_id, conversation_id)
+);
+
+alter table lectures enable row level security;
+
+drop policy if exists "je gère mes lectures" on lectures;
+create policy "je gère mes lectures"
+  on lectures for all to authenticated
+  using (auth.uid() = utilisateur_id)
+  with check (auth.uid() = utilisateur_id);
+
+-- Le nombre total de messages non lus, pour la pastille de la navigation.
+create or replace function total_non_lus()
+returns integer
+language sql
+stable
+as $$
+  select coalesce(count(*), 0)::integer
+  from messages m
+  join conversations c on c.id = m.conversation_id
+  left join lectures l
+    on l.conversation_id = c.id and l.utilisateur_id = auth.uid()
+  where auth.uid() in (c.membre_a, c.membre_b)
+    and m.auteur_id <> auth.uid()
+    and m.id > coalesce(l.dernier_message_lu, 0)
+    and not est_bloque(c.membre_a, c.membre_b);
+$$;
+
+-- La liste des conversations porte désormais le compte des non-lus.
+create or replace function mes_conversations()
+returns table (
+  conversation_id uuid,
+  autre_id        uuid,
+  pseudo          text,
+  dernier_message text,
+  dernier_envoi   timestamptz,
+  non_lus         integer
+)
+language sql
+stable
+as $$
+  select
+    c.id,
+    case when c.membre_a = auth.uid() then c.membre_b else c.membre_a end,
+    p.pseudo,
+    m.texte,
+    m.envoye_le,
+    coalesce(nl.nombre, 0)::integer
+  from conversations c
+  join profils p
+    on p.id = case when c.membre_a = auth.uid() then c.membre_b else c.membre_a end
+  left join lateral (
+    select texte, envoye_le
+    from messages
+    where conversation_id = c.id
+    order by envoye_le desc
+    limit 1
+  ) m on true
+  left join lectures l
+    on l.conversation_id = c.id and l.utilisateur_id = auth.uid()
+  left join lateral (
+    select count(*) as nombre
+    from messages
+    where conversation_id = c.id
+      and auteur_id <> auth.uid()
+      and id > coalesce(l.dernier_message_lu, 0)
+  ) nl on true
+  where auth.uid() in (c.membre_a, c.membre_b)
+    and not est_bloque(c.membre_a, c.membre_b)
+  order by coalesce(m.envoye_le, c.cree_le) desc;
+$$;

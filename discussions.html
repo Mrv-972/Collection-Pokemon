@@ -49,6 +49,14 @@
   .fil-tete a{font-size:12.5px;color:var(--text-on-ink-dim);text-decoration:underline;text-underline-offset:3px;}
   .fil-tete a:hover{color:var(--text-on-ink)}
 
+  .prevention{margin:0;padding:12px 20px;background:rgba(201,162,39,0.08);border-bottom:1px solid rgba(201,162,39,0.2);font-size:12.5px;color:#D8CFA8;}
+  .fil-actions{display:flex;gap:8px;margin-left:auto;}
+  .fil-actions button{background:transparent;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);padding:5px 11px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit;}
+  .fil-actions button:hover{border-color:rgba(237,234,224,0.35);color:var(--text-on-ink)}
+  .fil-actions button.danger:hover{border-color:rgba(168,67,28,0.6);color:#E08862}
+  .conv .pastille{display:inline-block;min-width:18px;padding:1px 5px;margin-left:6px;border-radius:9px;background:#A8431C;color:#F6EFEA;font-size:11px;font-weight:600;line-height:16px;text-align:center;}
+  .conv .qui{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+
   .fil-corps{flex:1;overflow-y:auto;max-height:52vh;padding:20px;display:flex;flex-direction:column;gap:10px;}
   .bulle{max-width:74%;padding:9px 13px;border-radius:12px;font-size:14px;word-wrap:break-word;overflow-wrap:anywhere;white-space:pre-wrap;}
   .bulle .heure{display:block;font-size:10.5px;opacity:.6;margin-top:4px;}
@@ -66,7 +74,6 @@
   .status-msg.err{color:#E08862}
   .cta-btn{display:inline-block;margin-top:16px;background:var(--teal);color:#EDF5F3;padding:11px 20px;border-radius:3px;font-size:14px;font-weight:500;}
   .cta-btn:hover{background:var(--teal-deep)}
-  .avis{font-size:12.5px;color:var(--text-on-ink-dim);padding:0 0 26px;max-width:70ch;}
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
 </style>
 </head>
@@ -109,7 +116,6 @@ let arreterSuivi = null;
 
 function rendreSquelette(){
   document.getElementById('content').innerHTML = `
-    <p class="avis">Les discussions restent entre leurs deux participants. Reste prudent : ne communique pas d'informations personnelles (adresse, téléphone) à quelqu'un que tu ne connais pas, et conviens d'un mode d'envoi sûr avant d'expédier des cartes.</p>
     <div class="messagerie">
       <div class="liste" id="liste"></div>
       <div class="fil" id="fil"></div>
@@ -125,7 +131,7 @@ function rendreListe(){
   }
   liste.innerHTML = conversations.map(c => `
     <button class="conv ${conversationOuverte?.conversation_id === c.conversation_id ? 'on' : ''}" data-id="${c.conversation_id}">
-      <div class="qui">${texteEchappe(c.pseudo)}</div>
+      <div class="qui">${texteEchappe(c.pseudo)}${c.non_lus > 0 ? `<span class="pastille">${c.non_lus}</span>` : ''}</div>
       <div class="apercu">${c.dernier_message ? texteEchappe(c.dernier_message) : 'Discussion ouverte, rien d\'envoyé'}</div>
     </button>
   `).join('');
@@ -141,7 +147,12 @@ function rendreFil(){
     <div class="fil-tete">
       <h2>${texteEchappe(conversationOuverte.pseudo)}</h2>
       <a href="echanges.html">Voir les échanges possibles</a>
+      <div class="fil-actions">
+        <button id="btn-signaler">Signaler</button>
+        <button id="btn-bloquer" class="danger">Bloquer</button>
+      </div>
     </div>
+    <p class="prevention">Tu discutes avec quelqu'un que tu ne connais pas. Ne communique ni adresse, ni numéro de téléphone, ni coordonnées bancaires. Pour un envoi, privilégie un mode de remise suivi, et méfie-toi de quiconque insiste pour sortir de la plateforme ou t'envoyer un lien.</p>
     <div class="fil-corps" id="fil-corps"></div>
     <div class="fil-pied">
       <textarea id="saisie" rows="1" placeholder="Écris ton message…"></textarea>
@@ -149,6 +160,8 @@ function rendreFil(){
     </div>
   `;
   document.getElementById('btn-envoyer').addEventListener('click', envoyer);
+  document.getElementById('btn-bloquer').addEventListener('click', bloquer);
+  document.getElementById('btn-signaler').addEventListener('click', signaler);
   const saisie = document.getElementById('saisie');
   saisie.addEventListener('keydown', (e) => {
     // Entrée envoie, Maj+Entrée passe à la ligne.
@@ -183,6 +196,19 @@ async function ouvrirFil(conversation){
   const messages = await lireMessages(conversation.conversation_id);
   if(messages.length) dernierMessageId = messages[messages.length - 1].id;
   ajouterMessages(messages);
+  await noterCommeLu();
+}
+
+// Ouvrir un fil vaut lecture : on mémorise où on en est, ici et pour la
+// pastille de la navigation.
+async function noterCommeLu(){
+  if(!conversationOuverte || !dernierMessageId) return;
+  try{
+    await marquerLu(conversationOuverte.conversation_id, dernierMessageId);
+    if(typeof afficherNonLus === 'function') afficherNonLus();
+  }catch(err){
+    console.warn('Marquage de lecture impossible', err);
+  }
 }
 
 async function envoyer(){
@@ -208,6 +234,30 @@ async function envoyer(){
   }
 }
 
+async function bloquer(){
+  const qui = conversationOuverte.pseudo;
+  if(!confirm(`Bloquer ${qui} ?\n\nVous ne pourrez plus vous écrire, et vous n'apparaîtrez plus dans les échanges possibles l'un de l'autre. C'est réversible depuis ton compte.`)) return;
+  try{
+    await bloquerMembre(conversationOuverte.autre_id);
+    conversationOuverte = null;
+    await rafraichirListe();
+    rendreFil();
+  }catch(err){
+    alert('Le blocage a échoué : ' + (err.message ?? err));
+  }
+}
+
+async function signaler(){
+  const motif = prompt(`Que reproches-tu à ${conversationOuverte.pseudo} ?\n\nDécris ce qui s'est passé ; le signalement sera examiné.`);
+  if(!motif || !motif.trim()) return;
+  try{
+    await signalerMembre(conversationOuverte.autre_id, motif);
+    alert('Signalement envoyé. Si cette personne te met mal à l\'aise, tu peux aussi la bloquer.');
+  }catch(err){
+    alert("Le signalement n'est pas parti : " + (err.message ?? err));
+  }
+}
+
 async function rafraichirListe(){
   conversations = await listerConversations();
   rendreListe();
@@ -220,6 +270,8 @@ async function rafraichir(){
     if(nouveaux.length){
       dernierMessageId = nouveaux[nouveaux.length - 1].id;
       ajouterMessages(nouveaux);
+      // Le fil est sous les yeux du lecteur : ces messages sont lus.
+      if(document.visibilityState === 'visible') await noterCommeLu();
     }
   }
   await rafraichirListe();

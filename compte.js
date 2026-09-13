@@ -38,9 +38,24 @@ function estConnecte(){
   return membre !== null;
 }
 
+// Âge minimum pour s'inscrire. La règle est aussi posée dans la base :
+// une vérification côté navigateur se contourne trop facilement.
+const AGE_MINIMUM = 15;
+
+// Renvoie null si la date convient, sinon la raison du refus.
+function refusAge(dateNaissance){
+  if(!dateNaissance) return 'Indique ta date de naissance.';
+  const ne = new Date(dateNaissance);
+  if(Number.isNaN(ne.getTime())) return 'Cette date ne semble pas valide.';
+  const limite = new Date();
+  limite.setFullYear(limite.getFullYear() - AGE_MINIMUM);
+  if(ne > limite) return `Il faut avoir au moins ${AGE_MINIMUM} ans pour s'inscrire.`;
+  return null;
+}
+
 async function chargerProfil(){
   const db = await clientSupabase();
-  const { data } = await db.from('profils').select('pseudo, contact').eq('id', membre.id).maybeSingle();
+  const { data } = await db.from('profils').select('pseudo, contact, ne_le').eq('id', membre.id).maybeSingle();
   profil = data;
   return profil;
 }
@@ -50,13 +65,16 @@ async function chargerProfil(){
 // membre, une fois sa session ouverte.
 const PSEUDO_EN_ATTENTE = 'pokeclasseur_profil_en_attente';
 
-async function sInscrire(email, motDePasse, pseudo, contact){
+async function sInscrire(email, motDePasse, pseudo, contact, dateNaissance){
+  const refus = refusAge(dateNaissance);
+  if(refus) throw new Error(refus);
+
   const db = await clientSupabase();
 
   const { data, error } = await db.auth.signUp({ email, password: motDePasse });
   if(error) throw error;
 
-  const profilVoulu = { pseudo: pseudo.trim(), contact: contact.trim() || null };
+  const profilVoulu = { pseudo: pseudo.trim(), contact: contact.trim() || null, ne_le: dateNaissance };
 
   // Sans session, aucune écriture n'est possible : la base ne saurait pas
   // qui écrit.
@@ -71,9 +89,11 @@ async function sInscrire(email, motDePasse, pseudo, contact){
   return membre;
 }
 
-async function creerProfil({ pseudo, contact }){
+async function creerProfil({ pseudo, contact, ne_le }){
+  const refus = refusAge(ne_le);
+  if(refus) throw new Error(refus);
   const db = await clientSupabase();
-  const { error } = await db.from('profils').insert({ id: membre.id, pseudo, contact });
+  const { error } = await db.from('profils').insert({ id: membre.id, pseudo, contact, ne_le });
   // Un pseudo déjà pris est le seul cas courant : on le dit clairement
   // plutôt que de laisser remonter un message technique.
   if(error){
@@ -122,10 +142,12 @@ async function seDeconnecter(){
   profil = null;
 }
 
-async function majProfil(pseudo, contact){
+async function majProfil(pseudo, contact, dateNaissance){
+  const refus = refusAge(dateNaissance);
+  if(refus) throw new Error(refus);
   const db = await clientSupabase();
   const { error } = await db.from('profils')
-    .update({ pseudo: pseudo.trim(), contact: contact.trim() || null })
+    .update({ pseudo: pseudo.trim(), contact: contact.trim() || null, ne_le: dateNaissance })
     .eq('id', membre.id);
   if(error){
     if(error.code === '23505') throw new Error('Ce pseudo est déjà utilisé.');
@@ -233,4 +255,28 @@ function afficherEtatCompte(){
   }
   lien.textContent = estConnecte() ? `${profil?.pseudo ?? 'Mon compte'} →` : 'Se connecter →';
   lien.href = 'connexion.html';
+  if(estConnecte()) afficherNonLus();
+}
+
+// Styles de la pastille, embarqués ici pour que toutes les pages en
+// bénéficient sans dupliquer de CSS.
+document.head.appendChild(Object.assign(document.createElement('style'), { textContent: `
+  nav .pastille{display:inline-block;min-width:18px;padding:1px 5px;border-radius:9px;background:#A8431C;color:#F6EFEA;font-size:11px;font-weight:600;line-height:16px;text-align:center;vertical-align:1px;}
+`}));
+
+// Pastille sur le lien "Discussions". Elle n'apparaît que s'il y a quelque
+// chose à lire : une pastille à zéro n'apprend rien.
+async function afficherNonLus(){
+  const lien = document.querySelector('nav a[href="discussions.html"]');
+  if(!lien || typeof totalNonLus !== 'function') return;
+  try{
+    const nombre = await totalNonLus();
+    lien.querySelector('.pastille')?.remove();
+    if(nombre > 0){
+      lien.insertAdjacentHTML('beforeend',
+        ` <span class="pastille">${nombre > 99 ? '99+' : nombre}</span>`);
+    }
+  }catch(err){
+    console.warn('Compte des non-lus indisponible', err);
+  }
 }

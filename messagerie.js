@@ -76,3 +76,79 @@ function texteEchappe(texte){
   boite.textContent = texte;
   return boite.innerHTML;
 }
+
+// ------------------------------------------------ blocage et signalement --
+
+async function bloquerMembre(autreId){
+  const db = await clientSupabase();
+  const { error } = await db.from('blocages')
+    .insert({ bloqueur_id: membre.id, bloque_id: autreId });
+  if(error) throw error;
+}
+
+async function debloquerMembre(autreId){
+  const db = await clientSupabase();
+  const { error } = await db.from('blocages')
+    .delete().eq('bloqueur_id', membre.id).eq('bloque_id', autreId);
+  if(error) throw error;
+}
+
+async function aiJeBloque(autreId){
+  const db = await clientSupabase();
+  const { data } = await db.from('blocages')
+    .select('bloque_id').eq('bloqueur_id', membre.id).eq('bloque_id', autreId).maybeSingle();
+  return !!data;
+}
+
+async function signalerMembre(autreId, motif, messageId = null){
+  const db = await clientSupabase();
+  const { error } = await db.from('signalements').insert({
+    signaleur_id: membre.id,
+    signale_id: autreId,
+    message_id: messageId,
+    motif: motif.trim(),
+  });
+  if(error) throw error;
+}
+
+// ------------------------------------------------------------ non-lus --
+
+async function totalNonLus(){
+  const db = await clientSupabase();
+  const { data, error } = await db.rpc('total_non_lus');
+  if(error) throw error;
+  return data ?? 0;
+}
+
+// Mémorise jusqu'où le membre a lu dans une conversation.
+async function marquerLu(conversationId, dernierMessageId){
+  if(!dernierMessageId) return;
+  const db = await clientSupabase();
+  const { error } = await db.from('lectures').upsert({
+    utilisateur_id: membre.id,
+    conversation_id: conversationId,
+    dernier_message_lu: dernierMessageId,
+  });
+  if(error) throw error;
+}
+
+// Les membres que j'ai bloqués, avec leur pseudo. Le lien entre un blocage
+// et un profil ne peut pas être déduit automatiquement (le blocage désigne
+// un compte, pas un profil) : on rapproche donc les deux en deux temps.
+async function listerBlocages(){
+  const db = await clientSupabase();
+  const { data: blocages, error } = await db.from('blocages')
+    .select('bloque_id, cree_le').eq('bloqueur_id', membre.id);
+  if(error) throw error;
+  if(!blocages?.length) return [];
+
+  const { data: profils } = await db.from('profils')
+    .select('id, pseudo').in('id', blocages.map(b => b.bloque_id));
+  const pseudos = Object.fromEntries((profils ?? []).map(p => [p.id, p.pseudo]));
+
+  return blocages.map(b => ({
+    id: b.bloque_id,
+    pseudo: pseudos[b.bloque_id] ?? 'Membre supprimé',
+    cree_le: b.cree_le,
+  }));
+}

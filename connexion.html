@@ -53,6 +53,12 @@
   .compte-actuel{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:22px;}
   .compte-actuel .pseudo{font-family:'Newsreader',serif;font-size:24px;}
   .compte-actuel .detail{color:var(--text-on-ink-dim);font-size:13.5px;margin-top:4px;}
+  .bloques{margin-top:30px;border-top:1px solid rgba(237,234,224,0.08);padding-top:22px;}
+  .bloques h2{font-size:19px;margin-bottom:4px;}
+  .bloques p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
+  .bloque{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid rgba(237,234,224,0.06);font-size:14px;}
+  .bloque button{background:transparent;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);padding:5px 12px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit;}
+  .bloque button:hover{border-color:rgba(237,234,224,0.35);color:var(--text-on-ink)}
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
 </style>
 </head>
@@ -80,6 +86,7 @@
 <script src="supabase-config.js"></script>
 <script src="tags.js"></script>
 <script src="compte.js"></script>
+<script src="messagerie.js"></script>
 <script>
 let ongletActif = 'connexion';
 
@@ -114,6 +121,10 @@ function rendre(){
       <label for="pseudo">Pseudo</label>
       <input id="pseudo" type="text" value="${attendu.pseudo ?? ''}">
 
+      <label for="naissance">Date de naissance</label>
+      <input id="naissance" type="date" value="${attendu.ne_le ?? ''}">
+      <div class="aide">Il faut avoir au moins ${AGE_MINIMUM} ans. Cette date n'est jamais montrée aux autres membres.</div>
+
       <label for="contact">Comment te joindre (facultatif)</label>
       <input id="contact" type="text" value="${attendu.contact ?? ''}" placeholder="Pseudo Discord, e-mail...">
       <div class="aide">Affiché uniquement aux membres avec qui un échange est possible.</div>
@@ -140,6 +151,10 @@ function rendre(){
       <label for="pseudo">Pseudo</label>
       <input id="pseudo" type="text" value="${profil?.pseudo ?? ''}">
 
+      <label for="naissance">Date de naissance</label>
+      <input id="naissance" type="date" value="${profil?.ne_le ?? ''}">
+      <div class="aide">Il faut avoir au moins ${AGE_MINIMUM} ans. Cette date n'est jamais montrée aux autres membres.</div>
+
       <label for="contact">Comment te joindre</label>
       <input id="contact" type="text" value="${profil?.contact ?? ''}" placeholder="Pseudo Discord, e-mail...">
       <div class="aide">Affiché uniquement aux membres avec qui un échange est possible.</div>
@@ -147,7 +162,10 @@ function rendre(){
       <button class="principal" id="btn-maj">Enregistrer</button>
       <button class="discret" id="btn-deconnexion">Se déconnecter</button>
       <div id="message"></div>
+
+      <div class="bloques" id="bloques"></div>
     `;
+    afficherBloques();
     document.getElementById('btn-maj').addEventListener('click', enregistrerProfil);
     document.getElementById('btn-deconnexion').addEventListener('click', deconnexion);
     return;
@@ -175,6 +193,10 @@ function rendre(){
     ${inscription ? `
       <label for="pseudo">Pseudo</label>
       <input id="pseudo" type="text" placeholder="Le nom que verront les autres collectionneurs">
+
+      <label for="naissance">Date de naissance</label>
+      <input id="naissance" type="date">
+      <div class="aide">Il faut avoir au moins ${AGE_MINIMUM} ans pour s'inscrire. Cette date n'est jamais montrée aux autres membres.</div>
 
       <label for="contact">Comment te joindre (facultatif)</label>
       <input id="contact" type="text" placeholder="Pseudo Discord, e-mail...">
@@ -211,7 +233,7 @@ async function valider(){
   bouton.textContent = 'Un instant…';
   try{
     if(inscription){
-      await sInscrire(email, mdp, pseudo, document.getElementById('contact').value);
+      await sInscrire(email, mdp, pseudo, document.getElementById('contact').value, document.getElementById('naissance').value);
     }else{
       await seConnecter(email, mdp);
     }
@@ -238,6 +260,42 @@ function messageLisible(err){
   return texte;
 }
 
+// Membres bloqués : la fenêtre de blocage annonce que c'est réversible, il
+// faut donc que ça le soit réellement.
+async function afficherBloques(){
+  const zone = document.getElementById('bloques');
+  if(!zone) return;
+  try{
+    const bloques = await listerBlocages();
+    if(bloques.length === 0){ zone.innerHTML = ''; return; }
+    zone.innerHTML = `
+      <h2>Membres bloqués</h2>
+      <p>Vous ne pouvez plus vous écrire, et vous n'apparaissez plus dans les échanges possibles l'un de l'autre.</p>
+      ${bloques.map(b => `
+        <div class="bloque">
+          <span>${texteEchappe(b.pseudo)}</span>
+          <button data-debloquer="${b.id}">Débloquer</button>
+        </div>
+      `).join('')}
+    `;
+  }catch(err){
+    console.warn('Liste des blocages indisponible', err);
+  }
+}
+
+document.addEventListener('click', async (e) => {
+  const bouton = e.target.closest('[data-debloquer]');
+  if(!bouton) return;
+  bouton.disabled = true;
+  try{
+    await debloquerMembre(bouton.dataset.debloquer);
+    await afficherBloques();
+  }catch(err){
+    bouton.disabled = false;
+    afficherMessage('Le déblocage a échoué : ' + (err.message ?? err), 'err');
+  }
+});
+
 async function terminerProfil(){
   const pseudo = document.getElementById('pseudo').value.trim();
   if(!pseudo){
@@ -245,7 +303,11 @@ async function terminerProfil(){
     return;
   }
   try{
-    await creerProfil({ pseudo, contact: document.getElementById('contact').value.trim() || null });
+    await creerProfil({
+      pseudo,
+      contact: document.getElementById('contact').value.trim() || null,
+      ne_le: document.getElementById('naissance').value,
+    });
     await fusionnerCollection();
     afficherEtatCompte();
     rendre();
@@ -257,7 +319,7 @@ async function terminerProfil(){
 
 async function enregistrerProfil(){
   try{
-    await majProfil(document.getElementById('pseudo').value, document.getElementById('contact').value);
+    await majProfil(document.getElementById('pseudo').value, document.getElementById('contact').value, document.getElementById('naissance').value);
     afficherEtatCompte();
     rendre();
     afficherMessage('Profil enregistré.', 'ok');
