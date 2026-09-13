@@ -43,6 +43,7 @@
   .toolbar select{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:10px 14px;border-radius:4px;font-size:13px;font-family:inherit;}
   .filter-btn{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
   .filter-btn.on.obt{color:#E3C766;border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
+  .filter-btn.on.manq{color:#B9C2CE;border-color:rgba(185,194,206,0.45);background:rgba(185,194,206,0.08)}
   .filter-btn.on.rech{color:#E08862;border-color:rgba(168,67,28,0.5);background:rgba(168,67,28,0.1)}
   .filter-btn.on.ech{color:#5FBAAA;border-color:rgba(31,111,99,0.5);background:rgba(31,111,99,0.12)}
 
@@ -104,6 +105,7 @@
     <input type="text" id="filter-input" placeholder="Filtrer par nom ou numéro...">
     <select id="rarity-filter"><option value="">Toutes les raretés</option></select>
     <button class="filter-btn obt" id="btn-obt">✅ Obtenues</button>
+    <button class="filter-btn manq" id="btn-manq">⬜ Manquantes</button>
     <button class="filter-btn rech" id="btn-rech">❤️ Recherchées</button>
     <button class="filter-btn ech" id="btn-ech">🔁 Échangeables</button>
     <span id="save-status" style="font-size:12px;color:var(--text-on-ink-dim);opacity:0;transition:opacity .3s;">Enregistré ✓</span>
@@ -135,9 +137,13 @@ const setId = params.get('set') || 'sv03.5'; // "151" par défaut si aucune exte
 
 let allCards = [];
 const tagState = {}; // { [cardId]: { obt: bool, rech: bool, ech: bool } }
-let activeFilter = null; // un des TAGS, ou null
+let activeFilter = null; // un des FILTERS, ou null
 
+// Tags posables sur une carte (un bouton chacun sur la vignette).
 const TAGS = ['obt', 'rech', 'ech'];
+// Filtres de la barre d'outils. "manq" n'est pas un tag : c'est l'absence
+// du tag "obt", donc rien à cocher sur les cartes.
+const FILTERS = ['obt', 'manq', 'rech', 'ech'];
 const TAG_META = {
   obt:  { emoji: '✅', label: 'Obtenue' },
   rech: { emoji: '❤️', label: 'Recherchée' },
@@ -433,7 +439,8 @@ function filteredCards(){
   let filtered = allCards;
   if(q) filtered = filtered.filter(c => c.name.toLowerCase().includes(q) || (c.localId || '').includes(q));
   if(rarity) filtered = filtered.filter(c => c.rarity === rarity);
-  if(activeFilter) filtered = filtered.filter(c => tagState[c.id]?.[activeFilter]);
+  if(activeFilter === 'manq') filtered = filtered.filter(c => !tagState[c.id]?.obt);
+  else if(activeFilter) filtered = filtered.filter(c => tagState[c.id]?.[activeFilter]);
   return filtered;
 }
 
@@ -466,12 +473,12 @@ document.querySelectorAll('.bulk-btn').forEach(btn => {
   btn.addEventListener('click', () => bulkToggle(btn.dataset.bulk));
 });
 
-// Les trois filtres s'excluent : en activer un désactive les autres.
-TAGS.forEach(tag => {
-  document.getElementById(`btn-${tag}`).addEventListener('click', () => {
-    activeFilter = activeFilter === tag ? null : tag;
-    TAGS.forEach(t => {
-      document.getElementById(`btn-${t}`).classList.toggle('on', activeFilter === t);
+// Les filtres s'excluent : en activer un désactive les autres.
+FILTERS.forEach(filter => {
+  document.getElementById(`btn-${filter}`).addEventListener('click', () => {
+    activeFilter = activeFilter === filter ? null : filter;
+    FILTERS.forEach(f => {
+      document.getElementById(`btn-${f}`).classList.toggle('on', activeFilter === f);
     });
     applyFilters();
   });
