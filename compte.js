@@ -264,11 +264,20 @@ document.head.appendChild(Object.assign(document.createElement('style'), { textC
   nav .pastille{display:inline-block;min-width:18px;padding:1px 5px;border-radius:9px;background:#A8431C;color:#F6EFEA;font-size:11px;font-weight:600;line-height:16px;text-align:center;vertical-align:1px;}
 `}));
 
+async function totalNonLus(){
+  const db = await clientSupabase();
+  const { data, error } = await db.rpc('total_non_lus');
+  if(error) throw error;
+  return data ?? 0;
+}
+
 // Pastille sur le lien "Discussions". Elle n'apparaît que s'il y a quelque
-// chose à lire : une pastille à zéro n'apprend rien.
+// chose à lire : une pastille à zéro n'apprend rien. Elle vit ici, et non
+// dans le module de messagerie, pour s'afficher sur toutes les pages : ce
+// module-là n'est chargé que par celles qui manipulent des conversations.
 async function afficherNonLus(){
   const lien = document.querySelector('nav a[href="discussions.html"]');
-  if(!lien || typeof totalNonLus !== 'function') return;
+  if(!lien) return;
   try{
     const nombre = await totalNonLus();
     lien.querySelector('.pastille')?.remove();

@@ -113,13 +113,6 @@ async function signalerMembre(autreId, motif, messageId = null){
 
 // ------------------------------------------------------------ non-lus --
 
-async function totalNonLus(){
-  const db = await clientSupabase();
-  const { data, error } = await db.rpc('total_non_lus');
-  if(error) throw error;
-  return data ?? 0;
-}
-
 // Mémorise jusqu'où le membre a lu dans une conversation.
 async function marquerLu(conversationId, dernierMessageId){
   if(!dernierMessageId) return;
