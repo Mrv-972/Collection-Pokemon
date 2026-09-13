@@ -106,6 +106,32 @@
 // TCGdex, rien n'est stocké ici.
 let allSets = [];
 
+// La liste complète des extensions renvoyée par l'API ne précise pas leur
+// série (Base, XY, Écarlate et Violet...) — seule la fiche détaillée d'une
+// extension le fait. On déduit donc la série à partir du début de son
+// identifiant (ex : "swsh8" → Épée et Bouclier), en se basant sur les codes
+// utilisés par TCGdex pour chaque grande période du jeu.
+const ERA_NAMES = {
+  base: 'Base', neo: 'Neo', ecard: 'e-Card', ex: 'EX',
+  dp: 'Diamant & Perle', pl: 'Platine', hgss: 'HeartGold & SoulSilver',
+  hs: 'HeartGold & SoulSilver', bw: 'Noir & Blanc', xy: 'XY',
+  sm: 'Soleil et Lune', swsh: 'Épée et Bouclier',
+  sv: 'Écarlate et Violet', me: 'Méga-Évolution',
+};
+const ERA_PREFIXES = ['ecard', 'hgss', 'swsh', 'base', 'neo', 'bw', 'xy', 'sm', 'sv', 'me', 'dp', 'pl', 'ex'];
+function guessSeriesName(id){
+  if(/^[AB]\d/.test(id) || id === 'P-A') return 'Pokémon TCG Pocket';
+  if(id === 'dv1') return ERA_NAMES.bw;
+  if(id === 'col1') return ERA_NAMES.hgss;
+  if(id === 'g1' || id === 'dc1') return ERA_NAMES.xy;
+  if(id === 'det1') return ERA_NAMES.sm;
+  if(id.startsWith('cel')) return ERA_NAMES.swsh;
+  let m = id.match(/^tk-([a-z]+)-/) || id.match(/^\d{4}([a-z]+)/);
+  if(m && ERA_NAMES[m[1]]) return ERA_NAMES[m[1]];
+  for(const p of ERA_PREFIXES) if(id.startsWith(p)) return ERA_NAMES[p];
+  return 'Autres';
+}
+
 async function fetchJson(url, retries = 1){
   const res = await fetch(url);
   const text = await res.text();
@@ -132,9 +158,9 @@ async function loadSets(){
 
   try{
     const sets = await fetchJson('https://api.tcgdex.net/v2/fr/sets');
-    // Tri du plus récent au plus ancien, quand la date de sortie est fournie.
-    sets.sort((a, b) => (b.releaseDate || '').localeCompare(a.releaseDate || ''));
-    allSets = sets;
+    // L'API renvoie les extensions de la plus ancienne à la plus récente ;
+    // on inverse pour afficher les plus récentes en premier.
+    allSets = sets.reverse();
     sessionStorage.setItem('reliure_sets_tcgdex', JSON.stringify(allSets));
     renderSets(allSets);
   }catch(err){
@@ -147,7 +173,7 @@ function groupBySeries(sets){
   const groups = {};
   const order = [];
   sets.forEach(s => {
-    const seriesName = s.serie?.name || 'Autres';
+    const seriesName = s.serie?.name || guessSeriesName(s.id);
     if(!groups[seriesName]){ groups[seriesName] = []; order.push(seriesName); }
     groups[seriesName].push(s);
   });
