@@ -251,9 +251,8 @@ function renderHead(set){
   const year = set.releaseDate ? new Date(set.releaseDate).getFullYear() : '';
   const total = set.cardCount?.official ?? set.cardCount?.total ?? '?';
   const serie = set.serie?.name || '';
-  const logoSrc = set.logo ? set.logo + '.png' : `https://images.pokemontcg.io/${setId}/logo.png`;
   document.getElementById('page-head').innerHTML = `
-    <img src="${logoSrc}" alt="${set.name}" data-fallback="${set.logo ? `https://images.pokemontcg.io/${setId}/logo.png` : ''}" onerror="setLogoFallback(this)">
+    ${set.logo ? `<img src="${set.logo}.png" alt="${set.name}" data-fallback="${englishAsset(set.logo)}.png" onerror="setLogoFallback(this)">` : ''}
     <div>
       <h1>${set.name}</h1>
       <div class="meta">${[serie, year, total + ' cartes'].filter(Boolean).join(' · ')}</div>
@@ -261,9 +260,13 @@ function renderHead(set){
   `;
 }
 
-// Si l'image TCGdex d'une carte est manquante ou ne charge pas, on retente
-// avec l'ancienne API pokemontcg.io (dont les identifiants d'extensions
-// classiques coïncident souvent avec ceux de TCGdex) avant d'abandonner.
+// TCGdex héberge ses visuels par langue : certaines images existent en
+// anglais mais pas en français. On retente donc la version anglaise avant
+// d'abandonner.
+function englishAsset(url){
+  return url.replace('/fr/', '/en/');
+}
+
 function cardImgFallback(img){
   const fallback = img.dataset.fallback;
   if(fallback){
@@ -286,8 +289,8 @@ function renderCards(cards){
       <div class="card-tile">
         <div class="card-img-wrap">
           ${c.image
-            ? `<img src="${c.image}/low.webp" alt="${c.name}" loading="lazy" data-fallback="https://images.pokemontcg.io/${setId}/${c.localId}.png" onerror="cardImgFallback(this)">`
-            : `<img src="https://images.pokemontcg.io/${setId}/${c.localId}.png" alt="${c.name}" loading="lazy" onerror="cardImgFallback(this)">`}
+            ? `<img src="${c.image}/low.webp" alt="${c.name}" loading="lazy" data-fallback="${englishAsset(c.image)}/low.webp" onerror="cardImgFallback(this)">`
+            : `<span class="glyph">···</span>`}
         </div>
         <div class="card-num"><span>#${c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
         <div class="card-name">${c.name}</div>
