@@ -120,60 +120,67 @@ let allCards = [];
 const tagState = {}; // { [cardId]: { rech: bool, ech: bool } }
 let activeFilter = null; // 'rech' | 'ech' | null
 
-// Symboles officiels (ou les plus proches équivalents) utilisés sur les cartes imprimées.
-// Certaines raretés récentes (Illustration Rare, Hyper Rare...) n'ont pas de symbole
-// unique standardisé : on leur attribue le nombre d'étoiles le plus proche de l'usage courant.
+// Symboles imprimés sur les cartes, associés aux raretés telles que TCGdex
+// les nomme en français. Les raretés récentes (Illustration rare, Hyper
+// rare...) n'ont pas de symbole unique standardisé : on leur attribue le
+// nombre d'étoiles le plus proche de l'usage courant chez les collectionneurs.
 const RARITY_SYMBOLS = {
-  'Common': '●',
-  'Uncommon': '◆',
+  'Sans Rareté': '',
+  'Commune': '●',
+  'Peu Commune': '◆',
   'Rare': '★',
   'Rare Holo': '★',
-  'Rare Holo EX': '★★',
-  'Rare Holo GX': '★★',
-  'Rare Holo V': '★★',
-  'Rare Holo VMAX': '★★',
-  'Rare Holo VSTAR': '★★',
-  'Rare BREAK': '★★',
+  'Holo Rare': '★',
+  'Rare Noir Blanc': '★',
   'Rare Prime': '★★',
-  'Amazing Rare': '★★',
-  'Radiant Rare': '★★',
-  'Double Rare': '★★',
+  'Rare Holo LV.X': '★★',
+  'LÉGENDE': '★★',
+  'Magnifique': '★★',
+  'Magnifique rare': '★★',
+  'Radieux Rare': '★★',
+  'Collection Classique': '★★',
+  'HIGH-TECH rare': '★★',
+  'Holo Rare V': '★★',
+  'Holo Rare VMAX': '★★',
+  'Holo Rare VSTAR': '★★',
+  'Double rare': '★★',
+  'Shiny rare': '★★',
+  'Shiny rare V': '★★',
+  'Shiny rare VMAX': '★★',
   'Ultra Rare': '★★★',
-  'Rare Ultra': '★★★',
-  'Illustration Rare': '★★★',
-  'Special Illustration Rare': '★★★★',
-  'Hyper Rare': '★★★★',
-  'Rare Rainbow': '★★★★',
-  'Rare Secret': '★★★★',
-  'Rare Shiny': '★★',
-  'Rare Shiny GX': '★★★',
-  'Shiny Rare': '★★',
-  'Shiny Ultra Rare': '★★★',
-  'ACE SPEC Rare': '★★★',
-  'Classic Collection': '★★',
-  'LEGEND': '★★',
+  'Dresseur Full Art': '★★★',
+  'Illustration rare': '★★★',
+  'Chromatique ultra rare': '★★★',
+  'Illustration spéciale rare': '★★★★',
+  'Hyper rare': '★★★★',
+  'Méga Hyper Rare': '★★★★',
   'Promo': '✦',
 };
 function raritySymbol(rarity){
   if(!rarity) return '';
-  if(RARITY_SYMBOLS[rarity]) return RARITY_SYMBOLS[rarity];
-  if(/secret|rainbow|hyper/i.test(rarity)) return '★★★★';
+  if(rarity in RARITY_SYMBOLS) return RARITY_SYMBOLS[rarity];
+  if(/hyper|spéciale/i.test(rarity)) return '★★★★';
   if(/ultra|illustration/i.test(rarity)) return '★★★';
   if(/holo|rare/i.test(rarity)) return '★';
-  if(/peu commune|uncommon/i.test(rarity)) return '◆';
-  if(/commune|common/i.test(rarity)) return '●';
+  if(/peu commune/i.test(rarity)) return '◆';
+  if(/commune/i.test(rarity)) return '●';
   return '✦';
+}
+
+// Ordre d'affichage dans le filtre : du plus commun au plus rare.
+const SYMBOL_RANK = { '': 0, '●': 1, '◆': 2, '★': 3, '★★': 4, '★★★': 5, '★★★★': 6, '✦': 7 };
+function rarityRank(rarity){
+  return SYMBOL_RANK[raritySymbol(rarity)] ?? 9;
 }
 
 function populateRarityFilter(cards){
   const select = document.getElementById('rarity-filter');
-  const seen = new Set();
-  const rarities = [];
-  cards.forEach(c => { if(c.rarity && !seen.has(c.rarity)){ seen.add(c.rarity); rarities.push(c.rarity); } });
-  // Trie du plus commun au plus rare, en s'appuyant sur le nombre de symboles.
-  rarities.sort((a, b) => raritySymbol(a).length - raritySymbol(b).length);
+  const previous = select.value;
+  const rarities = [...new Set(cards.map(c => c.rarity).filter(Boolean))];
+  rarities.sort((a, b) => rarityRank(a) - rarityRank(b) || a.localeCompare(b));
   select.innerHTML = '<option value="">Toutes les raretés</option>' +
     rarities.map(r => `<option value="${r}">${raritySymbol(r)} ${r}</option>`).join('');
+  select.value = previous;
 }
 
 async function fetchJson(url, retries = 1){
@@ -187,6 +194,69 @@ async function fetchJson(url, retries = 1){
     throw new Error(`Réponse vide ou erreur HTTP ${res.status}.`);
   }
   return JSON.parse(text);
+}
+
+// TCGdex ne renvoie pas la rareté dans la liste des cartes d'une extension.
+// On interroge donc l'API rareté par rareté ("quelles cartes de cette
+// extension sont communes ?", etc.) pour recomposer l'information. L'ordre
+// ci-dessous part des raretés les plus répandues, ce qui permet de s'arrêter
+// dès que toutes les cartes de l'extension ont trouvé la leur.
+// Les raretés propres à Pokémon TCG Pocket (Diamants, Étoiles, Couronne,
+// Chromatiques) sont volontairement absentes : ce jeu est hors périmètre.
+const RARITIES_TO_PROBE = [
+  'Commune', 'Peu Commune', 'Rare', 'Rare Holo', 'Holo Rare', 'Double rare',
+  'Ultra Rare', 'Illustration rare', 'Illustration spéciale rare', 'Hyper rare',
+  'Holo Rare V', 'Holo Rare VMAX', 'Holo Rare VSTAR', 'Promo', 'Sans Rareté',
+  'Dresseur Full Art', 'Shiny rare', 'Shiny rare V', 'Shiny rare VMAX',
+  'Radieux Rare', 'Chromatique ultra rare', 'Magnifique rare', 'Magnifique',
+  'Rare Prime', 'Rare Holo LV.X', 'Rare Noir Blanc', 'LÉGENDE',
+  'Collection Classique', 'HIGH-TECH rare', 'Méga Hyper Rare',
+];
+
+async function loadRarities(){
+  const cacheKey = `reliure_rar_${setId}`;
+  const cached = sessionStorage.getItem(cacheKey);
+  if(cached){
+    applyRarities(JSON.parse(cached));
+    return;
+  }
+
+  const byCardId = {};
+  let remaining = allCards.length;
+  // Par lots, pour ne pas saturer le navigateur ni l'API, en s'arrêtant dès
+  // que chaque carte a sa rareté.
+  for(let i = 0; i < RARITIES_TO_PROBE.length && remaining > 0; i += 5){
+    const batch = RARITIES_TO_PROBE.slice(i, i + 5);
+    const results = await Promise.all(batch.map(async rarity => {
+      try{
+        const url = `https://api.tcgdex.net/v2/fr/cards?set.id=eq:${setId}&rarity=eq:${encodeURIComponent(rarity)}`;
+        return { rarity, cards: await fetchJson(url, 0) };
+      }catch(err){
+        return { rarity, cards: [] };
+      }
+    }));
+    // Garde-fou : si une rareté "correspond" à toutes les cartes de
+    // l'extension, c'est que le filtre n'a pas été appliqué par l'API. Mieux
+    // vaut aucune rareté qu'une rareté fausse sur toutes les cartes.
+    if(results.some(r => r.cards.length === allCards.length && allCards.length > 12)){
+      console.warn("Le filtre par rareté n'est pas appliqué par l'API — raretés ignorées.");
+      return;
+    }
+    results.forEach(({ rarity, cards }) => {
+      cards.forEach(c => {
+        if(!byCardId[c.id]){ byCardId[c.id] = rarity; remaining--; }
+      });
+    });
+  }
+
+  sessionStorage.setItem(cacheKey, JSON.stringify(byCardId));
+  applyRarities(byCardId);
+}
+
+function applyRarities(byCardId){
+  allCards.forEach(c => { c.rarity = byCardId[c.id]; });
+  populateRarityFilter(allCards);
+  applyFilters();
 }
 
 async function init(){
@@ -227,6 +297,8 @@ async function init(){
     populateRarityFilter(allCards);
     renderCards(allCards);
     sessionStorage.setItem(cacheKey, JSON.stringify({ set, cards: allCards }));
+    // Les raretés arrivent après coup : les cartes restent affichées pendant ce temps.
+    loadRarities().catch(err => console.warn('Impossible de charger les raretés', err));
   }catch(err){
     console.warn("Impossible de charger l'extension", err);
     if(!cached){
