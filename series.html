@@ -173,12 +173,8 @@ async function loadSets(){
   }
 }
 
-// TCGdex héberge ses visuels par langue : certains logos existent en anglais
-// mais pas en français. On retente donc la version anglaise avant d'abandonner.
-function englishAsset(url){
-  return url.replace('/fr/', '/en/');
-}
-
+// Quand TCGdex n'a pas le logo français d'une extension, on retombe sur une
+// image ajoutée à la main dans le dépôt (images/sets/<id de l'extension>.png).
 function setLogoFallback(img){
   const fallback = img.dataset.fallback;
   if(fallback){
@@ -215,8 +211,8 @@ function renderSets(sets){
       return `
       <a class="set-card" href="extension.html?set=${s.id}">
         <div class="set-logo">${s.logo
-          ? `<img src="${s.logo}.png" alt="${s.name}" loading="lazy" data-fallback="${englishAsset(s.logo)}.png" onerror="setLogoFallback(this)">`
-          : ''}</div>
+          ? `<img src="${s.logo}.png" alt="${s.name}" loading="lazy" data-fallback="images/sets/${s.id}.png" onerror="setLogoFallback(this)">`
+          : `<img src="images/sets/${s.id}.png" alt="${s.name}" loading="lazy" onerror="setLogoFallback(this)">`}</div>
         <div class="set-name">${s.name}</div>
         <div class="set-meta">
           <span>${year}</span>

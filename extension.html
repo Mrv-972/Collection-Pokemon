@@ -252,7 +252,9 @@ function renderHead(set){
   const total = set.cardCount?.official ?? set.cardCount?.total ?? '?';
   const serie = set.serie?.name || '';
   document.getElementById('page-head').innerHTML = `
-    ${set.logo ? `<img src="${set.logo}.png" alt="${set.name}" data-fallback="${englishAsset(set.logo)}.png" onerror="setLogoFallback(this)">` : ''}
+    ${set.logo
+      ? `<img src="${set.logo}.png" alt="${set.name}" data-fallback="images/sets/${setId}.png" onerror="setLogoFallback(this)">`
+      : `<img src="images/sets/${setId}.png" alt="${set.name}" onerror="setLogoFallback(this)">`}
     <div>
       <h1>${set.name}</h1>
       <div class="meta">${[serie, year, total + ' cartes'].filter(Boolean).join(' · ')}</div>
@@ -260,13 +262,8 @@ function renderHead(set){
   `;
 }
 
-// TCGdex héberge ses visuels par langue : certaines images existent en
-// anglais mais pas en français. On retente donc la version anglaise avant
-// d'abandonner.
-function englishAsset(url){
-  return url.replace('/fr/', '/en/');
-}
-
+// Quand TCGdex n'a pas le visuel français d'une carte, on retombe sur une
+// image ajoutée à la main dans le dépôt (images/cards/<id de la carte>.png).
 function cardImgFallback(img){
   const fallback = img.dataset.fallback;
   if(fallback){
@@ -289,8 +286,8 @@ function renderCards(cards){
       <div class="card-tile">
         <div class="card-img-wrap">
           ${c.image
-            ? `<img src="${c.image}/low.webp" alt="${c.name}" loading="lazy" data-fallback="${englishAsset(c.image)}/low.webp" onerror="cardImgFallback(this)">`
-            : `<span class="glyph">···</span>`}
+            ? `<img src="${c.image}/low.webp" alt="${c.name}" loading="lazy" data-fallback="images/cards/${c.id}.png" onerror="cardImgFallback(this)">`
+            : `<img src="images/cards/${c.id}.png" alt="${c.name}" loading="lazy" onerror="cardImgFallback(this)">`}
         </div>
         <div class="card-num"><span>#${c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
         <div class="card-name">${c.name}</div>
