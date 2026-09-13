@@ -171,3 +171,55 @@ function cardTile(c, subtitle){
 function setIdOfCard(cardId){
   return cardId.slice(0, cardId.lastIndexOf('-'));
 }
+
+// --- Agrandissement d'une carte au clic -----------------------------------
+// Le composant est autonome (styles compris) pour que les deux grilles en
+// bénéficient sans dupliquer de CSS dans chaque page.
+
+document.head.appendChild(Object.assign(document.createElement('style'), { textContent: `
+  .card-img-wrap img{cursor:zoom-in}
+  .card-zoom{position:fixed;inset:0;z-index:50;background:rgba(10,11,13,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;cursor:zoom-out;opacity:0;transition:opacity .15s;}
+  .card-zoom.shown{opacity:1}
+  .card-zoom img{max-width:min(460px,100%);max-height:78vh;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,0.6);}
+  .card-zoom .caption{font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:#EDEAE0;text-align:center;}
+  .card-zoom .caption .hint{display:block;margin-top:4px;font-size:11.5px;color:#9B9E9C;}
+`}));
+
+function openCardZoom(img){
+  const thumbnail = img.currentSrc || img.src;
+  // La vignette est déjà en cache : on l'affiche tout de suite, puis on la
+  // remplace par la haute définition dès qu'elle est prête.
+  const fullSize = thumbnail.includes('/low.webp') ? thumbnail.replace('/low.webp', '/high.webp') : thumbnail;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'card-zoom';
+  overlay.innerHTML = `
+    <img src="${thumbnail}" alt="${img.alt}">
+    <div class="caption">${img.alt}<span class="hint">Clique ou appuie sur Échap pour fermer</span></div>
+  `;
+
+  const close = () => {
+    overlay.classList.remove('shown');
+    document.removeEventListener('keydown', onKey);
+    document.body.style.overflow = '';
+    setTimeout(() => overlay.remove(), 150);
+  };
+  const onKey = (e) => { if(e.key === 'Escape') close(); };
+
+  overlay.addEventListener('click', close);
+  document.addEventListener('keydown', onKey);
+  document.body.style.overflow = 'hidden';
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('shown'));
+
+  if(fullSize !== thumbnail){
+    const large = new Image();
+    large.onload = () => { overlay.querySelector('img').src = fullSize; };
+    large.src = fullSize;
+  }
+}
+
+document.addEventListener('click', (e) => {
+  const img = e.target.closest('.card-img-wrap img');
+  if(img) openCardZoom(img);
+});
