@@ -155,8 +155,8 @@ function cardTile(c, subtitle){
     <div class="card-tile">
       <div class="card-img-wrap">
         ${c.image
-          ? `<img src="${c.image}/low.webp" alt="${c.name}" loading="lazy" data-fallback="images/cards/${c.id}.png" onerror="cardImgFallback(this)">`
-          : `<img src="images/cards/${c.id}.png" alt="${c.name}" loading="lazy" onerror="cardImgFallback(this)">`}
+          ? `<img src="${c.image}/low.webp" alt="${c.name}" loading="lazy" data-card-id="${c.id}" data-fallback="images/cards/${c.id}.png" onerror="cardImgFallback(this)">`
+          : `<img src="images/cards/${c.id}.png" alt="${c.name}" loading="lazy" data-card-id="${c.id}" onerror="cardImgFallback(this)">`}
       </div>
       <div class="card-num"><span>${subtitle ?? '#' + c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
       <div class="card-name">${c.name}</div>
@@ -183,6 +183,8 @@ document.head.appendChild(Object.assign(document.createElement('style'), { textC
   .card-zoom img{max-width:min(460px,100%);max-height:78vh;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,0.6);}
   .card-zoom .caption{font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:#EDEAE0;text-align:center;}
   .card-zoom .caption .hint{display:block;margin-top:4px;font-size:11.5px;color:#9B9E9C;}
+  .card-zoom .valeur{display:block;margin-top:6px;font-size:15px;color:#E3C766;}
+  .card-zoom .valeur small{display:block;margin-top:2px;font-size:11px;color:#9B9E9C;}
 `}));
 
 function openCardZoom(img){
@@ -195,7 +197,7 @@ function openCardZoom(img){
   overlay.className = 'card-zoom';
   overlay.innerHTML = `
     <img src="${thumbnail}" alt="${img.alt}">
-    <div class="caption">${img.alt}<span class="hint">Clique ou appuie sur Échap pour fermer</span></div>
+    <div class="caption">${img.alt}<span class="valeur" id="zoom-valeur"></span><span class="hint">Clique ou appuie sur Échap pour fermer</span></div>
   `;
 
   const close = () => {
@@ -211,6 +213,18 @@ function openCardZoom(img){
   document.body.style.overflow = 'hidden';
   document.body.appendChild(overlay);
   requestAnimationFrame(() => overlay.classList.add('shown'));
+
+  // La cote arrive après coup : elle ne doit pas retarder l'agrandissement.
+  const carteId = img.dataset.cardId;
+  if(carteId && typeof prixCarte === 'function'){
+    prixCarte(carteId).then(prix => {
+      const zone = overlay.querySelector('#zoom-valeur');
+      if(!zone) return; // Vue déjà refermée.
+      zone.innerHTML = prix
+        ? `≈ ${prixLisible(prix)}<small>Cote indicative pour une carte en bon état${prix.devise === 'USD' ? ', marché nord-américain faute de cote européenne' : ''}${prix.variantes ? ' — d\'autres éditions de cette carte se négocient à des prix très différents' : ''}</small>`
+        : `<small>Pas de cote connue pour cette carte</small>`;
+    });
+  }
 
   if(fullSize !== thumbnail){
     const large = new Image();

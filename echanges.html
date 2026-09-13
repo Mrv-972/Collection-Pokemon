@@ -53,7 +53,16 @@
 
   .colonnes{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
   @media(max-width:720px){.colonnes{grid-template-columns:1fr}}
-  .colonne h3{font-size:13px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;letter-spacing:.3px;margin-bottom:12px;}
+  .colonne h3{font-size:13px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;letter-spacing:.3px;margin-bottom:4px;}
+  .colonne .total{font-size:12.5px;color:var(--text-on-ink-dim);margin-bottom:12px;}
+  .colonne .total strong{color:#E3C766;font-weight:600;}
+  .balance{margin-top:18px;padding:12px 14px;border-radius:5px;font-size:13px;background:rgba(237,234,224,0.04);border:1px solid rgba(237,234,224,0.08);}
+  .balance .ecart{font-weight:600;}
+  .balance.equitable{border-color:rgba(31,111,99,0.4);background:rgba(31,111,99,0.1)}
+  .balance.equitable .ecart{color:#5FBAAA}
+  .balance.desequilibre{border-color:rgba(201,162,39,0.35);background:rgba(201,162,39,0.08)}
+  .balance.desequilibre .ecart{color:#E3C766}
+  .balance small{display:block;margin-top:5px;font-size:11.5px;color:var(--text-on-ink-dim);}
   .colonne.recoit h3{color:#5FBAAA}
   .colonne.donne h3{color:#E08862}
   .colonne .vide{color:var(--text-on-ink-dim);font-size:13px;}
@@ -65,6 +74,7 @@
   .mini .img img{width:100%;height:100%;object-fit:cover;}
   .mini .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:26px;}
   .mini .nom{font-size:11.5px;line-height:1.25;}
+  .mini .valeur{font-size:11px;color:#E3C766;}
   .mini .ext{font-size:10.5px;color:var(--text-on-ink-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
   .status-msg{color:var(--text-on-ink-dim);font-size:15px;padding:28px 0;}
@@ -114,6 +124,7 @@
 <script src="sets.js"></script>
 <script src="tags.js"></script>
 <script src="cards.js"></script>
+<script src="prix.js"></script>
 <script src="compte.js"></script>
 <script src="messagerie.js"></script>
 <script>
@@ -167,6 +178,7 @@ function miniCarte(carteId){
           : `<span class="glyph">?</span>`}
       </div>
       <div class="nom">${nom}</div>
+      <div class="valeur" data-prix="${carteId}"></div>
       <div class="ext">${nomsExtensions[setId] || setId}${info.localId ? ' · #' + info.localId : ''}</div>
     </div>
   `;
@@ -176,6 +188,7 @@ function colonne(classe, titre, cartes, messageVide){
   return `
     <div class="colonne ${classe}">
       <h3>${titre}</h3>
+      <div class="total" data-total="${cartes.join(',')}"></div>
       ${cartes.length === 0
         ? `<p class="vide">${messageVide}</p>`
         : `<div class="mini-grid">${cartes.map(miniCarte).join('')}</div>`}
@@ -208,6 +221,7 @@ function rendre(){
         <a class="discuter" href="discussions.html?membre=${m.membre_id}">Lui écrire</a>
         ${m.contact ? `<span class="ailleurs">ou le joindre sur <strong>${texteEchappe(m.contact)}</strong></span>` : ''}
       </div>
+      <div class="balance" data-balance="${m.membre_id}"></div>
       <div class="colonnes">
         ${colonne('recoit', `↓ Ce qu'il peut te donner (${m.il_me_donne.length})`, m.il_me_donne,
                   'Rien que tu recherches pour le moment.')}
@@ -216,6 +230,57 @@ function rendre(){
       </div>
     </div>
   `).join('');
+}
+
+// Les cotes arrivent après l'affichage : chaque carte demande une requête,
+// et on ne fait pas attendre la page pour ça.
+async function afficherPrix(){
+  const ids = [...new Set(correspondances.flatMap(m => [...m.il_me_donne, ...m.je_lui_donne]))];
+  if(ids.length === 0) return;
+  const prix = await prixDeCartes(ids);
+
+  document.querySelectorAll('[data-prix]').forEach(el => {
+    const p = prix[el.dataset.prix];
+    el.textContent = p ? '≈ ' + prixLisible(p) : '';
+  });
+
+  document.querySelectorAll('[data-total]').forEach(el => {
+    const cartes = el.dataset.total ? el.dataset.total.split(',') : [];
+    const bilan = totalLisible(prix, cartes);
+    if(cartes.length === 0){ el.textContent = ''; return; }
+    el.innerHTML = bilan.texte
+      ? `Valeur : <strong>${bilan.texte}</strong>${bilan.sansCote > 0 ? ` <span>(${bilan.sansCote} sans cote)</span>` : ''}`
+      : 'Aucune cote connue';
+  });
+
+  document.querySelectorAll('[data-balance]').forEach(el => {
+    const m = correspondances.find(c => c.membre_id === el.dataset.balance);
+    if(!m) return;
+    el.innerHTML = texteBalance(totalLisible(prix, m.il_me_donne), totalLisible(prix, m.je_lui_donne), el);
+  });
+}
+
+// Une différence de valeur ne dit pas si un échange est juste : elle dit
+// seulement de combien les cotes s'écartent. L'état réel des cartes et ce que
+// chacun y attache comptent au moins autant.
+function texteBalance(recu, donne, el){
+  if(recu.cotees === 0 && donne.cotees === 0){
+    el.className = 'balance';
+    return 'Aucune des cartes de cet échange n\'a de cote connue.';
+  }
+  const ecart = Math.abs(recu.total - donne.total);
+  const plusGros = Math.max(recu.total, donne.total);
+  const proche = plusGros === 0 || ecart / plusGros <= 0.15;
+
+  el.className = `balance ${proche ? 'equitable' : 'desequilibre'}`;
+  const sens = recu.total > donne.total ? 'à ton avantage' : 'en sa faveur';
+  const manquantes = recu.sansCote + donne.sansCote;
+
+  return `${proche
+      ? `<span class="ecart">Valeurs proches</span> — l'échange paraît équilibré.`
+      : `<span class="ecart">Écart d'environ ${prixLisible({ montant: ecart, devise: recu.devise ?? donne.devise ?? 'EUR' })}</span> ${sens}.`}
+    <small>Cotes indicatives, mises à jour chaque jour, pour des cartes en bon état.
+    L'état réel de chaque exemplaire change beaucoup la donne.${manquantes > 0 ? ` ${manquantes} carte${manquantes > 1 ? 's' : ''} sans cote ne ${manquantes > 1 ? 'sont' : 'est'} pas comptée${manquantes > 1 ? 's' : ''}.` : ''}</small>`;
 }
 
 function majResume(){
@@ -256,6 +321,7 @@ async function init(){
     await chargerInfosCartes(ids);
     majResume();
     rendre();
+    afficherPrix().catch(err => console.warn('Cotes indisponibles', err));
   }catch(err){
     console.warn('Impossible de charger les échanges', err);
     content.innerHTML = `<p class="status-msg err">Impossible de charger les échanges pour le moment.<br>
@@ -267,6 +333,7 @@ document.getElementById('btn-equilibres').addEventListener('click', (e) => {
   equilibresSeulement = !equilibresSeulement;
   e.currentTarget.classList.toggle('on', equilibresSeulement);
   rendre();
+  afficherPrix().catch(err => console.warn('Cotes indisponibles', err));
 });
 
 init();
