@@ -79,16 +79,23 @@ async function prixCarte(carteId){
   return prix;
 }
 
-// Par petits paquets : une carte coûte une requête, et un échange peut en
-// compter plusieurs dizaines.
-async function prixDeCartes(idsCartes){
+// Par petits paquets : une carte coûte une requête, et une extension entière
+// en compte deux cents. `avancement` permet d'en rendre compte à l'écran,
+// car l'attente est perceptible.
+async function prixDeCartes(idsCartes, avancement){
   const resultat = {};
   for(let i = 0; i < idsCartes.length; i += 6){
     const lot = idsCartes.slice(i, i + 6);
     const prix = await Promise.all(lot.map(prixCarte));
     lot.forEach((id, n) => { resultat[id] = prix[n]; });
+    if(avancement) avancement(Math.min(i + lot.length, idsCartes.length), idsCartes.length);
   }
   return resultat;
+}
+
+// La cote déjà connue d'une carte, sans rien aller chercher.
+function prixConnu(carteId){
+  return prixEnMemoire[carteId] ?? null;
 }
 
 function prixLisible(prix){

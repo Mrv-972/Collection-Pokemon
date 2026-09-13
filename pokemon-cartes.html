@@ -49,6 +49,14 @@
   .filter-btn.on.rech{color:#E08862;border-color:rgba(168,67,28,0.5);background:rgba(168,67,28,0.1)}
   .filter-btn.on.ech{color:#5FBAAA;border-color:rgba(31,111,99,0.5);background:rgba(31,111,99,0.12)}
 
+  .tri-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:-18px;padding-bottom:14px;font-size:12.5px;color:var(--text-on-ink-dim);}
+  .tri-row select{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:6px 10px;border-radius:4px;font-size:12.5px;font-family:inherit;}
+  .tri-row button{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:5px 11px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;line-height:1.3;}
+  .tri-row button:hover{border-color:rgba(237,234,224,0.35)}
+  .tri-row select:disabled, .tri-row button:disabled{opacity:.5;cursor:default}
+  .tri-row #tri-etat{color:#E3C766;}
+  .card-cote{font-size:11.5px;color:#E3C766;margin-top:-3px;}
+
   .bulk-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:-14px;padding-bottom:28px;font-size:12.5px;color:var(--text-on-ink-dim);}
   .bulk-btn{font-size:14px;line-height:1.2;padding:4px 12px;border-radius:3px;cursor:pointer;border:1px solid rgba(237,234,224,0.14);background:transparent;font-family:inherit;transition:.12s;}
   .bulk-btn:hover{border-color:rgba(237,234,224,0.35);background:rgba(237,234,224,0.04)}
@@ -113,6 +121,16 @@
     <button class="filter-btn rech" id="btn-rech">❤️ Recherchées</button>
     <button class="filter-btn ech" id="btn-ech">🔁 Échangeables</button>
     <span id="save-status" style="font-size:12px;color:var(--text-on-ink-dim);opacity:0;transition:opacity .3s;">Enregistré ✓</span>
+  </div>
+
+  <div class="tri-row">
+    <label for="tri">Trier par</label>
+    <select id="tri">
+      <option value="numero">Numéro de carte</option>
+      <option value="valeur">Valeur</option>
+    </select>
+    <button id="tri-sens" title="Inverser l'ordre">↑</button>
+    <span id="tri-etat"></span>
   </div>
 
   <div class="bulk-row">
@@ -237,7 +255,7 @@ function filteredCards(){
 }
 
 function applyFilters(){
-  const filtered = filteredCards();
+  const filtered = trierCartes(filteredCards());
   renderCards(filtered);
   const count = filtered.length;
   document.getElementById('bulk-count').textContent =
@@ -335,6 +353,8 @@ FILTERS.forEach(filter => {
     applyFilters();
   });
 });
+
+installerTri(() => allCards, applyFilters);
 
 init();
 </script>

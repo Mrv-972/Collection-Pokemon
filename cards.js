@@ -160,9 +160,88 @@ function cardTile(c, subtitle){
       </div>
       <div class="card-num"><span>${subtitle ?? '#' + c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
       <div class="card-name">${c.name}</div>
+      ${coteVignette(c.id)}
       <div class="tag-row">${tagButtons(c.id)}</div>
     </div>
   `;
+}
+
+// La cote n'est affichée que si elle a déjà été récupérée — c'est-à-dire
+// après un tri par valeur. Sinon la ligne est absente, plutôt que d'occuper
+// une place vide.
+function coteVignette(carteId){
+  if(typeof prixConnu !== 'function') return '';
+  const prix = prixConnu(carteId);
+  return prix ? `<div class="card-cote">≈ ${prixLisible(prix)}</div>` : '';
+}
+
+// --- Tri d'une grille ------------------------------------------------------
+// Le tri par valeur suppose de connaître le prix de chaque carte, soit une
+// requête par carte. On ne le paie donc qu'à la demande explicite du membre,
+// et une seule fois par extension et par visite.
+
+let triCritere = 'numero';
+let triCroissant = true;
+
+function trierCartes(cartes){
+  const triees = [...cartes];
+  if(triCritere === 'valeur'){
+    triees.sort((a, b) => {
+      const pa = prixConnu(a.id)?.montant;
+      const pb = prixConnu(b.id)?.montant;
+      // Une carte sans cote n'est pas une carte à zéro euro : elle va au
+      // bout, quel que soit le sens du tri.
+      if(pa == null && pb == null) return 0;
+      if(pa == null) return 1;
+      if(pb == null) return -1;
+      return triCroissant ? pa - pb : pb - pa;
+    });
+  }else{
+    triees.sort((a, b) => {
+      const ordre = (a.localId || '').localeCompare(b.localId || '', undefined, { numeric: true });
+      return triCroissant ? ordre : -ordre;
+    });
+  }
+  return triees;
+}
+
+// Branche les deux contrôles de tri d'une page sur son propre rafraîchissement.
+// `cartesAtrier` fournit les cartes concernées au moment du chargement des
+// cotes ; `rafraichir` redessine la grille.
+function installerTri(cartesAtrier, rafraichir){
+  const choix = document.getElementById('tri');
+  const sens = document.getElementById('tri-sens');
+  const etat = document.getElementById('tri-etat');
+  if(!choix || !sens) return;
+
+  const majSens = () => {
+    sens.textContent = triCroissant ? '↑' : '↓';
+    sens.title = triCritere === 'valeur'
+      ? (triCroissant ? 'De la moins chère à la plus chère' : 'De la plus chère à la moins chère')
+      : (triCroissant ? 'Du plus petit au plus grand numéro' : 'Du plus grand au plus petit numéro');
+  };
+
+  const appliquer = async () => {
+    if(triCritere === 'valeur'){
+      const cartes = cartesAtrier();
+      const manquantes = cartes.filter(c => prixConnu(c.id) === null).map(c => c.id);
+      if(manquantes.length > 0){
+        choix.disabled = sens.disabled = true;
+        etat.textContent = `Chargement des cotes… 0/${manquantes.length}`;
+        await prixDeCartes(manquantes, (faits, total) => {
+          etat.textContent = `Chargement des cotes… ${faits}/${total}`;
+        });
+        etat.textContent = '';
+        choix.disabled = sens.disabled = false;
+      }
+    }
+    majSens();
+    rafraichir();
+  };
+
+  choix.addEventListener('change', () => { triCritere = choix.value; appliquer(); });
+  sens.addEventListener('click', () => { triCroissant = !triCroissant; appliquer(); });
+  majSens();
 }
 
 // L'identifiant d'une carte est "<id de l'extension>-<numéro>", et un id
