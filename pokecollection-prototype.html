@@ -123,7 +123,7 @@
       <p>Range ta collection Pokémon extension par extension, marque ce que tu cherches et ce que tu peux céder — Reliure trouve les collectionneurs avec qui échanger, automatiquement.</p>
       <div class="hero-actions">
         <a class="cta-btn" href="series.html">Créer mon classeur</a>
-        <a class="link-quiet" href="extension.html?set=sv3pt5">Voir une collection type</a>
+        <a class="link-quiet" href="extension.html?set=sv03.5">Voir une collection type</a>
       </div>
     </div>
     <div class="binder">
@@ -178,10 +178,10 @@
       <p>Chaque extension a sa propre page de classeur, avec l'avancement de ta collection en un coup d'œil.</p>
     </div>
     <div class="ext-grid">
-      <a class="ext-card" href="extension.html?set=sv3pt5"><div class="count">142 / 165</div><h3>151</h3><div class="bar"><div class="fill" style="width:86%"></div></div></a>
-      <a class="ext-card" href="extension.html?set=sv1"><div class="count">58 / 197</div><h3>Écarlate et Violet</h3><div class="bar"><div class="fill" style="width:29%"></div></div></a>
-      <a class="ext-card" href="extension.html?set=sv3"><div class="count">91 / 197</div><h3>Obsidian Flames</h3><div class="bar"><div class="fill" style="width:46%"></div></div></a>
-      <a class="ext-card" href="extension.html?set=sv2"><div class="count">12 / 165</div><h3>Évolutions à Paldea</h3><div class="bar"><div class="fill" style="width:7%"></div></div></a>
+      <a class="ext-card" href="extension.html?set=sv03.5"><div class="count">142 / 165</div><h3>151</h3><div class="bar"><div class="fill" style="width:86%"></div></div></a>
+      <a class="ext-card" href="extension.html?set=sv01"><div class="count">58 / 197</div><h3>Écarlate et Violet</h3><div class="bar"><div class="fill" style="width:29%"></div></div></a>
+      <a class="ext-card" href="extension.html?set=sv03"><div class="count">91 / 197</div><h3>Flammes Obsidiennes</h3><div class="bar"><div class="fill" style="width:46%"></div></div></a>
+      <a class="ext-card" href="extension.html?set=sv02"><div class="count">12 / 165</div><h3>Évolutions à Paldea</h3><div class="bar"><div class="fill" style="width:7%"></div></div></a>
     </div>
   </div>
 </section>
@@ -225,7 +225,7 @@ async function loadHeroCards(){
   const cached = sessionStorage.getItem('reliure_hero_cards');
   if(cached){ renderHeroCards(JSON.parse(cached), tags); return; }
   try{
-    const res = await fetch('https://api.tcgdex.net/v2/fr/cards?set.id=eq:sv3pt5');
+    const res = await fetch('https://api.tcgdex.net/v2/fr/cards?set.id=eq:sv03.5');
     const cards = (await res.json()).slice(0, 6);
     sessionStorage.setItem('reliure_hero_cards', JSON.stringify(cards));
     renderHeroCards(cards, tags);

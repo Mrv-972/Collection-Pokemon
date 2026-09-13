@@ -42,6 +42,7 @@
   .toolbar input::placeholder{color:var(--text-on-ink-dim)}
   .toolbar select{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:10px 14px;border-radius:4px;font-size:13px;font-family:inherit;}
   .filter-btn{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
+  .filter-btn.on.obt{color:#E3C766;border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
   .filter-btn.on.rech{color:#E08862;border-color:rgba(168,67,28,0.5);background:rgba(168,67,28,0.1)}
   .filter-btn.on.ech{color:#5FBAAA;border-color:rgba(31,111,99,0.5);background:rgba(31,111,99,0.12)}
 
@@ -57,8 +58,9 @@
   .rarity-symbol{color:var(--gold);letter-spacing:1px;}
   .card-name{font-size:13px;font-weight:500;}
 
-  .tag-row{display:flex;gap:6px;}
-  .tag-toggle{flex:1;font-size:10.5px;padding:5px 0;border-radius:3px;text-align:center;cursor:pointer;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);background:transparent;font-family:inherit;transition:.12s;}
+  .tag-row{display:flex;flex-direction:column;gap:4px;}
+  .tag-toggle{font-size:10.5px;padding:5px 0;border-radius:3px;text-align:center;cursor:pointer;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);background:transparent;font-family:inherit;transition:.12s;}
+  .tag-toggle.obt.active{background:rgba(201,162,39,0.16);color:#E3C766;border-color:rgba(201,162,39,0.5)}
   .tag-toggle.rech.active{background:rgba(168,67,28,0.16);color:#E08862;border-color:rgba(168,67,28,0.5)}
   .tag-toggle.ech.active{background:rgba(31,111,99,0.18);color:#5FBAAA;border-color:rgba(31,111,99,0.5)}
   .tag-toggle:hover{border-color:rgba(237,234,224,0.3)}
@@ -94,6 +96,7 @@
   <div class="toolbar">
     <input type="text" id="filter-input" placeholder="Filtrer par nom ou numéro...">
     <select id="rarity-filter"><option value="">Toutes les raretés</option></select>
+    <button class="filter-btn obt" id="btn-obt">Obtenues</button>
     <button class="filter-btn rech" id="btn-rech">Recherchées</button>
     <button class="filter-btn ech" id="btn-ech">Échangeables</button>
     <span id="save-status" style="font-size:12px;color:var(--text-on-ink-dim);opacity:0;transition:opacity .3s;">Enregistré ✓</span>
@@ -106,7 +109,7 @@
     </div>
   </div>
 
-  <footer>Reliure — cartes et images fournies en direct par l'API TCGdex. Tes tags sont sauvegardés pour de vrai, tant que tu ouvres cette page dans Claude.</footer>
+  <footer>Reliure — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
 </div>
 
 <script>
@@ -114,11 +117,15 @@
 // TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
 // Les images restent hébergées par TCGdex.
 const params = new URLSearchParams(window.location.search);
-const setId = params.get('set') || 'sv3pt5'; // "151" par défaut si aucune extension choisie
+const setId = params.get('set') || 'sv03.5'; // "151" par défaut si aucune extension choisie
 
 let allCards = [];
-const tagState = {}; // { [cardId]: { rech: bool, ech: bool } }
-let activeFilter = null; // 'rech' | 'ech' | null
+const tagState = {}; // { [cardId]: { obt: bool, rech: bool, ech: bool } }
+let activeFilter = null; // un des TAGS, ou null
+
+const TAGS = ['obt', 'rech', 'ech'];
+const emptyTagState = () => ({ obt:false, rech:false, ech:false });
+const tagStorageKey = `reliure_tags_${setId}`;
 
 // Symboles imprimés sur les cartes, associés aux raretés telles que TCGdex
 // les nomme en français. Les raretés récentes (Illustration rare, Hyper
@@ -273,18 +280,15 @@ async function init(){
     renderCards(allCards);
   }
 
-  // Charge les tags sauvegardés EN PARALLÈLE du reste, sans jamais pouvoir bloquer
-  // ou interrompre l'affichage des cartes, même si window.storage est indisponible.
-  (async () => {
-    try{
-      if(!window.storage) return;
-      const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms));
-      const saved = await Promise.race([window.storage.get(`tags:${setId}`, false), timeout(3000)]);
-      if(saved){ Object.assign(tagState, JSON.parse(saved.value)); applyFilters(); }
-    }catch(err){
-      // Rien de sauvegardé encore, stockage indisponible, ou lecture trop lente — sans conséquence.
-    }
-  })();
+  // Tags déjà posés sur cette extension. Ils vivent dans la mémoire du
+  // navigateur : ils tiennent dans le temps, mais restent propres à cet
+  // appareil tant qu'il n'y a pas de comptes utilisateurs.
+  try{
+    const saved = localStorage.getItem(tagStorageKey);
+    if(saved) Object.assign(tagState, JSON.parse(saved));
+  }catch(err){
+    // Navigation privée ou stockage refusé : on continue sans tags sauvegardés.
+  }
 
   try{
     const [set, cards] = await Promise.all([
@@ -353,7 +357,7 @@ function renderCards(cards){
     return;
   }
   content.innerHTML = `<div class="card-grid">${cards.map(c => {
-    const state = tagState[c.id] || { rech:false, ech:false };
+    const state = tagState[c.id] || emptyTagState();
     return `
       <div class="card-tile">
         <div class="card-img-wrap">
@@ -364,6 +368,7 @@ function renderCards(cards){
         <div class="card-num"><span>#${c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
         <div class="card-name">${c.name}</div>
         <div class="tag-row">
+          <button class="tag-toggle obt ${state.obt ? 'active' : ''}" data-id="${c.id}" data-tag="obt">Obtenue</button>
           <button class="tag-toggle rech ${state.rech ? 'active' : ''}" data-id="${c.id}" data-tag="rech">Recherchée</button>
           <button class="tag-toggle ech ${state.ech ? 'active' : ''}" data-id="${c.id}" data-tag="ech">Échangeable</button>
         </div>
@@ -372,18 +377,16 @@ function renderCards(cards){
   }).join('')}</div>`;
 }
 
-document.getElementById('content').addEventListener('click', async (e) => {
+document.getElementById('content').addEventListener('click', (e) => {
   const btn = e.target.closest('.tag-toggle');
   if(!btn) return;
   const id = btn.dataset.id;
   const tag = btn.dataset.tag;
-  if(!tagState[id]) tagState[id] = { rech:false, ech:false };
+  if(!tagState[id]) tagState[id] = emptyTagState();
   tagState[id][tag] = !tagState[id][tag];
   applyFilters();
-  showSaveStatus('saving');
   try{
-    if(!window.storage) throw new Error('storage indisponible');
-    await window.storage.set(`tags:${setId}`, JSON.stringify(tagState), false);
+    localStorage.setItem(tagStorageKey, JSON.stringify(tagState));
     showSaveStatus('saved');
   }catch(err){
     console.warn('Échec de la sauvegarde du tag', err);
@@ -415,17 +418,15 @@ function applyFilters(){
 document.getElementById('filter-input').addEventListener('input', applyFilters);
 document.getElementById('rarity-filter').addEventListener('change', applyFilters);
 
-document.getElementById('btn-rech').addEventListener('click', () => {
-  activeFilter = activeFilter === 'rech' ? null : 'rech';
-  document.getElementById('btn-rech').classList.toggle('on', activeFilter === 'rech');
-  document.getElementById('btn-ech').classList.remove('on');
-  applyFilters();
-});
-document.getElementById('btn-ech').addEventListener('click', () => {
-  activeFilter = activeFilter === 'ech' ? null : 'ech';
-  document.getElementById('btn-ech').classList.toggle('on', activeFilter === 'ech');
-  document.getElementById('btn-rech').classList.remove('on');
-  applyFilters();
+// Les trois filtres s'excluent : en activer un désactive les autres.
+TAGS.forEach(tag => {
+  document.getElementById(`btn-${tag}`).addEventListener('click', () => {
+    activeFilter = activeFilter === tag ? null : tag;
+    TAGS.forEach(t => {
+      document.getElementById(`btn-${t}`).classList.toggle('on', activeFilter === t);
+    });
+    applyFilters();
+  });
 });
 
 init();
