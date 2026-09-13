@@ -50,8 +50,9 @@
 
   .set-card{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s;}
   .set-card:hover{border-color:rgba(237,234,224,0.25)}
-  .set-logo{height:44px;display:flex;align-items:center;}
-  .set-logo img{max-height:100%;max-width:100%;object-fit:contain;}
+  .set-logo{height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .set-logo .logo{min-width:0;max-width:100%;max-height:100%;object-fit:contain;object-position:left center;}
+  .set-logo .symbol{height:20px;width:20px;flex-shrink:0;object-fit:contain;opacity:.85;}
   .set-logo .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:28px;line-height:1;}
   .set-name{font-size:14.5px;font-weight:500;line-height:1.3;}
   .set-meta{font-size:12px;color:var(--text-on-ink-dim);display:flex;justify-content:space-between;margin-top:auto;}
@@ -186,9 +187,14 @@ function renderSets(sets){
       const total = s.cardCount?.official ?? s.cardCount?.total ?? '?';
       return `
       <a class="set-card" href="extension.html?set=${s.id}">
-        <div class="set-logo">${s.logo
-          ? `<img src="${s.logo}.png" alt="${s.name}" loading="lazy" data-fallback="images/sets/${s.id}.png" onerror="setLogoFallback(this)">`
-          : `<img src="images/sets/${s.id}.png" alt="${s.name}" loading="lazy" onerror="setLogoFallback(this)">`}</div>
+        <div class="set-logo">
+          ${s.logo
+            ? `<img class="logo" src="${s.logo}.png" alt="${s.name}" loading="lazy" data-fallback="images/sets/${s.id}.png" onerror="setLogoFallback(this)">`
+            : `<img class="logo" src="images/sets/${s.id}.png" alt="${s.name}" loading="lazy" onerror="setLogoFallback(this)">`}
+          ${s.symbol
+            ? `<img class="symbol" src="${s.symbol}.png" alt="Symbole de ${s.name}" title="Symbole de l'extension" loading="lazy" onerror="this.remove()">`
+            : ''}
+        </div>
         <div class="set-name">${s.name}</div>
         <div class="set-meta">
           <span>${year}</span>
