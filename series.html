@@ -198,7 +198,9 @@ function renderSets(sets){
       const total = s.cardCount?.official ?? s.cardCount?.total ?? '?';
       return `
       <a class="set-card" href="extension.html?set=${s.id}">
-        <div class="set-logo"><img src="${s.logo ? s.logo + '.png' : ''}" alt="${s.name}" loading="lazy" onerror="this.style.display='none'"></div>
+        <div class="set-logo">${s.logo
+          ? `<img src="${s.logo}.png" alt="${s.name}" loading="lazy" onerror="this.replaceWith(document.createTextNode(''))">`
+          : ''}</div>
         <div class="set-name">${s.name}</div>
         <div class="set-meta">
           <span>${year}</span>
