@@ -118,6 +118,11 @@ let allCards = [];
 const tagState = {}; // { [cardId]: { rech: bool, ech: bool } }
 let activeFilter = null; // 'rech' | 'ech' | null
 
+// Clé API pokemontcg.io (facultative). Sans clé, l'API limite le nombre de
+// requêtes par minute ; avec une clé gratuite (https://pokemontcg.io/), la
+// limite est beaucoup plus haute. Colle ta clé entre les guillemets si tu en as une.
+const API_KEY = '';
+
 // Symboles officiels (ou les plus proches équivalents) utilisés sur les cartes imprimées.
 // Certaines raretés récentes (Illustration Rare, Hyper Rare...) n'ont pas de symbole
 // unique standardisé : on leur attribue le nombre d'étoiles le plus proche de l'usage courant.
@@ -175,7 +180,7 @@ function populateRarityFilter(cards){
 }
 
 async function fetchJson(url, retries = 1){
-  const res = await fetch(url);
+  const res = await fetch(url, API_KEY ? { headers: { 'X-Api-Key': API_KEY } } : undefined);
   const text = await res.text();
   if(!res.ok || !text){
     if(retries > 0){
@@ -185,6 +190,24 @@ async function fetchJson(url, retries = 1){
     throw new Error(`Réponse vide ou erreur HTTP ${res.status} — probablement la limite de débit de l'API publique (sans clé) temporairement atteinte.`);
   }
   return JSON.parse(text);
+}
+
+// Récupère TOUTES les pages de résultats (l'API limite chaque réponse à 250
+// éléments) pour être sûr de charger toutes les cartes, même sur les très
+// grosses extensions.
+async function fetchAllPages(baseUrl){
+  const pageSize = 250;
+  let page = 1;
+  let all = [];
+  while(true){
+    const sep = baseUrl.includes('?') ? '&' : '?';
+    const json = await fetchJson(`${baseUrl}${sep}page=${page}&pageSize=${pageSize}`);
+    const data = json.data || [];
+    all = all.concat(data);
+    if(data.length < pageSize) break;
+    page++;
+  }
+  return all;
 }
 
 async function init(){
@@ -215,12 +238,12 @@ async function init(){
   })();
 
   try{
-    const [setJson, cardsJson] = await Promise.all([
+    const [setJson, cards] = await Promise.all([
       fetchJson(`https://api.pokemontcg.io/v2/sets/${setId}`),
-      fetchJson(`https://api.pokemontcg.io/v2/cards?q=set.id:${setId}&orderBy=number&pageSize=250`)
+      fetchAllPages(`https://api.pokemontcg.io/v2/cards?q=set.id:${setId}&orderBy=number`)
     ]);
     renderHead(setJson.data);
-    allCards = cardsJson.data || [];
+    allCards = cards;
     populateRarityFilter(allCards);
     renderCards(allCards);
     sessionStorage.setItem(cacheKey, JSON.stringify({ set: setJson.data, cards: allCards }));

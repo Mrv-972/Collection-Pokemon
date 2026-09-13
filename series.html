@@ -105,8 +105,13 @@
 // Les logos/symboles affichés sont hébergés par pokemontcg.io, rien n'est stocké ici.
 let allSets = [];
 
+// Clé API pokemontcg.io (facultative). Sans clé, l'API limite le nombre de
+// requêtes par minute ; avec une clé gratuite (https://pokemontcg.io/), la
+// limite est beaucoup plus haute. Colle ta clé entre les guillemets si tu en as une.
+const API_KEY = '';
+
 async function fetchJson(url, retries = 1){
-  const res = await fetch(url);
+  const res = await fetch(url, API_KEY ? { headers: { 'X-Api-Key': API_KEY } } : undefined);
   const text = await res.text();
   if(!res.ok || !text){
     if(retries > 0){
@@ -116,6 +121,23 @@ async function fetchJson(url, retries = 1){
     throw new Error(`Réponse vide ou erreur HTTP ${res.status} — probablement la limite de débit de l'API publique (sans clé) temporairement atteinte.`);
   }
   return JSON.parse(text);
+}
+
+// Récupère TOUTES les pages de résultats (l'API en pokemontcg.io limite chaque
+// réponse à 250 éléments) pour être sûr de ne jamais manquer une extension.
+async function fetchAllPages(baseUrl){
+  const pageSize = 250;
+  let page = 1;
+  let all = [];
+  while(true){
+    const sep = baseUrl.includes('?') ? '&' : '?';
+    const json = await fetchJson(`${baseUrl}${sep}page=${page}&pageSize=${pageSize}`);
+    const data = json.data || [];
+    all = all.concat(data);
+    if(data.length < pageSize) break;
+    page++;
+  }
+  return all;
 }
 
 async function loadSets(){
@@ -130,8 +152,7 @@ async function loadSets(){
   }
 
   try{
-    const json = await fetchJson('https://api.pokemontcg.io/v2/sets?orderBy=-releaseDate');
-    allSets = json.data || [];
+    allSets = await fetchAllPages('https://api.pokemontcg.io/v2/sets?orderBy=-releaseDate');
     sessionStorage.setItem('reliure_sets', JSON.stringify(allSets));
     renderSets(allSets);
   }catch(err){
