@@ -58,6 +58,7 @@ function toggleTag(cardId, tag){
   if(!tagState[cardId]) tagState[cardId] = emptyTagState();
   tagState[cardId][tag] = !tagState[cardId][tag];
   saveTags();
+  synchroniser(() => enregistrerCarte(cardId, tagState[cardId]));
 }
 
 // Applique un tag à un lot de cartes — ou le retire si elles le portent déjà
@@ -70,6 +71,20 @@ function bulkToggleTag(cards, tag){
     tagState[c.id][tag] = !allTagged;
   });
   saveTags();
+  synchroniser(() => enregistrerCartes(cards.map(c => [c.id, tagState[c.id]])));
+}
+
+// Le marquage est d'abord enregistré dans le navigateur : l'envoi en ligne
+// se fait ensuite, et son échec ne doit jamais faire perdre un tag ni
+// interrompre la navigation.
+function synchroniser(envoi){
+  if(typeof estConnecte !== 'function' || !estConnecte()) return;
+  Promise.resolve()
+    .then(envoi)
+    .catch(err => {
+      console.warn('Synchronisation en ligne impossible', err);
+      if(typeof showSaveStatus === 'function') showSaveStatus('hors-ligne');
+    });
 }
 
 // Boutons de tag d'une vignette de carte.

@@ -112,7 +112,7 @@
     <div class="navlinks">
       <a href="series.html">Par extension</a>
       <a href="pokemon.html">Par Pokémon</a>
-      <a href="#">Échanges</a>
+      <a href="echanges.html">Échanges</a>
     </div>
     <a class="cta-btn" href="series.html">Créer mon classeur</a>
   </nav>
@@ -216,6 +216,8 @@
   </footer>
 </div>
 
+<script src="supabase-config.js"></script>
+<script src="compte.js"></script>
 <script>
 // Charge de vraies cartes depuis l'API publique et gratuite TCGdex (images
 // hébergées par eux, pas par ce prototype — voir https://tcgdex.dev).
@@ -246,6 +248,8 @@ function renderHeroCards(cards, tags){
   }).join('');
 }
 loadHeroCards();
+
+initCompte().then(afficherEtatCompte);
 </script>
 
 </body>

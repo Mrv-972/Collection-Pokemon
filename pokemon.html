@@ -72,9 +72,9 @@
     <div class="navlinks">
       <a href="series.html">Par extension</a>
       <a href="pokemon.html" class="active">Par Pokémon</a>
-      <a href="#">Échanges</a>
+      <a href="echanges.html">Échanges</a>
     </div>
-    <a class="brand" style="font-size:14px;font-style:normal" href="#">Mon classeur →</a>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
   </nav>
 
   <div class="page-head">
@@ -95,6 +95,8 @@
   <footer>Reliure — noms des Pokémon issus du paquet npm « pokemon » (MIT). Projet non affilié à The Pokémon Company.</footer>
 </div>
 
+<script src="supabase-config.js"></script>
+<script src="compte.js"></script>
 <script src="pokedex-fr.js"></script>
 <script>
 // Bornes officielles du Pokédex national pour chaque génération.
@@ -187,6 +189,8 @@ document.getElementById('search-input').addEventListener('input', (e) => {
 });
 
 showGeneration(1);
+
+initCompte().then(afficherEtatCompte);
 </script>
 
 </body>

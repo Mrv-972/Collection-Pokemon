@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon compte — Reliure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B; --ink-soft:#20232A; --teal:#1F6F63; --teal-deep:#123F38;
+    --rust:#A8431C; --gold:#C9A227; --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a:hover{color:var(--text-on-ink)}
+  @media(max-width:720px){.navlinks{display:none}}
+
+  .panel{max-width:440px;margin:56px auto 80px;}
+  .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
+  .panel h1{font-size:32px;margin-bottom:10px;}
+  .panel p.intro{color:var(--text-on-ink-dim);font-size:15px;margin:0 0 28px;}
+
+  .tabs{display:flex;gap:8px;margin-bottom:24px;}
+  .tab{flex:1;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .tab.on{color:var(--text-on-ink);border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
+
+  label{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:16px 0 6px;}
+  input{width:100%;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  input:focus{outline:none;border-color:rgba(201,162,39,0.5)}
+  .aide{font-size:12px;color:var(--text-on-ink-dim);margin-top:6px;}
+
+  button.principal{width:100%;margin-top:26px;background:var(--teal);border:none;color:#EDF5F3;padding:12px;border-radius:3px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}
+  button.principal:hover{background:var(--teal-deep)}
+  button.principal:disabled{opacity:.5;cursor:default}
+  button.discret{margin-top:14px;width:100%;background:transparent;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);padding:10px;border-radius:3px;font-size:13px;cursor:pointer;font-family:inherit;}
+  button.discret:hover{border-color:rgba(237,234,224,0.3)}
+
+  .message{margin-top:20px;font-size:13.5px;padding:12px 14px;border-radius:4px;}
+  .message.err{color:#E08862;background:rgba(168,67,28,0.1);border:1px solid rgba(168,67,28,0.35)}
+  .message.ok{color:#5FBAAA;background:rgba(31,111,99,0.12);border:1px solid rgba(31,111,99,0.35)}
+
+  .compte-actuel{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:22px;}
+  .compte-actuel .pseudo{font-family:'Newsreader',serif;font-size:24px;}
+  .compte-actuel .detail{color:var(--text-on-ink-dim);font-size:13.5px;margin-top:4px;}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="pokecollection-prototype.html">Reli<span>ure</span></a>
+    <div class="navlinks">
+      <a href="series.html">Par extension</a>
+      <a href="pokemon.html">Par Pokémon</a>
+      <a href="echanges.html">Échanges</a>
+    </div>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
+  </nav>
+
+  <div class="panel" id="panel">
+    <p class="intro">Chargement…</p>
+  </div>
+
+  <footer>Reliure — ton compte sert à retrouver ta collection sur tous tes appareils et à te mettre en relation avec d'autres collectionneurs.</footer>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="tags.js"></script>
+<script src="compte.js"></script>
+<script>
+let ongletActif = 'connexion';
+
+function afficherMessage(texte, type){
+  const el = document.getElementById('message');
+  if(!el) return;
+  el.className = `message ${type}`;
+  el.textContent = texte;
+}
+
+function rendre(){
+  const panel = document.getElementById('panel');
+
+  if(CONFIG_MANQUANTE){
+    panel.innerHTML = `
+      <div class="kicker">Compte</div>
+      <h1>Base de données à configurer</h1>
+      <p class="intro">Les comptes ont besoin d'une base en ligne. Renseigne l'adresse et la clé publique de ton projet Supabase dans le fichier <code>supabase-config.js</code>, puis recharge cette page.</p>
+    `;
+    return;
+  }
+
+  if(estConnecte()){
+    panel.innerHTML = `
+      <div class="kicker">Compte</div>
+      <h1>Mon compte</h1>
+      <div class="compte-actuel">
+        <div class="pseudo">${profil?.pseudo ?? 'Membre'}</div>
+        <div class="detail">${membre.email}</div>
+        <div class="detail">${profil?.contact ? 'Contact partagé : ' + profil.contact : 'Aucun moyen de contact renseigné'}</div>
+      </div>
+
+      <label for="pseudo">Pseudo</label>
+      <input id="pseudo" type="text" value="${profil?.pseudo ?? ''}">
+
+      <label for="contact">Comment te joindre</label>
+      <input id="contact" type="text" value="${profil?.contact ?? ''}" placeholder="Pseudo Discord, e-mail...">
+      <div class="aide">Affiché uniquement aux membres avec qui un échange est possible.</div>
+
+      <button class="principal" id="btn-maj">Enregistrer</button>
+      <button class="discret" id="btn-deconnexion">Se déconnecter</button>
+      <div id="message"></div>
+    `;
+    document.getElementById('btn-maj').addEventListener('click', enregistrerProfil);
+    document.getElementById('btn-deconnexion').addEventListener('click', deconnexion);
+    return;
+  }
+
+  const inscription = ongletActif === 'inscription';
+  panel.innerHTML = `
+    <div class="kicker">Compte</div>
+    <h1>${inscription ? 'Créer un compte' : 'Se connecter'}</h1>
+    <p class="intro">${inscription
+      ? 'Ton classeur te suivra sur tous tes appareils, et les autres collectionneurs pourront te proposer des échanges.'
+      : 'Retrouve ta collection et tes échanges possibles.'}</p>
+
+    <div class="tabs">
+      <button class="tab ${inscription ? '' : 'on'}" data-onglet="connexion">Se connecter</button>
+      <button class="tab ${inscription ? 'on' : ''}" data-onglet="inscription">Créer un compte</button>
+    </div>
+
+    <label for="email">Adresse e-mail</label>
+    <input id="email" type="email" autocomplete="email">
+
+    <label for="mdp">Mot de passe</label>
+    <input id="mdp" type="password" autocomplete="${inscription ? 'new-password' : 'current-password'}">
+
+    ${inscription ? `
+      <label for="pseudo">Pseudo</label>
+      <input id="pseudo" type="text" placeholder="Le nom que verront les autres collectionneurs">
+
+      <label for="contact">Comment te joindre (facultatif)</label>
+      <input id="contact" type="text" placeholder="Pseudo Discord, e-mail...">
+      <div class="aide">Affiché uniquement aux membres avec qui un échange est possible. Tu pourras le renseigner plus tard.</div>
+    ` : ''}
+
+    <button class="principal" id="btn-valider">${inscription ? 'Créer mon compte' : 'Se connecter'}</button>
+    <div id="message"></div>
+  `;
+
+  panel.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => { ongletActif = t.dataset.onglet; rendre(); });
+  });
+  document.getElementById('btn-valider').addEventListener('click', valider);
+}
+
+async function valider(){
+  const bouton = document.getElementById('btn-valider');
+  const email = document.getElementById('email').value.trim();
+  const mdp = document.getElementById('mdp').value;
+  const inscription = ongletActif === 'inscription';
+
+  if(!email || !mdp){
+    afficherMessage('Renseigne ton adresse e-mail et ton mot de passe.', 'err');
+    return;
+  }
+  const pseudo = inscription ? document.getElementById('pseudo').value.trim() : '';
+  if(inscription && !pseudo){
+    afficherMessage('Choisis un pseudo : c\'est ce que verront les autres collectionneurs.', 'err');
+    return;
+  }
+
+  bouton.disabled = true;
+  bouton.textContent = 'Un instant…';
+  try{
+    if(inscription){
+      await sInscrire(email, mdp, pseudo, document.getElementById('contact').value);
+    }else{
+      await seConnecter(email, mdp);
+    }
+    afficherEtatCompte();
+    rendre();
+    afficherMessage('Te voilà connecté. Ta collection est désormais enregistrée en ligne.', 'ok');
+  }catch(err){
+    console.warn(err);
+    bouton.disabled = false;
+    bouton.textContent = inscription ? 'Créer mon compte' : 'Se connecter';
+    afficherMessage(messageLisible(err), 'err');
+  }
+}
+
+// Les messages de Supabase sont en anglais et techniques : on traduit les cas
+// courants, et on garde le message d'origine pour les autres.
+function messageLisible(err){
+  const texte = err?.message ?? String(err);
+  if(/Invalid login credentials/i.test(texte)) return 'Adresse e-mail ou mot de passe incorrect.';
+  if(/User already registered/i.test(texte)) return 'Un compte existe déjà avec cette adresse e-mail.';
+  if(/Password should be at least/i.test(texte)) return 'Le mot de passe doit faire au moins 6 caractères.';
+  if(/Unable to validate email/i.test(texte) || /invalid format/i.test(texte)) return "L'adresse e-mail ne semble pas valide.";
+  if(/Email not confirmed/i.test(texte)) return "Ton adresse e-mail n'a pas encore été confirmée : regarde tes e-mails.";
+  return texte;
+}
+
+async function enregistrerProfil(){
+  try{
+    await majProfil(document.getElementById('pseudo').value, document.getElementById('contact').value);
+    afficherEtatCompte();
+    rendre();
+    afficherMessage('Profil enregistré.', 'ok');
+  }catch(err){
+    afficherMessage(messageLisible(err), 'err');
+  }
+}
+
+async function deconnexion(){
+  await seDeconnecter();
+  afficherEtatCompte();
+  rendre();
+}
+
+(async () => {
+  loadTags();
+  await initCompte();
+  afficherEtatCompte();
+  rendre();
+})();
+</script>
+
+</body>
+</html>

@@ -76,9 +76,9 @@
     <div class="navlinks">
       <a href="#" class="active">Par extension</a>
       <a href="pokemon.html">Par Pokémon</a>
-      <a href="#">Échanges</a>
+      <a href="echanges.html">Échanges</a>
     </div>
-    <a class="brand" style="font-size:14px;font-style:normal" href="#">Mon classeur →</a>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
   </nav>
 
   <div class="page-head">
@@ -101,6 +101,8 @@
   <footer>Reliure — données d'extensions fournies en direct par l'API TCGdex. Projet non affilié à The Pokémon Company.</footer>
 </div>
 
+<script src="supabase-config.js"></script>
+<script src="compte.js"></script>
 <script src="sets.js"></script>
 <script>
 // Récupère la liste complète des extensions depuis l'API publique et gratuite
@@ -237,6 +239,8 @@ document.getElementById('filter-input').addEventListener('input', (e) => {
 });
 
 loadSets();
+
+initCompte().then(afficherEtatCompte);
 </script>
 
 </body>

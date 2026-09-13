@@ -93,9 +93,9 @@
     <div class="navlinks">
       <a href="series.html">Par extension</a>
       <a href="pokemon.html" class="active">Par Pokémon</a>
-      <a href="#">Échanges</a>
+      <a href="echanges.html">Échanges</a>
     </div>
-    <a class="brand" style="font-size:14px;font-style:normal" href="#">Mon classeur →</a>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
   </nav>
 
   <div class="breadcrumb"><a href="pokemon.html">← Tous les Pokémon</a></div>
@@ -132,8 +132,10 @@
 
 <script src="pokedex-fr.js"></script>
 <script src="sets.js"></script>
+<script src="supabase-config.js"></script>
 <script src="tags.js"></script>
 <script src="cards.js"></script>
+<script src="compte.js"></script>
 <script>
 // Toutes les cartes d'un Pokémon, toutes extensions confondues, à partir de
 // son numéro du Pokédex national passé dans l'URL (?dex=25).
@@ -253,6 +255,7 @@ function showSaveStatus(state){
   if(!el) return;
   if(state === 'saved') el.textContent = 'Enregistré ✓';
   if(state === 'error') el.textContent = "Échec de l'enregistrement";
+  if(state === 'hors-ligne') el.textContent = 'Enregistré ici, pas encore en ligne';
   el.style.opacity = '1';
   clearTimeout(el._t);
   el._t = setTimeout(() => { el.style.opacity = '0'; }, 1500);
@@ -265,6 +268,19 @@ async function init(){
   // Avant le premier rendu, pour que les cartes s'affichent d'emblée avec
   // leurs marques.
   loadTags();
+
+  // La collection en ligne arrive ensuite : elle ne doit pas retarder
+  // l'affichage des cartes.
+  initCompte().then(async () => {
+    afficherEtatCompte();
+    if(!estConnecte()) return;
+    try{
+      await fusionnerCollection();
+      applyFilters();
+    }catch(err){
+      console.warn('Collection en ligne indisponible', err);
+    }
+  });
 
   try{
     const [allResults] = await Promise.all([

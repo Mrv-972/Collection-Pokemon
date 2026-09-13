@@ -90,9 +90,9 @@
     <div class="navlinks">
       <a href="series.html" class="active">Par extension</a>
       <a href="pokemon.html">Par Pokémon</a>
-      <a href="#">Échanges</a>
+      <a href="echanges.html">Échanges</a>
     </div>
-    <a class="brand" style="font-size:14px;font-style:normal" href="#">Mon classeur →</a>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
   </nav>
 
   <div class="breadcrumb"><a href="series.html">← Toutes les séries</a></div>
@@ -128,8 +128,10 @@
   <footer>Reliure — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
 </div>
 
+<script src="supabase-config.js"></script>
 <script src="tags.js"></script>
 <script src="cards.js"></script>
+<script src="compte.js"></script>
 <script>
 // Récupère les cartes d'une extension depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
@@ -158,6 +160,19 @@ async function init(){
   // Avant le premier rendu, pour que les cartes s'affichent d'emblée avec
   // leurs marques.
   loadTags();
+
+  // La collection en ligne arrive ensuite : elle ne doit pas retarder
+  // l'affichage des cartes.
+  initCompte().then(async () => {
+    afficherEtatCompte();
+    if(!estConnecte()) return;
+    try{
+      await fusionnerCollection();
+      applyFilters();
+    }catch(err){
+      console.warn('Collection en ligne indisponible', err);
+    }
+  });
 
   // Cache local : ré-ouvrir la même extension est instantané, on revérifie en arrière-plan.
   const cacheKey = `reliure_ext_${setId}`;
@@ -240,6 +255,7 @@ function showSaveStatus(state){
   if(state === 'saving') el.textContent = 'Enregistrement…';
   if(state === 'saved') el.textContent = 'Enregistré ✓';
   if(state === 'error') el.textContent = "Échec de l'enregistrement";
+  if(state === 'hors-ligne') el.textContent = 'Enregistré ici, pas encore en ligne';
   el.style.opacity = '1';
   clearTimeout(el._t);
   el._t = setTimeout(() => { el.style.opacity = '0'; }, 1500);

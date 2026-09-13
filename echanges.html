@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Échanges — Reliure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.tcgdex.net">
+<link rel="preconnect" href="https://assets.tcgdex.net">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B; --ink-soft:#20232A; --teal:#1F6F63; --teal-deep:#123F38;
+    --rust:#A8431C; --gold:#C9A227; --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2,h3{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a.active{color:var(--text-on-ink)}
+  .navlinks a:hover{color:var(--text-on-ink)}
+  @media(max-width:720px){.navlinks{display:none}}
+
+  .page-head{padding:56px 0 30px;}
+  .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
+  .page-head h1{font-size:40px;}
+  .page-head p{color:var(--text-on-ink-dim);margin-top:14px;font-size:16px;max-width:62ch;}
+
+  .filtres{display:flex;gap:10px;padding-bottom:30px;flex-wrap:wrap;align-items:center;}
+  .filter-btn{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
+  .filter-btn.on{color:#E3C766;border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
+
+  .membre{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;padding:24px;margin-bottom:18px;}
+  .membre.equilibre{border-color:rgba(201,162,39,0.35)}
+  .membre-tete{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:4px;}
+  .membre-tete h2{font-size:22px;}
+  .badge{font-size:11.5px;padding:3px 10px;border-radius:20px;font-weight:500;}
+  .badge.equilibre{background:rgba(201,162,39,0.16);color:#E3C766}
+  .badge.simple{background:rgba(237,234,224,0.06);color:var(--text-on-ink-dim)}
+  .contact{color:var(--text-on-ink-dim);font-size:13.5px;margin-bottom:20px;}
+  .contact strong{color:var(--text-on-ink);font-weight:500;}
+
+  .colonnes{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+  @media(max-width:720px){.colonnes{grid-template-columns:1fr}}
+  .colonne h3{font-size:13px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;letter-spacing:.3px;margin-bottom:12px;}
+  .colonne.recoit h3{color:#5FBAAA}
+  .colonne.donne h3{color:#E08862}
+  .colonne .vide{color:var(--text-on-ink-dim);font-size:13px;}
+
+  .mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  @media(max-width:900px){.mini-grid{grid-template-columns:repeat(3,1fr)}}
+  .mini{display:flex;flex-direction:column;gap:5px;}
+  .mini .img{aspect-ratio:2.5/3.5;border-radius:5px;overflow:hidden;background:rgba(237,234,224,0.04);border:1px solid rgba(237,234,224,0.08);display:flex;align-items:center;justify-content:center;}
+  .mini .img img{width:100%;height:100%;object-fit:cover;}
+  .mini .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:26px;}
+  .mini .nom{font-size:11.5px;line-height:1.25;}
+  .mini .ext{font-size:10.5px;color:var(--text-on-ink-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  .status-msg{color:var(--text-on-ink-dim);font-size:15px;padding:28px 0;}
+  .status-msg.err{color:#E08862}
+  .status-msg a{color:#E3C766;text-decoration:underline;text-underline-offset:3px;}
+  .cta-btn{display:inline-block;margin-top:16px;background:var(--teal);color:#EDF5F3;padding:11px 20px;border-radius:3px;font-size:14px;font-weight:500;}
+  .cta-btn:hover{background:var(--teal-deep)}
+
+  .skeleton{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;height:150px;margin-bottom:18px;position:relative;overflow:hidden;}
+  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(237,234,224,0.06),transparent);animation:shine 1.4s infinite;}
+  @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="pokecollection-prototype.html">Reli<span>ure</span></a>
+    <div class="navlinks">
+      <a href="series.html">Par extension</a>
+      <a href="pokemon.html">Par Pokémon</a>
+      <a href="echanges.html" class="active">Échanges</a>
+    </div>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
+  </nav>
+
+  <div class="page-head">
+    <div class="kicker">Mise en relation</div>
+    <h1>Les échanges possibles</h1>
+    <p>Reliure croise ton classeur avec celui des autres membres : dès que quelqu'un propose une carte que tu cherches, ou cherche une carte que tu proposes, il apparaît ici.</p>
+  </div>
+
+  <div class="filtres" id="filtres" hidden>
+    <button class="filter-btn" id="btn-equilibres">Échanges équilibrés seulement</button>
+    <span id="resume" style="font-size:13px;color:var(--text-on-ink-dim)"></span>
+  </div>
+
+  <div id="content"></div>
+
+  <footer>Reliure — cartes et images fournies en direct par l'API TCGdex. Projet non affilié à The Pokémon Company.</footer>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="sets.js"></script>
+<script src="tags.js"></script>
+<script src="cards.js"></script>
+<script src="compte.js"></script>
+<script>
+let correspondances = [];
+let equilibresSeulement = false;
+const infosCartes = {}; // { [id de carte]: { name, image } }
+let nomsExtensions = {};
+
+function estEquilibre(m){
+  return m.il_me_donne.length > 0 && m.je_lui_donne.length > 0;
+}
+
+// Les correspondances ne donnent que des identifiants de cartes : on
+// récupère nom et visuel auprès de TCGdex, une requête par extension
+// concernée plutôt qu'une par carte.
+async function chargerInfosCartes(idsCartes){
+  const parExtension = {};
+  idsCartes.forEach(id => {
+    const setId = setIdOfCard(id);
+    (parExtension[setId] ||= []).push(id);
+  });
+
+  const extensions = Object.keys(parExtension);
+  await Promise.all(extensions.map(async setId => {
+    try{
+      const cartes = await fetchJson(`https://api.tcgdex.net/v2/fr/cards?set.id=eq:${setId}`, 0);
+      cartes.forEach(c => { infosCartes[c.id] = { name: c.name, image: c.image, localId: c.localId }; });
+    }catch(err){
+      console.warn(`Impossible de charger les cartes de ${setId}`, err);
+    }
+  }));
+
+  try{
+    const cached = sessionStorage.getItem('reliure_sets_tcgdex');
+    const sets = cached ? JSON.parse(cached) : await fetchJson('https://api.tcgdex.net/v2/fr/sets');
+    sets.forEach(s => { nomsExtensions[s.id] = s.name; });
+  }catch(err){
+    console.warn('Impossible de charger le nom des extensions', err);
+  }
+}
+
+function miniCarte(carteId){
+  const info = infosCartes[carteId] || {};
+  const setId = setIdOfCard(carteId);
+  const nom = info.name || carteId;
+  return `
+    <div class="mini">
+      <div class="img card-img-wrap">
+        ${info.image
+          ? `<img src="${info.image}/low.webp" alt="${nom}" loading="lazy" data-fallback="images/cards/${carteId}.png" onerror="cardImgFallback(this)">`
+          : `<span class="glyph">?</span>`}
+      </div>
+      <div class="nom">${nom}</div>
+      <div class="ext">${nomsExtensions[setId] || setId}${info.localId ? ' · #' + info.localId : ''}</div>
+    </div>
+  `;
+}
+
+function colonne(classe, titre, cartes, messageVide){
+  return `
+    <div class="colonne ${classe}">
+      <h3>${titre}</h3>
+      ${cartes.length === 0
+        ? `<p class="vide">${messageVide}</p>`
+        : `<div class="mini-grid">${cartes.map(miniCarte).join('')}</div>`}
+    </div>
+  `;
+}
+
+function rendre(){
+  const content = document.getElementById('content');
+  const liste = equilibresSeulement ? correspondances.filter(estEquilibre) : correspondances;
+
+  if(liste.length === 0){
+    content.innerHTML = equilibresSeulement
+      ? `<p class="status-msg">Aucun échange équilibré pour l'instant. Retire le filtre pour voir les mises en relation à sens unique.</p>`
+      : `<p class="status-msg">Personne ne correspond encore à ton classeur.<br><br>
+         Marque des cartes en ❤️ recherchée et en 🔁 échangeable : dès qu'un autre membre proposera ce que tu cherches, il apparaîtra ici.
+         <br><a class="cta-btn" href="series.html">Compléter mon classeur</a></p>`;
+    return;
+  }
+
+  content.innerHTML = liste.map(m => `
+    <div class="membre ${estEquilibre(m) ? 'equilibre' : ''}">
+      <div class="membre-tete">
+        <h2>${m.pseudo}</h2>
+        <span class="badge ${estEquilibre(m) ? 'equilibre' : 'simple'}">
+          ${estEquilibre(m) ? 'Échange équilibré' : 'Échange à sens unique'}
+        </span>
+      </div>
+      <div class="contact">
+        ${m.contact
+          ? `Pour le contacter : <strong>${m.contact}</strong>`
+          : `Ce membre n'a pas indiqué comment le joindre.`}
+      </div>
+      <div class="colonnes">
+        ${colonne('recoit', `↓ Ce qu'il peut te donner (${m.il_me_donne.length})`, m.il_me_donne,
+                  'Rien que tu recherches pour le moment.')}
+        ${colonne('donne', `↑ Ce que tu peux lui donner (${m.je_lui_donne.length})`, m.je_lui_donne,
+                  'Rien qu\'il recherche pour le moment.')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function majResume(){
+  const equilibres = correspondances.filter(estEquilibre).length;
+  document.getElementById('filtres').hidden = correspondances.length === 0;
+  document.getElementById('resume').textContent =
+    `${correspondances.length} membre${correspondances.length > 1 ? 's' : ''} en correspondance, dont ${equilibres} en échange équilibré`;
+}
+
+async function init(){
+  const content = document.getElementById('content');
+  loadTags();
+  await initCompte();
+  afficherEtatCompte();
+
+  if(CONFIG_MANQUANTE){
+    content.innerHTML = `<p class="status-msg err">La base en ligne n'est pas encore configurée : renseigne <code>supabase-config.js</code>.</p>`;
+    return;
+  }
+  if(!estConnecte()){
+    content.innerHTML = `<p class="status-msg">La mise en relation compare ton classeur à celui des autres membres : il faut donc être connecté.
+      <br><a class="cta-btn" href="connexion.html">Se connecter ou créer un compte</a></p>`;
+    return;
+  }
+
+  content.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  try{
+    const db = await clientSupabase();
+    const { data, error } = await db.rpc('echanges_possibles');
+    if(error) throw error;
+    correspondances = data ?? [];
+    // Les échanges équilibrés d'abord, puis les plus fournis.
+    correspondances.sort((a, b) =>
+      (estEquilibre(b) - estEquilibre(a))
+      || (b.il_me_donne.length + b.je_lui_donne.length) - (a.il_me_donne.length + a.je_lui_donne.length));
+
+    const ids = [...new Set(correspondances.flatMap(m => [...m.il_me_donne, ...m.je_lui_donne]))];
+    await chargerInfosCartes(ids);
+    majResume();
+    rendre();
+  }catch(err){
+    console.warn('Impossible de charger les échanges', err);
+    content.innerHTML = `<p class="status-msg err">Impossible de charger les échanges pour le moment.<br>
+      <span style="font-size:12px;opacity:.7">${err.message ?? err}</span></p>`;
+  }
+}
+
+document.getElementById('btn-equilibres').addEventListener('click', (e) => {
+  equilibresSeulement = !equilibresSeulement;
+  e.currentTarget.classList.toggle('on', equilibresSeulement);
+  rendre();
+});
+
+init();
+</script>
+
+</body>
+</html>
