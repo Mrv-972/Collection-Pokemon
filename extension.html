@@ -63,15 +63,24 @@
   @media(max-width:960px){.card-grid{grid-template-columns:repeat(4,1fr)}}
   @media(max-width:640px){.card-grid{grid-template-columns:repeat(3,1fr)}}
 
-  .card-tile{display:flex;flex-direction:column;gap:8px;}
-  .card-img-wrap{position:relative;aspect-ratio:2.5/3.5;border-radius:6px;overflow:hidden;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);display:flex;align-items:center;justify-content:center;}
-  .card-img-wrap img{width:100%;height:100%;object-fit:cover;}
+  .card-tile{display:flex;flex-direction:column;gap:8px;height:100%;}
+  /* flex:none empêche la boîte d'être comprimée par un nom sur trois
+     lignes ou par une ligne de cote ; margin-top:auto pousse les tags
+     en bas, pour qu'ils s'alignent d'une vignette à l'autre. */
+  .card-img-wrap{flex:none;position:relative;aspect-ratio:2.5/3.5;border-radius:6px;overflow:hidden;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);display:flex;align-items:center;justify-content:center;}
+  /* La carte est montrée entière, jamais rognée. Les visuels fournis par
+     TCGdex n'ont pas tous exactement la même proportion — scans d'anciennes
+     séries, promos hors format — et « cover » les agrandissait jusqu'à
+     remplir la boîte, si bien qu'une carte sur deux paraissait plus grosse
+     que sa voisine. « contain » l'inscrit dans une boîte toujours identique,
+     à la plus grande taille qui la laisse entière. */
+  .card-img-wrap img{width:100%;height:100%;object-fit:contain;}
   .card-img-wrap .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:44px;line-height:1;}
   .card-num{font-size:11px;color:var(--text-on-ink-dim);display:flex;justify-content:space-between;align-items:center;}
   .rarity-symbol{color:var(--gold);letter-spacing:1px;}
   .card-name{font-size:13px;font-weight:500;}
 
-  .tag-row{display:flex;gap:5px;}
+  .tag-row{margin-top:auto;display:flex;gap:5px;}
   /* Les symboles sont des emojis : leur couleur ne se pilote pas en CSS.
      L'état inactif est donc signalé en les désaturant. */
   .tag-toggle{flex:1;font-size:14px;line-height:1.2;padding:5px 0;border-radius:3px;text-align:center;cursor:pointer;border:1px solid rgba(237,234,224,0.14);background:transparent;font-family:inherit;transition:.12s;}
