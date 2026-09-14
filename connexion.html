@@ -426,7 +426,7 @@ document.addEventListener('click', async (e) => {
   try{
     await definirLocalisation(commune);
     afficherZone();
-    messageZone('Zone enregistrée. Tu peux maintenant filtrer les échanges par distance.', 'ok');
+    messageZone('Zone enregistrée. La jauge de distance est maintenant disponible dans les échanges.', 'ok');
   }catch(err){
     messageZone("L'enregistrement a échoué : " + (err.message ?? err), 'err');
   }

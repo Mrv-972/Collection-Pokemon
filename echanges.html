@@ -37,9 +37,19 @@
   .filtres{display:flex;gap:10px;padding-bottom:30px;flex-wrap:wrap;align-items:center;}
   .filter-btn{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
   .filter-btn.on{color:#E3C766;border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
-  .filter-select{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:10px 14px;border-radius:4px;font-size:13px;font-family:inherit;cursor:pointer;}
-  .filter-select:focus{outline:none;border-color:rgba(201,162,39,0.5)}
   .lien-zone{font-size:13px;color:#E3C766;text-decoration:underline;text-underline-offset:3px;}
+
+  .distance-filtre{display:flex;align-items:center;gap:14px;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);border-radius:4px;padding:9px 16px;}
+  .distance-filtre input[type=range]{-webkit-appearance:none;appearance:none;width:190px;height:4px;border-radius:2px;outline:none;cursor:pointer;margin:0;}
+  .distance-filtre input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);border:none;cursor:grab;}
+  .distance-filtre input[type=range]::-webkit-slider-thumb:active{cursor:grabbing;transform:scale(1.15)}
+  .distance-filtre input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold);border:none;cursor:grab;}
+  .distance-filtre input[type=range]:focus-visible{outline:2px solid rgba(201,162,39,0.55);outline-offset:6px}
+  .distance-filtre output{font-size:13px;color:#E3C766;font-variant-numeric:tabular-nums;min-width:12ch;white-space:nowrap;}
+  @media(max-width:560px){
+    .distance-filtre{flex:1 1 100%}
+    .distance-filtre input[type=range]{flex:1;width:auto}
+  }
 
   .membre{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;padding:24px;margin-bottom:18px;}
   .membre.equilibre{border-color:rgba(201,162,39,0.35)}
@@ -150,11 +160,44 @@ function chargerPreferenceDistance(){
   distanceMax = Number.isFinite(valeur) && valeur > 0 ? valeur : null;
 }
 
-const PALIERS_DISTANCE = [25, 50, 100, 200, 400];
+// Les crans de la jauge. Ils se resserrent là où la précision compte : à
+// courte distance, un kilomètre de plus décide qu'on se déplace ou non ;
+// passé quelques centaines, l'écart entre 700 et 750 km ne veut plus dire
+// grand-chose. Un pas régulier aurait rendu le bas de l'échelle impossible à
+// viser — c'est justement là qu'on veut pouvoir régler finement.
+function construireCrans(){
+  const crans = [];
+  for(let km = 1;   km <= 30;   km += 1)  crans.push(km);   // au kilomètre près
+  for(let km = 35;  km <= 100;  km += 5)  crans.push(km);
+  for(let km = 110; km <= 200;  km += 10) crans.push(km);
+  for(let km = 225; km <= 500;  km += 25) crans.push(km);
+  for(let km = 550; km <= 1000; km += 50) crans.push(km);
+  crans.push(null);   // tout au bout de la jauge : aucune limite
+  return crans;
+}
+const CRANS_DISTANCE = construireCrans();
+
+function texteDistance(km){
+  return km === null ? 'Partout' : `Jusqu'à ${km} km`;
+}
+
+// Retrouve le cran d'une distance déjà enregistrée, même si elle ne tombe
+// pas exactement dessus — les paliers ont changé depuis la première version.
+function cranPourDistance(km){
+  if(km === null) return CRANS_DISTANCE.length - 1;
+  let cran = 0;
+  CRANS_DISTANCE.forEach((valeur, i) => {
+    if(valeur !== null && Math.abs(valeur - km) < Math.abs(CRANS_DISTANCE[cran] - km)) cran = i;
+  });
+  return cran;
+}
+
+// Le glissement en cours, le temps qu'il se termine.
+let relanceEnAttente = null;
 
 // Le filtre n'a de sens que si je sais moi-même où je suis : sinon la base
 // n'a aucune distance à calculer. On propose alors d'aller la renseigner
-// plutôt que d'afficher une liste déroulante qui ne ferait rien.
+// plutôt que d'afficher une jauge qui ne ferait rien.
 function rendreFiltreDistance(){
   const el = document.getElementById('zone-filtre');
   if(!aUneLocalisation()){
@@ -162,23 +205,46 @@ function rendreFiltreDistance(){
     return;
   }
   el.innerHTML = `
-    <select class="filter-select" id="distance" aria-label="Distance maximale">
-      <option value="">Partout</option>
-      ${PALIERS_DISTANCE.map(km =>
-        `<option value="${km}"${distanceMax === km ? ' selected' : ''}>Moins de ${km} km</option>`).join('')}
-    </select>`;
+    <div class="distance-filtre">
+      <input type="range" id="distance" min="0" max="${CRANS_DISTANCE.length - 1}" step="1"
+             value="${cranPourDistance(distanceMax)}" aria-label="Distance maximale">
+      <output id="distance-valeur">${texteDistance(distanceMax)}</output>
+    </div>`;
 
-  document.getElementById('distance').addEventListener('change', async (e) => {
-    const choix = e.target.value;
-    distanceMax = choix ? Number(choix) : null;
-    try{
-      if(choix) localStorage.setItem(MEMOIRE_DISTANCE, choix);
-      else localStorage.removeItem(MEMOIRE_DISTANCE);
-    }catch(err){}
-    // Le tri se fait dans la base : à mesure que les membres se multiplient,
-    // mieux vaut ne pas télécharger ceux qui sont à l'autre bout du pays.
-    await chargerCorrespondances();
+  const jauge = document.getElementById('distance');
+  majJauge(jauge);
+
+  // Le chiffre suit le doigt, mais la requête attend qu'on s'arrête : sans
+  // cela, un seul glissement en déclencherait des dizaines.
+  jauge.addEventListener('input', () => {
+    distanceMax = CRANS_DISTANCE[Number(jauge.value)];
+    majJauge(jauge);
+    clearTimeout(relanceEnAttente);
+    relanceEnAttente = setTimeout(() => {
+      memoriserDistance();
+      // Le filtrage se fait dans la base : à mesure que les membres se
+      // multiplient, mieux vaut ne pas télécharger ceux qui sont à l'autre
+      // bout du pays.
+      chargerCorrespondances();
+    }, 400);
   });
+}
+
+// La part parcourue se remplit en or : on voit d'un coup d'œil où on en est
+// sur l'échelle, ce qu'un curseur nu ne montrerait pas.
+function majJauge(jauge){
+  const part = (Number(jauge.value) / Number(jauge.max)) * 100;
+  jauge.style.background = `linear-gradient(90deg, var(--gold) ${part}%, rgba(237,234,224,0.15) ${part}%)`;
+  const texte = texteDistance(distanceMax);
+  jauge.setAttribute('aria-valuetext', texte);
+  document.getElementById('distance-valeur').textContent = texte;
+}
+
+function memoriserDistance(){
+  try{
+    if(distanceMax) localStorage.setItem(MEMOIRE_DISTANCE, String(distanceMax));
+    else localStorage.removeItem(MEMOIRE_DISTANCE);
+  }catch(err){}
 }
 
 // Ce qu'on montre d'un membre : une distance approximative et un
@@ -270,8 +336,8 @@ function rendre(){
 
   if(liste.length === 0){
     content.innerHTML = distanceMax
-      ? `<p class="status-msg">Personne à moins de ${distanceMax} km de chez toi${equilibresSeulement ? ' avec un échange équilibré' : ''} pour le moment.
-         <br><br>Choisis « Partout » pour voir les collectionneurs plus éloignés : un envoi postal reste possible.</p>`
+      ? `<p class="status-msg">Personne dans un rayon de ${distanceMax} km${equilibresSeulement ? ' avec un échange équilibré' : ''} pour le moment.
+         <br><br>Pousse la jauge vers la droite pour voir les collectionneurs plus éloignés : un envoi postal reste possible.</p>`
       : equilibresSeulement
       ? `<p class="status-msg">Aucun échange équilibré pour l'instant. Retire le filtre pour voir les mises en relation à sens unique.</p>`
       : `<p class="status-msg">Personne ne correspond encore à ton classeur.<br><br>
@@ -357,12 +423,13 @@ function texteBalance(recu, donne, el){
 
 function majResume(){
   const equilibres = correspondances.filter(estEquilibre).length;
-  // La barre reste visible même sans résultat quand un filtre est posé :
-  // sans elle, impossible de le retirer.
-  document.getElementById('filtres').hidden = correspondances.length === 0 && !distanceMax;
+  // La barre reste visible même sans résultat : sans elle, la jauge
+  // disparaîtrait sous les doigts de celui qui vient de la pousser trop loin.
+  document.getElementById('filtres').hidden =
+    correspondances.length === 0 && !distanceMax && !aUneLocalisation();
   document.getElementById('resume').textContent = correspondances.length === 0
     ? ''
-    : `${correspondances.length} membre${correspondances.length > 1 ? 's' : ''} en correspondance${distanceMax ? ` à moins de ${distanceMax} km` : ''}, dont ${equilibres} en échange équilibré`;
+    : `${correspondances.length} membre${correspondances.length > 1 ? 's' : ''} en correspondance${distanceMax ? ` dans un rayon de ${distanceMax} km` : ''}, dont ${equilibres} en échange équilibré`;
 }
 
 async function init(){
