@@ -98,14 +98,30 @@ create table if not exists signalements (
   cree_le      timestamptz not null default now()
 );
 
--- Où chaque membre s'est arrêté dans chaque conversation. Tout ce qui est
--- arrivé après est non lu.
+-- L'état d'une conversation pour un membre : où il s'est arrêté de lire, et
+-- ce qu'il a rangé ou effacé. Une conversation appartient à deux personnes,
+-- donc tout ce qui est ici ne vaut que pour l'une d'elles : archiver ou
+-- supprimer ne touche jamais la liste de l'autre. Il ne peut pas en aller
+-- autrement — sinon n'importe qui pourrait effacer d'un compte les messages
+-- qu'il vient d'y envoyer, et le signalement ne servirait plus à rien.
 create table if not exists lectures (
   utilisateur_id     uuid not null references auth.users on delete cascade,
   conversation_id    uuid not null references conversations on delete cascade,
   dernier_message_lu bigint not null default 0,
   primary key (utilisateur_id, conversation_id)
 );
+
+-- Archivage et suppression marchent pareil : on retient le numéro du dernier
+-- message au moment du geste. Tout ce qui arrive après passe outre — une
+-- discussion rangée ressort quand on t'écrit à nouveau, plutôt que de faire
+-- disparaître un message sans prévenir.
+--
+--   archivee_apres : null = pas archivée.
+--   effacee_jusqua : null = jamais effacée. Sinon les messages jusqu'à ce
+--                    numéro ne me sont plus montrés, et la discussion quitte
+--                    ma liste tant que rien de plus récent n'arrive.
+alter table lectures add column if not exists archivee_apres bigint;
+alter table lectures add column if not exists effacee_jusqua bigint;
 
 -- ==========================================================================
 -- Règles d'accès
@@ -209,13 +225,24 @@ create policy "ouvrir une conversation"
   on conversations for insert to authenticated
   with check (auth.uid() in (membre_a, membre_b));
 
+-- La limite de suppression est posée ici plutôt que dans l'affichage : un
+-- message effacé ne doit pas simplement être caché à l'écran, il ne doit plus
+-- sortir de la base. Tout ce qui lit des messages en hérite sans y penser —
+-- l'aperçu des conversations, le compte des non-lus, le fil lui-même.
 drop policy if exists "lire mes messages" on messages;
 create policy "lire mes messages"
   on messages for select to authenticated
-  using (exists (
-    select 1 from conversations c
-    where c.id = conversation_id and auth.uid() in (c.membre_a, c.membre_b)
-  ));
+  using (
+    exists (
+      select 1 from conversations c
+      where c.id = messages.conversation_id and auth.uid() in (c.membre_a, c.membre_b)
+    )
+    and messages.id > coalesce((
+      select l.effacee_jusqua from lectures l
+      where l.conversation_id = messages.conversation_id
+        and l.utilisateur_id = auth.uid()
+    ), 0)
+  );
 
 -- On n'écrit que sous son propre nom, dans une conversation dont on fait
 -- partie, et à condition qu'aucun blocage ne sépare les deux membres.
@@ -414,7 +441,8 @@ returns table (
   pseudo          text,
   dernier_message text,
   dernier_envoi   timestamptz,
-  non_lus         integer
+  non_lus         integer,
+  archivee        boolean
 )
 language sql
 stable
@@ -425,19 +453,26 @@ as $$
     p.pseudo,
     m.texte,
     m.envoye_le,
-    coalesce(nl.nombre, 0)::integer
+    coalesce(nl.nombre, 0)::integer,
+    -- Archivée tant que rien n'est arrivé depuis le rangement.
+    l.archivee_apres is not null and coalesce(m.id, 0) <= l.archivee_apres
   from conversations c
   join profils p
     on p.id = case when c.membre_a = auth.uid() then c.membre_b else c.membre_a end
-  left join lateral (
-    select texte, envoye_le
-    from messages
-    where conversation_id = c.id
-    order by envoye_le desc
-    limit 1
-  ) m on true
   left join lectures l
     on l.conversation_id = c.id and l.utilisateur_id = auth.uid()
+  -- Les messages effacés sont déjà écartés par la règle de lecture : ces
+  -- deux sous-requêtes ne voient donc que ce qui me reste.
+  left join lateral (
+    select id, texte, envoye_le
+    from messages
+    where conversation_id = c.id
+    -- Sur le numéro et non sur l'heure : deux messages de la même seconde
+    -- s'ordonneraient au hasard, et l'aperçu montrerait parfois l'avant-
+    -- dernier message.
+    order by id desc
+    limit 1
+  ) m on true
   left join lateral (
     select count(*) as nombre
     from messages
@@ -447,7 +482,78 @@ as $$
   ) nl on true
   where auth.uid() in (c.membre_a, c.membre_b)
     and not est_bloque(c.membre_a, c.membre_b)
+    -- Une conversation supprimée ne revient que si on m'écrit à nouveau.
+    and (l.effacee_jusqua is null or m.id is not null)
   order by coalesce(m.envoye_le, c.cree_le) desc;
+$$;
+
+-- Le dernier message d'une conversation dont je fais partie, en tenant
+-- compte de ce que j'ai déjà effacé : c'est le repère que posent les deux
+-- gestes ci-dessous. Refuse une conversation qui n'est pas la mienne.
+drop function if exists borne_conversation(uuid);
+create function borne_conversation(conversation uuid)
+returns bigint
+language plpgsql
+as $$
+declare
+  borne bigint;
+begin
+  if not exists (
+    select 1 from conversations c
+    where c.id = conversation and auth.uid() in (c.membre_a, c.membre_b)
+  ) then
+    raise exception 'Conversation inconnue';
+  end if;
+
+  select coalesce(max(m.id), 0) into borne
+  from messages m where m.conversation_id = conversation;
+
+  -- Ce que j'ai déjà effacé ne m'est plus visible ci-dessus : sans ce
+  -- rattrapage, un second geste ferait reculer la borne et ressusciterait
+  -- les messages précédemment effacés.
+  return greatest(borne, coalesce((
+    select l.effacee_jusqua from lectures l
+    where l.conversation_id = conversation and l.utilisateur_id = auth.uid()
+  ), 0));
+end;
+$$;
+
+-- Ranger une conversation, ou la ressortir.
+drop function if exists archiver_conversation(uuid, boolean);
+create function archiver_conversation(conversation uuid, archiver boolean)
+returns void
+language plpgsql
+as $$
+declare
+  borne bigint := borne_conversation(conversation);
+begin
+  insert into lectures (utilisateur_id, conversation_id, archivee_apres)
+  values (auth.uid(), conversation, case when archiver then borne else null end)
+  on conflict (utilisateur_id, conversation_id)
+  do update set archivee_apres = excluded.archivee_apres;
+end;
+$$;
+
+-- Supprimer une conversation — pour moi seul. Les messages restent chez
+-- l'autre membre : personne ne peut effacer ce qu'il a envoyé à quelqu'un.
+drop function if exists supprimer_conversation(uuid);
+create function supprimer_conversation(conversation uuid)
+returns void
+language plpgsql
+as $$
+declare
+  borne bigint := borne_conversation(conversation);
+begin
+  insert into lectures (utilisateur_id, conversation_id, effacee_jusqua, dernier_message_lu, archivee_apres)
+  values (auth.uid(), conversation, borne, borne, null)
+  on conflict (utilisateur_id, conversation_id)
+  do update set
+    -- Jamais en arrière : ce qui est effacé le reste.
+    effacee_jusqua = greatest(coalesce(lectures.effacee_jusqua, 0), excluded.effacee_jusqua),
+    -- Ce qui vient d'être effacé ne doit pas rester compté comme non lu.
+    dernier_message_lu = greatest(lectures.dernier_message_lu, excluded.dernier_message_lu),
+    archivee_apres = null;
+end;
 $$;
 
 -- Le nombre total de messages non lus, pour la pastille de la navigation.

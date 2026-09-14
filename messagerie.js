@@ -29,7 +29,10 @@ async function lireMessages(conversationId, depuisId = 0){
     .select('id, auteur_id, texte, envoye_le')
     .eq('conversation_id', conversationId)
     .gt('id', depuisId)
-    .order('envoye_le', { ascending: true });
+    // Sur le numéro et non sur l'heure : deux messages de la même seconde
+    // s'ordonneraient au hasard, alors que l'appelant retient le dernier
+    // numéro reçu pour savoir où il en est.
+    .order('id', { ascending: true });
   if(error) throw error;
   return data ?? [];
 }
@@ -75,6 +78,34 @@ function texteEchappe(texte){
   const boite = document.createElement('div');
   boite.textContent = texte;
   return boite.innerHTML;
+}
+
+// --------------------------------------------- ranger et faire le ménage --
+
+// Archiver et supprimer ne valent que pour moi. Une conversation a deux
+// propriétaires : je peux la retirer de ma liste, jamais de celle d'en face.
+
+async function archiverConversation(conversationId, archiver = true){
+  const db = await clientSupabase();
+  const { error } = await db.rpc('archiver_conversation', {
+    conversation: conversationId,
+    archiver,
+  });
+  if(error) throw error;
+}
+
+async function supprimerConversation(conversationId){
+  const db = await clientSupabase();
+  const { error } = await db.rpc('supprimer_conversation', { conversation: conversationId });
+  if(error) throw error;
+}
+
+// Le pseudo d'un membre, quand on n'a que son identifiant : c'est le cas
+// d'une discussion supprimée qu'on rouvre depuis la page Échanges.
+async function pseudoDe(membreId){
+  const db = await clientSupabase();
+  const { data } = await db.from('profils').select('pseudo').eq('id', membreId).maybeSingle();
+  return data?.pseudo ?? null;
 }
 
 // ------------------------------------------------ blocage et signalement --

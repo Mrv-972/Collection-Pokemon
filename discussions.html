@@ -34,6 +34,12 @@
   .messagerie{display:grid;grid-template-columns:280px 1fr;gap:20px;padding-bottom:70px;align-items:start;}
   @media(max-width:800px){.messagerie{grid-template-columns:1fr}}
 
+  .colonne-liste{display:flex;flex-direction:column;gap:10px;}
+  .filtres-conv{display:flex;gap:6px;flex-wrap:wrap;}
+  .chip{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;}
+  .chip:hover{color:var(--text-on-ink)}
+  .chip.on{color:#E3C766;border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
+
   .liste{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;overflow:hidden;}
   .conv{display:block;width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid rgba(237,234,224,0.06);padding:14px 16px;cursor:pointer;font-family:inherit;color:inherit;}
   .conv:last-child{border-bottom:none}
@@ -50,7 +56,7 @@
   .fil-tete a:hover{color:var(--text-on-ink)}
 
   .prevention{margin:0;padding:12px 20px;background:rgba(201,162,39,0.08);border-bottom:1px solid rgba(201,162,39,0.2);font-size:12.5px;color:#D8CFA8;}
-  .fil-actions{display:flex;gap:8px;margin-left:auto;}
+  .fil-actions{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;}
   .fil-actions button{background:transparent;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);padding:5px 11px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit;}
   .fil-actions button:hover{border-color:rgba(237,234,224,0.35);color:var(--text-on-ink)}
   .fil-actions button.danger:hover{border-color:rgba(168,67,28,0.6);color:#E08862}
@@ -117,19 +123,64 @@ let arreterSuivi = null;
 function rendreSquelette(){
   document.getElementById('content').innerHTML = `
     <div class="messagerie">
-      <div class="liste" id="liste"></div>
+      <div class="colonne-liste">
+        <div class="filtres-conv" id="filtres-conv"></div>
+        <div class="liste" id="liste"></div>
+      </div>
       <div class="fil" id="fil"></div>
     </div>
   `;
 }
 
+// Les trois vues de la liste. Une discussion archivée sort des « Actives »
+// mais y revient d'elle-même dès qu'on t'écrit : ranger ne doit jamais
+// revenir à manquer un message.
+const FILTRES = [
+  { cle: 'actives',   libelle: 'Actives' },
+  { cle: 'non_lues',  libelle: 'Non lues' },
+  { cle: 'archivees', libelle: 'Archivées' },
+];
+let filtreActif = 'actives';
+
+function correspondAuFiltre(c, cle){
+  if(cle === 'archivees') return c.archivee;
+  if(cle === 'non_lues')  return c.non_lus > 0 && !c.archivee;
+  return !c.archivee;
+}
+
+function compterFiltre(cle){
+  return conversations.filter(c => correspondAuFiltre(c, cle)).length;
+}
+
+function rendreFiltres(){
+  const barre = document.getElementById('filtres-conv');
+  if(!barre) return;
+  barre.innerHTML = FILTRES.map(f => {
+    const nombre = compterFiltre(f.cle);
+    // Inutile de proposer les archives à qui n'en a pas.
+    if(f.cle === 'archivees' && nombre === 0 && filtreActif !== 'archivees') return '';
+    const compte = f.cle === 'actives' || nombre === 0 ? '' : ` (${nombre})`;
+    return `<button class="chip ${filtreActif === f.cle ? 'on' : ''}" data-filtre="${f.cle}">${f.libelle}${compte}</button>`;
+  }).join('');
+}
+
+function listeVide(){
+  if(filtreActif === 'non_lues')  return 'Tout est lu.';
+  if(filtreActif === 'archivees') return 'Aucune discussion archivée.';
+  const archivees = compterFiltre('archivees');
+  return archivees > 0
+    ? `Aucune discussion active. Tu en as ${archivees} dans les archives.`
+    : `Aucune discussion pour l'instant. Ouvre-en une depuis la page Échanges.`;
+}
+
 function rendreListe(){
   const liste = document.getElementById('liste');
-  if(conversations.length === 0){
-    liste.innerHTML = `<p class="vide">Aucune discussion pour l'instant. Ouvre-en une depuis la page Échanges.</p>`;
+  const visibles = conversations.filter(c => correspondAuFiltre(c, filtreActif));
+  if(visibles.length === 0){
+    liste.innerHTML = `<p class="vide">${listeVide()}</p>`;
     return;
   }
-  liste.innerHTML = conversations.map(c => `
+  liste.innerHTML = visibles.map(c => `
     <button class="conv ${conversationOuverte?.conversation_id === c.conversation_id ? 'on' : ''}" data-id="${c.conversation_id}">
       <div class="qui">${texteEchappe(c.pseudo)}${c.non_lus > 0 ? `<span class="pastille">${c.non_lus}</span>` : ''}</div>
       <div class="apercu">${c.dernier_message ? texteEchappe(c.dernier_message) : 'Discussion ouverte, rien d\'envoyé'}</div>
@@ -140,7 +191,7 @@ function rendreListe(){
 function rendreFil(){
   const fil = document.getElementById('fil');
   if(!conversationOuverte){
-    fil.innerHTML = `<p class="status-msg" style="padding:28px 20px">Choisis une discussion à gauche, ou lances-en une depuis la page Échanges.</p>`;
+    fil.innerHTML = `<p class="status-msg" style="padding:28px 20px">Choisis une discussion dans la liste, ou lances-en une depuis la page Échanges.</p>`;
     return;
   }
   fil.innerHTML = `
@@ -148,6 +199,8 @@ function rendreFil(){
       <h2>${texteEchappe(conversationOuverte.pseudo)}</h2>
       <a href="echanges.html">Voir les échanges possibles</a>
       <div class="fil-actions">
+        <button id="btn-archiver">${conversationOuverte.archivee ? 'Sortir des archives' : 'Archiver'}</button>
+        <button id="btn-supprimer" class="danger">Supprimer</button>
         <button id="btn-signaler">Signaler</button>
         <button id="btn-bloquer" class="danger">Bloquer</button>
       </div>
@@ -160,6 +213,8 @@ function rendreFil(){
     </div>
   `;
   document.getElementById('btn-envoyer').addEventListener('click', envoyer);
+  document.getElementById('btn-archiver').addEventListener('click', archiver);
+  document.getElementById('btn-supprimer').addEventListener('click', supprimer);
   document.getElementById('btn-bloquer').addEventListener('click', bloquer);
   document.getElementById('btn-signaler').addEventListener('click', signaler);
   const saisie = document.getElementById('saisie');
@@ -234,6 +289,49 @@ async function envoyer(){
   }
 }
 
+async function archiver(){
+  const conv = conversationOuverte;
+  if(!conv) return;
+  const aArchiver = !conv.archivee;
+  try{
+    await archiverConversation(conv.conversation_id, aArchiver);
+    // En la ressortant, on remet la vue sur les discussions actives, sinon
+    // elle disparaîtrait de l'écran au moment même où on la récupère.
+    if(!aArchiver) filtreActif = 'actives';
+    await rafraichirListe();
+    const maj = conversations.find(c => c.conversation_id === conv.conversation_id);
+    conversationOuverte = maj && correspondAuFiltre(maj, filtreActif) ? maj : null;
+    rendreListe();
+    rendreFil();
+  }catch(err){
+    alert("L'archivage a échoué : " + (err.message ?? err));
+  }
+}
+
+async function supprimer(){
+  const conv = conversationOuverte;
+  if(!conv) return;
+  // Le message dit exactement ce qui se passe : la moitié de la discussion
+  // appartient à quelqu'un d'autre, et elle ne s'efface pas.
+  if(!confirm(
+    `Supprimer la discussion avec ${conv.pseudo} ?\n\n`
+    + `Elle quittera ta liste et tu n'en verras plus les messages.\n\n`
+    + `${conv.pseudo} gardera la sienne : on ne peut pas effacer ce qu'on a déjà envoyé à quelqu'un. `
+    + `Si cette personne t'écrit à nouveau, la discussion reviendra — avec les nouveaux messages seulement.`
+  )) return;
+
+  try{
+    await supprimerConversation(conv.conversation_id);
+    conversationOuverte = null;
+    await rafraichirListe();
+    rendreListe();
+    rendreFil();
+    if(typeof afficherNonLus === 'function') afficherNonLus();
+  }catch(err){
+    alert("La suppression a échoué : " + (err.message ?? err));
+  }
+}
+
 async function bloquer(){
   const qui = conversationOuverte.pseudo;
   if(!confirm(`Bloquer ${qui} ?\n\nVous ne pourrez plus vous écrire, et vous n'apparaîtrez plus dans les échanges possibles l'un de l'autre. C'est réversible depuis ton compte.`)) return;
@@ -260,6 +358,13 @@ async function signaler(){
 
 async function rafraichirListe(){
   conversations = await listerConversations();
+  // La conversation ouverte est un objet de cette liste : sans cette reprise,
+  // son drapeau « archivée » resterait celui du chargement précédent.
+  if(conversationOuverte){
+    const maj = conversations.find(c => c.conversation_id === conversationOuverte.conversation_id);
+    if(maj) conversationOuverte = maj;
+  }
+  rendreFiltres();
   rendreListe();
 }
 
@@ -302,8 +407,22 @@ async function init(){
     if(membreDemande){
       const idConv = await ouvrirConversation(membreDemande);
       await rafraichirListe();
-      const conv = conversations.find(c => c.conversation_id === idConv);
-      if(conv) await ouvrirFil(conv);
+      let conv = conversations.find(c => c.conversation_id === idConv);
+      if(!conv){
+        // Discussion précédemment supprimée : on la rouvre pour écrire, sans
+        // faire réapparaître les messages effacés.
+        conv = {
+          conversation_id: idConv,
+          autre_id: membreDemande,
+          pseudo: await pseudoDe(membreDemande) ?? 'Membre',
+          non_lus: 0,
+          archivee: false,
+        };
+      }
+      // Rangée puis rouverte volontairement : on montre la vue où elle est.
+      if(conv.archivee) filtreActif = 'archivees';
+      rendreFiltres();
+      await ouvrirFil(conv);
     }else{
       rendreFil();
     }
@@ -317,6 +436,20 @@ async function init(){
 }
 
 document.addEventListener('click', (e) => {
+  const puce = e.target.closest('[data-filtre]');
+  if(puce){
+    filtreActif = puce.dataset.filtre;
+    // La discussion ouverte n'a plus sa place dans cette vue : on la ferme
+    // plutôt que de la laisser surlignée dans une liste où elle ne figure pas.
+    if(conversationOuverte && !correspondAuFiltre(conversationOuverte, filtreActif)){
+      conversationOuverte = null;
+      rendreFil();
+    }
+    rendreFiltres();
+    rendreListe();
+    return;
+  }
+
   const bouton = e.target.closest('.conv');
   if(!bouton) return;
   const conv = conversations.find(c => c.conversation_id === bouton.dataset.id);
