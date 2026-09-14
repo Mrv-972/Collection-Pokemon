@@ -573,3 +573,15 @@ as $$
     and m.id > coalesce(l.dernier_message_lu, 0)
     and not est_bloque(c.membre_a, c.membre_b);
 $$;
+
+-- ==========================================================================
+-- Rafraîchissement de la couche d'accès
+--
+-- Entre la base et le navigateur, Supabase intercale un service (PostgREST)
+-- qui garde en mémoire la liste des tables et des fonctions. Tant qu'il ne
+-- l'a pas relue, une fonction toute neuve lui reste inconnue et le site
+-- répond « Could not find the function ». Ce signal la lui fait relire tout
+-- de suite, plutôt que d'attendre ou de redémarrer le projet.
+-- ==========================================================================
+
+notify pgrst, 'reload schema';
