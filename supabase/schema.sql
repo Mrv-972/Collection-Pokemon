@@ -27,6 +27,20 @@ create table if not exists profils (
 );
 alter table profils add column if not exists ne_le date;
 
+-- Localisation. Deux échangeurs proches peuvent se remettre les cartes en
+-- main propre plutôt que de les confier à la poste : savoir qui est à côté
+-- de chez soi a donc une vraie valeur.
+--
+-- Ce qui est enregistré n'est jamais une adresse, mais le centre de la
+-- commune choisie — un point identique pour tous les habitants de cette
+-- commune. La précision s'arrête donc volontairement là où commencerait le
+-- fait de pouvoir retrouver quelqu'un chez lui.
+alter table profils add column if not exists ville       text;
+alter table profils add column if not exists code_postal text;
+alter table profils add column if not exists departement text;
+alter table profils add column if not exists latitude    double precision;
+alter table profils add column if not exists longitude   double precision;
+
 -- L'état d'une carte pour un membre. Une ligne n'existe que si au moins un
 -- des trois marquages a été posé.
 create table if not exists cartes (
@@ -156,6 +170,17 @@ create policy "chacun modifie son profil"
     and ne_le <= current_date - interval '15 years'
   );
 
+-- Une règle « row level » filtre des lignes, jamais des colonnes : tant que la
+-- table entière est lisible, n'importe quel membre peut demander la date de
+-- naissance ou les coordonnées de tous les autres. On restreint donc la
+-- lecture aux seules colonnes qui ont vocation à être vues : le pseudo, le
+-- moyen de contact et le département. La commune, le code postal, la date de
+-- naissance et le point géographique ne sortent plus de la base ; chacun
+-- relit les siens par la fonction mon_profil(), et la distance entre deux
+-- membres est calculée par la base, qui n'en renvoie que le résultat.
+revoke select on profils from anon, authenticated;
+grant  select (id, pseudo, contact, departement, cree_le) on profils to authenticated;
+
 -- --- cartes ---------------------------------------------------------------
 
 drop policy if exists "chacun gère ses cartes" on cartes;
@@ -236,16 +261,77 @@ create policy "je gère mes lectures"
 -- se produit à chaque fois que le script évolue.
 -- ==========================================================================
 
+-- Mon propre profil, colonnes privées comprises. Nécessaire depuis que la
+-- lecture directe de la table est limitée aux colonnes publiques.
+drop function if exists mon_profil();
+create function mon_profil()
+returns table (
+  pseudo      text,
+  contact     text,
+  ne_le       date,
+  ville       text,
+  code_postal text,
+  departement text,
+  latitude    double precision,
+  longitude   double precision
+)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select p.pseudo, p.contact, p.ne_le, p.ville, p.code_postal,
+         p.departement, p.latitude, p.longitude
+  from profils p
+  where p.id = auth.uid();
+$$;
+
+-- Distance à vol d'oiseau entre deux membres, en kilomètres entiers, ou null
+-- si l'un des deux n'a pas renseigné sa zone.
+--
+-- Comme est_bloque(), la fonction s'exécute avec les droits de son
+-- propriétaire pour atteindre des colonnes que l'appelant ne peut pas lire,
+-- et ne renvoie qu'un nombre : jamais les coordonnées elles-mêmes. Comme ces
+-- coordonnées sont celles du centre d'une commune, le plus précis qu'on
+-- puisse déduire d'une distance reste la commune — jamais un domicile.
+--
+-- Le calcul est la formule de haversine : la Terre étant ronde, une simple
+-- soustraction de latitudes donnerait un résultat faux.
+drop function if exists distance_km(uuid, uuid);
+create function distance_km(a uuid, b uuid)
+returns integer
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select round(
+    6371 * 2 * asin(least(1.0, sqrt(
+        power(sin(radians(pb.latitude - pa.latitude) / 2), 2)
+      + cos(radians(pa.latitude)) * cos(radians(pb.latitude))
+        * power(sin(radians(pb.longitude - pa.longitude) / 2), 2)
+    )))
+  )::integer
+  from profils pa, profils pb
+  where pa.id = a
+    and pb.id = b
+    and pa.latitude is not null and pa.longitude is not null
+    and pb.latitude is not null and pb.longitude is not null;
+$$;
+
 -- Croise ma collection avec celle des autres membres. Le calcul est fait par
 -- la base plutôt que par le navigateur : elle seule a toutes les données, et
 -- cela évite d'envoyer des milliers d'identifiants de cartes sur le réseau.
 -- Un membre bloqué disparaît des correspondances, dans les deux sens.
 drop function if exists echanges_possibles();
-create function echanges_possibles()
+drop function if exists echanges_possibles(integer);
+create function echanges_possibles(distance_max integer default null)
 returns table (
   membre_id    uuid,
   pseudo       text,
   contact      text,
+  departement  text,
+  distance     integer,
   il_me_donne  text[],
   je_lui_donne text[]
 )
@@ -279,6 +365,8 @@ as $$
     p.id,
     p.pseudo,
     p.contact,
+    p.departement,
+    distance_km(auth.uid(), p.id),
     coalesce(d.cartes, '{}'::text[]),
     coalesce(r.cartes, '{}'::text[])
   from profils p
@@ -286,7 +374,11 @@ as $$
   left join je_lui_donne r on r.utilisateur_id = p.id
   where p.id <> auth.uid()
     and (d.cartes is not null or r.cartes is not null)
-    and not est_bloque(auth.uid(), p.id);
+    and not est_bloque(auth.uid(), p.id)
+    -- Sans filtre, tout le monde reste visible, y compris ceux qui n'ont pas
+    -- renseigné de zone. Avec un filtre, une distance inconnue ne peut pas
+    -- être déclarée « proche » : ces membres sortent de la liste.
+    and (distance_max is null or distance_km(auth.uid(), p.id) <= distance_max);
 $$;
 
 -- Retrouve la conversation avec un membre, ou l'ouvre si elle n'existe pas.

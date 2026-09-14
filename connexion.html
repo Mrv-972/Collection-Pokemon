@@ -59,6 +59,24 @@
   .bloque{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid rgba(237,234,224,0.06);font-size:14px;}
   .bloque button{background:transparent;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);padding:5px 12px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit;}
   .bloque button:hover{border-color:rgba(237,234,224,0.35);color:var(--text-on-ink)}
+
+  .zone{margin-top:30px;border-top:1px solid rgba(237,234,224,0.08);padding-top:22px;}
+  .zone h2{font-size:19px;margin-bottom:4px;}
+  .zone > p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
+  .zone-actuelle{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:12px 14px;font-size:14px;}
+  .zone-actuelle.vide{color:var(--text-on-ink-dim);font-size:13.5px;}
+  .recherche{display:flex;gap:8px;align-items:stretch;}
+  .recherche input{flex:1}
+  .recherche button{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:0 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .recherche button:hover{border-color:rgba(201,162,39,0.5)}
+  .recherche button:disabled{opacity:.5;cursor:default}
+  .communes{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;}
+  .commune{text-align:left;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:9px 12px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .commune:hover{border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.06)}
+  .commune small{display:block;color:var(--text-on-ink-dim);font-size:11.5px;margin-top:1px;}
+  .zone-msg{font-size:12.5px;margin-top:10px;}
+  .zone-msg.err{color:#E08862}
+  .zone-msg.ok{color:#5FBAAA}
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
 </style>
 </head>
@@ -85,6 +103,7 @@
 
 <script src="supabase-config.js"></script>
 <script src="tags.js"></script>
+<script src="localisation.js"></script>
 <script src="compte.js"></script>
 <script src="messagerie.js"></script>
 <script>
@@ -184,8 +203,10 @@ function rendre(){
       <button class="discret" id="btn-deconnexion">Se déconnecter</button>
       <div id="message"></div>
 
+      <div class="zone" id="zone"></div>
       <div class="bloques" id="bloques"></div>
     `;
+    afficherZone();
     afficherBloques();
     document.getElementById('btn-maj').addEventListener('click', enregistrerProfil);
     document.getElementById('btn-deconnexion').addEventListener('click', deconnexion);
@@ -305,6 +326,111 @@ function messageLisible(err){
   if(/Auth session missing|expired|invalid/i.test(texte)) return "Ce lien n'est plus valable. Redemandes-en un depuis « Mot de passe oublié ? ».";
   return texte;
 }
+
+// Zone d'échange. Le membre choisit une commune ; le site n'en retient que le
+// point central, et n'en montre aux autres qu'un département et une distance
+// approximative. C'est dit noir sur blanc dans le formulaire : on ne demande
+// pas sa position à quelqu'un sans lui dire ce qui en sera fait.
+let communesTrouvees = [];
+
+function afficherZone(){
+  const zone = document.getElementById('zone');
+  if(!zone) return;
+  const actuelle = zoneLisible(profil);
+
+  zone.innerHTML = `
+    <h2>Ma zone d'échange</h2>
+    <p>Elle permet de ne voir que les collectionneurs proches de chez toi, et de convenir
+       d'une remise en main propre plutôt que d'un envoi postal.
+       Les autres membres ne voient que ton département et une distance approximative —
+       jamais ta commune, et encore moins ton adresse.</p>
+
+    <div class="zone-actuelle ${actuelle ? '' : 'vide'}">
+      ${actuelle ? texteEchappe(actuelle) : 'Aucune zone renseignée : tu apparais dans les échanges sans indication de distance.'}
+    </div>
+
+    <label for="commune">Code postal ou nom de commune</label>
+    <div class="recherche">
+      <input id="commune" type="text" placeholder="69001, ou Lyon" autocomplete="postal-code">
+      <button id="btn-commune">Chercher</button>
+    </div>
+    <div class="communes" id="communes"></div>
+    <div class="zone-msg" id="zone-msg"></div>
+    ${actuelle ? '<button class="discret" id="btn-retirer-zone">Retirer ma zone</button>' : ''}
+  `;
+
+  document.getElementById('btn-commune').addEventListener('click', chercherZone);
+  document.getElementById('commune').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){ e.preventDefault(); chercherZone(); }
+  });
+  document.getElementById('btn-retirer-zone')?.addEventListener('click', effacerZone);
+}
+
+function messageZone(texte, type){
+  const el = document.getElementById('zone-msg');
+  if(!el) return;
+  el.className = `zone-msg ${type ?? ''}`;
+  el.textContent = texte;
+}
+
+async function chercherZone(){
+  const bouton = document.getElementById('btn-commune');
+  const saisie = document.getElementById('commune').value;
+  const liste = document.getElementById('communes');
+
+  liste.innerHTML = '';
+  messageZone('');
+  if(saisie.trim().length < 2){
+    messageZone('Indique un code postal ou au moins deux lettres.', 'err');
+    return;
+  }
+
+  bouton.disabled = true;
+  bouton.textContent = 'Recherche…';
+  try{
+    communesTrouvees = await chercherCommunes(saisie);
+    if(communesTrouvees.length === 0){
+      messageZone('Aucune commune ne correspond. Vérifie le code postal ou l\'orthographe.', 'err');
+      return;
+    }
+    liste.innerHTML = communesTrouvees.map((c, i) => `
+      <button class="commune" data-commune="${i}">
+        ${texteEchappe(c.nom)}
+        <small>${texteEchappe([c.codePostal, c.departement].filter(Boolean).join(' · '))}</small>
+      </button>
+    `).join('');
+  }catch(err){
+    console.warn('Recherche de commune impossible', err);
+    messageZone("L'annuaire des communes est injoignable pour le moment. Réessaie dans un instant.", 'err');
+  }finally{
+    bouton.disabled = false;
+    bouton.textContent = 'Chercher';
+  }
+}
+
+async function effacerZone(){
+  try{
+    await retirerLocalisation();
+    afficherZone();
+    messageZone('Zone retirée.', 'ok');
+  }catch(err){
+    messageZone('Impossible de retirer la zone : ' + (err.message ?? err), 'err');
+  }
+}
+
+document.addEventListener('click', async (e) => {
+  const bouton = e.target.closest('[data-commune]');
+  if(!bouton) return;
+  const commune = communesTrouvees[Number(bouton.dataset.commune)];
+  if(!commune) return;
+  try{
+    await definirLocalisation(commune);
+    afficherZone();
+    messageZone('Zone enregistrée. Tu peux maintenant filtrer les échanges par distance.', 'ok');
+  }catch(err){
+    messageZone("L'enregistrement a échoué : " + (err.message ?? err), 'err');
+  }
+});
 
 // Membres bloqués : la fenêtre de blocage annonce que c'est réversible, il
 // faut donc que ça le soit réellement.

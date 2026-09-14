@@ -66,10 +66,16 @@ function refusAge(dateNaissance){
   return null;
 }
 
+// Une règle d'accès filtre des lignes, jamais des colonnes : la table des
+// profils est donc lisible en partie seulement (pseudo, contact,
+// département), pour que personne ne puisse récupérer la date de naissance
+// ou la position des autres membres. Chacun relit les siennes par cette
+// fonction, qui ne renvoie que sa propre ligne.
 async function chargerProfil(){
   const db = await clientSupabase();
-  const { data } = await db.from('profils').select('pseudo, contact, ne_le').eq('id', membre.id).maybeSingle();
-  profil = data;
+  const { data, error } = await db.rpc('mon_profil');
+  if(error) console.warn('Profil illisible', error);
+  profil = data?.[0] ?? null;
   return profil;
 }
 
@@ -204,6 +210,43 @@ async function majProfil(pseudo, contact, dateNaissance){
     throw error;
   }
   await chargerProfil();
+}
+
+// ----------------------------------------------------- localisation ------
+
+// Enregistre la commune choisie. Seul le point central de la commune part en
+// base : ni adresse, ni position réelle de l'appareil.
+async function definirLocalisation(commune){
+  // Le méridien de Greenwich traverse la France : une longitude de zéro est
+  // une vraie position, pas une absence de position.
+  if(!Number.isFinite(commune?.latitude) || !Number.isFinite(commune?.longitude)){
+    throw new Error("Cette commune n'a pas de position connue.");
+  }
+  const db = await clientSupabase();
+  const { error } = await db.from('profils').update({
+    ville:       commune.nom,
+    code_postal: commune.codePostal,
+    departement: commune.departement,
+    latitude:    commune.latitude,
+    longitude:   commune.longitude,
+  }).eq('id', membre.id);
+  if(error) throw error;
+  await chargerProfil();
+}
+
+// Renseigner sa zone doit rester réversible, sans quoi ce serait un
+// engagement définitif pris en deux clics.
+async function retirerLocalisation(){
+  const db = await clientSupabase();
+  const { error } = await db.from('profils').update({
+    ville: null, code_postal: null, departement: null, latitude: null, longitude: null,
+  }).eq('id', membre.id);
+  if(error) throw error;
+  await chargerProfil();
+}
+
+function aUneLocalisation(){
+  return Number.isFinite(profil?.latitude) && Number.isFinite(profil?.longitude);
 }
 
 // ------------------------------------------------------- collection ------
