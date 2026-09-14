@@ -89,6 +89,7 @@
 <script src="messagerie.js"></script>
 <script>
 let ongletActif = 'connexion';
+let motDePasseOublie = false;
 
 function afficherMessage(texte, type){
   const el = document.getElementById('message');
@@ -106,6 +107,26 @@ function rendre(){
       <h1>Base de données à configurer</h1>
       <p class="intro">Les comptes ont besoin d'une base en ligne. Renseigne l'adresse et la clé publique de ton projet Supabase dans le fichier <code>supabase-config.js</code>, puis recharge cette page.</p>
     `;
+    return;
+  }
+
+  // Arrivée depuis un lien de réinitialisation : la session ouverte ne sert
+  // qu'à cela, on ne montre donc rien d'autre.
+  if(enRecuperation()){
+    panel.innerHTML = `
+      <div class="kicker">Compte</div>
+      <h1>Nouveau mot de passe</h1>
+      <p class="intro">Choisis un nouveau mot de passe. Tu seras connecté dans la foulée.</p>
+
+      <label for="mdp">Nouveau mot de passe</label>
+      <input id="mdp" type="password" autocomplete="new-password">
+      <div class="aide">Au moins ${LONGUEUR_MOT_DE_PASSE} caractères.</div>
+
+      <button class="principal" id="btn-nouveau-mdp">Enregistrer</button>
+      <div id="message"></div>
+    `;
+    document.getElementById('btn-nouveau-mdp').addEventListener('click', enregistrerNouveauMotDePasse);
+    document.getElementById('mdp').focus();
     return;
   }
 
@@ -171,6 +192,25 @@ function rendre(){
     return;
   }
 
+  if(motDePasseOublie){
+    panel.innerHTML = `
+      <div class="kicker">Compte</div>
+      <h1>Mot de passe oublié</h1>
+      <p class="intro">Indique ton adresse e-mail : tu recevras un lien pour en choisir un nouveau.</p>
+
+      <label for="email">Adresse e-mail</label>
+      <input id="email" type="email" autocomplete="email">
+
+      <button class="principal" id="btn-lien">Envoyer le lien</button>
+      <button class="discret" id="btn-retour">Revenir à la connexion</button>
+      <div id="message"></div>
+    `;
+    document.getElementById('btn-lien').addEventListener('click', demanderLien);
+    document.getElementById('btn-retour').addEventListener('click', () => { motDePasseOublie = false; rendre(); });
+    document.getElementById('email').focus();
+    return;
+  }
+
   const inscription = ongletActif === 'inscription';
   panel.innerHTML = `
     <div class="kicker">Compte</div>
@@ -204,8 +244,11 @@ function rendre(){
     ` : ''}
 
     <button class="principal" id="btn-valider">${inscription ? 'Créer mon compte' : 'Se connecter'}</button>
+    ${inscription ? '' : '<button class="discret" id="btn-oubli">Mot de passe oublié ?</button>'}
     <div id="message"></div>
   `;
+
+  document.getElementById('btn-oubli')?.addEventListener('click', () => { motDePasseOublie = true; rendre(); });
 
   panel.querySelectorAll('.tab').forEach(t => {
     t.addEventListener('click', () => { ongletActif = t.dataset.onglet; rendre(); });
@@ -257,6 +300,9 @@ function messageLisible(err){
   if(/Password should be at least/i.test(texte)) return 'Le mot de passe doit faire au moins 6 caractères.';
   if(/Unable to validate email/i.test(texte) || /invalid format/i.test(texte)) return "L'adresse e-mail ne semble pas valide.";
   if(/Email not confirmed/i.test(texte)) return "Ton adresse e-mail n'a pas encore été confirmée : regarde tes e-mails.";
+  if(/New password should be different/i.test(texte)) return "Choisis un mot de passe différent de l'ancien.";
+  if(/For security purposes|rate limit|too many/i.test(texte)) return "Trop de tentatives d'affilée. Patiente une minute avant de réessayer.";
+  if(/Auth session missing|expired|invalid/i.test(texte)) return "Ce lien n'est plus valable. Redemandes-en un depuis « Mot de passe oublié ? ».";
   return texte;
 }
 
@@ -295,6 +341,42 @@ document.addEventListener('click', async (e) => {
     afficherMessage('Le déblocage a échoué : ' + (err.message ?? err), 'err');
   }
 });
+
+async function demanderLien(){
+  const bouton = document.getElementById('btn-lien');
+  const email = document.getElementById('email').value.trim();
+  if(!email){
+    afficherMessage('Indique ton adresse e-mail.', 'err');
+    return;
+  }
+  bouton.disabled = true;
+  bouton.textContent = 'Envoi…';
+  try{
+    await envoyerLienReinitialisation(email);
+    // On ne révèle pas si l'adresse correspond à un compte : ce serait dire à
+    // un inconnu qui est inscrit ici.
+    afficherMessage("Si un compte existe avec cette adresse, un lien vient d'y être envoyé. Pense à regarder tes courriers indésirables.", 'ok');
+  }catch(err){
+    afficherMessage(messageLisible(err), 'err');
+  }finally{
+    bouton.disabled = false;
+    bouton.textContent = 'Envoyer le lien';
+  }
+}
+
+async function enregistrerNouveauMotDePasse(){
+  const bouton = document.getElementById('btn-nouveau-mdp');
+  bouton.disabled = true;
+  try{
+    await definirNouveauMotDePasse(document.getElementById('mdp').value);
+    afficherEtatCompte();
+    rendre();
+    afficherMessage('Mot de passe enregistré. Te voilà connecté.', 'ok');
+  }catch(err){
+    bouton.disabled = false;
+    afficherMessage(messageLisible(err), 'err');
+  }
+}
 
 async function terminerProfil(){
   const pseudo = document.getElementById('pseudo').value.trim();

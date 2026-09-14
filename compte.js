@@ -9,6 +9,10 @@ let supabase = null;
 let membre = null;   // l'utilisateur connecté, ou null
 let profil = null;   // son pseudo et son contact
 
+// Vrai quand le membre arrive depuis un lien de réinitialisation : il a une
+// session, mais elle ne sert qu'à choisir un nouveau mot de passe.
+let modeRecuperation = false;
+
 const CONFIG_MANQUANTE = SUPABASE_URL.includes('REMPLACER');
 
 async function clientSupabase(){
@@ -23,8 +27,17 @@ async function clientSupabase(){
 // en a une, sans jamais bloquer l'affichage si la base est injoignable.
 async function initCompte(){
   if(CONFIG_MANQUANTE) return null;
+
+  // Le lien reçu par courriel porte sa nature dans l'adresse. On le repère
+  // avant tout traitement, car la bibliothèque consomme ces paramètres en
+  // ouvrant la session.
+  if(window.location.hash.includes('type=recovery')) modeRecuperation = true;
+
   try{
     const db = await clientSupabase();
+    db.auth.onAuthStateChange((evenement) => {
+      if(evenement === 'PASSWORD_RECOVERY') modeRecuperation = true;
+    });
     const { data } = await db.auth.getSession();
     membre = data.session?.user ?? null;
     if(membre) await chargerProfil();
@@ -135,11 +148,48 @@ async function seConnecter(email, motDePasse){
   return membre;
 }
 
+// ------------------------------------------------ mot de passe oublié ----
+
+function enRecuperation(){
+  return modeRecuperation;
+}
+
+// Envoie le lien de réinitialisation. Le retour se fait sur cette même page,
+// qui proposera alors de choisir un nouveau mot de passe.
+async function envoyerLienReinitialisation(email){
+  const db = await clientSupabase();
+  const { error } = await db.auth.resetPasswordForEmail(email.trim(), {
+    redirectTo: new URL('connexion.html', window.location.href).href,
+  });
+  if(error) throw error;
+}
+
+const LONGUEUR_MOT_DE_PASSE = 6;
+
+async function definirNouveauMotDePasse(motDePasse){
+  if(motDePasse.length < LONGUEUR_MOT_DE_PASSE){
+    throw new Error(`Le mot de passe doit faire au moins ${LONGUEUR_MOT_DE_PASSE} caractères.`);
+  }
+  const db = await clientSupabase();
+  const { data, error } = await db.auth.updateUser({ password: motDePasse });
+  if(error) throw error;
+
+  // Le lien de réinitialisation ouvre déjà une session : le membre est
+  // connecté une fois son mot de passe changé.
+  modeRecuperation = false;
+  membre = data.user;
+  // On nettoie l'adresse, pour qu'un rafraîchissement ne rejoue pas le lien.
+  history.replaceState(null, '', window.location.pathname);
+  await chargerProfil();
+  await fusionnerCollection();
+}
+
 async function seDeconnecter(){
   const db = await clientSupabase();
   await db.auth.signOut();
   membre = null;
   profil = null;
+  modeRecuperation = false;
 }
 
 async function majProfil(pseudo, contact, dateNaissance){
