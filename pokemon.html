@@ -49,9 +49,9 @@
   .gen-title h2{font-size:22px;}
   .gen-title .count{font-size:13px;color:var(--text-on-ink-dim);}
 
-  .dex-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding-bottom:60px;}
-  @media(max-width:900px){.dex-grid{grid-template-columns:repeat(4,1fr)}}
-  @media(max-width:560px){.dex-grid{grid-template-columns:repeat(3,1fr)}}
+  .dex-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;padding-bottom:60px;}
+  @media(max-width:900px){.dex-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+  @media(max-width:560px){.dex-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
   .dex-card{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color .15s;}
   .dex-card:hover{border-color:rgba(237,234,224,0.28)}
