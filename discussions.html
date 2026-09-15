@@ -25,7 +25,6 @@
   .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
   .navlinks a.active{color:var(--text-on-ink)}
   .navlinks a:hover{color:var(--text-on-ink)}
-  @media(max-width:720px){.navlinks{display:none}}
 
   .page-head{padding:48px 0 26px;}
   .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
@@ -81,6 +80,38 @@
   .cta-btn{display:inline-block;margin-top:16px;background:var(--teal);color:#EDF5F3;padding:11px 20px;border-radius:3px;font-size:14px;font-weight:500;}
   .cta-btn:hover{background:var(--teal-deep)}
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+
+  /* ========================= Téléphone =========================
+     Les liens de navigation passaient en display:none sous 720 px : depuis
+     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
+     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
+     visibles, et assez hauts pour être touchés sans viser. La règle de
+     débordement horizontal n'est là que pour les très petits écrans, où
+     quatre libellés ne tiennent plus côte à côte.
+
+     Le reste resserre des marges verticales taillées pour un grand écran,
+     et porte les commandes à une hauteur tactile confortable — en bas de
+     42 px, un doigt touche la voisine une fois sur trois. */
+  @media(max-width:720px){
+    nav{flex-wrap:wrap;padding:18px 0 0;}
+    .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
+              justify-content:space-between;overflow-x:auto;scrollbar-width:none;}
+    .navlinks::-webkit-scrollbar{display:none}
+    .navlinks a{white-space:nowrap;padding:12px 6px;border-bottom:2px solid transparent;}
+    .navlinks a.active{border-bottom-color:currentColor;}
+    .brand{font-size:19px;padding:6px 0}
+    .compte-lien{padding:11px 0 11px 12px}
+
+    .page-head{padding:28px 0 20px}
+    .page-head h1{font-size:27px}
+    .chip{padding:10px 14px}
+    .fil{min-height:0}
+    .fil-corps{max-height:56vh}
+    .fil-tete{padding:14px 16px}
+    .fil-actions button{min-height:38px}
+    .fil-pied textarea{min-height:44px}
+    .fil-pied button{min-height:44px}
+  }
 </style>
 </head>
 <body>

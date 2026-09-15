@@ -28,7 +28,6 @@
   .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
   .navlinks a.active{color:var(--text-on-ink)}
   .navlinks a:hover{color:var(--text-on-ink)}
-  @media(max-width:720px){.navlinks{display:none}}
 
   .breadcrumb{padding:24px 0 0;font-size:13px;color:var(--text-on-ink-dim);}
   .breadcrumb a:hover{color:var(--text-on-ink)}
@@ -64,6 +63,11 @@
   .card-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;padding-bottom:60px;}
   @media(max-width:960px){.card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
   @media(max-width:640px){.card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  /* Deux colonnes en dessous de 430 px. À trois, la carte tombe à 83 px
+     et ses trois boutons de tag à 24 px de large : marquer une carte,
+     qui est le geste principal du site, devient un jeu d'adresse.
+     On voit moins de cartes à la fois, mais on les marque juste. */
+  @media(max-width:430px){.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
   .card-tile{display:flex;flex-direction:column;gap:8px;height:100%;}
   /* flex:none empêche la boîte d'être comprimée par un nom sur trois
@@ -102,6 +106,43 @@
   .status-msg{color:var(--text-on-ink-dim);font-size:14px;padding:20px 0;}
   .status-msg.err{color:#E08862}
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+
+  /* ========================= Téléphone =========================
+     Les liens de navigation passaient en display:none sous 720 px : depuis
+     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
+     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
+     visibles, et assez hauts pour être touchés sans viser. La règle de
+     débordement horizontal n'est là que pour les très petits écrans, où
+     quatre libellés ne tiennent plus côte à côte.
+
+     Le reste resserre des marges verticales taillées pour un grand écran,
+     et porte les commandes à une hauteur tactile confortable — en bas de
+     42 px, un doigt touche la voisine une fois sur trois. */
+  @media(max-width:720px){
+    nav{flex-wrap:wrap;padding:18px 0 0;}
+    .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
+              justify-content:space-between;overflow-x:auto;scrollbar-width:none;}
+    .navlinks::-webkit-scrollbar{display:none}
+    .navlinks a{white-space:nowrap;padding:12px 6px;border-bottom:2px solid transparent;}
+    .navlinks a.active{border-bottom-color:currentColor;}
+    .brand{font-size:19px;padding:6px 0}
+    .compte-lien{padding:11px 0 11px 12px}
+    .breadcrumb a{display:inline-block;padding:12px 0}
+
+    .page-head{padding:12px 0 20px;gap:14px}
+    .page-head h1{font-size:23px}
+    .page-head .sprite{width:60px;height:60px}
+    .filter-btn{min-height:42px}
+    #filter-input, select{min-height:42px}
+    .tri-row{margin-top:-6px;padding-bottom:12px}
+    .tri-row select, .tri-row button{min-height:40px;padding:8px 12px}
+    .bulk-row{margin-top:-6px;padding-bottom:22px}
+    /* L'intitulé prend toute la ligne, sinon les trois boutons se
+       séparent et le dernier tombe seul en dessous. */
+    .bulk-row > span:first-child{flex:1 0 100%}
+    .bulk-btn{min-height:40px;padding:6px 16px}
+    .tag-toggle{padding:11px 0;font-size:16px}
+  }
 </style>
 </head>
 <body>
