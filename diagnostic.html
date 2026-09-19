@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnostic des extensions — PokéClasseur</title>
+<style>
+  :root{--ink:#15171B;--ink-soft:#20232A;--gold:#C9A227;--accent-clair:#E3C766;
+        --teal:#1F6F63;--rust:#A8431C;--text:#EDEAE0;--dim:#9B9E9C;}
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px 20px 70px;background:var(--ink);color:var(--text);
+       font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.55;}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{font-family:Georgia,serif;font-weight:500;font-size:26px;margin:0 0 6px}
+  p.intro{color:var(--dim);margin:0 0 22px;font-size:13px}
+  button{background:var(--teal);border:none;color:#EDF5F3;padding:11px 18px;border-radius:4px;
+         font-size:13px;font-family:inherit;cursor:pointer;margin-bottom:18px}
+  button:hover{background:#123F38}
+  pre{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.1);border-radius:5px;
+      padding:16px;white-space:pre-wrap;word-break:break-word;margin:0;overflow-x:auto}
+  .ok{color:#5FBAAA}.ko{color:#E08862}.att{color:var(--accent-clair)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Diagnostic des extensions</h1>
+  <p class="intro">Cette page interroge TCGdex depuis ton navigateur et compare ce qu'elle
+     y trouve avec ce que le site sait reconnaître. Elle n'est liée depuis aucune autre page :
+     c'est un outil, pas une rubrique.</p>
+  <button id="copier">Tout copier</button>
+  <pre id="sortie">Interrogation en cours…</pre>
+</div>
+
+<script src="sets.js"></script>
+<script>
+// Les extensions que le catalogue ne montrait pas, telles que signalées.
+const SIGNALEES = ['Booster De Luxe Ex','Méga-Rayonnement','Aura Palpitante',
+  'Propulsion Paradoxe','Jours Heureux','Domination Céleste',"L'Ambition de la Team Rocket"];
+
+const sortie = document.getElementById('sortie');
+const lignes = [];
+const dire = (t = '') => { lignes.push(t); sortie.textContent = lignes.join('\n'); };
+
+// Une comparaison de noms tolérante : accents, casse et ponctuation varient
+// d'une source à l'autre, et ce n'est pas ce qu'on cherche à mesurer.
+function simplifie(t){
+  return String(t).normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .toLowerCase().replace(/[^a-z0-9]/g,'');
+}
+
+async function sets(langue){
+  const r = await fetch(`https://api.tcgdex.net/v2/${langue}/sets`);
+  if(!r.ok) throw new Error(`${langue} : HTTP ${r.status}`);
+  return r.json();
+}
+
+(async () => {
+  try{
+    const [fr, en] = await Promise.all([sets('fr'), sets('en')]);
+    dire(`TCGdex — ${fr.length} extensions en français, ${en.length} en anglais`);
+    dire();
+
+    const pocketFr = fr.filter(s => isPocketSet(s.id));
+    const pocketEn = en.filter(s => isPocketSet(s.id));
+    dire(`Reconnues comme Pocket : ${pocketFr.length} en français, ${pocketEn.length} en anglais`);
+    dire();
+
+    dire('--- Extensions Pocket vues en français -------------------------');
+    pocketFr.forEach(s => dire(`  ${s.id.padEnd(7)} ${guessSeriesName(s.id).padEnd(9)} ${s.name}`));
+    dire();
+
+    const idsFr = new Set(fr.map(s => s.id));
+    const absentes = en.filter(s => !idsFr.has(s.id));
+    dire('--- Présentes en anglais, absentes en français -----------------');
+    dire(absentes.length ? '' : '  (aucune)');
+    absentes.forEach(s => dire(`  ${s.id.padEnd(7)} ${(isPocketSet(s.id) ? 'Pocket' : 'physique').padEnd(9)} ${s.name}`));
+    dire();
+
+    dire('--- Les extensions signalées comme manquantes ------------------');
+    const toutes = [...fr.map(s => ({...s, langue:'fr'})), ...en.map(s => ({...s, langue:'en'}))];
+    SIGNALEES.forEach(nom => {
+      const trouvees = toutes.filter(s => simplifie(s.name).includes(simplifie(nom))
+                                       || simplifie(nom).includes(simplifie(s.name)));
+      if(trouvees.length === 0){
+        dire(`  ${nom}\n      introuvable sous ce nom — voir la section précédente :`
+           + ` si elle y figure en anglais, c'est que le jeu de données français est en retard`);
+        return;
+      }
+      trouvees.forEach(s => dire(`  ${nom}\n      ${s.langue} · id=${s.id} · reconnu ${isPocketSet(s.id) ? 'Pocket → ' + guessSeriesName(s.id) : 'PHYSIQUE (à corriger)'} · « ${s.name} »`));
+    });
+    dire();
+
+    // Une extension Pocket dont l'identifiant sortirait de la forme attendue
+    // atterrirait ici, classée « Autres » du côté physique : c'est le signe
+    // qu'il faut élargir la règle.
+    dire('--- Identifiants qui ne ressemblent à rien de connu ------------');
+    const vus = new Set();
+    const etranges = [...fr, ...en].filter(s => {
+      if(vus.has(s.id)) return false;
+      vus.add(s.id);
+      return !isPocketSet(s.id) && guessSeriesName(s.id) === 'Autres';
+    });
+    dire(etranges.length ? '' : '  (aucun)');
+    etranges.forEach(s => dire(`  ${s.id.padEnd(9)} ${s.name}`));
+  }catch(err){
+    dire(`Échec : ${err.message}`);
+    dire("Si c'est un refus de connexion, c'est que TCGdex est injoignable depuis ce réseau.");
+  }
+})();
+
+document.getElementById('copier').addEventListener('click', async () => {
+  const b = document.getElementById('copier');
+  try{
+    await navigator.clipboard.writeText(sortie.textContent);
+    b.textContent = 'Copié !';
+  }catch(err){
+    // Le presse-papiers est parfois refusé : on sélectionne, à défaut.
+    const plage = document.createRange();
+    plage.selectNodeContents(sortie);
+    getSelection().removeAllRanges();
+    getSelection().addRange(plage);
+    b.textContent = 'Sélectionné — fais Ctrl+C';
+  }
+  setTimeout(() => { b.textContent = 'Tout copier'; }, 2500);
+});
+</script>
+</body>
+</html>
