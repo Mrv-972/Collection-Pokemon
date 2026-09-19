@@ -77,6 +77,8 @@ async function construirePhysique(){
   // dictionnaire, qui servira à traduire les cartes de l'application dont la
   // source n'a pas encore de version française.
   const traductions = new Map();
+  // Les extensions de l'application dont TCGdex a les visuels français.
+  const pocketChezTcgdex = new Set();
 
   for(const serie of entrees.filter(e => e.isDirectory())){
     const ficheSerie = path.join(racine, `${serie.name}.ts`);
@@ -93,9 +95,14 @@ async function construirePhysique(){
       const setId = champTexte(sourceSet, 'id');
       if(!setId) continue;
       // TCGdex héberge aussi les extensions de l'application, qu'on prend
-      // ailleurs et plus à jour. Les embarquer ici alourdirait l'instantané
-      // physique d'un millier de cartes que le site n'y montre jamais.
-      if(/^[A-Z]\d/.test(setId) || /^P-[A-Z]$/.test(setId)) continue;
+      // ailleurs et plus à jour. On ne garde pas leurs cartes — l'instantané
+      // physique en serait alourdi d'un millier que le site n'y montre
+      // jamais — mais on note lesquelles il connaît : ses visuels, eux, sont
+      // en français, là où l'autre source n'héberge que l'anglais.
+      if(/^[A-Z]\d/.test(setId) || /^P-[A-Z]$/.test(setId)){
+        pocketChezTcgdex.add(setId);
+        continue;
+      }
       const nomSet = nomTraduit(sourceSet);
       const compte = sourceSet.match(/official:\s*(\d+)/);
 
@@ -141,7 +148,7 @@ async function construirePhysique(){
   }
 
   extensions.sort((a, b) => String(a.dateSortie ?? '').localeCompare(String(b.dateSortie ?? '')));
-  return { extensions, cartesParSet, traductions };
+  return { extensions, cartesParSet, traductions, pocketChezTcgdex };
 }
 
 // -------------------------------------------------------------- Pocket ---
@@ -201,7 +208,14 @@ function traduireNom(nom, traductions, nomsFrancais){
   return nom;
 }
 
-async function construirePocket(traductions = new Map(), nomsFrancais = new Set()){
+// TCGdex sert ses visuels par langue ; la série de l'application y porte
+// l'identifiant « tcgp ». Ses images montrent donc le texte de la carte en
+// français, alors que la source Pocket n'héberge qu'une seule version, en
+// anglais. On préfère la française quand elle existe, l'autre en secours :
+// au pire on retombe sur ce qu'on affichait déjà.
+const TCGDEX_POCKET = 'https://assets.tcgdex.net/fr/tcgp';
+
+async function construirePocket(traductions = new Map(), nomsFrancais = new Set(), chezTcgdex = new Set()){
   const parSerie = await telecharger(`${POCKET_BASE}/sets.json`);
 
   const extensions = [];
@@ -244,7 +258,12 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
     // l'anglais, qu'on traduit au mieux.
     const aTraduire = !francaisTrouve;
     let traduites = 0;
+    const enFrancais = chezTcgdex.has(ext.id);
+    // Le site le dira : pour ces extensions, aucune source ne propose le
+    // visuel français, donc le texte imprimé sur la carte reste en anglais.
+    if(!enFrancais) ext.visuelsAnglais = true;
     const cartes = brutes.slice().sort((a, b) => a.number - b.number).map(c => {
+      const numero = String(c.number).padStart(3, '0');
       let nom = c.name;
       if(aTraduire){
         const essai = traduireNom(nom, traductions, nomsFrancais);
@@ -256,9 +275,15 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
       name: nom,
       rarity: RARETES_POCKET[c.rarity] ?? null,
       dexId: null,                     // absent de cette source, déduit ensuite
-      image: `${POCKET_IMAGES}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
-      imageHaute: `${POCKET_IMAGES}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
-      imageSecours: `${POCKET_IMAGES_SECOURS}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
+      image: enFrancais
+        ? `${TCGDEX_POCKET}/${ext.id}/${numero}/low.webp`
+        : `${POCKET_IMAGES}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
+      imageHaute: enFrancais
+        ? `${TCGDEX_POCKET}/${ext.id}/${numero}/high.webp`
+        : `${POCKET_IMAGES}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
+      // Le visuel anglais reste le filet : si le français manque pour une
+      // carte, on montre l'autre plutôt qu'un point d'interrogation.
+      imageSecours: `${POCKET_IMAGES}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
       };
     });
     if(aTraduire){
@@ -346,10 +371,11 @@ async function principal(){
   const physique = await construirePhysique();
 
   console.log(`  ${physique.traductions.size} correspondances anglais → français récoltées`);
+  console.log(`  ${physique.pocketChezTcgdex.size} extensions Pocket avec visuels français chez TCGdex`);
   const { dexDuNomDeCarte, POKEDEX_FR } = await chargerRegleDuPokedex();
 
   console.log("Application — téléchargement du jeu de données…");
-  const pocket = await construirePocket(physique.traductions, new Set(POKEDEX_FR));
+  const pocket = await construirePocket(physique.traductions, new Set(POKEDEX_FR), physique.pocketChezTcgdex);
 
   console.log('Rattachement des cartes Pocket à leur Pokémon…');
   let rattachees = 0, orphelines = 0;

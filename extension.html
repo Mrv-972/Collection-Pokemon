@@ -205,14 +205,14 @@
   <footer>PokéClasseur — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
 </div>
 
-<script src="sets.js"></script>
-<script src="univers.js"></script>
-<script src="catalogue.js"></script>
-<script src="supabase-config.js"></script>
-<script src="tags.js"></script>
-<script src="cards.js"></script>
-<script src="prix.js"></script>
-<script src="compte.js"></script>
+<script src="sets.js?v=2026-09-19-yyht"></script>
+<script src="univers.js?v=2026-09-19-yyht"></script>
+<script src="catalogue.js?v=2026-09-19-yyht"></script>
+<script src="supabase-config.js?v=2026-09-19-yyht"></script>
+<script src="tags.js?v=2026-09-19-yyht"></script>
+<script src="cards.js?v=2026-09-19-yyht"></script>
+<script src="prix.js?v=2026-09-19-yyht"></script>
+<script src="compte.js?v=2026-09-19-yyht"></script>
 <script>
 // Récupère les cartes d'une extension depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
@@ -316,10 +316,16 @@ function renderHead(set){
   const year = set.releaseDate ? new Date(set.releaseDate).getFullYear() : '';
   const total = set.cardCount?.official ?? set.cardCount?.total ?? '?';
   const serie = set.serie?.name || set.serieNom || '';
-  // Quand la source n'a pas encore publié sa version française, les noms sont
-  // reconstitués à partir des cartes physiques. Le dire évite qu'on les
-  // prenne pour les noms officiels — et explique ceux qui restent en anglais.
-  const t = set.traductionAutomatique;
+  // Deux réserves possibles sur une extension, qu'on annonce plutôt que de
+  // laisser découvrir : des noms reconstitués faute de version française
+  // publiée, et des visuels dont le texte imprimé reste en anglais parce
+  // qu'aucune source n'héberge la version française.
+  const reserves = [];
+  if(set.traductionAutomatique){
+    const t = set.traductionAutomatique;
+    reserves.push(`noms traduits automatiquement (${t.traduits}/${t.total})`);
+  }
+  if(set.visuelsAnglais) reserves.push('visuels des cartes en anglais');
   document.getElementById('page-head').innerHTML = `
     ${set.logo
       ? `<img src="${set.logo}.png" alt="${set.name}" data-fallback="images/sets/${setId}.png" onerror="setLogoFallback(this)">`
@@ -327,7 +333,7 @@ function renderHead(set){
     <div>
       <h1>${set.name}</h1>
       <div class="meta">${[serie, year, total + ' cartes'].filter(Boolean).join(' · ')}</div>
-      ${t ? `<div class="meta avertissement">Noms traduits automatiquement (${t.traduits}/${t.total}) — la source n'a pas encore de version française.</div>` : ''}
+      ${reserves.length ? `<div class="meta avertissement" title="Cela se corrigera tout seul quand la source publiera sa version française.">${reserves.join(' · ')} — la source n'a pas encore de version française.</div>` : ''}
     </div>
   `;
 }
