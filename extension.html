@@ -36,6 +36,7 @@
   .page-head{padding:18px 0 30px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
   .page-head img{height:56px;object-fit:contain;}
   .page-head h1{font-size:30px;}
+  .page-head .avertissement{color:var(--accent-clair);opacity:.85;margin-top:3px;}
   .page-head .meta{color:var(--text-on-ink-dim);font-size:14px;margin-top:6px;}
 
   .toolbar{display:flex;gap:10px;padding-bottom:30px;flex-wrap:wrap;align-items:center;}
@@ -314,7 +315,11 @@ function renderHead(set){
   if(!set) return;
   const year = set.releaseDate ? new Date(set.releaseDate).getFullYear() : '';
   const total = set.cardCount?.official ?? set.cardCount?.total ?? '?';
-  const serie = set.serie?.name || '';
+  const serie = set.serie?.name || set.serieNom || '';
+  // Quand la source n'a pas encore publié sa version française, les noms sont
+  // reconstitués à partir des cartes physiques. Le dire évite qu'on les
+  // prenne pour les noms officiels — et explique ceux qui restent en anglais.
+  const t = set.traductionAutomatique;
   document.getElementById('page-head').innerHTML = `
     ${set.logo
       ? `<img src="${set.logo}.png" alt="${set.name}" data-fallback="images/sets/${setId}.png" onerror="setLogoFallback(this)">`
@@ -322,6 +327,7 @@ function renderHead(set){
     <div>
       <h1>${set.name}</h1>
       <div class="meta">${[serie, year, total + ' cartes'].filter(Boolean).join(' · ')}</div>
+      ${t ? `<div class="meta avertissement">Noms traduits automatiquement (${t.traduits}/${t.total}) — la source n'a pas encore de version française.</div>` : ''}
     </div>
   `;
 }

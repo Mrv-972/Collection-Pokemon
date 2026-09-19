@@ -73,6 +73,10 @@ async function construirePhysique(){
 
   const extensions = [];
   const cartesParSet = new Map();
+  // TCGdex décrit chaque carte physique dans les deux langues. On en tire un
+  // dictionnaire, qui servira à traduire les cartes de l'application dont la
+  // source n'a pas encore de version française.
+  const traductions = new Map();
 
   for(const serie of entrees.filter(e => e.isDirectory())){
     const ficheSerie = path.join(racine, `${serie.name}.ts`);
@@ -116,6 +120,7 @@ async function construirePhysique(){
         const localId = fichier.replace(/\.ts$/, '');
         const source = await readFile(path.join(racine, serie.name, ext.name, fichier), 'utf8');
         const nom = nomTraduit(source);
+        if(nom.en && nom.fr && nom.en !== nom.fr) traductions.set(nom.en, nom.fr);
         const rarete = champTexte(source, 'rarity');
         cartes.push({
           id: `${setId}-${localId}`,
@@ -136,7 +141,7 @@ async function construirePhysique(){
   }
 
   extensions.sort((a, b) => String(a.dateSortie ?? '').localeCompare(String(b.dateSortie ?? '')));
-  return { extensions, cartesParSet };
+  return { extensions, cartesParSet, traductions };
 }
 
 // -------------------------------------------------------------- Pocket ---
@@ -167,7 +172,36 @@ async function telecharger(adresse){
 
 const aplatir = donnees => Array.isArray(donnees) ? donnees : Object.values(donnees).flat();
 
-async function construirePocket(){
+// La source de l'application traduit ses fichiers avec un temps de retard :
+// la dernière extension parue n'existe qu'en anglais. Plutôt que de l'afficher
+// telle quelle sur un site français, on traduit ce qu'on peut grâce au
+// dictionnaire tiré des cartes physiques — le suffixe « ex » se recolle après
+// coup, puisqu'il ne se traduit pas.
+function traduireNom(nom, traductions, nomsFrancais){
+  if(traductions.has(nom)) return traductions.get(nom);
+
+  // Le suffixe « ex » ne se traduit pas, et s'écrit avec un trait d'union en
+  // français : « Florizarre-ex ».
+  const avecEx = String(nom).match(/^(.*?)[\s-]ex$/i);
+  const base = avecEx ? avecEx[1] : nom;
+  const recoller = fr => avecEx ? `${fr}-ex` : fr;
+
+  const connu = traductions.get(base) ?? (nomsFrancais.has(base) ? base : null);
+  if(connu) return recoller(connu);
+
+  // « Team Rocket's Persian ex » se dit « Persian-ex de la Team Rocket » —
+  // convention relevée sur les cartes physiques, pas inventée ici. On ne
+  // l'applique que si le Pokémon lui-même a été reconnu : mieux vaut un nom
+  // anglais honnête qu'un faux nom français.
+  const rocket = base.match(/^Team Rocket['\u2019]s\s+(.+)$/);
+  if(rocket){
+    const pokemon = traductions.get(rocket[1]) ?? (nomsFrancais.has(rocket[1]) ? rocket[1] : null);
+    if(pokemon) return `${recoller(pokemon)} de la Team Rocket`;
+  }
+  return nom;
+}
+
+async function construirePocket(traductions = new Map(), nomsFrancais = new Set()){
   const parSerie = await telecharger(`${POCKET_BASE}/sets.json`);
 
   const extensions = [];
@@ -198,23 +232,41 @@ async function construirePocket(){
       `${POCKET_BASE}/cards/${encodeURIComponent(ext.codeDistant)}.min.json`,
     ];
     let brutes = [];
+    let francaisTrouve = false;
     for(const chemin of chemins){
       try{
         brutes = aplatir(await telecharger(chemin));
-        if(brutes.length) break;
+        if(brutes.length){ francaisTrouve = chemin.includes('/cards/fr/'); break; }
       }catch(err){ /* on tente le suivant */ }
     }
     if(brutes.length === 0) console.warn(`  ! aucune carte pour ${ext.id}`);
-    const cartes = brutes.slice().sort((a, b) => a.number - b.number).map(c => ({
+    // Le fichier français de cette extension manquait : on est tombé sur
+    // l'anglais, qu'on traduit au mieux.
+    const aTraduire = !francaisTrouve;
+    let traduites = 0;
+    const cartes = brutes.slice().sort((a, b) => a.number - b.number).map(c => {
+      let nom = c.name;
+      if(aTraduire){
+        const essai = traduireNom(nom, traductions, nomsFrancais);
+        if(essai !== nom){ nom = essai; traduites++; }
+      }
+      return {
       id: `${ext.id}-${String(c.number).padStart(3, '0')}`,
       localId: String(c.number),
-      name: c.name,
+      name: nom,
       rarity: RARETES_POCKET[c.rarity] ?? null,
       dexId: null,                     // absent de cette source, déduit ensuite
       image: `${POCKET_IMAGES}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
       imageHaute: `${POCKET_IMAGES}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
       imageSecours: `${POCKET_IMAGES_SECOURS}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
-    }));
+      };
+    });
+    if(aTraduire){
+      console.log(`  ${ext.id} : source anglaise, ${traduites}/${cartes.length} noms traduits`);
+      // Le site le dira au visiteur : ces noms sont une reconstruction, pas
+      // les noms officiels.
+      ext.traductionAutomatique = { traduits: traduites, total: cartes.length };
+    }
     cartesParSet.set(ext.id, cartes);
     delete ext.codeDistant;
   }
@@ -238,7 +290,7 @@ async function chargerRegleDuPokedex(){
 
   const portee = {};
   const code = pokedex + '\n' + catalogue.slice(debut, fin)
-    + '\nreturn { dexDuNomDeCarte };';
+    + '\nreturn { dexDuNomDeCarte, POKEDEX_FR };';
   return new Function(code).call(portee);
 }
 
@@ -293,11 +345,13 @@ async function principal(){
   console.log('Jeu physique — lecture du dépôt TCGdex…');
   const physique = await construirePhysique();
 
+  console.log(`  ${physique.traductions.size} correspondances anglais → français récoltées`);
+  const { dexDuNomDeCarte, POKEDEX_FR } = await chargerRegleDuPokedex();
+
   console.log("Application — téléchargement du jeu de données…");
-  const pocket = await construirePocket();
+  const pocket = await construirePocket(physique.traductions, new Set(POKEDEX_FR));
 
   console.log('Rattachement des cartes Pocket à leur Pokémon…');
-  const { dexDuNomDeCarte } = await chargerRegleDuPokedex();
   let rattachees = 0, orphelines = 0;
   for(const cartes of pocket.cartesParSet.values()){
     for(const carte of cartes){
