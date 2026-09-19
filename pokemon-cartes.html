@@ -12,7 +12,7 @@
 <style>
   :root{
     --ink:#15171B; --ink-soft:#20232A; --paper:#F1EBDC; --paper-line:#D9CFB6;
-    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227;
+    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair);
     --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
   }
   *{box-sizing:border-box}
@@ -43,7 +43,7 @@
   .toolbar input::placeholder{color:var(--text-on-ink-dim)}
   .toolbar select{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:10px 14px;border-radius:4px;font-size:13px;font-family:inherit;}
   .filter-btn{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
-  .filter-btn.on.obt{color:#E3C766;border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
+  .filter-btn.on.obt{color:var(--accent-clair);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
   .filter-btn.on.manq{color:#B9C2CE;border-color:rgba(185,194,206,0.45);background:rgba(185,194,206,0.08)}
   .filter-btn.on.rech{color:#E08862;border-color:rgba(168,67,28,0.5);background:rgba(168,67,28,0.1)}
   .filter-btn.on.ech{color:#5FBAAA;border-color:rgba(31,111,99,0.5);background:rgba(31,111,99,0.12)}
@@ -53,8 +53,8 @@
   .tri-row button{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:5px 11px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;line-height:1.3;}
   .tri-row button:hover{border-color:rgba(237,234,224,0.35)}
   .tri-row select:disabled, .tri-row button:disabled{opacity:.5;cursor:default}
-  .tri-row #tri-etat{color:#E3C766;}
-  .card-cote{font-size:11.5px;color:#E3C766;margin-top:-3px;}
+  .tri-row #tri-etat{color:var(--accent-clair);}
+  .card-cote{font-size:11.5px;color:var(--accent-clair);margin-top:-3px;}
 
   .bulk-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:-14px;padding-bottom:28px;font-size:12.5px;color:var(--text-on-ink-dim);}
   .bulk-btn{font-size:14px;line-height:1.2;padding:4px 12px;border-radius:3px;cursor:pointer;border:1px solid rgba(237,234,224,0.14);background:transparent;font-family:inherit;transition:.12s;}
@@ -94,7 +94,7 @@
      L'état inactif est donc signalé en les désaturant. */
   .tag-toggle{flex:1;font-size:14px;line-height:1.2;padding:5px 0;border-radius:3px;text-align:center;cursor:pointer;border:1px solid rgba(237,234,224,0.14);background:transparent;font-family:inherit;transition:.12s;}
   .tag-toggle:not(.active){filter:grayscale(1);opacity:.45}
-  .tag-toggle.obt.active{background:rgba(201,162,39,0.16);border-color:rgba(201,162,39,0.5)}
+  .tag-toggle.obt.active{background:rgba(var(--gold-rgb),0.16);border-color:rgba(var(--gold-rgb),0.5)}
   .tag-toggle.rech.active{background:rgba(168,67,28,0.16);border-color:rgba(168,67,28,0.5)}
   .tag-toggle.ech.active{background:rgba(31,111,99,0.18);border-color:rgba(31,111,99,0.5)}
   .tag-toggle:hover{border-color:rgba(237,234,224,0.35);opacity:1}
@@ -201,6 +201,7 @@
   <footer>PokéClasseur — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
 </div>
 
+<script src="univers.js"></script>
 <script src="pokedex-fr.js"></script>
 <script src="sets.js"></script>
 <script src="supabase-config.js"></script>
@@ -359,9 +360,9 @@ async function init(){
       fetchJson(`https://api.tcgdex.net/v2/fr/cards?dexId=eq:${dexId}`),
       loadSetNames(),
     ]);
-    // La recherche par numéro de Pokédex ramène aussi les cartes du jeu
-    // mobile Pokémon TCG Pocket, hors périmètre pour l'instant.
-    const cards = allResults.filter(c => !isPocketSet(setIdOfCard(c.id)));
+    // La recherche par numéro de Pokédex ramène les cartes des deux jeux
+    // mêlées : on ne garde que celles de l'univers où l'on se trouve.
+    const cards = allResults.filter(c => appartientAUnivers(setIdOfCard(c.id)));
     // De la carte la plus récente à la plus ancienne.
     cards.sort((a, b) =>
       (setOrder[setIdOfCard(b.id)] ?? -1) - (setOrder[setIdOfCard(a.id)] ?? -1)

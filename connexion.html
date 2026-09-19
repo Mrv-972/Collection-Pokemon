@@ -10,7 +10,7 @@
 <style>
   :root{
     --ink:#15171B; --ink-soft:#20232A; --teal:#1F6F63; --teal-deep:#123F38;
-    --rust:#A8431C; --gold:#C9A227; --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+    --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair); --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
@@ -32,11 +32,11 @@
 
   .tabs{display:flex;gap:8px;margin-bottom:24px;}
   .tab{flex:1;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
-  .tab.on{color:var(--text-on-ink);border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
+  .tab.on{color:var(--text-on-ink);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
 
   label{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:16px 0 6px;}
   input{width:100%;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
-  input:focus{outline:none;border-color:rgba(201,162,39,0.5)}
+  input:focus{outline:none;border-color:rgba(var(--gold-rgb),0.5)}
   .aide{font-size:12px;color:var(--text-on-ink-dim);margin-top:6px;}
 
   button.principal{width:100%;margin-top:26px;background:var(--teal);border:none;color:#EDF5F3;padding:12px;border-radius:3px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}
@@ -67,11 +67,11 @@
   .recherche{display:flex;gap:8px;align-items:stretch;}
   .recherche input{flex:1}
   .recherche button{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:0 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
-  .recherche button:hover{border-color:rgba(201,162,39,0.5)}
+  .recherche button:hover{border-color:rgba(var(--gold-rgb),0.5)}
   .recherche button:disabled{opacity:.5;cursor:default}
   .communes{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;}
   .commune{text-align:left;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:9px 12px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
-  .commune:hover{border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.06)}
+  .commune:hover{border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.06)}
   .commune small{display:block;color:var(--text-on-ink-dim);font-size:11.5px;margin-top:1px;}
   .zone-msg{font-size:12.5px;margin-top:10px;}
   .zone-msg.err{color:#E08862}
@@ -130,6 +130,7 @@
   <footer>PokéClasseur — ton compte sert à retrouver ta collection sur tous tes appareils et à te mettre en relation avec d'autres collectionneurs.</footer>
 </div>
 
+<script src="univers.js"></script>
 <script src="supabase-config.js"></script>
 <script src="tags.js"></script>
 <script src="localisation.js"></script>

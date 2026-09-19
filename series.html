@@ -12,7 +12,7 @@
 <style>
   :root{
     --ink:#15171B; --ink-soft:#20232A; --paper:#F1EBDC; --paper-line:#D9CFB6;
-    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227;
+    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair);
     --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
   }
   *{box-sizing:border-box}
@@ -109,9 +109,9 @@
   </nav>
 
   <div class="page-head">
-    <div class="kicker">Catalogue</div>
-    <h1>Toutes les séries, toutes les extensions</h1>
-    <p>Le jeu de cartes Pokémon est découpé en grandes séries (Écarlate et Violet, Épée et Bouclier, Soleil et Lune...), chacune contenant plusieurs extensions. Choisis une extension pour voir son classeur.</p>
+    <div class="kicker" id="tete-kicker">Catalogue</div>
+    <h1 id="tete-titre">Toutes les séries, toutes les extensions</h1>
+    <p id="tete-intro"></p>
   </div>
 
   <div class="search-row">
@@ -128,6 +128,7 @@
   <footer>PokéClasseur — données d'extensions fournies en direct par l'API TCGdex. Projet non affilié à The Pokémon Company.</footer>
 </div>
 
+<script src="univers.js"></script>
 <script src="supabase-config.js"></script>
 <script src="compte.js"></script>
 <script src="sets.js"></script>
@@ -151,6 +152,29 @@ async function fetchJson(url, retries = 1){
   return JSON.parse(text);
 }
 
+// La présentation dépend de l'univers : parler des grandes séries du jeu
+// physique n'a aucun sens devant le catalogue de l'application.
+const PRESENTATION = {
+  physique: {
+    kicker: 'Catalogue · TCG physique',
+    titre: 'Toutes les séries, toutes les extensions',
+    intro: "Le jeu de cartes Pokémon est découpé en grandes séries (Écarlate et Violet, Épée et Bouclier, Soleil et Lune...), chacune contenant plusieurs extensions. Choisis une extension pour voir son classeur.",
+  },
+  pocket: {
+    kicker: 'Catalogue · TCG Pocket',
+    titre: "Toutes les extensions de l'application",
+    intro: "Pokémon TCG Pocket sort ses propres extensions, qui n'existent que dans l'application. Choisis-en une pour voir son classeur — tes cartes physiques restent rangées de l'autre côté.",
+  },
+};
+
+function rendreTete(){
+  const t = PRESENTATION[universActuel().cle];
+  document.getElementById('tete-kicker').textContent = t.kicker;
+  document.getElementById('tete-titre').textContent = t.titre;
+  document.getElementById('tete-intro').textContent = t.intro;
+}
+rendreTete();
+
 async function loadSets(){
   const content = document.getElementById('content');
 
@@ -164,10 +188,9 @@ async function loadSets(){
 
   try{
     const sets = await fetchJson('https://api.tcgdex.net/v2/fr/sets');
-    // On exclut pour l'instant les extensions de Pokémon TCG Pocket (le jeu
-    // mobile, distinct du jeu de cartes physique) — à réintroduire plus tard
-    // dans une page dédiée séparée.
-    const physicalOnly = sets.filter(s => !isPocketSet(s.id));
+    // Chaque univers son catalogue : les extensions de l'application mobile
+    // et celles du jeu de cartes physique ne se mélangent pas.
+    const physicalOnly = sets.filter(s => appartientAUnivers(s.id));
     // L'API renvoie les extensions de la plus ancienne à la plus récente ;
     // on inverse pour afficher les plus récentes en premier.
     allSets = physicalOnly.reverse();

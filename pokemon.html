@@ -11,7 +11,7 @@
 <style>
   :root{
     --ink:#15171B; --ink-soft:#20232A; --paper:#F1EBDC; --paper-line:#D9CFB6;
-    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227;
+    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair);
     --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
   }
   *{box-sizing:border-box}
@@ -40,9 +40,9 @@
   .gen-tabs{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:34px;}
   .gen-tab{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:9px 14px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;transition:.12s;}
   .gen-tab:hover{border-color:rgba(237,234,224,0.3)}
-  .gen-tab.on{color:var(--text-on-ink);border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
+  .gen-tab.on{color:var(--text-on-ink);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
   .gen-tab .region{color:var(--text-on-ink-dim);font-size:11.5px;display:block;}
-  .gen-tab.on .region{color:#E3C766}
+  .gen-tab.on .region{color:var(--accent-clair)}
 
   .gen-title{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;}
   .gen-title h2{font-size:22px;}
@@ -121,6 +121,7 @@
   <footer>PokéClasseur — noms des Pokémon issus du paquet npm « pokemon » (MIT). Projet non affilié à The Pokémon Company.</footer>
 </div>
 
+<script src="univers.js"></script>
 <script src="supabase-config.js"></script>
 <script src="compte.js"></script>
 <script src="pokedex-fr.js"></script>

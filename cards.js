@@ -170,6 +170,9 @@ function cardTile(c, subtitle){
 // après un tri par valeur. Sinon la ligne est absente, plutôt que d'occuper
 // une place vide.
 function coteVignette(carteId){
+  // Une carte de l'application n'a pas de marché : rien à afficher, et
+  // surtout rien à aller chercher.
+  if(typeof estPocket === 'function' && estPocket()) return '';
   if(typeof prixConnu !== 'function') return '';
   const prix = prixConnu(carteId);
   return prix ? `<div class="card-cote">≈ ${prixLisible(prix)}</div>` : '';
@@ -213,6 +216,13 @@ function installerTri(cartesAtrier, rafraichir){
   const sens = document.getElementById('tri-sens');
   const etat = document.getElementById('tri-etat');
   if(!choix || !sens) return;
+
+  // Trier par valeur n'a de sens que là où les cartes en ont une : dans
+  // l'application, l'option est retirée plutôt que laissée sans effet.
+  if(typeof estPocket === 'function' && estPocket()){
+    choix.querySelector('option[value="valeur"]')?.remove();
+    if(triCritere === 'valeur'){ triCritere = 'numero'; choix.value = 'numero'; }
+  }
 
   const majSens = () => {
     sens.textContent = triCroissant ? '↑' : '↓';

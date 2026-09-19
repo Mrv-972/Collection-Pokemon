@@ -12,7 +12,7 @@
 <style>
   :root{
     --ink:#15171B; --ink-soft:#20232A; --paper:#F1EBDC; --paper-line:#D9CFB6;
-    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227;
+    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair);
     --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
   }
   *{box-sizing:border-box}
@@ -41,7 +41,7 @@
   .toolbar input::placeholder{color:var(--text-on-ink-dim)}
   .toolbar select{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:10px 14px;border-radius:4px;font-size:13px;font-family:inherit;}
   .filter-btn{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
-  .filter-btn.on.obt{color:#E3C766;border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
+  .filter-btn.on.obt{color:var(--accent-clair);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
   .filter-btn.on.manq{color:#B9C2CE;border-color:rgba(185,194,206,0.45);background:rgba(185,194,206,0.08)}
   .filter-btn.on.rech{color:#E08862;border-color:rgba(168,67,28,0.5);background:rgba(168,67,28,0.1)}
   .filter-btn.on.ech{color:#5FBAAA;border-color:rgba(31,111,99,0.5);background:rgba(31,111,99,0.12)}
@@ -51,8 +51,8 @@
   .tri-row button{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:5px 11px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;line-height:1.3;}
   .tri-row button:hover{border-color:rgba(237,234,224,0.35)}
   .tri-row select:disabled, .tri-row button:disabled{opacity:.5;cursor:default}
-  .tri-row #tri-etat{color:#E3C766;}
-  .card-cote{font-size:11.5px;color:#E3C766;margin-top:-3px;}
+  .tri-row #tri-etat{color:var(--accent-clair);}
+  .card-cote{font-size:11.5px;color:var(--accent-clair);margin-top:-3px;}
 
   .bulk-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:-14px;padding-bottom:28px;font-size:12.5px;color:var(--text-on-ink-dim);}
   .bulk-btn{font-size:14px;line-height:1.2;padding:4px 12px;border-radius:3px;cursor:pointer;border:1px solid rgba(237,234,224,0.14);background:transparent;font-family:inherit;transition:.12s;}
@@ -92,7 +92,7 @@
      L'état inactif est donc signalé en les désaturant. */
   .tag-toggle{flex:1;font-size:14px;line-height:1.2;padding:5px 0;border-radius:3px;text-align:center;cursor:pointer;border:1px solid rgba(237,234,224,0.14);background:transparent;font-family:inherit;transition:.12s;}
   .tag-toggle:not(.active){filter:grayscale(1);opacity:.45}
-  .tag-toggle.obt.active{background:rgba(201,162,39,0.16);border-color:rgba(201,162,39,0.5)}
+  .tag-toggle.obt.active{background:rgba(var(--gold-rgb),0.16);border-color:rgba(var(--gold-rgb),0.5)}
   .tag-toggle.rech.active{background:rgba(168,67,28,0.16);border-color:rgba(168,67,28,0.5)}
   .tag-toggle.ech.active{background:rgba(31,111,99,0.18);border-color:rgba(31,111,99,0.5)}
   .tag-toggle:hover{border-color:rgba(237,234,224,0.35);opacity:1}
@@ -202,6 +202,8 @@
   <footer>PokéClasseur — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
 </div>
 
+<script src="sets.js"></script>
+<script src="univers.js"></script>
 <script src="supabase-config.js"></script>
 <script src="tags.js"></script>
 <script src="cards.js"></script>
@@ -212,7 +214,15 @@
 // TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
 // Les images restent hébergées par TCGdex.
 const params = new URLSearchParams(window.location.search);
-const setId = params.get('set') || 'sv03.5'; // "151" par défaut si aucune extension choisie
+// L'extension par défaut dépend de l'univers : « 151 » pour le physique,
+// « Puissance Génétique » pour Pocket, la toute première de l'application.
+const setId = params.get('set') || (estPocket() ? 'A1' : 'sv03.5');
+
+// Un lien partagé désigne une extension, pas un univers. Si celle qu'on
+// ouvre n'est pas du côté où l'on se croyait, c'est le lien qui a raison :
+// on bascule plutôt que d'afficher une extension Pocket sous les couleurs
+// du carton.
+if(isPocketSet(setId) !== estPocket()) adopterUnivers(isPocketSet(setId) ? 'pocket' : 'physique');
 
 let allCards = [];
 let activeFilter = null; // un des FILTERS, ou null

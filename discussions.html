@@ -10,7 +10,7 @@
 <style>
   :root{
     --ink:#15171B; --ink-soft:#20232A; --teal:#1F6F63; --teal-deep:#123F38;
-    --rust:#A8431C; --gold:#C9A227; --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+    --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair); --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
@@ -37,13 +37,13 @@
   .filtres-conv{display:flex;gap:6px;flex-wrap:wrap;}
   .chip{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;}
   .chip:hover{color:var(--text-on-ink)}
-  .chip.on{color:#E3C766;border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
+  .chip.on{color:var(--accent-clair);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
 
   .liste{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;overflow:hidden;}
   .conv{display:block;width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid rgba(237,234,224,0.06);padding:14px 16px;cursor:pointer;font-family:inherit;color:inherit;}
   .conv:last-child{border-bottom:none}
   .conv:hover{background:rgba(237,234,224,0.03)}
-  .conv.on{background:rgba(201,162,39,0.1)}
+  .conv.on{background:rgba(var(--gold-rgb),0.1)}
   .conv .qui{font-size:14px;font-weight:500;}
   .conv .apercu{font-size:12px;color:var(--text-on-ink-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;}
   .liste .vide{padding:18px 16px;font-size:13px;color:var(--text-on-ink-dim);}
@@ -54,7 +54,7 @@
   .fil-tete a{font-size:12.5px;color:var(--text-on-ink-dim);text-decoration:underline;text-underline-offset:3px;}
   .fil-tete a:hover{color:var(--text-on-ink)}
 
-  .prevention{margin:0;padding:12px 20px;background:rgba(201,162,39,0.08);border-bottom:1px solid rgba(201,162,39,0.2);font-size:12.5px;color:#D8CFA8;}
+  .prevention{margin:0;padding:12px 20px;background:rgba(var(--gold-rgb),0.08);border-bottom:1px solid rgba(var(--gold-rgb),0.2);font-size:12.5px;color:#D8CFA8;}
   .fil-actions{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;}
   .fil-actions button{background:transparent;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);padding:5px 11px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit;}
   .fil-actions button:hover{border-color:rgba(237,234,224,0.35);color:var(--text-on-ink)}
@@ -70,7 +70,7 @@
 
   .fil-pied{padding:14px 16px;border-top:1px solid rgba(237,234,224,0.08);display:flex;gap:10px;}
   .fil-pied textarea{flex:1;resize:none;background:var(--ink);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:10px 13px;border-radius:4px;font-size:14px;font-family:inherit;line-height:1.4;max-height:120px;}
-  .fil-pied textarea:focus{outline:none;border-color:rgba(201,162,39,0.5)}
+  .fil-pied textarea:focus{outline:none;border-color:rgba(var(--gold-rgb),0.5)}
   .fil-pied button{background:var(--teal);border:none;color:#EDF5F3;padding:0 18px;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}
   .fil-pied button:hover{background:var(--teal-deep)}
   .fil-pied button:disabled{opacity:.5;cursor:default}
@@ -138,6 +138,7 @@
   <footer>PokéClasseur — les discussions ne sont lisibles que par leurs deux participants.</footer>
 </div>
 
+<script src="univers.js"></script>
 <script src="supabase-config.js"></script>
 <script src="tags.js"></script>
 <script src="compte.js"></script>

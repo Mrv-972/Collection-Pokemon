@@ -12,7 +12,7 @@
 <style>
   :root{
     --ink:#15171B; --ink-soft:#20232A; --teal:#1F6F63; --teal-deep:#123F38;
-    --rust:#A8431C; --gold:#C9A227; --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+    --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair); --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
@@ -35,29 +35,29 @@
 
   .filtres{display:flex;gap:10px;padding-bottom:30px;flex-wrap:wrap;align-items:center;}
   .filter-btn{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
-  .filter-btn.on{color:#E3C766;border-color:rgba(201,162,39,0.5);background:rgba(201,162,39,0.1)}
-  .lien-zone{font-size:13px;color:#E3C766;text-decoration:underline;text-underline-offset:3px;}
+  .filter-btn.on{color:var(--accent-clair);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
+  .lien-zone{font-size:13px;color:var(--accent-clair);text-decoration:underline;text-underline-offset:3px;}
 
   .distance-filtre{display:flex;align-items:center;gap:14px;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);border-radius:4px;padding:9px 16px;}
   .distance-filtre input[type=range]{-webkit-appearance:none;appearance:none;width:190px;height:4px;border-radius:2px;outline:none;cursor:pointer;margin:0;}
   .distance-filtre input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);border:none;cursor:grab;}
   .distance-filtre input[type=range]::-webkit-slider-thumb:active{cursor:grabbing;transform:scale(1.15)}
   .distance-filtre input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold);border:none;cursor:grab;}
-  .distance-filtre input[type=range]:focus-visible{outline:2px solid rgba(201,162,39,0.55);outline-offset:6px}
-  .distance-filtre output{font-size:13px;color:#E3C766;font-variant-numeric:tabular-nums;min-width:12ch;white-space:nowrap;}
+  .distance-filtre input[type=range]:focus-visible{outline:2px solid rgba(var(--gold-rgb),0.55);outline-offset:6px}
+  .distance-filtre output{font-size:13px;color:var(--accent-clair);font-variant-numeric:tabular-nums;min-width:12ch;white-space:nowrap;}
   @media(max-width:560px){
     .distance-filtre{flex:1 1 100%}
     .distance-filtre input[type=range]{flex:1;width:auto}
   }
 
   .membre{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;padding:24px;margin-bottom:18px;}
-  .membre.equilibre{border-color:rgba(201,162,39,0.35)}
+  .membre.equilibre{border-color:rgba(var(--gold-rgb),0.35)}
   .membre-tete{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:4px;}
   .membre-tete h2{font-size:22px;}
   .lieu{font-size:12.5px;color:var(--text-on-ink-dim);margin-bottom:14px;}
   .lieu .proche{color:#5FBAAA}
   .badge{font-size:11.5px;padding:3px 10px;border-radius:20px;font-weight:500;}
-  .badge.equilibre{background:rgba(201,162,39,0.16);color:#E3C766}
+  .badge.equilibre{background:rgba(var(--gold-rgb),0.16);color:var(--accent-clair)}
   .badge.simple{background:rgba(237,234,224,0.06);color:var(--text-on-ink-dim)}
   .contact{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
   .contact .discuter{background:var(--teal);color:#EDF5F3;padding:8px 16px;border-radius:3px;font-size:13px;font-weight:500;}
@@ -69,13 +69,13 @@
   @media(max-width:720px){.colonnes{grid-template-columns:1fr}}
   .colonne h3{font-size:13px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;letter-spacing:.3px;margin-bottom:4px;}
   .colonne .total{font-size:12.5px;color:var(--text-on-ink-dim);margin-bottom:12px;}
-  .colonne .total strong{color:#E3C766;font-weight:600;}
+  .colonne .total strong{color:var(--accent-clair);font-weight:600;}
   .balance{margin-top:18px;padding:12px 14px;border-radius:5px;font-size:13px;background:rgba(237,234,224,0.04);border:1px solid rgba(237,234,224,0.08);}
   .balance .ecart{font-weight:600;}
   .balance.equitable{border-color:rgba(31,111,99,0.4);background:rgba(31,111,99,0.1)}
   .balance.equitable .ecart{color:#5FBAAA}
-  .balance.desequilibre{border-color:rgba(201,162,39,0.35);background:rgba(201,162,39,0.08)}
-  .balance.desequilibre .ecart{color:#E3C766}
+  .balance.desequilibre{border-color:rgba(var(--gold-rgb),0.35);background:rgba(var(--gold-rgb),0.08)}
+  .balance.desequilibre .ecart{color:var(--accent-clair)}
   .balance small{display:block;margin-top:5px;font-size:11.5px;color:var(--text-on-ink-dim);}
   .colonne.recoit h3{color:#5FBAAA}
   .colonne.donne h3{color:#E08862}
@@ -88,12 +88,12 @@
   .mini .img img{width:100%;height:100%;object-fit:contain;}
   .mini .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:26px;}
   .mini .nom{font-size:11.5px;line-height:1.25;}
-  .mini .valeur{font-size:11px;color:#E3C766;}
+  .mini .valeur{font-size:11px;color:var(--accent-clair);}
   .mini .ext{font-size:10.5px;color:var(--text-on-ink-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
   .status-msg{color:var(--text-on-ink-dim);font-size:15px;padding:28px 0;}
   .status-msg.err{color:#E08862}
-  .status-msg a{color:#E3C766;text-decoration:underline;text-underline-offset:3px;}
+  .status-msg a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:3px;}
   .cta-btn{display:inline-block;margin-top:16px;background:var(--teal);color:#EDF5F3;padding:11px 20px;border-radius:3px;font-size:14px;font-weight:500;}
   .cta-btn:hover{background:var(--teal-deep)}
 
@@ -164,6 +164,7 @@
   <footer>PokéClasseur — cartes et images fournies en direct par l'API TCGdex. Projet non affilié à The Pokémon Company.</footer>
 </div>
 
+<script src="univers.js"></script>
 <script src="supabase-config.js"></script>
 <script src="sets.js"></script>
 <script src="tags.js"></script>
@@ -228,6 +229,10 @@ let relanceEnAttente = null;
 // plutôt que d'afficher une jauge qui ne ferait rien.
 function rendreFiltreDistance(){
   const el = document.getElementById('zone-filtre');
+  // Dans l'application, l'échange se fait dans le jeu : la distance entre
+  // deux joueurs n'y change rien, et proposer de filtrer dessus laisserait
+  // croire le contraire.
+  if(estPocket()){ el.innerHTML = ''; return; }
   if(!aUneLocalisation()){
     el.innerHTML = `<a class="lien-zone" href="connexion.html">Renseigne ta zone pour filtrer par distance →</a>`;
     return;
@@ -382,7 +387,7 @@ function rendre(){
           ${estEquilibre(m) ? 'Échange équilibré' : 'Échange à sens unique'}
         </span>
       </div>
-      <div class="lieu">${lieuLisible(m)}</div>
+      ${estPocket() ? '' : `<div class="lieu">${lieuLisible(m)}</div>`}
       <div class="contact">
         <a class="discuter" href="discussions.html?membre=${m.membre_id}">Lui écrire</a>
         ${m.contact ? `<span class="ailleurs">ou le joindre sur <strong>${texteEchappe(m.contact)}</strong></span>` : ''}
@@ -401,6 +406,18 @@ function rendre(){
 // Les cotes arrivent après l'affichage : chaque carte demande une requête,
 // et on ne fait pas attendre la page pour ça.
 async function afficherPrix(){
+  // Les cartes de l'application ne s'achètent ni ne se revendent : aucune
+  // cote n'existe, et il n'y a rien à peser. On remplace donc la balance par
+  // ce qui compte vraiment là-bas — l'échange se conclut dans le jeu.
+  if(estPocket()){
+    document.querySelectorAll('[data-balance]').forEach(el => {
+      el.className = 'balance';
+      el.innerHTML = `L'échange se fait dans Pokémon TCG Pocket, entre joueurs qui se sont ajoutés en ami.
+        <small>Le jeu applique ses propres conditions : toutes les cartes ne sont pas échangeables,
+        et un échange peut coûter des jetons. Mettez-vous d'accord ici, concluez là-bas.</small>`;
+    });
+    return;
+  }
   const ids = [...new Set(correspondances.flatMap(m => [...m.il_me_donne, ...m.je_lui_donne]))];
   if(ids.length === 0) return;
   const prix = await prixDeCartes(ids);
@@ -487,9 +504,18 @@ async function chargerCorrespondances(){
   try{
     const db = await clientSupabase();
     const { data, error } = await db.rpc('echanges_possibles',
-      distanceMax ? { distance_max: distanceMax } : {});
+      distanceMax && !estPocket() ? { distance_max: distanceMax } : {});
     if(error) throw error;
-    correspondances = data ?? [];
+    // On ne troque pas une carte d'application contre une carte de carton :
+    // chaque univers ne montre que ses propres correspondances, et un membre
+    // dont il ne reste rien de ce côté-ci disparaît de la liste.
+    correspondances = (data ?? [])
+      .map(m => ({
+        ...m,
+        il_me_donne:  m.il_me_donne.filter(id => appartientAUnivers(setIdOfCard(id))),
+        je_lui_donne: m.je_lui_donne.filter(id => appartientAUnivers(setIdOfCard(id))),
+      }))
+      .filter(m => m.il_me_donne.length > 0 || m.je_lui_donne.length > 0);
     // Les échanges équilibrés d'abord, puis les plus proches, puis les plus
     // fournis.
     correspondances.sort((a, b) =>

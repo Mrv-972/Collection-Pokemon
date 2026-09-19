@@ -18,7 +18,7 @@
     --teal:#1F6F63;
     --teal-deep:#123F38;
     --rust:#A8431C;
-    --gold:#C9A227;
+    --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair);
     --text-on-ink:#EDEAE0;
     --text-on-ink-dim:#9B9E9C;
   }
@@ -150,7 +150,7 @@
       <p>Range ta collection Pokémon extension par extension, marque ce que tu cherches et ce que tu peux céder — PokéClasseur trouve les collectionneurs avec qui échanger, automatiquement.</p>
       <div class="hero-actions">
         <a class="cta-btn" href="series.html">Créer mon classeur</a>
-        <a class="link-quiet" href="extension.html?set=sv03.5">Voir une collection type</a>
+        <a class="link-quiet" href="series.html">Voir une collection type</a>
       </div>
     </div>
     <div class="binder">
@@ -204,12 +204,7 @@
       <h2>Toutes les extensions, classées comme sur l'étagère</h2>
       <p>Chaque extension a sa propre page de classeur, avec l'avancement de ta collection en un coup d'œil.</p>
     </div>
-    <div class="ext-grid">
-      <a class="ext-card" href="extension.html?set=sv03.5"><div class="count">142 / 165</div><h3>151</h3><div class="bar"><div class="fill" style="width:86%"></div></div></a>
-      <a class="ext-card" href="extension.html?set=sv01"><div class="count">58 / 197</div><h3>Écarlate et Violet</h3><div class="bar"><div class="fill" style="width:29%"></div></div></a>
-      <a class="ext-card" href="extension.html?set=sv03"><div class="count">91 / 197</div><h3>Flammes Obsidiennes</h3><div class="bar"><div class="fill" style="width:46%"></div></div></a>
-      <a class="ext-card" href="extension.html?set=sv02"><div class="count">12 / 165</div><h3>Évolutions à Paldea</h3><div class="bar"><div class="fill" style="width:7%"></div></div></a>
-    </div>
+    <div class="ext-grid" id="ext-vedette"></div>
   </div>
 </section>
 
@@ -243,20 +238,56 @@
   </footer>
 </div>
 
+<script src="sets.js"></script>
+<script src="univers.js"></script>
 <script src="supabase-config.js"></script>
 <script src="compte.js"></script>
 <script>
+// Les dernières extensions de l'univers courant, avec leurs vrais noms.
+// Les nommer en dur voulait dire les retaper à chaque sortie, et inventer
+// pour Pocket des noms que je ne pouvais pas vérifier.
+let derniereExtension = null;
+
+async function chargerVedettes(){
+  const grille = document.getElementById('ext-vedette');
+  try{
+    const sets = await fetchSets();
+    const miennes = sets.filter(s => appartientAUnivers(s.id));
+    derniereExtension = miennes.length ? miennes[miennes.length - 1].id : null;
+    grille.innerHTML = miennes.slice(-4).reverse().map(s => `
+      <a class="ext-card" href="extension.html?set=${s.id}">
+        <div class="count">${s.cardCount?.official ? s.cardCount.official + ' cartes' : 'Voir le classeur'}</div>
+        <h3>${s.name}</h3>
+        <div class="bar"><div class="fill" style="width:0%"></div></div>
+      </a>`).join('');
+    if(typeof propagerUnivers === 'function') propagerUnivers();
+  }catch(err){
+    console.warn('Extensions indisponibles', err);
+    grille.innerHTML = `<a class="ext-card" href="series.html"><h3>Voir toutes les extensions</h3></a>`;
+  }
+}
+
+async function fetchSets(){
+  const cache = sessionStorage.getItem('pokeclasseur_sets_tcgdex');
+  if(cache) return JSON.parse(cache);
+  const sets = await (await fetch('https://api.tcgdex.net/v2/fr/sets')).json();
+  try{ sessionStorage.setItem('pokeclasseur_sets_tcgdex', JSON.stringify(sets)); }catch(err){}
+  return sets;
+}
+
 // Charge de vraies cartes depuis l'API publique et gratuite TCGdex (images
 // hébergées par eux, pas par ce prototype — voir https://tcgdex.dev).
 async function loadHeroCards(){
   const slotsEl = document.getElementById('hero-slots');
   const tags = ['rech', null, 'ech', null, 'ech', 'rech']; // démo de tagging
-  const cached = sessionStorage.getItem('pokeclasseur_hero_cards');
+  const memoire = `pokeclasseur_hero_${universActuel().cle}`;
+  const cached = sessionStorage.getItem(memoire);
   if(cached){ renderHeroCards(JSON.parse(cached), tags); return; }
   try{
-    const res = await fetch('https://api.tcgdex.net/v2/fr/cards?set.id=eq:sv03.5');
+    const extrait = derniereExtension || (estPocket() ? 'A1' : 'sv03.5');
+    const res = await fetch(`https://api.tcgdex.net/v2/fr/cards?set.id=eq:${extrait}`);
     const cards = (await res.json()).slice(0, 6);
-    sessionStorage.setItem('pokeclasseur_hero_cards', JSON.stringify(cards));
+    sessionStorage.setItem(memoire, JSON.stringify(cards));
     renderHeroCards(cards, tags);
   }catch(err){
     // Si l'API est injoignable (ex: hors-ligne), on garde les emplacements vides plutôt que planter.
@@ -274,7 +305,9 @@ function renderHeroCards(cards, tags){
     </div>`;
   }).join('');
 }
-loadHeroCards();
+// Les vedettes d'abord : c'est elles qui désignent l'extension dont on
+// tirera l'échantillon de cartes.
+chargerVedettes().then(loadHeroCards);
 
 initCompte().then(afficherEtatCompte);
 </script>
