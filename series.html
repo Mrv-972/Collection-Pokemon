@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://raw.githubusercontent.com">
 <link rel="preconnect" href="https://assets.tcgdex.net">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -129,6 +131,7 @@
 </div>
 
 <script src="univers.js"></script>
+<script src="catalogue.js"></script>
 <script src="supabase-config.js"></script>
 <script src="compte.js"></script>
 <script src="sets.js"></script>
@@ -179,7 +182,7 @@ async function loadSets(){
   const content = document.getElementById('content');
 
   try{
-    const sets = await chargerExtensions();
+    const sets = await listerExtensions();
     // Chaque univers son catalogue : les extensions de l'application mobile
     // et celles du jeu de cartes physique ne se mélangent pas. Le filtre se
     // fait ici, jamais dans le cache : celui-ci porte le catalogue entier,
@@ -226,12 +229,8 @@ function groupBySeries(sets){
   const groups = {};
   const order = [];
   sets.forEach(s => {
-    // Côté Pocket, c'est notre découpage qui fait foi : l'API range ces
-    // extensions sous une série unique, ce qui écraserait la distinction
-    // entre la série A et la série B.
-    const seriesName = isPocketSet(s.id)
-      ? guessSeriesName(s.id)
-      : (s.serie?.name || guessSeriesName(s.id));
+    // Le catalogue livre déjà chaque extension avec sa série.
+    const seriesName = s.serieNom;
     if(!groups[seriesName]){ groups[seriesName] = []; order.push(seriesName); }
     groups[seriesName].push(s);
   });
@@ -249,21 +248,23 @@ function renderSets(sets){
     const setsInSeries = groups[seriesName];
     const cards = setsInSeries.map(s => {
       const year = s.releaseDate ? new Date(s.releaseDate).getFullYear() : '';
-      const total = s.cardCount?.official ?? s.cardCount?.total ?? '?';
+      // Toutes les sources ne comptent pas les cartes d'une extension de
+      // promotion : mieux vaut ne rien annoncer qu'un point d'interrogation.
+      const total = s.cardCount?.official ?? s.cardCount?.total ?? null;
       return `
       <a class="set-card" href="extension.html?set=${s.id}">
         <div class="set-logo">
           ${s.logo
-            ? `<img class="logo" src="${s.logo}.png" alt="${s.name}" loading="lazy" data-fallback="images/sets/${s.id}.png" onerror="setLogoFallback(this)">`
+            ? `<img class="logo" src="${s.logo}" alt="${s.name}" loading="lazy" data-fallback="images/sets/${s.id}.png" onerror="setLogoFallback(this)">`
             : `<img class="logo" src="images/sets/${s.id}.png" alt="${s.name}" loading="lazy" onerror="setLogoFallback(this)">`}
           ${s.symbol
-            ? `<img class="symbol" src="${s.symbol.replace('/univ/', '/fr/')}.png" data-fallback="${s.symbol}.png" alt="Symbole de ${s.name}" title="Symbole de l'extension" loading="lazy" onerror="symbolFallback(this)">`
+            ? `<img class="symbol" src="${s.symbol}" alt="Symbole de ${s.name}" title="Symbole de l'extension" loading="lazy" onerror="symbolFallback(this)">`
             : ''}
         </div>
         <div class="set-name">${s.name}</div>
         <div class="set-meta">
           <span>${year}</span>
-          <span class="tag-count">${total} cartes</span>
+          <span class="tag-count">${total ? total + ' cartes' : ''}</span>
         </div>
       </a>
     `;

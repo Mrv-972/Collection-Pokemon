@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://raw.githubusercontent.com">
 <link rel="preconnect" href="https://assets.tcgdex.net">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -240,6 +242,7 @@
 
 <script src="sets.js"></script>
 <script src="univers.js"></script>
+<script src="catalogue.js"></script>
 <script src="supabase-config.js"></script>
 <script src="compte.js"></script>
 <script>
@@ -251,7 +254,7 @@ let derniereExtension = null;
 async function chargerVedettes(){
   const grille = document.getElementById('ext-vedette');
   try{
-    const sets = await chargerExtensions();
+    const sets = await listerExtensions();
     const miennes = sets.filter(s => appartientAUnivers(s.id));
     derniereExtension = miennes.length ? miennes[miennes.length - 1].id : null;
     grille.innerHTML = miennes.slice(-4).reverse().map(s => `
@@ -277,8 +280,7 @@ async function loadHeroCards(){
   if(cached){ renderHeroCards(JSON.parse(cached), tags); return; }
   try{
     const extrait = derniereExtension || (estPocket() ? 'A1' : 'sv03.5');
-    const res = await fetch(`https://api.tcgdex.net/v2/fr/cards?set.id=eq:${extrait}`);
-    const cards = (await res.json()).slice(0, 6);
+    const cards = (await cartesDeLExtension(extrait)).slice(0, 6);
     sessionStorage.setItem(memoire, JSON.stringify(cards));
     renderHeroCards(cards, tags);
   }catch(err){
@@ -292,7 +294,7 @@ function renderHeroCards(cards, tags){
     const tag = tags[i];
     const stamp = tag ? `<div class="stamp ${tag}">${tag === 'rech' ? 'recherchée' : 'échangeable'}</div>` : '';
     return `<div class="slot loaded">
-      <img src="${card.image}/low.webp" alt="${card.name}" loading="lazy">
+      <img src="${card.image}" alt="${card.name}" loading="lazy">
       ${stamp}
     </div>`;
   }).join('');

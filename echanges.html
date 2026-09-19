@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://raw.githubusercontent.com">
 <link rel="preconnect" href="https://assets.tcgdex.net">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -165,6 +167,7 @@
 </div>
 
 <script src="univers.js"></script>
+<script src="catalogue.js"></script>
 <script src="supabase-config.js"></script>
 <script src="sets.js"></script>
 <script src="tags.js"></script>
@@ -317,15 +320,15 @@ async function chargerInfosCartes(idsCartes){
   const extensions = Object.keys(parExtension);
   await Promise.all(extensions.map(async setId => {
     try{
-      const cartes = await fetchJson(`https://api.tcgdex.net/v2/fr/cards?set.id=eq:${setId}`, 0);
-      cartes.forEach(c => { infosCartes[c.id] = { name: c.name, image: c.image, localId: c.localId }; });
+      const cartes = await cartesDeLExtension(setId);
+      cartes.forEach(c => { infosCartes[c.id] = c; });
     }catch(err){
       console.warn(`Impossible de charger les cartes de ${setId}`, err);
     }
   }));
 
   try{
-    const sets = await chargerExtensions();
+    const sets = await listerExtensions();
     sets.forEach(s => { nomsExtensions[s.id] = s.name; });
   }catch(err){
     console.warn('Impossible de charger le nom des extensions', err);
@@ -340,7 +343,7 @@ function miniCarte(carteId){
     <div class="mini">
       <div class="img card-img-wrap">
         ${info.image
-          ? `<img src="${info.image}/low.webp" alt="${nom}" loading="lazy" data-fallback="images/cards/${carteId}.png" onerror="cardImgFallback(this)">`
+          ? `<img src="${info.image}" alt="${nom}" loading="lazy" data-fallback="${info.imageSecours ?? `images/cards/${carteId}.png`}" onerror="cardImgFallback(this)">`
           : `<span class="glyph">?</span>`}
       </div>
       <div class="nom">${nom}</div>

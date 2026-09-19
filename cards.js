@@ -19,6 +19,12 @@ async function fetchJson(url, retries = 1){
 // rare...) n'ont pas de symbole unique standardisé : on leur attribue le
 // nombre d'étoiles le plus proche de l'usage courant chez les collectionneurs.
 const RARITY_SYMBOLS = {
+  // Pokémon TCG Pocket : des losanges, des étoiles, une couronne.
+  'Un Diamant': '◆', 'Deux Diamants': '◆◆', 'Trois Diamants': '◆◆◆',
+  'Quatre Diamants': '◆◆◆◆', 'Une Étoile': '★', 'Deux Étoiles': '★★',
+  'Trois Étoiles': '★★★', 'Couronne': '♛',
+  'Chromatique': '✦', 'Chromatique deux étoiles': '✦✦',
+  // Jeu physique.
   'Sans Rareté': '',
   'Commune': '●',
   'Peu Commune': '◆',
@@ -82,8 +88,8 @@ function populateRarityFilter(cards){
 // l'API rareté par rareté ("parmi ces cartes, lesquelles sont communes ?")
 // pour recomposer l'information. L'ordre part des raretés les plus répandues,
 // ce qui permet de s'arrêter dès que chaque carte a trouvé la sienne.
-// Les raretés propres à Pokémon TCG Pocket (Diamants, Étoiles, Couronne,
-// Chromatiques) sont volontairement absentes : ce jeu est hors périmètre.
+// Les raretés de l'application (losanges, étoiles, couronne) ne sont pas
+// sondées : leur source les fournit avec la carte.
 const RARITIES_TO_PROBE = [
   'Commune', 'Peu Commune', 'Rare', 'Rare Holo', 'Holo Rare', 'Double rare',
   'Ultra Rare', 'Illustration rare', 'Illustration spéciale rare', 'Hyper rare',
@@ -155,7 +161,7 @@ function cardTile(c, subtitle){
     <div class="card-tile">
       <div class="card-img-wrap">
         ${c.image
-          ? `<img src="${c.image}/low.webp" alt="${c.name}" loading="lazy" data-card-id="${c.id}" data-fallback="images/cards/${c.id}.png" onerror="cardImgFallback(this)">`
+          ? `<img src="${c.image}" alt="${c.name}" loading="lazy" data-card-id="${c.id}" data-haute="${c.imageHaute ?? c.image}" data-fallback="${c.imageSecours ?? `images/cards/${c.id}.png`}" onerror="cardImgFallback(this)">`
           : `<img src="images/cards/${c.id}.png" alt="${c.name}" loading="lazy" data-card-id="${c.id}" onerror="cardImgFallback(this)">`}
       </div>
       <div class="card-num"><span>${subtitle ?? '#' + c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
@@ -280,7 +286,10 @@ function openCardZoom(img){
   const thumbnail = img.currentSrc || img.src;
   // La vignette est déjà en cache : on l'affiche tout de suite, puis on la
   // remplace par la haute définition dès qu'elle est prête.
-  const fullSize = thumbnail.includes('/low.webp') ? thumbnail.replace('/low.webp', '/high.webp') : thumbnail;
+  // La haute définition voyage avec la vignette : toutes les sources ne la
+  // nomment pas en remplaçant « low » par « high » dans l'adresse.
+  const fullSize = img.dataset.haute
+    || (thumbnail.includes('/low.webp') ? thumbnail.replace('/low.webp', '/high.webp') : thumbnail);
 
   const overlay = document.createElement('div');
   overlay.className = 'card-zoom';

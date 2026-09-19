@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://raw.githubusercontent.com">
 <link rel="preconnect" href="https://assets.tcgdex.net">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -202,6 +204,7 @@
 </div>
 
 <script src="univers.js"></script>
+<script src="catalogue.js"></script>
 <script src="pokedex-fr.js"></script>
 <script src="sets.js"></script>
 <script src="supabase-config.js"></script>
@@ -268,7 +271,7 @@ function renderHead(cardCount){
 async function loadSetNames(){
   let sets;
   try{
-    sets = await chargerExtensions();
+    sets = await listerExtensions();
   }catch(err){
     console.warn('Impossible de charger le nom des extensions', err);
     return;
@@ -355,7 +358,7 @@ async function init(){
 
   try{
     const [allResults] = await Promise.all([
-      fetchJson(`https://api.tcgdex.net/v2/fr/cards?dexId=eq:${dexId}`),
+      cartesDuPokemon(dexId),
       loadSetNames(),
     ]);
     // La recherche par numéro de Pokédex ramène les cartes des deux jeux
@@ -369,8 +372,11 @@ async function init(){
     renderHead(cards.length);
     populateRarityFilter(allCards);
     applyFilters();
-    // Les raretés arrivent après coup : les cartes restent affichées pendant ce temps.
-    loadRarities().catch(err => console.warn('Impossible de charger les raretés', err));
+    // Toutes les sources ne livrent pas la rareté avec la carte : quand
+    // elle manque, on la sonde après coup, cartes déjà affichées.
+    if(!raretesFourniesParLaSource()){
+      loadRarities().catch(err => console.warn('Impossible de charger les raretés', err));
+    }
   }catch(err){
     console.warn('Impossible de charger les cartes de ce Pokémon', err);
     document.getElementById('content').innerHTML = `<p class="status-msg err">Impossible de charger les cartes pour le moment.<br><span style="font-size:12px;opacity:.7">${err.message}</span><br><br><button onclick="init()" class="filter-btn" style="margin-top:8px">Réessayer</button></p>`;
