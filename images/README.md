@@ -17,6 +17,17 @@ Exemples :
 
 ## Images de carte → `images/cards/`
 
+**Depuis la mise en place de l'instantané, une image déposée ici passe
+devant toutes les sources extérieures** — elle n'est plus seulement un
+recours quand les autres échouent. C'est utile pour les cartes qui n'ont
+de visuel français nulle part, comme les extensions Pocket les plus
+récentes.
+
+Formats acceptés : `.webp`, `.png`, `.jpg`. L'image apparaît à la
+prochaine reconstruction — automatique chaque nuit, ou déclenchée à la
+main depuis l'onglet **Actions** du dépôt.
+
+
 Nom du fichier : l'identifiant de la carte, en `.png`. Il s'écrit
 `<identifiant de l'extension>-<numéro de la carte>`.
 

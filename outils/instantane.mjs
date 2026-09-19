@@ -26,6 +26,43 @@ const args = Object.fromEntries(
 const CHEMIN_TCGDEX = args.tcgdex;
 const SORTIE = args.sortie ?? 'donnees';
 
+// ------------------------------------------- les visuels que tu déposes ---
+//
+// Certaines cartes n'ont de visuel français chez personne — les extensions
+// Pocket les plus récentes, par exemple. Plutôt que de subir cette limite,
+// on peut déposer l'image à la main dans images/cards/, nommée d'après
+// l'identifiant de la carte :
+//
+//     images/cards/B4a-001.webp
+//
+// Ce dossier existait déjà comme dernier recours à l'affichage, quand une
+// image distante échouait. Il devient ici un choix délibéré, appliqué à la
+// construction : plus de requête perdue avant d'y arriver.
+//
+// La construction la repère et la fait passer devant toutes les sources.
+// C'est le seul endroit du site où ton propre travail l'emporte sur les
+// données récupérées ailleurs, et c'est voulu : tu es le dernier recours.
+
+const DOSSIER_VISUELS = 'images/cards';
+const EXTENSIONS_IMAGE = ['.webp', '.png', '.jpg', '.jpeg'];
+
+async function recenserVisuelsLocaux(){
+  const parCarte = new Map();
+  let fichiers = [];
+  try{
+    fichiers = await readdir(DOSSIER_VISUELS);
+  }catch(err){
+    return parCarte;   // le dossier n'existe pas encore : rien à recenser
+  }
+  for(const fichier of fichiers){
+    const point = fichier.lastIndexOf('.');
+    if(point < 0) continue;
+    if(!EXTENSIONS_IMAGE.includes(fichier.slice(point).toLowerCase())) continue;
+    parCarte.set(fichier.slice(0, point), `${DOSSIER_VISUELS}/${fichier}`);
+  }
+  return parCarte;
+}
+
 // ---------------------------------------------------- lecture des .ts ----
 //
 // Les fiches de TCGdex sont des fichiers TypeScript écrits à la main mais
@@ -386,6 +423,25 @@ async function principal(){
     }
   }
   console.log(`  ${rattachees} rattachées, ${orphelines} sans Pokémon (cartes de Dresseur comprises)`);
+
+  const visuelsLocaux = await recenserVisuelsLocaux();
+  if(visuelsLocaux.size){
+    let poses = 0;
+    for(const lot of [physique, pocket]){
+      for(const cartes of lot.cartesParSet.values()){
+        for(const carte of cartes){
+          const local = visuelsLocaux.get(carte.id);
+          if(!local) continue;
+          // Ce qui venait d'ailleurs devient le secours.
+          carte.imageSecours = carte.image;
+          carte.image = local;
+          carte.imageHaute = local;
+          poses++;
+        }
+      }
+    }
+    console.log(`Visuels déposés à la main : ${poses} posés sur ${visuelsLocaux.size} fichiers trouvés`);
+  }
 
   const bilanPhysique = await publier('physique', physique, SORTIE);
   const bilanPocket = await publier('pocket', pocket, SORTIE);

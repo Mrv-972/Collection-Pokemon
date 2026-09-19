@@ -35,9 +35,9 @@
   <pre id="sortie">…</pre>
 </div>
 
-<script src="sets.js?v=2026-09-19-yyht"></script>
-<script src="univers.js?v=2026-09-19-yyht"></script>
-<script src="catalogue.js?v=2026-09-19-yyht"></script>
+<script src="sets.js?v=2026-09-19-qou3"></script>
+<script src="univers.js?v=2026-09-19-qou3"></script>
+<script src="catalogue.js?v=2026-09-19-qou3"></script>
 <script>
 const sortie = document.getElementById('sortie');
 let lignes = [];
@@ -120,6 +120,36 @@ async function rapport(universVoulu){
       dire(`  ${ext.id.padEnd(8)} ${String(cartes.length).padStart(4)} cartes · ${part}% reconnus au Pokédex français`);
       dire(`           ${noms.slice(0, 6).join(', ')}`);
     }catch(err){ dire(`  ${ext.id} : échec — ${err.message}`); }
+  }
+  dire();
+
+  dire('--- Les visuels des cartes -------------------------------------');
+  // Je ne peux pas joindre l'hébergeur d'images depuis mon environnement :
+  // c'est donc ton navigateur qui dit lesquels existent vraiment.
+  const echantillon = [];
+  // Un échantillon pris aux deux bouts : les plus anciennes, censées avoir
+  // leur visuel français, et les plus récentes, qui n'en ont nulle part.
+  const miennes = extensions.filter(e => appartientAUnivers(e.id));
+  const aSonder = [...miennes.slice(0, 3), ...miennes.slice(-3)];
+  for(const ext of aSonder){
+    try{
+      const cartes = await cartesDeLExtension(ext.id);
+      if(cartes[0]?.image) echantillon.push({ ext: ext.id, carte: cartes[0] });
+    }catch(err){}
+  }
+  for(const { ext, carte } of echantillon){
+    const hote = new URL(carte.image, location.href).hostname.replace('www.', '');
+    const charge = await new Promise(ok => {
+      const img = new Image();
+      img.onload = () => ok(`${img.naturalWidth}×${img.naturalHeight}`);
+      img.onerror = () => ok(null);
+      img.src = carte.image;
+    });
+    const langue = carte.image.startsWith('images/') ? 'ton propre visuel'
+      : hote.includes('tcgdex') ? 'FRANÇAIS attendu'
+      : 'anglais (seule version publiée)';
+    dire(`  ${ext.padEnd(7)} ${(charge ?? 'NE CHARGE PAS').padEnd(14)} ${langue}`);
+    dire(`          ${carte.image.replace(/^https?:\/\//, '')}`);
   }
   dire();
 
