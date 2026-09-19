@@ -286,7 +286,9 @@ async function init(){
     sessionStorage.setItem(cacheKey, JSON.stringify({ set, cards: allCards }));
     // Toutes les sources ne livrent pas la rareté avec la carte : quand
     // elle manque, on la sonde après coup, cartes déjà affichées.
-    if(!raretesFourniesParLaSource()){
+    // On ne sonde que si les cartes sont arrivées sans rareté :
+      // l'instantané la porte, certaines sources en direct non.
+      if(!allCards.some(c => c.rarity)){
       loadRarities().catch(err => console.warn('Impossible de charger les raretés', err));
     }
   }catch(err){

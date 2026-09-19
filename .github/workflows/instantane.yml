@@ -1,0 +1,58 @@
+# Reconstruit chaque jour l'instantané des données que le site sert lui-même.
+#
+# Le site ne dépend donc plus d'une API au moment où un visiteur ouvre une
+# page : il dépend d'elle une fois par jour, ici, où un échec est visible et
+# sans conséquence pour les visiteurs — l'instantané de la veille reste en
+# place.
+name: Instantané des cartes
+
+on:
+  schedule:
+    - cron: '17 4 * * *'   # tous les jours, un peu après 4 h UTC
+  workflow_dispatch:        # et à la demande, depuis l'onglet Actions
+
+permissions:
+  contents: write
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le site
+        uses: actions/checkout@v4
+
+      # Seul le dossier « data » nous intéresse : le dépôt entier pèse le
+      # double, images de développement comprises.
+      - name: Récupérer les données de TCGdex
+        run: |
+          git clone --depth 1 --filter=blob:none --no-checkout \
+            https://github.com/tcgdex/cards-database tcgdex
+          cd tcgdex
+          git sparse-checkout init --cone
+          git sparse-checkout set data meta
+          git checkout
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Construire l'instantané
+        run: node outils/instantane.mjs --tcgdex tcgdex --sortie donnees
+
+      - name: Publier s'il a changé
+        run: |
+          rm -rf tcgdex
+          git config user.name  "Instantané des cartes"
+          git config user.email "actions@users.noreply.github.com"
+          # « git add » d'abord : sans lui, une extension toute neuve, donc
+          # un fichier que git ne suit pas encore, passerait inaperçue.
+          git add donnees
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau : aucun dépôt."
+            exit 0
+          fi
+          resume=$(node -p "
+            const v = require('./donnees/version.json');
+            \`physique : \${v.physique.extensions} extensions, \${v.physique.cartes} cartes\\npocket   : \${v.pocket.extensions} extensions, \${v.pocket.cartes} cartes\`")
+          git commit -m "Met à jour l'instantané des cartes" -m "$resume"
+          git push

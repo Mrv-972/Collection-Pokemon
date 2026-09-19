@@ -113,9 +113,6 @@ function carteTcgdex(c){
 const sourceTcgdex = {
   cle: 'tcgdex',
   nom: 'TCGdex',
-  // TCGdex ne donne la rareté que carte par carte : les pages la complètent
-  // après coup, par sondage.
-  raretesFournies: false,
   extensions: extensionsTcgdex,
 
   async extension(setId){
@@ -194,30 +191,21 @@ function cartePocket(c){
   };
 }
 
-// Toutes les cartes françaises tiennent dans un fichier de 459 Ko, chargé
-// une fois par visite. Le découper par extension ferait une requête de plus
-// à chaque page pour économiser des miettes.
-async function toutesLesCartesPocket(){
-  const cartes = await lireJson(
-    POCKET_DONNEES.map(base => `${base}/cards.fr.min.json`),
-    'pokeclasseur_pocket_cartes');
-  return (Array.isArray(cartes) ? cartes : Object.values(cartes).flat());
-}
-
-// La traduction française retarde d'une extension sur la saisie des cartes :
-// au moment d'écrire, tout est traduit jusqu'à B4, et la toute dernière
-// n'existe qu'en anglais. Plutôt qu'une extension vide, on va chercher son
-// fichier anglais — un nom anglais vaut mieux qu'une page blanche.
+// On lit les fichiers par extension, et non le fichier français agrégé :
+// celui-ci contient aujourd'hui des noms anglais, alors que les fichiers par
+// extension sont bien traduits. Le fichier anglais sert de dernier recours,
+// car un nom anglais vaut mieux qu'une extension vide.
 async function cartesPocketDUneExtension(codeDistant){
-  const toutes = await toutesLesCartesPocket();
-  const siennes = toutes.filter(c => c.set === codeDistant);
-  if(siennes.length > 0) return siennes;
-
+  const chemins = [];
+  for(const base of POCKET_DONNEES){
+    chemins.push(`${base}/cards/fr/${encodeURIComponent(codeDistant)}.min.json`);
+  }
+  for(const base of POCKET_DONNEES){
+    chemins.push(`${base}/cards/${encodeURIComponent(codeDistant)}.min.json`);
+  }
   try{
-    const secours = await lireJson(
-      POCKET_DONNEES.map(base => `${base}/cards/${encodeURIComponent(codeDistant)}.min.json`),
-      `pokeclasseur_pocket_${codeDistant}`);
-    return Array.isArray(secours) ? secours : Object.values(secours).flat();
+    const cartes = await lireJson(chemins, `pokeclasseur_pocket_${codeDistant}`);
+    return Array.isArray(cartes) ? cartes : Object.values(cartes).flat();
   }catch(err){
     console.warn(`Aucune carte pour ${codeDistant}`, err);
     return [];
@@ -227,7 +215,6 @@ async function cartesPocketDUneExtension(codeDistant){
 const sourcePocket = {
   cle: 'pocket',
   nom: 'Base communautaire TCG Pocket',
-  raretesFournies: true,   // la rareté vient avec la carte : rien à sonder
 
   async extensions(){
     const parSerie = await lireJson(
@@ -264,9 +251,18 @@ const sourcePocket = {
     return cartes.slice().sort((a, b) => a.number - b.number).map(cartePocket);
   },
 
+  // Repli seulement : sans instantané, il faut parcourir les extensions une
+  // à une, cette source n'offrant pas de recherche par Pokémon.
   async cartesDuPokemon(dexId){
-    const toutes = await toutesLesCartesPocket();
-    return toutes.filter(c => dexDuNomDeCarte(c.name) === dexId).map(cartePocket);
+    const extensions = await this.extensions();
+    const trouvees = [];
+    for(const ext of extensions){
+      const cartes = await cartesPocketDUneExtension(idSetDistant(ext.id));
+      cartes.forEach(c => {
+        if(dexDuNomDeCarte(c.name) === dexId) trouvees.push(cartePocket(c));
+      });
+    }
+    return trouvees;
   },
 };
 
@@ -331,6 +327,43 @@ function dexDuNomDeCarte(nom){
 }
 
 
+// ========================= L'instantané local ===========================
+//
+// Le site sert d'abord ses propres données, rangées dans « donnees/ » par
+// outils/instantane.mjs et déposées là par une tâche quotidienne. Trois
+// raisons : il reste debout quand une source tombe, il n'attend plus le
+// réseau d'un tiers à chaque page, et ce qu'une source se trompe peut être
+// corrigé chez nous.
+//
+// Les sources d'origine restent branchées en second : une extension parue
+// depuis la dernière construction n'est pas encore dans l'instantané, et
+// c'est exactement le cas où l'on veut aller la chercher en direct.
+
+const INSTANTANE = 'donnees';
+const instantanePresent = new Map();   // par univers
+
+async function lireInstantane(chemin){
+  const r = await fetch(`${INSTANTANE}/${chemin}`);
+  if(!r.ok) throw new Error(`Instantané absent : ${chemin}`);
+  return r.json();
+}
+
+// Sert à distinguer « ce Pokémon n'a aucune carte » — une réponse, donc —
+// de « l'instantané n'existe pas », qui appelle un repli.
+async function instantaneDisponible(){
+  const cle = universActuel().cle;
+  if(!instantanePresent.has(cle)){
+    try{
+      await lireInstantane(`${cle}/extensions.json`);
+      instantanePresent.set(cle, true);
+    }catch(err){
+      console.info("Pas d'instantané local : lecture directe des sources.");
+      instantanePresent.set(cle, false);
+    }
+  }
+  return instantanePresent.get(cle);
+}
+
 // ============================ L'interface ===============================
 // Ce que les pages voient. Elles ne nomment jamais une source.
 
@@ -338,23 +371,40 @@ function sourceCourante(){
   return estPocket() ? sourcePocket : sourceTcgdex;
 }
 
-function raretesFourniesParLaSource(){
-  return sourceCourante().raretesFournies;
-}
-
 // Le catalogue entier de l'univers courant, du plus ancien au plus récent.
 async function listerExtensions(){
-  return sourceCourante().extensions();
+  try{
+    return await lireInstantane(`${universActuel().cle}/extensions.json`);
+  }catch(err){
+    return sourceCourante().extensions();
+  }
 }
 
 async function lireExtension(setId){
+  try{
+    const toutes = await lireInstantane(`${universActuel().cle}/extensions.json`);
+    const trouvee = toutes.find(s => s.id === setId);
+    if(trouvee) return trouvee;
+  }catch(err){}
   return sourceCourante().extension(setId);
 }
 
 async function cartesDeLExtension(setId){
-  return sourceCourante().cartesDeLExtension(setId);
+  try{
+    return await lireInstantane(`${universActuel().cle}/sets/${encodeURIComponent(setId)}.json`);
+  }catch(err){
+    return sourceCourante().cartesDeLExtension(setId);
+  }
 }
 
 async function cartesDuPokemon(dexId){
-  return sourceCourante().cartesDuPokemon(dexId);
+  try{
+    return await lireInstantane(`${universActuel().cle}/dex/${dexId}.json`);
+  }catch(err){
+    // Un fichier absent alors que l'instantané existe veut dire qu'aucune
+    // carte de cet univers ne représente ce Pokémon. Aller le redemander en
+    // direct ne ferait que confirmer un vide.
+    if(await instantaneDisponible()) return [];
+    return sourceCourante().cartesDuPokemon(dexId);
+  }
 }
