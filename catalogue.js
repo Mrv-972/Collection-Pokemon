@@ -339,6 +339,10 @@ function dexDuNomDeCarte(nom){
 // depuis la dernière construction n'est pas encore dans l'instantané, et
 // c'est exactement le cas où l'on veut aller la chercher en direct.
 
+// Repère de version, lu par diagnostic.html : il permet de distinguer « le
+// site ne marche pas » de « le navigateur sert encore l'ancien fichier ».
+const CATALOGUE_VERSION = '2026-09-19-instantane';
+
 const INSTANTANE = 'donnees';
 const instantanePresent = new Map();   // par univers
 

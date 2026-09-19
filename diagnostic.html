@@ -3,126 +3,181 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diagnostic des extensions — PokéClasseur</title>
+<title>Diagnostic — PokéClasseur</title>
 <style>
   :root{--ink:#15171B;--ink-soft:#20232A;--gold:#C9A227;--accent-clair:#E3C766;
-        --teal:#1F6F63;--rust:#A8431C;--text:#EDEAE0;--dim:#9B9E9C;}
+        --teal:#1F6F63;--text:#EDEAE0;--dim:#9B9E9C;}
   *{box-sizing:border-box}
-  body{margin:0;padding:28px 20px 70px;background:var(--ink);color:var(--text);
+  body{margin:0;padding:26px 18px 70px;background:var(--ink);color:var(--text);
        font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.55;}
   .wrap{max-width:900px;margin:0 auto}
-  h1{font-family:Georgia,serif;font-weight:500;font-size:26px;margin:0 0 6px}
-  p.intro{color:var(--dim);margin:0 0 22px;font-size:13px}
-  button{background:var(--teal);border:none;color:#EDF5F3;padding:11px 18px;border-radius:4px;
-         font-size:13px;font-family:inherit;cursor:pointer;margin-bottom:18px}
-  button:hover{background:#123F38}
-  pre{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.1);border-radius:5px;
-      padding:16px;white-space:pre-wrap;word-break:break-word;margin:0;overflow-x:auto}
-  .ok{color:#5FBAAA}.ko{color:#E08862}.att{color:var(--accent-clair)}
+  h1{font-family:Georgia,serif;font-weight:500;font-size:25px;margin:0 0 6px}
+  p.intro{color:var(--dim);margin:0 0 20px;font-size:13px}
+  .onglets{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  button{background:var(--ink-soft);border:1px solid rgba(237,234,224,.15);color:var(--text);
+         padding:10px 16px;border-radius:4px;font-size:13px;font-family:inherit;cursor:pointer}
+  button.on{background:var(--teal);border-color:var(--teal);color:#EDF5F3}
+  button.copier{background:var(--teal);border:none;color:#EDF5F3}
+  pre{background:var(--ink-soft);border:1px solid rgba(237,234,224,.1);border-radius:5px;
+      padding:16px;white-space:pre-wrap;word-break:break-word;margin:0}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Diagnostic des extensions</h1>
-  <p class="intro">Cette page interroge TCGdex depuis ton navigateur et compare ce qu'elle
-     y trouve avec ce que le site sait reconnaître. Elle n'est liée depuis aucune autre page :
-     c'est un outil, pas une rubrique.</p>
-  <button id="copier">Tout copier</button>
-  <pre id="sortie">Interrogation en cours…</pre>
+  <h1>Diagnostic</h1>
+  <p class="intro">Cette page interroge le site depuis ton navigateur et dit exactement ce qu'il
+     charge, d'où, et dans quelle langue. Choisis l'univers, puis copie le rapport.</p>
+  <div class="onglets">
+    <button id="b-physique" class="on">Jeu physique</button>
+    <button id="b-pocket">TCG Pocket</button>
+    <button class="copier" id="copier">Tout copier</button>
+  </div>
+  <pre id="sortie">…</pre>
 </div>
 
 <script src="sets.js"></script>
+<script src="univers.js"></script>
+<script src="catalogue.js"></script>
 <script>
-// Les extensions que le catalogue ne montrait pas, telles que signalées.
-const SIGNALEES = ['Booster De Luxe Ex','Méga-Rayonnement','Aura Palpitante',
-  'Propulsion Paradoxe','Jours Heureux','Domination Céleste',"L'Ambition de la Team Rocket"];
-
 const sortie = document.getElementById('sortie');
-const lignes = [];
+let lignes = [];
 const dire = (t = '') => { lignes.push(t); sortie.textContent = lignes.join('\n'); };
 
-// Une comparaison de noms tolérante : accents, casse et ponctuation varient
-// d'une source à l'autre, et ce n'est pas ce qu'on cherche à mesurer.
-function simplifie(t){
-  return String(t).normalize('NFD').replace(/[̀-ͯ]/g,'')
+// On mesure la « francité » d'une liste de noms en la confrontant au Pokédex
+// français : c'est le seul juge fiable, et il ne dépend d'aucune source.
+let pokedex = null;
+async function chargerPokedex(){
+  if(pokedex) return pokedex;
+  await new Promise((ok, ko) => {
+    const s = document.createElement('script');
+    s.src = 'pokedex-fr.js'; s.onload = ok; s.onerror = ko;
+    document.head.appendChild(s);
+  }).catch(() => {});
+  const norm = n => String(n).normalize('NFD').replace(/[̀-ͯ]/g,'')
     .toLowerCase().replace(/[^a-z0-9]/g,'');
+  pokedex = typeof POKEDEX_FR !== 'undefined' ? new Set(POKEDEX_FR.map(norm)) : new Set();
+  pokedex.norm = norm;
+  return pokedex;
 }
 
-async function sets(langue){
-  const r = await fetch(`https://api.tcgdex.net/v2/${langue}/sets`);
-  if(!r.ok) throw new Error(`${langue} : HTTP ${r.status}`);
-  return r.json();
-}
-
-(async () => {
+async function essai(adresse){
   try{
-    const [fr, en] = await Promise.all([sets('fr'), sets('en')]);
-    dire(`TCGdex — ${fr.length} extensions en français, ${en.length} en anglais`);
-    dire();
-
-    const pocketFr = fr.filter(s => isPocketSet(s.id));
-    const pocketEn = en.filter(s => isPocketSet(s.id));
-    dire(`Reconnues comme Pocket : ${pocketFr.length} en français, ${pocketEn.length} en anglais`);
-    dire();
-
-    dire('--- Extensions Pocket vues en français -------------------------');
-    pocketFr.forEach(s => dire(`  ${s.id.padEnd(7)} ${guessSeriesName(s.id).padEnd(9)} ${s.name}`));
-    dire();
-
-    const idsFr = new Set(fr.map(s => s.id));
-    const absentes = en.filter(s => !idsFr.has(s.id));
-    dire('--- Présentes en anglais, absentes en français -----------------');
-    dire(absentes.length ? '' : '  (aucune)');
-    absentes.forEach(s => dire(`  ${s.id.padEnd(7)} ${(isPocketSet(s.id) ? 'Pocket' : 'physique').padEnd(9)} ${s.name}`));
-    dire();
-
-    dire('--- Les extensions signalées comme manquantes ------------------');
-    const toutes = [...fr.map(s => ({...s, langue:'fr'})), ...en.map(s => ({...s, langue:'en'}))];
-    SIGNALEES.forEach(nom => {
-      const trouvees = toutes.filter(s => simplifie(s.name).includes(simplifie(nom))
-                                       || simplifie(nom).includes(simplifie(s.name)));
-      if(trouvees.length === 0){
-        dire(`  ${nom}\n      introuvable sous ce nom — voir la section précédente :`
-           + ` si elle y figure en anglais, c'est que le jeu de données français est en retard`);
-        return;
-      }
-      trouvees.forEach(s => dire(`  ${nom}\n      ${s.langue} · id=${s.id} · reconnu ${isPocketSet(s.id) ? 'Pocket → ' + guessSeriesName(s.id) : 'PHYSIQUE (à corriger)'} · « ${s.name} »`));
-    });
-    dire();
-
-    // Une extension Pocket dont l'identifiant sortirait de la forme attendue
-    // atterrirait ici, classée « Autres » du côté physique : c'est le signe
-    // qu'il faut élargir la règle.
-    dire('--- Identifiants qui ne ressemblent à rien de connu ------------');
-    const vus = new Set();
-    const etranges = [...fr, ...en].filter(s => {
-      if(vus.has(s.id)) return false;
-      vus.add(s.id);
-      return !isPocketSet(s.id) && guessSeriesName(s.id) === 'Autres';
-    });
-    dire(etranges.length ? '' : '  (aucun)');
-    etranges.forEach(s => dire(`  ${s.id.padEnd(9)} ${s.name}`));
+    const r = await fetch(adresse, { cache: 'no-store' });
+    return { ok: r.ok, statut: r.status, corps: r.ok ? await r.json() : null };
   }catch(err){
-    dire(`Échec : ${err.message}`);
-    dire("Si c'est un refus de connexion, c'est que TCGdex est injoignable depuis ce réseau.");
+    return { ok: false, statut: 'erreur réseau', message: err.message };
   }
-})();
+}
 
-document.getElementById('copier').addEventListener('click', async () => {
-  const b = document.getElementById('copier');
+async function rapport(universVoulu){
+  lignes = [];
+  adopterUnivers(universVoulu);
+  const p = await chargerPokedex();
+
+  dire(`Adresse      : ${location.href}`);
+  dire(`Univers      : ${universActuel().cle}`);
+  dire(`catalogue.js : ${typeof CATALOGUE_VERSION !== 'undefined' ? CATALOGUE_VERSION : 'ANCIENNE VERSION (sans repère) — ton navigateur sert un fichier en cache'}`);
+  dire(`Pokédex fr   : ${p.size} noms chargés`);
+  dire();
+
+  dire('--- L\'instantané local est-il servi ? -------------------------');
+  const version = await essai('donnees/version.json');
+  dire(`  donnees/version.json → ${version.statut}`);
+  if(version.ok){
+    dire(`  construit le ${version.corps.genere_le}`);
+    dire(`  physique : ${version.corps.physique.extensions} extensions, ${version.corps.physique.cartes} cartes`);
+    dire(`  pocket   : ${version.corps.pocket.extensions} extensions, ${version.corps.pocket.cartes} cartes`);
+  }else{
+    dire('  ABSENT — le site retombe sur les sources en direct.');
+  }
+  dire();
+
+  const u = universActuel().cle;
+  dire('--- Le fichier brut de l\'instantané ---------------------------');
+  const brut = await essai(`donnees/${u}/extensions.json`);
+  dire(`  donnees/${u}/extensions.json → ${brut.statut}`);
+  if(brut.ok) dire(`  ${brut.corps.length} extensions · ${brut.corps.slice(-4).map(e => e.name).join(' · ')}`);
+  dire();
+
+  dire('--- Ce que le site affiche réellement --------------------------');
+  let extensions = [];
   try{
-    await navigator.clipboard.writeText(sortie.textContent);
-    b.textContent = 'Copié !';
-  }catch(err){
-    // Le presse-papiers est parfois refusé : on sélectionne, à défaut.
-    const plage = document.createRange();
-    plage.selectNodeContents(sortie);
-    getSelection().removeAllRanges();
-    getSelection().addRange(plage);
-    b.textContent = 'Sélectionné — fais Ctrl+C';
+    extensions = await listerExtensions();
+    dire(`  listerExtensions() → ${extensions.length} extensions`);
+    dire(`  quatre dernières : ${extensions.slice(-4).map(e => e.name).join(' · ')}`);
+  }catch(err){ dire(`  listerExtensions() a échoué : ${err.message}`); }
+  dire();
+
+  dire('--- Les cartes de trois extensions -----------------------------');
+  const aTester = extensions.filter(e => appartientAUnivers(e.id)).slice(-3);
+  for(const ext of aTester){
+    try{
+      const cartes = await cartesDeLExtension(ext.id);
+      const noms = cartes.map(c => c.name);
+      const simples = noms.map(p.norm).filter(n => n.length > 2);
+      const francais = simples.filter(n => p.has(n)).length;
+      const part = simples.length ? Math.round(100 * francais / simples.length) : 0;
+      dire(`  ${ext.id.padEnd(8)} ${String(cartes.length).padStart(4)} cartes · ${part}% reconnus au Pokédex français`);
+      dire(`           ${noms.slice(0, 6).join(', ')}`);
+    }catch(err){ dire(`  ${ext.id} : échec — ${err.message}`); }
+  }
+  dire();
+
+  dire('--- Caches du navigateur ---------------------------------------');
+  const cles = [];
+  try{ for(let i = 0; i < sessionStorage.length; i++) cles.push(sessionStorage.key(i)); }catch(err){}
+  dire(cles.length ? '  session : ' + cles.join(', ') : '  session : vide');
+
+  // Distinguer « le serveur n'a pas publié » de « ton navigateur garde
+  // l'ancien fichier » : on redemande catalogue.js en contournant le cache
+  // et on regarde s'il porte le repère de version.
+  let surLeServeur = null;
+  try{
+    const r = await fetch('catalogue.js?' + Date.now(), { cache: 'no-store' });
+    surLeServeur = (await r.text()).includes('CATALOGUE_VERSION');
+  }catch(err){}
+
+  const charge = typeof CATALOGUE_VERSION !== 'undefined';
+  dire();
+  dire('=== VERDICT ====================================================');
+  if(!version.ok && surLeServeur === false){
+    dire("  GitHub Pages n'a pas encore publié la nouvelle version du site.");
+    dire('  Rien à faire de ton côté : attends la fin de la publication');
+    dire('  (onglet Actions du dépôt), puis recharge.');
+  }else if(!charge && surLeServeur){
+    dire('  Ton navigateur sert un catalogue.js gardé en cache.');
+    dire('  Recharge en forçant : Ctrl+Maj+R (Cmd+Maj+R sur Mac).');
+  }else if(!version.ok){
+    dire("  Le site fonctionne, mais l'instantané local n'est pas servi :");
+    dire('  les données sont demandées en direct aux sources.');
+  }else{
+    dire("  Tout est en place : instantané servi, catalogue à jour.");
+    dire('  Si des cartes restent en anglais, ce sont celles dont la');
+    dire("  source n'a pas de version française — la ligne « % reconnus »");
+    dire('  ci-dessus le chiffre extension par extension.');
+  }
+}
+
+document.getElementById('b-physique').addEventListener('click', e => {
+  document.querySelectorAll('.onglets button').forEach(b => b.classList.remove('on'));
+  e.target.classList.add('on'); rapport('physique');
+});
+document.getElementById('b-pocket').addEventListener('click', e => {
+  document.querySelectorAll('.onglets button').forEach(b => b.classList.remove('on'));
+  e.target.classList.add('on'); rapport('pocket');
+});
+document.getElementById('copier').addEventListener('click', async (e) => {
+  const b = e.target;
+  try{ await navigator.clipboard.writeText(sortie.textContent); b.textContent = 'Copié !'; }
+  catch(err){
+    const r = document.createRange(); r.selectNodeContents(sortie);
+    getSelection().removeAllRanges(); getSelection().addRange(r);
+    b.textContent = 'Sélectionné — Ctrl+C';
   }
   setTimeout(() => { b.textContent = 'Tout copier'; }, 2500);
 });
+
+rapport(universActuel().cle);
 </script>
 </body>
 </html>
