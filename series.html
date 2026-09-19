@@ -233,7 +233,12 @@ function groupBySeries(sets){
   const groups = {};
   const order = [];
   sets.forEach(s => {
-    const seriesName = s.serie?.name || guessSeriesName(s.id);
+    // Côté Pocket, c'est notre découpage qui fait foi : l'API range ces
+    // extensions sous une série unique, ce qui écraserait la distinction
+    // entre la série A et la série B.
+    const seriesName = isPocketSet(s.id)
+      ? guessSeriesName(s.id)
+      : (s.serie?.name || guessSeriesName(s.id));
     if(!groups[seriesName]){ groups[seriesName] = []; order.push(seriesName); }
     groups[seriesName].push(s);
   });
