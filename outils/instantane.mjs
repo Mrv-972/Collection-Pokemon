@@ -199,6 +199,37 @@ const POCKET_BASE = 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-po
 const POCKET_IMAGES = 'https://cdn.jsdelivr.net/gh/flibustier/pokemon-tcg-exchange@main/public/images/cards-by-set';
 const POCKET_IMAGES_SECOURS = 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-exchange/main/public/images/cards-by-set';
 
+// Les logos d'extension, eux, existent par langue — contrairement aux
+// visuels de cartes, dont il n'y a qu'une seule version. Le catalogue Pocket
+// affichait un point d'interrogation à leur place faute de les avoir
+// cherchés là.
+//
+// La graphie du fichier varie (« A2a » ou « A2A » selon les extensions) et
+// toutes n'ont pas de version française. Plutôt que de figer une liste qui
+// vieillirait, on essaie les combinaisons et on garde la première qui
+// répond : le jour où une traduction est ajoutée, la construction suivante
+// la prend d'elle-même.
+const POCKET_LOGOS = 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-exchange/main/public/images/sets';
+
+async function existe(adresse){
+  try{
+    const r = await fetch(adresse, { method: 'HEAD' });
+    return r.ok;
+  }catch(err){
+    return false;
+  }
+}
+
+async function logoPocket(code){
+  for(const langue of ['fr_FR', 'en_US']){
+    for(const graphie of new Set([code, code.toUpperCase()])){
+      const adresse = `${POCKET_LOGOS}/LOGO_expansion_${graphie}_${langue}.webp`;
+      if(await existe(adresse)) return { adresse, francais: langue === 'fr_FR' };
+    }
+  }
+  return null;
+}
+
 const EQUIVALENCES_SET = { 'PROMO-A': 'P-A', 'PROMO-B': 'P-B' };
 const idLocal = code => EQUIVALENCES_SET[code] ?? code;
 
@@ -258,12 +289,14 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
   const extensions = [];
   for(const [lettre, liste] of Object.entries(parSerie)){
     for(const s of liste){
+      const logo = await logoPocket(s.code);
       extensions.push({
         id: idLocal(s.code),
         codeDistant: s.code,
         name: s.name?.fr || s.name?.en || s.code,
         cardCount: { official: s.count ?? null },
-        logo: null, symbol: null,          // cette source n'héberge pas de logo
+        logo: logo?.adresse ?? null,
+        symbol: null,                      // cette source n'a pas de symbole
         serieNom: `Série ${lettre}`,
         dateSortie: s.releaseDate ?? null,
       });
