@@ -1,0 +1,61 @@
+{
+  "_lisezmoi": [
+    "La liste des sources où aller chercher les visuels français qui manquent.",
+    "",
+    "Rien ici n'est allumé par défaut : « actif: false » veut dire que la",
+    "construction nocturne ignore la source. On n'allume une source qu'après",
+    "que la sonde (outils/sonde-visuels.mjs) a prouvé, chiffres à l'appui,",
+    "qu'elle répond ET que son image diffère de la version anglaise.",
+    "",
+    "Deux genres de source :",
+    "  « motif » — l'adresse de l'image se devine à partir du numéro de carte.",
+    "  « page »  — il faut d'abord lire une page web et y repêcher les images.",
+    "",
+    "Jetons remplacés au moment de l'appel :",
+    "  {SET}     l'extension telle qu'on la nomme         → A4b, P-B",
+    "  {SETMAJ}  la même, tout en majuscules              → A4B, P-B",
+    "  {SETDIST} le nom qu'en donne la source d'origine   → PROMO-B",
+    "  {NUM}     le numéro de la carte                    → 7",
+    "  {NUM3}    le même sur trois chiffres               → 007"
+  ],
+  "candidats": [
+    {
+      "nom": "Limitless Pocket (suffixe de langue)",
+      "genre": "motif",
+      "actif": false,
+      "motif": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/{SETMAJ}/{SETMAJ}_{NUM3}_FR.webp"
+    },
+    {
+      "nom": "Limitless Pocket (dossier de langue)",
+      "genre": "motif",
+      "actif": false,
+      "motif": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/fr/{SETMAJ}/{SETMAJ}_{NUM3}.webp"
+    },
+    {
+      "nom": "Pokémon Zone (visuels français)",
+      "genre": "motif",
+      "actif": false,
+      "motif": "https://static.pokemon-zone.com/assets/cards/{SETMAJ}_{NUM3}_FR.webp"
+    },
+    {
+      "nom": "TCGdex (au cas où l'extension serait ajoutée plus tard)",
+      "genre": "motif",
+      "actif": false,
+      "motif": "https://assets.tcgdex.net/fr/tcgp/{SET}/{NUM3}/low.webp"
+    },
+    {
+      "nom": "Limitless Pocket — page française de l'extension",
+      "genre": "page",
+      "actif": false,
+      "page": "https://pocket.limitlesstcg.com/cards/{SET}?lang=fr",
+      "motifImage": "https://[^\"'\\s]+/{SETMAJ}_(\\d{3})[^\"'\\s]*\\.(?:webp|png|jpg)"
+    },
+    {
+      "nom": "Pokémon Zone — page française de l'extension",
+      "genre": "page",
+      "actif": false,
+      "page": "https://www.pokemon-zone.com/fr/sets/{SET}/",
+      "motifImage": "https://[^\"'\\s]+/{SETMAJ}_(\\d{3})[^\"'\\s]*\\.(?:webp|png|jpg)"
+    }
+  ]
+}

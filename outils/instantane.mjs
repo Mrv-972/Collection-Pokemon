@@ -18,6 +18,7 @@
 import { readFile, readdir, writeFile, mkdir, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 
 const args = Object.fromEntries(
   process.argv.slice(2).reduce((paires, valeur, i, tout) =>
@@ -213,7 +214,7 @@ const POCKET_LOGOS = 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-e
 
 async function existe(adresse){
   try{
-    const r = await fetch(adresse, { method: 'HEAD' });
+    const r = await fetch(adresse, { method: 'HEAD', headers: IDENTITE });
     return r.ok;
   }catch(err){
     return false;
@@ -368,6 +369,153 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
   return { extensions, cartesParSet };
 }
 
+
+// ------------------------------- récolte des visuels français manquants ---
+//
+// Huit extensions Pocket n'ont, chez les sources d'origine, que des visuels
+// anglais. Le navigateur qui affiche le site ne peut pas aller les chercher
+// ailleurs : un navigateur refuse par sécurité d'aller lire un autre site que
+// le sien. Cette construction-ci, elle, tourne sur un serveur — cette règle
+// ne s'y applique pas, donc c'est ici, et seulement ici, que la récolte peut
+// se faire.
+//
+// Les adresses à essayer sont listées dans outils/sources-visuels.json et
+// aucune n'est allumée tant que la sonde n'a pas prouvé qu'elle rend bien une
+// image DIFFÉRENTE de l'anglaise. La vérification est refaite ici à chaque
+// construction, sur deux cartes par extension : le jour où une source se met
+// à resservir l'anglais sous une adresse française, on ne la suit pas.
+
+// Beaucoup de sites refusent sèchement une requête sans identité. On se
+// présente donc, honnêtement : le nom du projet et son adresse, pour que
+// l'administrateur d'en face sache qui l'interroge et puisse nous écrire.
+const IDENTITE = {
+  'User-Agent': 'PokeClasseur/1.0 (+https://github.com/Mrv-972/Collection-Pokemon)',
+  'Accept-Language': 'fr-FR,fr;q=0.9',
+};
+
+const SOURCES_VISUELS = 'outils/sources-visuels.json';
+const CODES_DISTANTS = { 'P-A': 'PROMO-A', 'P-B': 'PROMO-B' };
+
+function gabarit(texte, { set, numero }){
+  return texte
+    .replaceAll('{SETDIST}', CODES_DISTANTS[set] ?? set)
+    .replaceAll('{SETMAJ}', set.toUpperCase())
+    .replaceAll('{SET}', set)
+    .replaceAll('{NUM3}', String(numero).padStart(3, '0'))
+    .replaceAll('{NUM}', String(numero));
+}
+
+async function empreinteDe(adresse){
+  try{
+    const r = await fetch(adresse, { redirect: 'follow', headers: IDENTITE });
+    if(!r.ok) return null;
+    const type = r.headers.get('content-type') ?? '';
+    if(!/image\//.test(type)) return null;
+    const octets = Buffer.from(await r.arrayBuffer());
+    return createHash('sha1').update(octets).digest('hex');
+  }catch(err){
+    return null;
+  }
+}
+
+// Une source qui rend le fichier anglais sous une adresse française ne nous
+// apporte rien. On le vérifie avant d'adopter la source pour l'extension.
+async function vraimentFrancais(adresses, cartes){
+  let verifiees = 0;
+  for(const carte of cartes){
+    const candidate = adresses.get(String(carte.localId));
+    if(!candidate) continue;
+    const [neuf, ancien] = await Promise.all([
+      empreinteDe(candidate),
+      empreinteDe(carte.imageSecours ?? carte.image),
+    ]);
+    if(!neuf) continue;
+    if(ancien && neuf === ancien) return false;   // c'est la même image
+    if(++verifiees >= 2) return true;
+  }
+  return verifiees > 0;
+}
+
+// Parcours en petits paquets : 1300 requêtes une par une seraient
+// interminables, et toutes d'un coup se feraient jeter par le serveur d'en
+// face.
+async function parPaquets(elements, taille, travail){
+  const resultats = [];
+  for(let i = 0; i < elements.length; i += taille){
+    resultats.push(...await Promise.all(elements.slice(i, i + taille).map(travail)));
+  }
+  return resultats;
+}
+
+async function adressesDepuisMotif(source, ext, cartes){
+  const trouvees = new Map();
+  await parPaquets(cartes, 12, async carte => {
+    const adresse = gabarit(source.motif, { set: ext.id, numero: carte.localId });
+    if(await existe(adresse)) trouvees.set(String(carte.localId), adresse);
+  });
+  return trouvees;
+}
+
+async function adressesDepuisPage(source, ext){
+  const trouvees = new Map();
+  try{
+    const r = await fetch(gabarit(source.page, { set: ext.id, numero: 1 }), { redirect: 'follow', headers: IDENTITE });
+    if(!r.ok) return trouvees;
+    const texte = await r.text();
+    const motif = new RegExp(gabarit(source.motifImage, { set: ext.id, numero: 1 }), 'g');
+    for(const m of texte.matchAll(motif)) trouvees.set(String(Number(m[1])), m[0]);
+  }catch(err){ /* source muette : on passera à la suivante */ }
+  return trouvees;
+}
+
+async function recolterVisuelsFrancais(pocket){
+  let config;
+  try{
+    config = JSON.parse(await readFile(SOURCES_VISUELS, 'utf8'));
+  }catch(err){
+    return;                                   // pas de liste, pas de récolte
+  }
+  const sources = (config.candidats ?? []).filter(s => s.actif);
+  if(!sources.length) return;
+
+  console.log(`Récolte des visuels français manquants — ${sources.length} source(s) allumée(s)…`);
+
+  for(const ext of pocket.extensions){
+    if(!ext.visuelsAnglais) continue;
+    const cartes = pocket.cartesParSet.get(ext.id) ?? [];
+    if(!cartes.length) continue;
+
+    for(const source of sources){
+      const adresses = source.genre === 'page'
+        ? await adressesDepuisPage(source, ext)
+        : await adressesDepuisMotif(source, ext, cartes);
+      if(!adresses.size) continue;
+
+      if(!await vraimentFrancais(adresses, cartes)){
+        console.log(`  ${ext.id} : ${source.nom} resert le visuel anglais — écartée`);
+        continue;
+      }
+
+      let poses = 0;
+      for(const carte of cartes){
+        const adresse = adresses.get(String(carte.localId));
+        if(!adresse) continue;
+        if(!carte.imageSecours) carte.imageSecours = carte.image;
+        carte.image = adresse;
+        carte.imageHaute = adresse;
+        poses++;
+      }
+      console.log(`  ${ext.id} : ${poses}/${cartes.length} visuels français depuis ${source.nom}`);
+      if(poses === cartes.length){
+        // Plus rien ne manque : le bandeau « visuels anglais » n'a plus lieu
+        // d'être, et les sources suivantes n'ont plus rien à apporter.
+        delete ext.visuelsAnglais;
+        break;
+      }
+    }
+  }
+}
+
 // ------------------------------- retrouver le Pokémon d'une carte Pocket --
 //
 // Le jeu de données de l'application ne porte pas le numéro de Pokédex, dont
@@ -456,6 +604,8 @@ async function principal(){
     }
   }
   console.log(`  ${rattachees} rattachées, ${orphelines} sans Pokémon (cartes de Dresseur comprises)`);
+
+  await recolterVisuelsFrancais(pocket);
 
   const visuelsLocaux = await recenserVisuelsLocaux();
   if(visuelsLocaux.size){

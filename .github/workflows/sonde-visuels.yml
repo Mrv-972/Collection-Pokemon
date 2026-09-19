@@ -1,0 +1,51 @@
+# Cherche où récupérer les visuels français qui manquent encore.
+#
+# Cette action ne modifie rien : elle interroge les sources listées dans
+# outils/sources-visuels.json et affiche un rapport. C'est volontaire — une
+# source n'est allumée qu'à la main, après lecture du rapport.
+#
+# Elle existe parce qu'un serveur d'action, contrairement au navigateur qui
+# affiche le site, peut aller lire n'importe quel site : c'est le seul endroit
+# d'où cette question peut être posée.
+name: Sonder les visuels français
+
+on:
+  workflow_dispatch:
+    inputs:
+      echantillon:
+        description: "Cartes testées par extension"
+        required: false
+        default: '3'
+      toutes:
+        description: "Sonder aussi les sources déjà allumées"
+        type: boolean
+        required: false
+        default: false
+
+# Aucune écriture : la sonde ne publie pas.
+permissions:
+  contents: read
+
+jobs:
+  sonder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Sonder
+        run: |
+          node outils/sonde-visuels.mjs \
+            --echantillon=${{ inputs.echantillon }} \
+            ${{ inputs.toutes && '--toutes' || '' }} \
+            | tee rapport-visuels.txt
+
+      - name: Garder le rapport
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-visuels
+          path: rapport-visuels.txt
