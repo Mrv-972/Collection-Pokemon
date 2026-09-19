@@ -58,6 +58,16 @@ async function corps(adresse){
   };
 }
 
+// Une image peut très bien différer de notre témoin tout en étant anglaise :
+// c'est le cas quand la source sert la MÊME illustration en petit format. Les
+// octets diffèrent, l'illustration non. Seule l'adresse le dit — et elle le
+// dit souvent : « B3_001_EN_SM.webp ».
+function marqueurDeLangue(adresse){
+  const m = String(adresse).match(/[_\-\/](en|en_US|english|ja|jp|zh|ko|de|es|it|pt|fr|fr_FR|french)[_\-\.\/]/i);
+  return m ? m[1].toLowerCase() : null;
+}
+const ESTFRANCAIS = l => l === null || l === 'fr' || l === 'fr_fr' || l === 'french';
+
 function remplacer(gabarit, { set, numero }){
   return gabarit
     .replaceAll('{SETDIST}', CODES_DISTANTS[set] ?? set)
@@ -127,6 +137,11 @@ async function sonderMotif(candidat, ext, anglais){
       lignes.push({ carte: carte.id, verdict: 'IDENTIQUE À L’ANGLAIS', detail: `${r.taille} o` });
       continue;
     }
+    const langue = marqueurDeLangue(adresse);
+    if(!ESTFRANCAIS(langue)){
+      lignes.push({ carte: carte.id, verdict: `adresse marquée « ${langue} »`, detail: adresse });
+      continue;
+    }
     lignes.push({
       carte: carte.id,
       verdict: temoin ? 'image distincte' : 'image (pas de témoin anglais)',
@@ -152,11 +167,17 @@ async function sonderPage(candidat, ext, anglais){
   for(const m of texte.matchAll(motif)) trouvees.set(String(Number(m[1])), m[0]);
 
   if(!trouvees.size){
-    return [{
-      carte: '—',
-      verdict: 'page lue, aucune image repérée',
-      detail: `${texte.length} caractères — le motif de recherche est à revoir`,
-    }];
+    // Plutôt que de conclure « rien », on montre ce que la page contient
+    // vraiment : c'est ce qui permet de corriger le motif de recherche au
+    // lieu de le deviner une deuxième fois.
+    const echantillon = [...new Set(
+      [...texte.matchAll(/https?:\/\/[^\s"'\\]+\.(?:webp|png|jpg|jpeg)/g)].map(m => m[0])
+    )].slice(0, 6);
+    return [
+      { carte: '—', verdict: 'page lue, aucune image repérée',
+        detail: `${texte.length} caractères — voici ce qu'elle contient :` },
+      ...echantillon.map(a => ({ carte: '  ex.', verdict: '', detail: a })),
+    ];
   }
 
   const lignes = [{ carte: '—', verdict: `${trouvees.size} images repérées sur la page`, detail: adressePage }];
@@ -166,11 +187,11 @@ async function sonderPage(candidat, ext, anglais){
     try{
       const r = await corps(adresse);
       const temoin = anglais.get(carte.id);
-      lignes.push({
-        carte: carte.id,
-        verdict: temoin && temoin.empreinte === r.empreinte ? 'IDENTIQUE À L’ANGLAIS' : 'image distincte',
-        detail: `${r.taille ?? '?'} o · ${adresse}`,
-      });
+      const langue = marqueurDeLangue(adresse);
+      const verdict = !ESTFRANCAIS(langue) ? `adresse marquée « ${langue} »`
+        : temoin && temoin.empreinte === r.empreinte ? 'IDENTIQUE À L’ANGLAIS'
+        : 'image distincte';
+      lignes.push({ carte: carte.id, verdict, detail: `${r.taille ?? '?'} o · ${adresse}` });
     }catch(err){
       lignes.push({ carte: carte.id, verdict: 'injoignable', detail: err.message });
     }

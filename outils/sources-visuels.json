@@ -16,20 +16,32 @@
     "  {SETMAJ}  la même, tout en majuscules              → A4B, P-B",
     "  {SETDIST} le nom qu'en donne la source d'origine   → PROMO-B",
     "  {NUM}     le numéro de la carte                    → 7",
-    "  {NUM3}    le même sur trois chiffres               → 007"
+    "  {NUM3}    le même sur trois chiffres               → 007",
+    "",
+    "Leçon du premier sondage : Limitless sert ses pages en français (?lang=fr)",
+    "mais les images qu'elles portent s'appellent « B3_001_EN_SM.webp ». Une",
+    "image peut donc différer de notre témoin — c'est un format réduit — tout en",
+    "restant anglaise. L'adresse le dit ; la sonde la lit désormais, et écarte",
+    "tout marqueur de langue qui n'est pas le français."
   ],
   "candidats": [
     {
-      "nom": "Limitless Pocket (suffixe de langue)",
+      "nom": "Limitless Pocket — nommage réel, sans suffixe de taille",
       "genre": "motif",
       "actif": false,
       "motif": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/{SETMAJ}/{SETMAJ}_{NUM3}_FR.webp"
     },
     {
-      "nom": "Limitless Pocket (dossier de langue)",
+      "nom": "Limitless Pocket — nommage réel, grand format",
       "genre": "motif",
       "actif": false,
-      "motif": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/fr/{SETMAJ}/{SETMAJ}_{NUM3}.webp"
+      "motif": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/{SETMAJ}/{SETMAJ}_{NUM3}_FR_LG.webp"
+    },
+    {
+      "nom": "Limitless Pocket — nommage réel, petit format",
+      "genre": "motif",
+      "actif": false,
+      "motif": "https://limitlesstcg.nyc3.cdn.digitaloceanspaces.com/pocket/{SETMAJ}/{SETMAJ}_{NUM3}_FR_SM.webp"
     },
     {
       "nom": "Pokémon Zone (visuels français)",
@@ -48,7 +60,7 @@
       "genre": "page",
       "actif": false,
       "page": "https://pocket.limitlesstcg.com/cards/{SET}?lang=fr",
-      "motifImage": "https://[^\"'\\s]+/{SETMAJ}_(\\d{3})[^\"'\\s]*\\.(?:webp|png|jpg)"
+      "motifImage": "https://[^\"'\\s]+/{SETMAJ}_(\\d{3})(?:_[A-Za-z]{2})?(?:_[A-Za-z]{2})?\\.(?:webp|png|jpg)"
     },
     {
       "nom": "Pokémon Zone — page française de l'extension",

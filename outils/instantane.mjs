@@ -405,6 +405,18 @@ function gabarit(texte, { set, numero }){
     .replaceAll('{NUM}', String(numero));
 }
 
+// Une adresse peut porter sa langue dans son nom — « B3_001_EN_SM.webp ».
+// Quand elle le fait et que ce n'est pas le français, inutile d'aller plus
+// loin : l'illustration sera la même qu'aujourd'hui, en plus petit.
+function marqueurDeLangue(adresse){
+  const m = String(adresse).match(/[_\-\/](en|en_US|english|ja|jp|zh|ko|de|es|it|pt|fr|fr_FR|french)[_\-\.\/]/i);
+  return m ? m[1].toLowerCase() : null;
+}
+const francaisPlausible = adresse => {
+  const l = marqueurDeLangue(adresse);
+  return l === null || l === 'fr' || l === 'fr_fr' || l === 'french';
+};
+
 async function empreinteDe(adresse){
   try{
     const r = await fetch(adresse, { redirect: 'follow', headers: IDENTITE });
@@ -451,6 +463,7 @@ async function adressesDepuisMotif(source, ext, cartes){
   const trouvees = new Map();
   await parPaquets(cartes, 12, async carte => {
     const adresse = gabarit(source.motif, { set: ext.id, numero: carte.localId });
+    if(!francaisPlausible(adresse)) return;
     if(await existe(adresse)) trouvees.set(String(carte.localId), adresse);
   });
   return trouvees;
@@ -463,7 +476,9 @@ async function adressesDepuisPage(source, ext){
     if(!r.ok) return trouvees;
     const texte = await r.text();
     const motif = new RegExp(gabarit(source.motifImage, { set: ext.id, numero: 1 }), 'g');
-    for(const m of texte.matchAll(motif)) trouvees.set(String(Number(m[1])), m[0]);
+    for(const m of texte.matchAll(motif)){
+      if(francaisPlausible(m[0])) trouvees.set(String(Number(m[1])), m[0]);
+    }
   }catch(err){ /* source muette : on passera à la suivante */ }
   return trouvees;
 }
