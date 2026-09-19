@@ -325,8 +325,7 @@ async function chargerInfosCartes(idsCartes){
   }));
 
   try{
-    const cached = sessionStorage.getItem('pokeclasseur_sets_tcgdex');
-    const sets = cached ? JSON.parse(cached) : await fetchJson('https://api.tcgdex.net/v2/fr/sets');
+    const sets = await chargerExtensions();
     sets.forEach(s => { nomsExtensions[s.id] = s.name; });
   }catch(err){
     console.warn('Impossible de charger le nom des extensions', err);

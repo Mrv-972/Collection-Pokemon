@@ -266,11 +266,9 @@ function renderHead(cardCount){
 // nom de leur extension. Il se déduit de l'identifiant de la carte, croisé
 // avec le catalogue des extensions.
 async function loadSetNames(){
-  const cacheKey = 'pokeclasseur_sets_tcgdex';
   let sets;
   try{
-    const cached = sessionStorage.getItem(cacheKey);
-    sets = cached ? JSON.parse(cached) : await fetchJson('https://api.tcgdex.net/v2/fr/sets');
+    sets = await chargerExtensions();
   }catch(err){
     console.warn('Impossible de charger le nom des extensions', err);
     return;

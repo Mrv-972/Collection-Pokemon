@@ -178,27 +178,20 @@ rendreTete();
 async function loadSets(){
   const content = document.getElementById('content');
 
-  // Affichage instantané depuis le cache local si on l'a déjà chargé une fois,
-  // pendant qu'on vérifie en arrière-plan s'il y a du nouveau.
-  const cached = sessionStorage.getItem('pokeclasseur_sets_tcgdex');
-  if(cached){
-    allSets = JSON.parse(cached);
-    renderSets(allSets);
-  }
-
   try{
-    const sets = await fetchJson('https://api.tcgdex.net/v2/fr/sets');
+    const sets = await chargerExtensions();
     // Chaque univers son catalogue : les extensions de l'application mobile
-    // et celles du jeu de cartes physique ne se mélangent pas.
-    const physicalOnly = sets.filter(s => appartientAUnivers(s.id));
+    // et celles du jeu de cartes physique ne se mélangent pas. Le filtre se
+    // fait ici, jamais dans le cache : celui-ci porte le catalogue entier,
+    // que trois autres pages relisent pour y trouver un nom d'extension.
+    const duCote = sets.filter(s => appartientAUnivers(s.id));
     // L'API renvoie les extensions de la plus ancienne à la plus récente ;
     // on inverse pour afficher les plus récentes en premier.
-    allSets = physicalOnly.reverse();
-    sessionStorage.setItem('pokeclasseur_sets_tcgdex', JSON.stringify(allSets));
+    allSets = duCote.slice().reverse();
     renderSets(allSets);
   }catch(err){
     console.warn('Impossible de charger les extensions', err);
-    if(!cached) content.innerHTML = `<p class="status-msg err">Impossible de charger le catalogue pour le moment.<br><span style="font-size:12px;opacity:.7">${err.message}</span><br><br><button onclick="loadSets()" class="filter-btn" style="margin-top:8px">Réessayer</button></p>`;
+    content.innerHTML = `<p class="status-msg err">Impossible de charger le catalogue pour le moment.<br><span style="font-size:12px;opacity:.7">${err.message}</span><br><br><button onclick="loadSets()" class="filter-btn" style="margin-top:8px">Réessayer</button></p>`;
   }
 }
 

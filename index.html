@@ -251,7 +251,7 @@ let derniereExtension = null;
 async function chargerVedettes(){
   const grille = document.getElementById('ext-vedette');
   try{
-    const sets = await fetchSets();
+    const sets = await chargerExtensions();
     const miennes = sets.filter(s => appartientAUnivers(s.id));
     derniereExtension = miennes.length ? miennes[miennes.length - 1].id : null;
     grille.innerHTML = miennes.slice(-4).reverse().map(s => `
@@ -265,14 +265,6 @@ async function chargerVedettes(){
     console.warn('Extensions indisponibles', err);
     grille.innerHTML = `<a class="ext-card" href="series.html"><h3>Voir toutes les extensions</h3></a>`;
   }
-}
-
-async function fetchSets(){
-  const cache = sessionStorage.getItem('pokeclasseur_sets_tcgdex');
-  if(cache) return JSON.parse(cache);
-  const sets = await (await fetch('https://api.tcgdex.net/v2/fr/sets')).json();
-  try{ sessionStorage.setItem('pokeclasseur_sets_tcgdex', JSON.stringify(sets)); }catch(err){}
-  return sets;
 }
 
 // Charge de vraies cartes depuis l'API publique et gratuite TCGdex (images

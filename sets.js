@@ -34,9 +34,28 @@ function lettreSeriePocket(id){
   return m ? m[1] : null;
 }
 
+// Une vingtaine d'extensions physiques ne commencent par aucun des préfixes
+// d'époque et atterrissaient toutes dans « Autres » : les deux séries Gym,
+// les neuf POP Series, les promotions, et jusqu'à l'extension du 30e
+// anniversaire. Les voici rangées.
+const SERIES_PARTICULIERES = {
+  gym1: 'Gym', gym2: 'Gym',
+  lc: 'Legendary Collection',
+  rc: 'Noir & Blanc',                 // la Radiant Collection accompagnait Trésors Légendaires
+  '30th': '30ᵉ Anniversaire', '30th-c': '30ᵉ Anniversaire',
+  // Promotions, distributions et hors-format : des extensions bien réelles,
+  // mais qui n'appartiennent à aucune époque du jeu.
+  np: 'Promos et hors-série', wp: 'Promos et hors-série', miscp: 'Promos et hors-série',
+  jumbo: 'Promos et hors-série', si1: 'Promos et hors-série', sp: 'Promos et hors-série',
+  bog: 'Promos et hors-série', ru1: 'Promos et hors-série',
+  fut2020: 'Promos et hors-série', mfb: 'Promos et hors-série',
+};
+
 function guessSeriesName(id){
   const lettre = lettreSeriePocket(id);
   if(lettre) return `Série ${lettre}`;
+  if(SERIES_PARTICULIERES[id]) return SERIES_PARTICULIERES[id];
+  if(/^pop\d/.test(id)) return 'POP Series';
   if(id === 'dv1') return ERA_NAMES.bw;
   if(id === 'col1') return ERA_NAMES.hgss;
   if(id === 'g1' || id === 'dc1') return ERA_NAMES.xy;
@@ -52,4 +71,59 @@ function guessSeriesName(id){
 // moitié du site.
 function isPocketSet(setId){
   return lettreSeriePocket(setId) !== null;
+}
+
+// ==========================================================================
+// Chargement du catalogue
+// ==========================================================================
+
+// Le jeu de données français de TCGdex est incomplet : vingt et une
+// extensions physiques n'existent que dans sa version anglaise — Gym Heroes,
+// Legendary Collection, Team Rocket Returns, Arceus... Les faire disparaître
+// du classeur parce que personne ne les a encore traduites serait absurde :
+// on complète donc le français par l'anglais, et un nom anglais vaut mieux
+// qu'une extension absente.
+//
+// (Pour Pokémon TCG Pocket, les deux versions contiennent exactement les
+// mêmes quinze extensions : ce qui manque là-bas manque des deux côtés, et
+// apparaîtra tout seul quand TCGdex l'aura ajouté.)
+
+const CACHE_EXTENSIONS = 'pokeclasseur_sets_tcgdex';
+
+async function lireExtensions(langue){
+  const r = await fetch(`https://api.tcgdex.net/v2/${langue}/sets`);
+  if(!r.ok) throw new Error(`Réponse ${r.status} de TCGdex (${langue})`);
+  return r.json();
+}
+
+// Renvoie toujours le catalogue entier, les deux univers mêlés : c'est à
+// l'appelant de filtrer. La mise en cache portait auparavant une liste déjà
+// filtrée, que les autres pages relisaient en croyant l'avoir toute.
+async function chargerExtensions(){
+  try{
+    const cache = sessionStorage.getItem(CACHE_EXTENSIONS);
+    if(cache) return JSON.parse(cache);
+  }catch(err){}
+
+  const [fr, en] = await Promise.all([
+    lireExtensions('fr').catch(() => []),
+    lireExtensions('en').catch(() => []),
+  ]);
+  if(fr.length === 0 && en.length === 0){
+    throw new Error("Le catalogue des extensions est injoignable.");
+  }
+
+  const parId = new Map();
+  en.forEach(s => parId.set(s.id, { ...s, nomAnglais: true }));
+  fr.forEach(s => parId.set(s.id, s));   // le français l'emporte quand il existe
+
+  // L'anglais sert d'ossature : plus complet, et rangé dans le même ordre
+  // chronologique. Les quelques extensions propres au français viennent
+  // ensuite.
+  const connus = new Set(en.map(s => s.id));
+  const fusion = en.map(s => parId.get(s.id))
+    .concat(fr.filter(s => !connus.has(s.id)));
+
+  try{ sessionStorage.setItem(CACHE_EXTENSIONS, JSON.stringify(fusion)); }catch(err){}
+  return fusion;
 }
