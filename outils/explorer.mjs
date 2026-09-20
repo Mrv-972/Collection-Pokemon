@@ -114,6 +114,18 @@ async function suivreLesScripts(adressePage, texte){
       trouvees.slice(0, 20).forEach(a => console.log('     ' + a));
       total += trouvees.length;
     }
+
+    // Une adresse seule ne dit pas comment elle est complétée : c'est le code
+    // autour qui porte le dossier, le nom de fichier, la langue. Avec
+    // --contexte, on lit ce voisinage.
+    if(args.contexte){
+      const cible = new RegExp(String(args.contexte), 'g');
+      for(const m of code.matchAll(cible)){
+        const debut = Math.max(0, m.index - 400);
+        console.log(`\n     ┌─ voisinage de « ${m[0]} » dans ${src.split('/').pop().split('?')[0]}`);
+        console.log('     │ ' + code.slice(debut, m.index + 500).replace(/\n/g, ' ').replace(/(.{110})/g, '$1\n     │ '));
+      }
+    }
   }
   if(!total) console.log('  — aucune adresse ne correspond au filtre —');
 }

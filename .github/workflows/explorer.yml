@@ -16,6 +16,10 @@ on:
         type: boolean
         required: false
         default: true
+      contexte:
+        description: "Afficher le code autour de ce motif"
+        required: false
+        default: ''
       filtre:
         description: "Ne garder que les adresses correspondant à ceci"
         required: false
@@ -36,4 +40,5 @@ jobs:
           node outils/explorer.mjs \
             --url="${{ inputs.url }}" \
             --filtre="${{ inputs.filtre }}" \
+            ${{ inputs.contexte && format('--contexte={0}', inputs.contexte) || '' }} \
             ${{ inputs.suivre && '--suivre' || '' }}
