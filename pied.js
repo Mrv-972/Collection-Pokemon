@@ -146,7 +146,7 @@ if(document.readyState === 'loading'){
 // petite bulle, elle, se pose dans le coin en bas à droite et reste visible.
 //
 // Trois règles de politesse, parce qu'une bulle qui insiste fait fuir :
-//   — elle attend quelques secondes avant d'apparaître, le temps qu'on lise ;
+//   — elle attend cinq secondes avant d'apparaître, le temps qu'on lise ;
 //   — la croix la referme, et on ne la revoit pas avant un mois ;
 //   — qui a cliqué sur le lien de dons ne la revoit pas avant trois mois.
 //
@@ -154,7 +154,7 @@ if(document.readyState === 'loading'){
 // gauche, et la vue zoom (z-index 70) passe par-dessus la bulle (55).
 const BULLE = {
   actif: true,
-  delaiAvantAffichage: 8000,
+  delaiAvantAffichage: 5000,
   silenceApresFermeture: 30,   // en jours
   silenceApresClic: 90,        // en jours
   titre: 'Un coup de pouce ?',
