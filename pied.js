@@ -139,3 +139,122 @@ if(document.readyState === 'loading'){
 }else{
   poserPied();
 }
+
+// ------------------------------------------------- Bulle de soutien -----
+//
+// Le bouton du pied de page ne se voit que si on descend jusqu'en bas. Cette
+// petite bulle, elle, se pose dans le coin en bas à droite et reste visible.
+//
+// Trois règles de politesse, parce qu'une bulle qui insiste fait fuir :
+//   — elle attend quelques secondes avant d'apparaître, le temps qu'on lise ;
+//   — la croix la referme, et on ne la revoit pas avant un mois ;
+//   — qui a cliqué sur le lien de dons ne la revoit pas avant trois mois.
+//
+// Le coin bas-droite est choisi exprès : le bandeau des univers occupe la
+// gauche, et la vue zoom (z-index 70) passe par-dessus la bulle (55).
+const BULLE = {
+  actif: true,
+  delaiAvantAffichage: 8000,
+  silenceApresFermeture: 30,   // en jours
+  silenceApresClic: 90,        // en jours
+  titre: 'Un coup de pouce ?',
+  pagesExclues: ['admin.html'], // inutile de se solliciter soi-même
+};
+
+const CLE_BULLE = 'pokeclasseur-bulle-soutien';
+
+// localStorage n'est pas toujours accessible (navigation privée stricte,
+// cookies bloqués). Une bulle qui plante la page serait pire que pas de bulle.
+function lireSilence(){
+  try{ return Number(localStorage.getItem(CLE_BULLE)) || 0; }
+  catch{ return 0; }
+}
+function poserSilence(jours){
+  try{ localStorage.setItem(CLE_BULLE, String(Date.now() + jours * 86400000)); }
+  catch{ /* tant pis, la bulle reviendra */ }
+}
+
+const STYLE_BULLE = `
+  .bulle-soutien{position:fixed;right:20px;bottom:20px;z-index:55;width:292px;
+                 max-width:calc(100vw - 40px);padding:16px 17px 17px;
+                 border-radius:14px;background:#15171A;
+                 border:1px solid rgba(227,199,102,0.28);
+                 box-shadow:0 18px 44px rgba(0,0,0,0.55);
+                 font-family:'IBM Plex Sans',sans-serif;
+                 opacity:0;transform:translateY(14px);
+                 transition:opacity .28s ease,transform .28s ease;}
+  .bulle-soutien.visible{opacity:1;transform:translateY(0)}
+  .bulle-soutien h3{margin:0 0 6px;font-size:14px;font-weight:600;
+                    color:var(--text-on-ink,#EDEAE0);padding-right:20px;}
+  .bulle-soutien p{margin:0 0 13px;font-size:12.5px;line-height:1.5;
+                   color:var(--text-on-ink-dim,#9B9E9C);}
+  .bulle-soutien .lien{display:inline-flex;align-items:center;gap:8px;
+                       padding:9px 16px;border-radius:999px;text-decoration:none;
+                       font-size:13px;font-weight:600;color:var(--ink,#0A0B0D);
+                       background:var(--gold,#E3C766);transition:filter .12s;}
+  .bulle-soutien .lien:hover{filter:brightness(1.1)}
+  .bulle-soutien .lien svg{width:15px;height:15px}
+  .bulle-soutien .fermer{position:absolute;top:8px;right:8px;width:26px;height:26px;
+                         display:flex;align-items:center;justify-content:center;
+                         border:0;border-radius:7px;background:transparent;
+                         color:var(--text-on-ink-dim,#9B9E9C);font-size:17px;
+                         line-height:1;cursor:pointer;transition:background .12s,color .12s;}
+  .bulle-soutien .fermer:hover{background:rgba(237,234,224,0.09);
+                               color:var(--text-on-ink,#EDEAE0);}
+  @media(max-width:640px){
+    .bulle-soutien{right:12px;left:12px;bottom:12px;width:auto;max-width:none}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .bulle-soutien{transition:none}
+  }
+`;
+
+function pageCourante(){
+  const bout = location.pathname.split('/').pop();
+  return bout || 'index.html';
+}
+
+function poserBulleSoutien(){
+  if(!BULLE.actif || !SOUTIEN.adresse) return;
+  if(BULLE.pagesExclues.includes(pageCourante())) return;
+  if(Date.now() < lireSilence()) return;
+  if(document.querySelector('.bulle-soutien')) return;
+
+  document.head.appendChild(Object.assign(document.createElement('style'),
+    { textContent: STYLE_BULLE }));
+
+  const coeur = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9A5.4 5.4 0 0 1 12 6.5 5.4 5.4 0 0 1 21.6 12c-2.1 4.4-9.6 9-9.6 9z"/></svg>';
+  const bulle = document.createElement('aside');
+  bulle.className = 'bulle-soutien';
+  bulle.setAttribute('role', 'complementary');
+  bulle.setAttribute('aria-label', 'Soutenir PokéClasseur');
+  bulle.innerHTML = `
+    <button class="fermer" type="button" aria-label="Fermer">&times;</button>
+    <h3>${BULLE.titre}</h3>
+    <p>${SOUTIEN.phrase}</p>
+    <a class="lien" href="${SOUTIEN.adresse}" target="_blank" rel="noopener noreferrer">
+      ${coeur}${SOUTIEN.libelle}
+    </a>`;
+
+  bulle.querySelector('.fermer').addEventListener('click', () => {
+    poserSilence(BULLE.silenceApresFermeture);
+    bulle.classList.remove('visible');
+    setTimeout(() => bulle.remove(), 300);
+  });
+  // Qui a cliqué a fait son geste : on le laisse tranquille bien plus longtemps.
+  bulle.querySelector('.lien').addEventListener('click', () => {
+    poserSilence(BULLE.silenceApresClic);
+  });
+
+  document.body.appendChild(bulle);
+  setTimeout(() => {
+    // requestAnimationFrame pour que la transition parte bien de l'état initial.
+    requestAnimationFrame(() => bulle.classList.add('visible'));
+  }, BULLE.delaiAvantAffichage);
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', poserBulleSoutien);
+}else{
+  poserBulleSoutien();
+}
