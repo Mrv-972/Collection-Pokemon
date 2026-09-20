@@ -599,16 +599,31 @@ async function recolterLogosFrancais(pocket){
     const fichier = `${DOSSIER_LOGOS}/${ext.id}.png`;
     if(existsSync(fichier)){ ext.logo = fichier; deja++; continue; }
 
-    const adresse = `${LOGOS_WIKI}/LOGO_${NOM_DISTANT_LOGO[ext.id] ?? ext.id}_fr.png`;
-    try{
-      const r = await fetch(adresse, { redirect: 'follow', headers: IDENTITE });
-      // Un stockage public répond volontiers 200 avec un message d'erreur en
-      // guise de fichier : on exige une vraie image.
-      if(!r.ok || !/image\//.test(r.headers.get('content-type') ?? '')){ sansSuite++; continue; }
-      await writeFile(fichier, Buffer.from(await r.arrayBuffer()));
-      ext.logo = fichier;
-      pris++;
-    }catch(err){ sansSuite++; }
+    // On essaie le wiki, puis, s'il n'a pas cette extension, le logo qu'on
+    // servait déjà. Le second cas n'est pas un pis-aller : P-B a un logo
+    // français chez flibustier que le wiki n'a pas, et le rapatrier vaut
+    // mieux que de le remplacer par un logo générique ou de le laisser
+    // pendre à un serveur extérieur.
+    const candidates = [
+      `${LOGOS_WIKI}/LOGO_${NOM_DISTANT_LOGO[ext.id] ?? ext.id}_fr.png`,
+      /^https?:/.test(String(ext.logo)) ? ext.logo : null,
+    ].filter(Boolean);
+
+    let obtenu = false;
+    for(const adresse of candidates){
+      try{
+        const r = await fetch(adresse, { redirect: 'follow', headers: IDENTITE });
+        // Un stockage public répond volontiers 200 avec un message d'erreur
+        // en guise de fichier : on exige une vraie image.
+        if(!r.ok || !/image\//.test(r.headers.get('content-type') ?? '')) continue;
+        await writeFile(fichier, Buffer.from(await r.arrayBuffer()));
+        ext.logo = fichier;
+        pris++;
+        obtenu = true;
+        break;
+      }catch(err){ /* source suivante */ }
+    }
+    if(!obtenu) sansSuite++;
   }
 
   console.log(`Logos d'extension : ${pris} récoltés, ${deja} déjà là, ${sansSuite} restés à leur source d'origine`);
