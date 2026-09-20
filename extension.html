@@ -215,16 +215,17 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="sets.js?v=2026-09-20-bwv3"></script>
-<script src="univers.js?v=2026-09-20-bwv3"></script>
-<script src="catalogue.js?v=2026-09-20-bwv3"></script>
-<script src="supabase-config.js?v=2026-09-20-bwv3"></script>
-<script src="pied.js?v=2026-09-20-bwv3"></script>
-<script src="admin.js?v=2026-09-20-bwv3"></script>
-<script src="tags.js?v=2026-09-20-bwv3"></script>
-<script src="cards.js?v=2026-09-20-bwv3"></script>
-<script src="prix.js?v=2026-09-20-bwv3"></script>
-<script src="compte.js?v=2026-09-20-bwv3"></script>
+<script src="sets.js?v=2026-09-20-25et"></script>
+<script src="univers.js?v=2026-09-20-25et"></script>
+<script src="catalogue.js?v=2026-09-20-25et"></script>
+<script src="supabase-config.js?v=2026-09-20-25et"></script>
+<script src="pied.js?v=2026-09-20-25et"></script>
+<script src="admin.js?v=2026-09-20-25et"></script>
+<script src="progression.js?v=2026-09-20-25et"></script>
+<script src="tags.js?v=2026-09-20-25et"></script>
+<script src="cards.js?v=2026-09-20-25et"></script>
+<script src="prix.js?v=2026-09-20-25et"></script>
+<script src="compte.js?v=2026-09-20-25et"></script>
 <script>
 // Récupère les cartes d'une extension depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
@@ -345,6 +346,7 @@ function renderHead(set){
     <div>
       <h1>${set.name}</h1>
       <div class="meta">${[serie, year, total + ' cartes'].filter(Boolean).join(' · ')}</div>
+      <div id="progression-extension"></div>
       ${reserves.length ? `<div class="meta avertissement" title="Cela se corrigera tout seul quand la source publiera sa version française.">${reserves.join(' · ')} — la source n'a pas encore de version française.</div>` : ''}
     </div>
   `;
@@ -394,9 +396,19 @@ function filteredCards(){
   return filtered;
 }
 
+// La barre de l'en-tête compte toute l'extension, jamais le sous-ensemble
+// affiché : filtrer sur « Manquantes » ne doit pas faire tomber la
+// progression à zéro.
+function majProgression(){
+  const boite = document.getElementById('progression-extension');
+  if(!boite || allCards.length === 0) return;
+  boite.innerHTML = barreProgression(progressionDesCartes(allCards), { large: true });
+}
+
 function applyFilters(){
   const filtered = trierCartes(filteredCards());
   renderCards(filtered);
+  majProgression();
   const count = filtered.length;
   document.getElementById('bulk-count').textContent =
     count === allCards.length ? `les ${count} cartes` : `les ${count} cartes affichées`;
