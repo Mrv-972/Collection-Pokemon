@@ -55,13 +55,28 @@ async function recenserVisuelsLocaux(){
   }catch(err){
     return parCarte;   // le dossier n'existe pas encore : rien à recenser
   }
-  for(const fichier of fichiers){
+  // Une même carte peut avoir deux fichiers — un .webp récolté et un .png
+  // téléversé depuis l'administration. Sans règle, celui qui l'emporte
+  // dépendrait de l'ordre dans lequel le système rend les fichiers, qui n'est
+  // pas garanti. On tranche par l'ordre d'EXTENSIONS_IMAGE, qui est écrit.
+  const rang = fichier => EXTENSIONS_IMAGE.indexOf(fichier.slice(fichier.lastIndexOf('.')).toLowerCase());
+  for(const fichier of fichiers.slice().sort()){
     const point = fichier.lastIndexOf('.');
     if(point < 0) continue;
-    if(!EXTENSIONS_IMAGE.includes(fichier.slice(point).toLowerCase())) continue;
-    parCarte.set(fichier.slice(0, point), `${DOSSIER_VISUELS}/${fichier}`);
+    if(rang(fichier) < 0) continue;
+    const nom = fichier.slice(0, point);
+    const deja = parCarte.get(nom);
+    if(deja && rang(deja.split('/').pop()) <= rang(fichier)) continue;
+    parCarte.set(nom, `${DOSSIER_VISUELS}/${fichier}`);
   }
   return parCarte;
+}
+
+// « Cette carte a-t-elle déjà un visuel chez nous ? », quelle que soit
+// l'extension du fichier. Demander « existe-t-il un .webp ? » laisserait
+// retélécharger une carte dont on a déjà le .png.
+function aDejaUnVisuel(id){
+  return EXTENSIONS_IMAGE.some(ext => existsSync(`${DOSSIER_VISUELS}/${id}${ext}`));
 }
 
 // Le zoom réclame une définition supérieure, rangée sous « <carte>-hd ». La
@@ -547,7 +562,7 @@ async function recolterVisuelsFrancais(pocket){
     // nous, oui ou non. Les extensions déjà complètes sont écartées
     // immédiatement, sans une seule requête.
     const toutes = pocket.cartesParSet.get(ext.id) ?? [];
-    const cartes = toutes.filter(c => !existsSync(`${DOSSIER_VISUELS}/${c.id}.webp`));
+    const cartes = toutes.filter(c => !aDejaUnVisuel(c.id));
     if(!cartes.length) continue;
 
     for(const source of sources){
@@ -572,7 +587,7 @@ async function recolterVisuelsFrancais(pocket){
         const adresse = adresses.get(String(carte.localId));
         if(!adresse){ manques++; return; }
         const fichier = `${DOSSIER_VISUELS}/${carte.id}.webp`;
-        if(existsSync(fichier)){ deja++; return; }
+        if(aDejaUnVisuel(carte.id)){ deja++; return; }
         try{
           const r = await fetch(adresse, { redirect: 'follow', headers: IDENTITE });
           if(!r.ok){ manques++; return; }
@@ -585,6 +600,135 @@ async function recolterVisuelsFrancais(pocket){
       if(!manques) break;   // rien ne manque plus : sources suivantes inutiles
     }
   }
+}
+
+// --------------------- absorber les corrections de l'administration ------
+//
+// L'espace d'administration enregistre ses corrections dans Supabase, d'où
+// le site les lit aussitôt : l'effet est immédiat. Mais Supabase n'est qu'une
+// zone de dépôt — laisser les corrections y vivre pour toujours rendrait le
+// site dépendant d'un service extérieur, ce qu'on a passé la journée à
+// défaire pour 3863 cartes.
+//
+// La construction les inscrit donc dans les fichiers du dépôt. Une fois
+// absorbée, la correction s'applique sur une donnée déjà identique : elle ne
+// change plus rien, et l'espace d'administration propose de la supprimer.
+//
+// On ne la supprime PAS ici. Effacer depuis la construction demanderait une
+// clé d'écriture, donc un secret dans le dépôt ; et surtout, une correction
+// effacée trop tôt — parce que la construction a échoué après l'avoir lue —
+// disparaîtrait de l'écran sans prévenir. C'est à toi de retirer ce que la
+// page indique comme absorbé.
+
+async function coordonneesSupabase(){
+  const config = await readFile('supabase-config.js', 'utf8');
+  const url = config.match(/SUPABASE_URL\s*=\s*'([^']+)'/)?.[1];
+  const cle = config.match(/SUPABASE_ANON_KEY\s*=\s*'([^']+)'/)?.[1];
+  return url && cle && !url.includes('REMPLACER') ? { url, cle } : null;
+}
+
+async function lireCorrections(){
+  const coord = await coordonneesSupabase();
+  if(!coord) return [];
+  const r = await fetch(
+    `${coord.url}/rest/v1/corrections?select=univers,genre,cible,donnees,image_chemin`,
+    { headers: { apikey: coord.cle, Authorization: `Bearer ${coord.cle}` } }
+  );
+  if(!r.ok) throw new Error(`corrections → HTTP ${r.status}`);
+  return { lignes: await r.json(), base: coord.url };
+}
+
+async function absorberCorrections(lots){
+  let paquet;
+  try{
+    paquet = await lireCorrections();
+  }catch(err){
+    // Une correction non absorbée reste affichée par le site, qui la lit
+    // directement. Rien n'est perdu : on réessaiera demain.
+    console.log(`Corrections : lecture impossible (${err.message}) — on réessaiera`);
+    return;
+  }
+  const lignes = paquet.lignes ?? [];
+  if(!lignes.length){ console.log('Corrections : aucune en attente'); return; }
+
+  await mkdir(DOSSIER_VISUELS, { recursive: true });
+  let visuels = 0, champs = 0, ignorees = 0;
+
+  for(const c of lignes){
+    const lot = lots[c.univers];
+    if(!lot){ ignorees++; continue; }
+
+    // Le visuel d'abord : il vaut pour les trois genres de correction, une
+    // carte ajoutée pouvant arriver avec le sien.
+    if(c.image_chemin && c.genre !== 'extension'){
+      const extension = path.extname(c.image_chemin).toLowerCase();
+      const fichier = `${DOSSIER_VISUELS}/${c.cible}${EXTENSIONS_IMAGE.includes(extension) ? extension : '.webp'}`;
+      if(!existsSync(fichier)){
+        try{
+          const r = await fetch(`${paquet.base}/storage/v1/object/public/corrections/${c.image_chemin}`);
+          if(r.ok){
+            await writeFile(fichier, Buffer.from(await r.arrayBuffer()));
+            visuels++;
+          }
+        }catch(err){ /* on réessaiera */ }
+      }
+    }
+
+    if(c.genre === 'extension'){
+      const ext = lot.extensions.find(e => e.id === c.cible);
+      if(ext){
+        for(const champ of ['name', 'serieNom', 'dateSortie']){
+          if(c.donnees?.[champ]){ ext[champ] = c.donnees[champ]; champs++; }
+        }
+      }else if(c.donnees?.name){
+        lot.extensions.push({
+          id: c.cible,
+          name: c.donnees.name,
+          cardCount: { official: c.donnees.cardCount ?? null },
+          logo: null,
+          symbol: null,
+          serieNom: c.donnees.serieNom ?? 'Autres',
+          dateSortie: c.donnees.dateSortie ?? null,
+          saisieManuelle: true,
+        });
+        lot.cartesParSet.set(c.cible, lot.cartesParSet.get(c.cible) ?? []);
+        champs++;
+      }
+      continue;
+    }
+
+    const setId = c.cible.replace(/-\d+$/, '');
+    const cartes = lot.cartesParSet.get(setId);
+    if(!cartes){ ignorees++; continue; }
+
+    let carte = cartes.find(x => x.id === c.cible);
+    if(!carte && c.genre === 'carte' && c.donnees?.ajout && c.donnees?.name){
+      carte = {
+        id: c.cible,
+        localId: String(c.donnees.localId ?? Number(c.cible.split('-').pop())),
+        name: c.donnees.name,
+        rarity: c.donnees.rarity ?? null,
+        dexId: c.donnees.dexId ?? null,
+        image: null, imageHaute: null, imageSecours: null,
+      };
+      cartes.push(carte);
+      cartes.sort((a, b) => Number(a.localId) - Number(b.localId));
+      champs++;
+    }
+    if(!carte){ ignorees++; continue; }
+
+    if(c.genre === 'carte'){
+      for(const champ of ['name', 'rarity', 'dexId']){
+        if(c.donnees?.[champ] !== undefined && c.donnees[champ] !== null){
+          carte[champ] = c.donnees[champ];
+          champs++;
+        }
+      }
+    }
+  }
+
+  console.log(`Corrections : ${lignes.length} lue(s) — ${visuels} visuel(s) copié(s), ${champs} champ(s) appliqué(s), ${ignorees} sans cible`);
+  console.log('  Elles restent dans Supabase : leur suppression se fait depuis admin.html, une fois marquées « absorbée ».');
 }
 
 // ------------------------- les extensions saisies à la main --------------
@@ -780,7 +924,7 @@ async function copierLeResteDuCatalogue(pocket){
   const aFaire = [];
   for(const cartes of pocket.cartesParSet.values()){
     for(const carte of cartes){
-      if(/^https?:/.test(carte.image ?? '') && !existsSync(`${DOSSIER_VISUELS}/${carte.id}.webp`)){
+      if(/^https?:/.test(carte.image ?? '') && !aDejaUnVisuel(carte.id)){
         aFaire.push({ adresse: carte.image, fichier: `${DOSSIER_VISUELS}/${carte.id}.webp` });
       }
       if(/^https?:/.test(carte.imageHaute ?? '') && carte.imageHaute !== carte.image
@@ -896,6 +1040,8 @@ async function principal(){
     }
   }
   console.log(`  ${rattachees} rattachées, ${orphelines} sans Pokémon (cartes de Dresseur comprises)`);
+
+  await absorberCorrections({ pocket, physique });
 
   await recolterVisuelsFrancais(pocket);
 

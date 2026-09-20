@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration — PokéClasseur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B; --ink-soft:#20232A; --teal:#1F6F63; --teal-deep:#123F38;
+    --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair); --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a:hover{color:var(--text-on-ink)}
+
+  .panel{max-width:440px;margin:56px auto 80px;}
+  .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
+  .panel h1{font-size:32px;margin-bottom:10px;}
+  .panel p.intro{color:var(--text-on-ink-dim);font-size:15px;margin:0 0 28px;}
+
+  .tabs{display:flex;gap:8px;margin-bottom:24px;}
+  .tab{flex:1;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .tab.on{color:var(--text-on-ink);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
+
+  label{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:16px 0 6px;}
+  input{width:100%;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  input:focus{outline:none;border-color:rgba(var(--gold-rgb),0.5)}
+  .aide{font-size:12px;color:var(--text-on-ink-dim);margin-top:6px;}
+
+  button.principal{width:100%;margin-top:26px;background:var(--teal);border:none;color:#EDF5F3;padding:12px;border-radius:3px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}
+  button.principal:hover{background:var(--teal-deep)}
+  button.principal:disabled{opacity:.5;cursor:default}
+  button.discret{margin-top:14px;width:100%;background:transparent;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);padding:10px;border-radius:3px;font-size:13px;cursor:pointer;font-family:inherit;}
+  button.discret:hover{border-color:rgba(237,234,224,0.3)}
+
+  .message{margin-top:20px;font-size:13.5px;padding:12px 14px;border-radius:4px;}
+  .message.err{color:#E08862;background:rgba(168,67,28,0.1);border:1px solid rgba(168,67,28,0.35)}
+  .message.ok{color:#5FBAAA;background:rgba(31,111,99,0.12);border:1px solid rgba(31,111,99,0.35)}
+
+  .compte-actuel{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:22px;}
+  .compte-actuel .pseudo{font-family:'Newsreader',serif;font-size:24px;}
+  .compte-actuel .detail{color:var(--text-on-ink-dim);font-size:13.5px;margin-top:4px;}
+  .bloques{margin-top:30px;border-top:1px solid rgba(237,234,224,0.08);padding-top:22px;}
+  .bloques h2{font-size:19px;margin-bottom:4px;}
+  .bloques p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
+  .bloque{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid rgba(237,234,224,0.06);font-size:14px;}
+  .bloque button{background:transparent;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);padding:5px 12px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit;}
+  .bloque button:hover{border-color:rgba(237,234,224,0.35);color:var(--text-on-ink)}
+
+  .zone{margin-top:30px;border-top:1px solid rgba(237,234,224,0.08);padding-top:22px;}
+  .zone h2{font-size:19px;margin-bottom:4px;}
+  .zone > p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
+  .zone-actuelle{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:12px 14px;font-size:14px;}
+  .zone-actuelle.vide{color:var(--text-on-ink-dim);font-size:13.5px;}
+  .recherche{display:flex;gap:8px;align-items:stretch;}
+  .recherche input{flex:1}
+  .recherche button{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:0 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .recherche button:hover{border-color:rgba(var(--gold-rgb),0.5)}
+  .recherche button:disabled{opacity:.5;cursor:default}
+  .communes{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;}
+  .commune{text-align:left;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:9px 12px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .commune:hover{border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.06)}
+  .commune small{display:block;color:var(--text-on-ink-dim);font-size:11.5px;margin-top:1px;}
+  .zone-msg{font-size:12.5px;margin-top:10px;}
+  .zone-msg.err{color:#E08862}
+  .zone-msg.ok{color:#5FBAAA}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+
+  /* ========================= Téléphone =========================
+     Les liens de navigation passaient en display:none sous 720 px : depuis
+     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
+     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
+     visibles, et assez hauts pour être touchés sans viser. La règle de
+     débordement horizontal n'est là que pour les très petits écrans, où
+     quatre libellés ne tiennent plus côte à côte.
+
+     Le reste resserre des marges verticales taillées pour un grand écran,
+     et porte les commandes à une hauteur tactile confortable — en bas de
+     42 px, un doigt touche la voisine une fois sur trois. */
+  @media(max-width:720px){
+    nav{flex-wrap:wrap;padding:18px 0 0;}
+    .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
+              justify-content:space-between;overflow-x:auto;scrollbar-width:none;}
+    .navlinks::-webkit-scrollbar{display:none}
+    .navlinks a{white-space:nowrap;padding:12px 6px;border-bottom:2px solid transparent;}
+    .navlinks a.active{border-bottom-color:currentColor;}
+    .brand{font-size:19px;padding:6px 0}
+    .compte-lien{padding:11px 0 11px 12px}
+
+    .panel{margin:30px auto 60px}
+    .panel h1{font-size:26px}
+    .tab{min-height:44px}
+    input{min-height:44px}
+    button.discret{min-height:44px}
+    .recherche button{min-height:44px}
+    .commune{min-height:44px}
+  }
+
+  /* --- Espace d'administration --------------------------------------- */
+  .admin-onglets{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 24px}
+  .admin-onglets button{background:none;border:1px solid rgba(255,255,255,.14);color:var(--text-on-ink-dim);
+    padding:9px 16px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px;min-height:40px}
+  .admin-onglets button[aria-selected="true"]{background:rgba(var(--gold-rgb),.14);
+    border-color:rgba(var(--gold-rgb),.5);color:var(--text-on-ink)}
+  .champ{display:block;margin:0 0 16px}
+  .champ span{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:0 0 6px}
+  .champ input,.champ select{width:100%;background:rgba(255,255,255,.05);color:var(--text-on-ink);
+    border:1px solid rgba(255,255,255,.16);border-radius:8px;padding:10px 12px;font:inherit;min-height:44px}
+  .champ .aide{font-size:12px;color:var(--text-on-ink-dim);margin:6px 0 0}
+  .bouton-fort{background:var(--teal);color:#fff;border:0;border-radius:8px;padding:12px 22px;
+    font:inherit;font-weight:600;cursor:pointer;min-height:44px}
+  .bouton-fort[disabled]{opacity:.5;cursor:default}
+  .retour{background:none;border:1px solid rgba(255,255,255,.2);color:var(--text-on-ink-dim);
+    border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer;min-height:40px}
+  .msg{margin:16px 0 0;padding:12px 14px;border-radius:8px;font-size:14px}
+  .msg.ok{background:rgba(31,111,99,.22);border:1px solid rgba(31,111,99,.5)}
+  .msg.ko{background:rgba(168,67,28,.2);border:1px solid rgba(168,67,28,.55)}
+  .liste-corrections{list-style:none;padding:0;margin:20px 0 0}
+  .liste-corrections li{display:flex;gap:14px;align-items:center;padding:12px 0;
+    border-top:1px solid rgba(255,255,255,.09);flex-wrap:wrap}
+  .liste-corrections .quoi{flex:1;min-width:200px}
+  .liste-corrections .cible{font-weight:600}
+  .liste-corrections .detail{font-size:13px;color:var(--text-on-ink-dim)}
+  .etiquette{font-size:12px;padding:3px 9px;border-radius:999px;white-space:nowrap}
+  .etiquette.attente{background:rgba(var(--gold-rgb),.16);color:#E8D89A}
+  .etiquette.absorbee{background:rgba(31,111,99,.22);color:#9FD9CE}
+  .apercu{width:64px;border-radius:6px;display:block}
+  .garde{text-align:center;padding:48px 0}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="index.html">Poké<span>Classeur</span></a>
+    <div class="navlinks">
+      <a href="series.html">Par extension</a>
+      <a href="pokemon.html">Par Pokémon</a>
+      <a href="echanges.html">Échanges</a>
+      <a href="discussions.html">Discussions</a>
+    </div>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Mon compte →</a>
+  </nav>
+
+  <div class="panel" id="panel">
+    <div class="garde"><p class="intro">Vérification…</p></div>
+  </div>
+
+  <footer>PokéClasseur — espace d'administration. Une correction saisie ici prend effet tout de suite, puis la construction nocturne l'inscrit dans les fichiers du site.</footer>
+</div>
+
+<script src="univers.js?v=2026-09-20-qqm8"></script>
+<script src="supabase-config.js?v=2026-09-20-qqm8"></script>
+<script src="catalogue.js?v=2026-09-20-qqm8"></script>
+<script src="admin.js?v=2026-09-20-qqm8"></script>
+<script>
+const panel = document.getElementById('panel');
+let ongletActif = 'visuel';
+
+const ONGLETS = [
+  { cle: 'visuel',    titre: 'Visuel d\'une carte' },
+  { cle: 'carte',     titre: 'Corriger une carte' },
+  { cle: 'ajout',     titre: 'Ajouter une carte' },
+  { cle: 'extension', titre: 'Ajouter une extension' },
+  { cle: 'liste',     titre: 'Corrections en cours' },
+];
+
+function message(texte, type){
+  const el = document.getElementById('message');
+  if(el) el.outerHTML = `<p class="msg ${type}" id="message">${texte}</p>`;
+}
+
+function champ(nom, etiquette, { type = 'text', aide = '', obligatoire = false, valeur = '' } = {}){
+  return `<label class="champ"><span>${etiquette}${obligatoire ? ' *' : ''}</span>
+    <input id="${nom}" type="${type}" value="${valeur}" ${type === 'file' ? 'accept="image/webp,image/png,image/jpeg"' : ''}>
+    ${aide ? `<p class="aide">${aide}</p>` : ''}</label>`;
+}
+
+const AIDE_CARTE = 'L\'identifiant se lit dans l\'adresse d\'une page d\'extension, par exemple <strong>B3-001</strong> pour la première carte d\'Aura Palpitante.';
+
+function universChoisi(){
+  return document.getElementById('univers')?.value ?? 'pocket';
+}
+
+function choixUnivers(){
+  return `<label class="champ"><span>Univers</span><select id="univers">
+    <option value="pocket">TCG Pocket</option>
+    <option value="physique">TCG physique</option>
+  </select></label>`;
+}
+
+const FORMULAIRES = {
+  visuel: () => `
+    <h2>Remplacer le visuel d'une carte</h2>
+    <p class="intro">La nouvelle image s'affiche immédiatement. La nuit suivante, elle est copiée dans le dépôt du site et n'aura plus besoin de cette page.</p>
+    ${choixUnivers()}
+    ${champ('cible', 'Identifiant de la carte', { obligatoire: true, aide: AIDE_CARTE })}
+    ${champ('fichier', 'Image', { type: 'file', obligatoire: true, aide: 'WebP, PNG ou JPEG, 5 Mo maximum.' })}
+    <button class="bouton-fort" id="valider">Remplacer le visuel</button>
+    <p class="msg" id="message" hidden></p>`,
+
+  carte: () => `
+    <h2>Corriger une carte</h2>
+    <p class="intro">Laisse vide ce que tu ne veux pas changer : seuls les champs remplis remplacent la donnée d'origine.</p>
+    ${choixUnivers()}
+    ${champ('cible', 'Identifiant de la carte', { obligatoire: true, aide: AIDE_CARTE })}
+    ${champ('name', 'Nom français')}
+    ${champ('rarity', 'Rareté', { aide: 'Par exemple : Un Diamant, Deux Étoiles, Couronne.' })}
+    ${champ('dexId', 'Numéro du Pokémon', { type: 'number', aide: 'Numéro au Pokédex national. Sert à rattacher la carte à sa page Pokémon.' })}
+    <button class="bouton-fort" id="valider">Enregistrer la correction</button>
+    <p class="msg" id="message" hidden></p>`,
+
+  ajout: () => `
+    <h2>Ajouter une carte</h2>
+    <p class="intro">Pour une carte absente d'une extension déjà présente sur le site.</p>
+    ${choixUnivers()}
+    ${champ('cible', 'Identifiant de la carte', { obligatoire: true, aide: 'Extension, tiret, numéro sur trois chiffres — par exemple <strong>B3-234</strong>.' })}
+    ${champ('name', 'Nom français', { obligatoire: true })}
+    ${champ('rarity', 'Rareté')}
+    ${champ('dexId', 'Numéro du Pokémon', { type: 'number' })}
+    ${champ('fichier', 'Visuel (facultatif)', { type: 'file' })}
+    <button class="bouton-fort" id="valider">Ajouter la carte</button>
+    <p class="msg" id="message" hidden></p>`,
+
+  extension: () => `
+    <h2>Ajouter une extension</h2>
+    <p class="intro">Pour une extension qu'aucune source ne publie encore. Elle apparaîtra dans la liste des extensions, prête à recevoir ses cartes.</p>
+    ${choixUnivers()}
+    ${champ('cible', 'Identifiant de l\'extension', { obligatoire: true, aide: 'Court, sans espace — par exemple <strong>B5</strong>.' })}
+    ${champ('name', 'Nom français', { obligatoire: true })}
+    ${champ('serieNom', 'Série', { obligatoire: true, valeur: 'Série B', aide: 'Range l\'extension au bon endroit. Écris exactement « Série A », « Série B »…' })}
+    ${champ('dateSortie', 'Date de sortie', { type: 'date', aide: 'Sert à l\'ordre à l\'intérieur de la série.' })}
+    ${champ('cardCount', 'Nombre de cartes annoncé', { type: 'number' })}
+    ${champ('fichier', 'Logo (facultatif)', { type: 'file' })}
+    <button class="bouton-fort" id="valider">Ajouter l'extension</button>
+    <p class="msg" id="message" hidden></p>`,
+};
+
+async function enregistrer(){
+  const bouton = document.getElementById('valider');
+  bouton.disabled = true;
+  const valeur = id => document.getElementById(id)?.value.trim() ?? '';
+  const cible = valeur('cible');
+
+  try{
+    if(!cible) throw new Error('Indique un identifiant.');
+
+    const fichier = document.getElementById('fichier')?.files?.[0] ?? null;
+    if(ongletActif === 'visuel' && !fichier) throw new Error('Choisis une image.');
+
+    let chemin = null;
+    if(fichier){
+      message('Envoi de l\'image…', 'ok');
+      chemin = await televerserVisuel(cible, fichier);
+    }
+
+    const donnees = {};
+    for(const champ of ['name', 'rarity', 'serieNom', 'dateSortie']){
+      if(valeur(champ)) donnees[champ] = valeur(champ);
+    }
+    for(const champ of ['dexId', 'cardCount']){
+      if(valeur(champ)) donnees[champ] = Number(valeur(champ));
+    }
+    if(ongletActif === 'ajout'){
+      donnees.ajout = true;
+      donnees.localId = String(Number(cible.split('-').pop()));
+      if(!donnees.name) throw new Error('Une carte ajoutée doit avoir un nom.');
+    }
+    if(ongletActif === 'extension' && (!donnees.name || !donnees.serieNom)){
+      throw new Error('Le nom et la série sont obligatoires.');
+    }
+
+    const genre = ongletActif === 'visuel' ? 'visuel'
+      : ongletActif === 'extension' ? 'extension' : 'carte';
+
+    await enregistrerCorrection({ univers: universChoisi(), genre, cible, donnees, image_chemin: chemin });
+
+    // Le catalogue garde les corrections le temps d'une visite : sans ce
+    // nettoyage, on ne verrait son propre changement qu'au prochain onglet.
+    try{ sessionStorage.removeItem('pokeclasseur-corrections'); }catch(err){}
+
+    message(`Enregistré. <a href="extension.html?set=${cible.replace(/-\d+$/, '')}" style="text-decoration:underline">Voir le résultat</a>`, 'ok');
+  }catch(err){
+    message(`Échec : ${err.message}`, 'ko');
+  }finally{
+    bouton.disabled = false;
+  }
+}
+
+async function afficherListe(){
+  const zone = document.getElementById('zone-liste');
+  try{
+    const lignes = await listerCorrections();
+    if(!lignes.length){
+      zone.innerHTML = '<p class="intro">Aucune correction en cours. Tout ce que tu as saisi a été absorbé par le site.</p>';
+      return;
+    }
+    const etats = await Promise.all(lignes.map(correctionAbsorbee));
+    zone.innerHTML = `<ul class="liste-corrections">` + lignes.map((c, i) => `
+      <li>
+        ${c.image_chemin ? `<img class="apercu" src="${SUPABASE_URL}/storage/v1/object/public/corrections/${c.image_chemin}" alt="">` : ''}
+        <span class="quoi">
+          <span class="cible">${c.cible}</span>
+          <span class="detail"> — ${({ visuel: 'visuel', carte: 'carte', extension: 'extension' })[c.genre]}
+            · ${c.univers} · ${new Date(c.cree_le).toLocaleDateString('fr-FR')}</span>
+        </span>
+        <span class="etiquette ${etats[i] ? 'absorbee' : 'attente'}">${etats[i] ? 'absorbée par le site' : 'en attente'}</span>
+        <button class="retour" data-id="${c.id}">Supprimer</button>
+      </li>`).join('') + '</ul>' +
+      `<p class="aide" style="margin-top:18px">« Absorbée » signifie que la construction nocturne a inscrit la correction dans les fichiers du site : tu peux la supprimer ici sans rien perdre. « En attente » signifie que le site ne l'affiche que grâce à cette ligne — ne la supprime pas encore.</p>`;
+
+    zone.querySelectorAll('button[data-id]').forEach(b => b.onclick = async () => {
+      b.disabled = true;
+      try{
+        await supprimerCorrection(Number(b.dataset.id));
+        try{ sessionStorage.removeItem('pokeclasseur-corrections'); }catch(err){}
+        afficherListe();
+      }catch(err){
+        b.disabled = false;
+        alert(`Suppression impossible : ${err.message}`);
+      }
+    });
+  }catch(err){
+    zone.innerHTML = `<p class="msg ko">Lecture impossible : ${err.message}</p>`;
+  }
+}
+
+function dessiner(){
+  const onglets = `<div class="admin-onglets">` + ONGLETS.map(o =>
+    `<button data-onglet="${o.cle}" aria-selected="${o.cle === ongletActif}">${o.titre}</button>`).join('') + '</div>';
+
+  const corps = ongletActif === 'liste'
+    ? `<h2>Corrections en cours</h2><div id="zone-liste"><p class="intro">Chargement…</p></div>`
+    : FORMULAIRES[ongletActif]();
+
+  panel.innerHTML = onglets + corps;
+  panel.querySelectorAll('[data-onglet]').forEach(b => b.onclick = () => {
+    ongletActif = b.dataset.onglet;
+    dessiner();
+  });
+
+  if(ongletActif === 'liste') afficherListe();
+  else document.getElementById('valider').onclick = enregistrer;
+}
+
+(async function(){
+  const etat = await verifierAdmin();
+  if(!etat.connecte){
+    panel.innerHTML = `<div class="garde"><h1>Administration</h1>
+      <p class="intro">Cette page demande un compte administrateur.</p>
+      <p><a class="bouton-fort" style="display:inline-block;text-decoration:none" href="connexion.html">Se connecter</a></p></div>`;
+    return;
+  }
+  if(!etat.admin){
+    panel.innerHTML = `<div class="garde"><h1>Administration</h1>
+      <p class="intro">Ton compte n'a pas les droits d'administration. Si c'est une erreur, le drapeau se pose dans l'éditeur SQL de Supabase.</p>
+      <p><a class="bouton-fort" style="display:inline-block;text-decoration:none" href="index.html">Retour au site</a></p></div>`;
+    return;
+  }
+  dessiner();
+})();
+</script>
+</body>
+</html>

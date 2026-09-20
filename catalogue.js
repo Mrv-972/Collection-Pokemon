@@ -376,7 +376,7 @@ function sourceCourante(){
 }
 
 // Le catalogue entier de l'univers courant, du plus ancien au plus récent.
-async function listerExtensions(){
+async function listerExtensionsBrutes(){
   try{
     return await lireInstantane(`${universActuel().cle}/extensions.json`);
   }catch(err){
@@ -384,7 +384,7 @@ async function listerExtensions(){
   }
 }
 
-async function lireExtension(setId){
+async function lireExtensionBrute(setId){
   try{
     const toutes = await lireInstantane(`${universActuel().cle}/extensions.json`);
     const trouvee = toutes.find(s => s.id === setId);
@@ -393,7 +393,7 @@ async function lireExtension(setId){
   return sourceCourante().extension(setId);
 }
 
-async function cartesDeLExtension(setId){
+async function cartesDeLExtensionBrutes(setId){
   try{
     return await lireInstantane(`${universActuel().cle}/sets/${encodeURIComponent(setId)}.json`);
   }catch(err){
@@ -401,7 +401,7 @@ async function cartesDeLExtension(setId){
   }
 }
 
-async function cartesDuPokemon(dexId){
+async function cartesDuPokemonBrutes(dexId){
   try{
     return await lireInstantane(`${universActuel().cle}/dex/${dexId}.json`);
   }catch(err){
@@ -411,4 +411,175 @@ async function cartesDuPokemon(dexId){
     if(await instantaneDisponible()) return [];
     return sourceCourante().cartesDuPokemon(dexId);
   }
+}
+
+// ======================================================================
+// Corrections saisies depuis l'espace d'administration
+//
+// Une correction prend effet tout de suite, sans attendre la construction
+// nocturne : elle se pose par-dessus l'instantané, au moment de l'affichage.
+// La nuit suivante, la construction l'absorbe dans les fichiers du dépôt et
+// la correction devient redondante — elle s'applique alors sur une donnée
+// déjà identique, donc ne change plus rien.
+//
+// On interroge la base sans la bibliothèque Supabase : une seule requête de
+// lecture, sur une table publique, ne justifie pas de charger 100 Ko de
+// code sur chaque page. Et le catalogue doit rester utilisable si la base
+// est injoignable — une correction en moins n'est pas une page cassée.
+// ======================================================================
+
+const CLE_CORRECTIONS = 'pokeclasseur-corrections';
+let correctionsChargees = null;
+
+async function lireCorrections(){
+  if(correctionsChargees) return correctionsChargees;
+
+  // Le temps d'une visite, on ne redemande pas : la liste est courte et ne
+  // change qu'au rythme où l'administrateur la modifie.
+  try{
+    const gardee = sessionStorage.getItem(CLE_CORRECTIONS);
+    if(gardee) return (correctionsChargees = JSON.parse(gardee));
+  }catch(err){ /* stockage indisponible : on redemandera */ }
+
+  let lignes = [];
+  try{
+    if(typeof SUPABASE_URL === 'string' && !SUPABASE_URL.includes('REMPLACER')){
+      const r = await fetch(
+        `${SUPABASE_URL}/rest/v1/corrections?select=univers,genre,cible,donnees,image_chemin`,
+        { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+      );
+      if(r.ok) lignes = await r.json();
+    }
+  }catch(err){
+    console.warn('Corrections indisponibles', err);
+  }
+
+  correctionsChargees = lignes;
+  try{ sessionStorage.setItem(CLE_CORRECTIONS, JSON.stringify(lignes)); }catch(err){}
+  return lignes;
+}
+
+function adresseVisuelCorrige(chemin){
+  return `${SUPABASE_URL}/storage/v1/object/public/corrections/${chemin}`;
+}
+
+// Les champs qu'une correction peut écraser sur une carte. Une liste fermée
+// plutôt qu'une fusion libre : sans elle, une donnée mal formée pourrait
+// remplacer l'identifiant d'une carte et la détacher de sa collection.
+const CHAMPS_CARTE = ['name', 'rarity', 'dexId'];
+
+function appliquerAUneCarte(carte, corrections){
+  const univers = universActuel().cle;
+  for(const c of corrections){
+    if(c.univers !== univers || c.cible !== carte.id) continue;
+    if(c.genre === 'visuel' && c.image_chemin){
+      carte.imageSecours = carte.image;
+      carte.image = adresseVisuelCorrige(c.image_chemin);
+      carte.imageHaute = carte.image;
+    }
+    if(c.genre === 'carte'){
+      for(const champ of CHAMPS_CARTE){
+        if(c.donnees?.[champ] !== undefined && c.donnees[champ] !== null) carte[champ] = c.donnees[champ];
+      }
+    }
+  }
+  return carte;
+}
+
+async function corrigerCartes(cartes, setId = null){
+  const corrections = await lireCorrections();
+  if(!corrections.length) return cartes;
+
+  const univers = universActuel().cle;
+  const corrigees = cartes.map(c => appliquerAUneCarte({ ...c }, corrections));
+
+  // Les cartes ajoutées à la main pour cette extension, qui n'existent chez
+  // aucune source. On les reconnaît à ce qu'aucune carte du même
+  // identifiant n'est déjà là.
+  if(setId){
+    const connues = new Set(corrigees.map(c => c.id));
+    for(const c of corrections){
+      if(c.univers !== univers || c.genre !== 'carte' || connues.has(c.cible)) continue;
+      if(!c.donnees?.ajout || !String(c.cible).startsWith(`${setId}-`)) continue;
+      corrigees.push(appliquerAUneCarte({
+        id: c.cible,
+        localId: String(c.donnees.localId ?? c.cible.split('-').pop()).replace(/^0+/, ''),
+        name: c.donnees.name ?? c.cible,
+        rarity: c.donnees.rarity ?? null,
+        dexId: c.donnees.dexId ?? null,
+        image: null, imageHaute: null, imageSecours: null,
+      }, corrections));
+    }
+    corrigees.sort((a, b) => Number(a.localId) - Number(b.localId));
+  }
+  return corrigees;
+}
+
+async function corrigerExtensions(extensions){
+  const corrections = await lireCorrections();
+  if(!corrections.length) return extensions;
+
+  const univers = universActuel().cle;
+  const liste = extensions.map(e => ({ ...e }));
+  const connues = new Set(liste.map(e => e.id));
+
+  for(const c of corrections){
+    if(c.univers !== univers || c.genre !== 'extension') continue;
+    const existante = liste.find(e => e.id === c.cible);
+    if(existante){
+      for(const champ of ['name', 'serieNom', 'dateSortie']){
+        if(c.donnees?.[champ]) existante[champ] = c.donnees[champ];
+      }
+    }else if(c.donnees?.name && !connues.has(c.cible)){
+      liste.push({
+        id: c.cible,
+        name: c.donnees.name,
+        serieNom: c.donnees.serieNom ?? 'Autres',
+        dateSortie: c.donnees.dateSortie ?? null,
+        cardCount: { official: c.donnees.cardCount ?? null },
+        logo: c.image_chemin ? adresseVisuelCorrige(c.image_chemin) : null,
+        symbol: null,
+        saisieManuelle: true,
+      });
+    }
+  }
+
+  // Même ordre que la construction : série, promos en tête, puis date.
+  const estPromo = e => /^P-/.test(e.id);
+  liste.sort((a, b) =>
+    String(a.serieNom ?? '').localeCompare(String(b.serieNom ?? ''))
+    || (estPromo(b) - estPromo(a))
+    || String(a.dateSortie ?? '').localeCompare(String(b.dateSortie ?? '')));
+  return liste;
+}
+
+// ----------------------------------------------------------------------
+// Ce que les pages appellent
+//
+// Les fonctions « brutes » rendent l'instantané tel qu'il est publié ; ces
+// trois-ci y posent les corrections en vigueur. Les pages n'ont rien à
+// savoir de cette distinction : elles appellent les mêmes noms qu'avant.
+// ----------------------------------------------------------------------
+
+async function listerExtensions(){
+  return corrigerExtensions(await listerExtensionsBrutes());
+}
+
+async function cartesDeLExtension(setId){
+  return corrigerCartes(await cartesDeLExtensionBrutes(setId), setId);
+}
+
+async function cartesDuPokemon(dexId){
+  return corrigerCartes(await cartesDuPokemonBrutes(dexId));
+}
+
+// Une extension ajoutée à la main n'existe dans aucun instantané : la
+// chercher dans la liste corrigée est le seul moyen de lui donner une page.
+async function lireExtension(setId){
+  const corrigee = (await corrigerExtensions([])).find(e => e.id === setId);
+  if(corrigee) return corrigee;
+
+  const brute = await lireExtensionBrute(setId);
+  if(!brute) return brute;
+  return (await corrigerExtensions([brute]))[0] ?? brute;
 }
