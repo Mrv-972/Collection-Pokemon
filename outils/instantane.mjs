@@ -927,7 +927,13 @@ async function copierLeResteDuCatalogue(pocket){
       if(/^https?:/.test(carte.image ?? '') && !aDejaUnVisuel(carte.id)){
         aFaire.push({ adresse: carte.image, fichier: `${DOSSIER_VISUELS}/${carte.id}.webp` });
       }
+      // La haute définition ne se demande que si on prend AUSSI la vignette,
+      // c'est-à-dire si la carte n'a pas déjà son visuel chez nous. Sinon on
+      // redemandait chaque nuit la haute définition de cartes servies par une
+      // autre source — 1028 requêtes vouées au 404, puisque le serveur qui
+      // n'avait pas la vignette française n'a pas davantage la grande.
       if(/^https?:/.test(carte.imageHaute ?? '') && carte.imageHaute !== carte.image
+         && !aDejaUnVisuel(carte.id)
          && !existsSync(`${DOSSIER_VISUELS}/${carte.id}${SUFFIXE_HD}.webp`)){
         aFaire.push({ adresse: carte.imageHaute, fichier: `${DOSSIER_VISUELS}/${carte.id}${SUFFIXE_HD}.webp` });
       }
