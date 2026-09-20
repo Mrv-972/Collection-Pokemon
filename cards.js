@@ -310,55 +310,151 @@ document.head.appendChild(Object.assign(document.createElement('style'), { textC
   .card-zoom .caption .hint{display:block;margin-top:4px;font-size:11.5px;color:#9B9E9C;}
   .card-zoom .valeur{display:block;margin-top:6px;font-size:15px;color:#E3C766;}
   .card-zoom .valeur small{display:block;margin-top:2px;font-size:11px;color:#9B9E9C;}
+  .card-zoom .fleche{position:fixed;top:50%;transform:translateY(-50%);width:52px;height:52px;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+    color:#EDEAE0;border-radius:50%;font:22px/1 'IBM Plex Sans',sans-serif;
+    padding:0;transition:background .12s,opacity .12s;}
+  .card-zoom .fleche:hover{background:rgba(255,255,255,.18)}
+  .card-zoom .fleche[disabled]{opacity:.22;cursor:default}
+  .card-zoom .fleche.avant{left:16px}
+  .card-zoom .fleche.apres{right:16px}
+  /* Sur un écran étroit, les flèches descendent sous l'image plutôt que de
+     mordre dessus. */
+  @media(max-width:620px){
+    .card-zoom .fleche{top:auto;bottom:18px;transform:none;width:46px;height:46px}
+    .card-zoom .fleche.avant{left:22px}
+    .card-zoom .fleche.apres{right:22px}
+  }
 `}));
 
 function openCardZoom(img){
-  const thumbnail = img.currentSrc || img.src;
-  // La vignette est déjà en cache : on l'affiche tout de suite, puis on la
-  // remplace par la haute définition dès qu'elle est prête.
-  // La haute définition voyage avec la vignette : toutes les sources ne la
-  // nomment pas en remplaçant « low » par « high » dans l'adresse.
-  const fullSize = img.dataset.haute
-    || (thumbnail.includes('/low.webp') ? thumbnail.replace('/low.webp', '/high.webp') : thumbnail);
+  // Les vignettes affichées à l'instant, dans l'ordre de la grille : c'est
+  // sur celles-là qu'on défile, filtres compris. Se fier au catalogue entier
+  // ferait défiler des cartes que l'écran ne montre pas.
+  const vignettes = [...document.querySelectorAll('.card-grid img[data-card-id]')];
+  let position = Math.max(0, vignettes.indexOf(img));
 
   const overlay = document.createElement('div');
   overlay.className = 'card-zoom';
   overlay.innerHTML = `
-    <img src="${thumbnail}" alt="${img.alt}">
-    <div class="caption">${img.alt}<span class="valeur" id="zoom-valeur"></span><span class="hint">Clique ou appuie sur Échap pour fermer</span></div>
+    <button class="fleche avant" aria-label="Carte précédente">‹</button>
+    <img alt="">
+    <div class="caption"><span class="titre"></span><span class="valeur" id="zoom-valeur"></span><span class="hint">Flèches ← → pour défiler · Échap pour fermer</span></div>
+    <button class="fleche apres" aria-label="Carte suivante">›</button>
   `;
 
-  const close = () => {
+  const elImage  = overlay.querySelector('img');
+  const elTitre  = overlay.querySelector('.titre');
+  const elValeur = overlay.querySelector('#zoom-valeur');
+  const avant    = overlay.querySelector('.fleche.avant');
+  const apres    = overlay.querySelector('.fleche.apres');
+
+  // Chaque affichage reçoit son propre jeton. Une cote ou une haute
+  // définition qui arrive après qu'on a changé de carte est alors ignorée,
+  // au lieu de s'écrire par-dessus la suivante.
+  let jeton = 0;
+
+  function afficher(indice){
+    position = indice;
+    const source = vignettes[position];
+    const monJeton = ++jeton;
+
+    const vignette = source.currentSrc || source.src;
+    elImage.src = vignette;
+    elImage.alt = source.alt;
+    elTitre.textContent = source.alt;
+    elValeur.innerHTML = '';
+    avant.disabled = position === 0;
+    apres.disabled = position === vignettes.length - 1;
+
+    decrire(source, monJeton);
+
+    // La vignette est déjà en cache : on l'affiche tout de suite, puis on la
+    // remplace par la haute définition dès qu'elle est prête. Celle-ci
+    // voyage avec la vignette — toutes les sources ne la nomment pas en
+    // remplaçant « low » par « high » dans l'adresse.
+    const grande = source.dataset.haute
+      || (vignette.includes('/low.webp') ? vignette.replace('/low.webp', '/high.webp') : vignette);
+    if(grande !== vignette){
+      const chargement = new Image();
+      chargement.onload = () => { if(monJeton === jeton) elImage.src = grande; };
+      chargement.src = grande;
+    }
+  }
+
+  // Ce qu'on écrit sous l'image. Dans Pocket, les cartes sont virtuelles :
+  // elles n'ont pas de cote et n'en auront jamais, donc annoncer « pas de
+  // cote connue » serait laisser croire à une information manquante. On y
+  // met l'extension et le numéro, qui eux manquent vraiment quand la grille
+  // mélange plusieurs extensions.
+  async function decrire(source, monJeton){
+    const carteId = source.dataset.cardId;
+    if(!carteId) return;
+
+    const pocket = typeof universActuel === 'function' && universActuel().cle === 'pocket';
+    if(pocket){
+      const setId = setIdOfCard(carteId);
+      const numero = Number(carteId.slice(setId.length + 1));
+      let extension = setId;
+      let total = null;
+      try{
+        const fiche = typeof lireExtension === 'function' ? await lireExtension(setId) : null;
+        if(fiche){
+          extension = fiche.name ?? setId;
+          total = fiche.cardCount?.official ?? fiche.cardCount?.total ?? null;
+        }
+      }catch(err){ /* le nom court fera l'affaire */ }
+      if(monJeton !== jeton) return;
+      elValeur.innerHTML =
+        `<small>${echapperTexte(extension)} · n° ${numero}${total ? ` / ${total}` : ''}</small>`;
+      return;
+    }
+
+    if(typeof prixCarte !== 'function') return;
+    const prix = await prixCarte(carteId).catch(() => null);
+    if(monJeton !== jeton) return;
+    elValeur.innerHTML = prix
+      ? `≈ ${prixLisible(prix)}<small>Cote indicative pour une carte en bon état${prix.devise === 'USD' ? ', marché nord-américain faute de cote européenne' : ''}${prix.variantes ? ' — d\'autres éditions de cette carte se négocient à des prix très différents' : ''}</small>`
+      : `<small>Pas de cote connue pour cette carte</small>`;
+  }
+
+  const aller = pas => {
+    const cible = position + pas;
+    if(cible >= 0 && cible < vignettes.length) afficher(cible);
+  };
+
+  const fermer = () => {
     overlay.classList.remove('shown');
-    document.removeEventListener('keydown', onKey);
+    document.removeEventListener('keydown', auClavier);
     document.body.style.overflow = '';
     setTimeout(() => overlay.remove(), 150);
   };
-  const onKey = (e) => { if(e.key === 'Escape') close(); };
 
-  overlay.addEventListener('click', close);
-  document.addEventListener('keydown', onKey);
+  const auClavier = (e) => {
+    if(e.key === 'Escape') return fermer();
+    if(e.key === 'ArrowLeft'){ e.preventDefault(); aller(-1); }
+    if(e.key === 'ArrowRight'){ e.preventDefault(); aller(1); }
+  };
+
+  // Le fond ferme la vue ; les flèches, elles, doivent pouvoir être
+  // cliquées sans la refermer aussitôt.
+  overlay.addEventListener('click', (e) => {
+    const fleche = e.target.closest('.fleche');
+    if(!fleche) return fermer();
+    e.stopPropagation();
+    aller(fleche.classList.contains('avant') ? -1 : 1);
+  });
+
+  document.addEventListener('keydown', auClavier);
   document.body.style.overflow = 'hidden';
   document.body.appendChild(overlay);
+  afficher(position);
   requestAnimationFrame(() => overlay.classList.add('shown'));
+}
 
-  // La cote arrive après coup : elle ne doit pas retarder l'agrandissement.
-  const carteId = img.dataset.cardId;
-  if(carteId && typeof prixCarte === 'function'){
-    prixCarte(carteId).then(prix => {
-      const zone = overlay.querySelector('#zoom-valeur');
-      if(!zone) return; // Vue déjà refermée.
-      zone.innerHTML = prix
-        ? `≈ ${prixLisible(prix)}<small>Cote indicative pour une carte en bon état${prix.devise === 'USD' ? ', marché nord-américain faute de cote européenne' : ''}${prix.variantes ? ' — d\'autres éditions de cette carte se négocient à des prix très différents' : ''}</small>`
-        : `<small>Pas de cote connue pour cette carte</small>`;
-    });
-  }
-
-  if(fullSize !== thumbnail){
-    const large = new Image();
-    large.onload = () => { overlay.querySelector('img').src = fullSize; };
-    large.src = fullSize;
-  }
+function echapperTexte(texte){
+  return String(texte).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 document.addEventListener('click', (e) => {
