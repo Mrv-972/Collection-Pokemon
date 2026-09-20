@@ -1,0 +1,26 @@
+# Ouvre une adresse et déballe ce qu'elle contient.
+#
+# Outil d'enquête, à lancer à la main depuis l'onglet Actions quand une page
+# ne livre pas ce qu'on y cherche. Il ne modifie rien.
+name: Explorer une page
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Adresse(s) à explorer, séparées par des virgules"
+        required: true
+        default: 'https://pokemon-tcg-pocket.wiki/fr/cards'
+
+permissions:
+  contents: read
+
+jobs:
+  explorer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node outils/explorer.mjs --url="${{ inputs.url }}"

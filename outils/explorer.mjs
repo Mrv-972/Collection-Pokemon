@@ -1,0 +1,86 @@
+#!/usr/bin/env node
+//
+// Explorateur de page
+// ===================
+//
+// Quand une page ne contient pas ce qu'on y cherche, c'est presque toujours
+// qu'elle ne le contient pas ENCORE : le navigateur va le chercher ailleurs
+// une fois la page affichée. Reste à savoir où.
+//
+// Cet outil ne décide rien. Il ouvre une adresse et déballe ce qu'elle
+// contient — les scripts qu'elle charge, les serveurs qu'elle nomme, les
+// fichiers de données qu'elle référence — pour qu'on puisse lire, plutôt que
+// deviner, la vraie source.
+//
+//   node outils/explorer.mjs --url="https://exemple.fr/cartes"
+
+import { argv } from 'node:process';
+
+const args = Object.fromEntries(argv.slice(2).map(a => {
+  const [cle, ...reste] = a.replace(/^--/, '').split('=');
+  return [cle, reste.length ? reste.join('=') : true];
+}));
+
+const IDENTITE = {
+  'User-Agent': 'PokeClasseur/1.0 (+https://github.com/Mrv-972/Collection-Pokemon)',
+  'Accept-Language': 'fr-FR,fr;q=0.9',
+};
+
+const titre = t => { console.log('\n' + '─'.repeat(70)); console.log(t); console.log('─'.repeat(70)); };
+const lister = (nom, valeurs, max = 25) => {
+  titre(`${nom} (${valeurs.length})`);
+  if(!valeurs.length){ console.log('  — rien —'); return; }
+  valeurs.slice(0, max).forEach(v => console.log('  ' + v));
+  if(valeurs.length > max) console.log(`  … et ${valeurs.length - max} autres`);
+};
+const uniques = it => [...new Set(it)];
+
+async function explorer(adresse){
+  console.log(`\n══ ${adresse}`);
+  const r = await fetch(adresse, { redirect: 'follow', headers: IDENTITE });
+  console.log(`   HTTP ${r.status} · ${r.headers.get('content-type')} · arrivé sur ${r.url}`);
+  if(!r.ok) return;
+  const texte = await r.text();
+  console.log(`   ${texte.length} caractères`);
+
+  // Les scripts : c'est là que vit le code qui va chercher les données.
+  lister('Scripts chargés',
+    uniques([...texte.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)].map(m => m[1])));
+
+  // Les fichiers de données directement nommés dans la page.
+  lister('Fichiers de données (.json)',
+    uniques([...texte.matchAll(/["'(]([^"'()\s]*\.json[^"'()\s]*)/g)].map(m => m[1])));
+
+  // Tout ce qui ressemble à un point d'entrée de données.
+  lister("Adresses contenant « api », « data », « graphql » ou « trpc »",
+    uniques([...texte.matchAll(/["'(]([^"'()\s]*(?:\/api\/|\/data\/|graphql|trpc)[^"'()\s]*)/gi)].map(m => m[1])));
+
+  // Les serveurs tiers : un site range presque toujours ses images ailleurs
+  // que sur son propre domaine.
+  const hotes = uniques([...texte.matchAll(/https?:\/\/([a-z0-9.\-]+)/gi)].map(m => m[1].toLowerCase()));
+  lister('Serveurs nommés dans la page', hotes.sort(), 40);
+
+  lister('Images trouvées',
+    uniques([...texte.matchAll(/https?:\/\/[^\s"'\\]+\.(?:webp|png|jpg|jpeg|avif)/gi)].map(m => m[0])));
+
+  // Les blocs de données embarqués : le meilleur des cas, tout est déjà là.
+  for(const [nom, motif] of [
+    ['__NEXT_DATA__', /<script[^>]*id=["']__NEXT_DATA__["'][^>]*>([\s\S]*?)<\/script>/i],
+    ['ld+json',       /<script[^>]*application\/ld\+json[^>]*>([\s\S]*?)<\/script>/i],
+    ['self.__next_f', /self\.__next_f\.push\(([\s\S]{0,400})/],
+  ]){
+    const m = texte.match(motif);
+    if(m){
+      titre(`Bloc « ${nom} » — début du contenu`);
+      console.log('  ' + m[1].trim().slice(0, 700).replace(/\n/g, '\n  '));
+    }
+  }
+}
+
+const adresses = String(args.url ?? '').split(',').filter(Boolean);
+if(!adresses.length){ console.error('Il manque --url="…"'); process.exit(1); }
+
+for(const a of adresses){
+  try{ await explorer(a); }
+  catch(err){ console.log(`\n══ ${a}\n   échec : ${err.message}`); }
+}
