@@ -118,6 +118,54 @@ async function comparerLesPromos(base, cle){
   }
 }
 
+// Les symboles de rareté affichés aujourd'hui sont des caractères
+// typographiques — « ◆◆◆ », « ♛ » — qui approchent l'idée sans être les
+// vraies icônes du jeu. Le wiki en sert de vraies, sous
+// /icons/card-rarity/<code>.png. Reste à savoir quels codes existent : on les
+// lit dans les cartes elles-mêmes, puis on vérifie que l'icône répond.
+async function trouverLesIconesDeRarete(base, cle){
+  const r = await demander(base, cle, '/cards', {});
+  if(r.statut !== 200) return console.log('Liste des cartes indisponible.');
+
+  const raretes = new Map();
+  (function parcourir(x, p = 0){
+    if(!x || p > 6) return;
+    if(Array.isArray(x)) return x.forEach(y => parcourir(y, p + 1));
+    if(typeof x === 'object'){
+      const code = x.rarity ?? x.rarete ?? x.rarity_code;
+      if(typeof code === 'string' && code.length <= 12){
+        raretes.set(code, (raretes.get(code) ?? 0) + 1);
+      }
+      Object.values(x).forEach(y => parcourir(y, p + 1));
+    }
+  })(r.donnees);
+
+  if(!raretes.size) return console.log('Aucun code de rareté repéré dans les cartes.');
+
+  console.log(`\n${raretes.size} codes de rareté chez eux :`);
+  const racine = base.replace(/\/functions\/v1\/web_api$/, '');
+  const site = 'https://pokemon-tcg-pocket.wiki';
+
+  for(const [code, nombre] of [...raretes].sort((a, b) => b[1] - a[1])){
+    const essais = [
+      `${site}/icons/card-rarity/${code}.png`,
+      `${site}/icons/card-rarity/${encodeURIComponent(code)}.png`,
+      `${racine}/storage/v1/object/public/public_files/system/rarity/${code}.png`,
+    ];
+    let verdict = 'aucune icône';
+    for(const adresse of essais){
+      try{
+        const rr = await fetch(adresse, { method: 'HEAD', redirect: 'follow', headers: IDENTITE });
+        if(rr.ok && /image\//.test(rr.headers.get('content-type') ?? '')){
+          verdict = `${adresse}  (${rr.headers.get('content-length') ?? '?'} o)`;
+          break;
+        }
+      }catch(err){ /* adresse suivante */ }
+    }
+    console.log(`  ${code.padEnd(6)} ${String(nombre).padStart(5)} cartes  →  ${verdict}`);
+  }
+}
+
 async function principal(){
   console.log('Lecture du code du wiki…');
   const { base, cle } = await reperages();
@@ -153,7 +201,7 @@ async function principal(){
     break;   // un chemin qui répond suffit : inutile de les essayer tous
   }
 
-  await comparerLesPromos(base, cle);
+  await trouverLesIconesDeRarete(base, cle);
 }
 
 principal().catch(err => { console.error('Échec :', err.message); process.exit(1); });
