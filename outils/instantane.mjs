@@ -510,8 +510,18 @@ async function recolterVisuelsFrancais(pocket){
   console.log(`Récolte des visuels français manquants — ${sources.length} source(s) allumée(s)…`);
 
   for(const ext of pocket.extensions){
-    if(!ext.visuelsAnglais) continue;
-    const cartes = pocket.cartesParSet.get(ext.id) ?? [];
+    // On ne se fie plus au drapeau « visuelsAnglais » pour savoir où chercher.
+    // Il disait qu'une extension était présente chez TCGdex parce que leur
+    // dépôt de données la contient — ce qui ne garantit pas que leur serveur
+    // d'images héberge la version française. Six extensions étaient dans ce
+    // cas : données là, visuels absents, et le site retombait sur l'anglais
+    // sans que rien ne le signale.
+    //
+    // Le seul critère fiable est donc : cette carte a-t-elle un visuel chez
+    // nous, oui ou non. Les extensions déjà complètes sont écartées
+    // immédiatement, sans une seule requête.
+    const toutes = pocket.cartesParSet.get(ext.id) ?? [];
+    const cartes = toutes.filter(c => !existsSync(`${DOSSIER_VISUELS}/${c.id}.webp`));
     if(!cartes.length) continue;
 
     for(const source of sources){
