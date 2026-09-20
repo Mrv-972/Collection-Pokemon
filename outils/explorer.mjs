@@ -60,6 +60,12 @@ async function explorer(adresse){
   const hotes = uniques([...texte.matchAll(/https?:\/\/([a-z0-9.\-]+)/gi)].map(m => m[1].toLowerCase()));
   lister('Serveurs nommés dans la page', hotes.sort(), 40);
 
+  // Un nom de serveur ne suffit pas : c'est l'adresse complète qui dit quoi
+  // est pris, et où.
+  const tiers = uniques([...texte.matchAll(/https?:\/\/[^\s"'\\<>]{6,200}/g)].map(m => m[0]))
+    .filter(a => !a.includes('pokemon-tcg-pocket.wiki') && !a.includes('schema.org') && !a.includes('w3.org'));
+  lister('Adresses extérieures complètes', tiers, 30);
+
   lister('Images trouvées',
     uniques([...texte.matchAll(/https?:\/\/[^\s"'\\]+\.(?:webp|png|jpg|jpeg|avif)/gi)].map(m => m[0])));
 
@@ -75,6 +81,41 @@ async function explorer(adresse){
       console.log('  ' + m[1].trim().slice(0, 700).replace(/\n/g, '\n  '));
     }
   }
+
+  if(args.suivre) await suivreLesScripts(r.url, texte);
+}
+
+// Le code de la page ne dit pas d'où viennent les cartes ; le code qu'elle
+// charge, si. Avec --suivre, on ouvre chaque script et on y cherche les
+// adresses qu'il contient.
+async function suivreLesScripts(adressePage, texte){
+  const srcs = uniques([...texte.matchAll(/<script[^>]+src=["']([^"']+)["']/gi)].map(m => m[1]));
+  const filtre = new RegExp(String(args.filtre ?? 'jsdelivr|/api/|\\.json|githubusercontent|cdn\\.'), 'i');
+  titre(`Adresses trouvées DANS les ${srcs.length} scripts (filtre : ${filtre.source})`);
+
+  let total = 0;
+  for(const src of srcs){
+    let code;
+    try{
+      const r = await fetch(new URL(src, adressePage), { headers: IDENTITE });
+      if(!r.ok) continue;
+      code = await r.text();
+    }catch(err){ continue; }
+
+    // Les adresses sont souvent assemblées morceau par morceau. On attrape
+    // donc aussi les fragments de texte, pas seulement les adresses entières.
+    const trouvees = uniques([
+      ...[...code.matchAll(/https?:\/\/[^\s"'`\\<>]{6,200}/g)].map(m => m[0]),
+      ...[...code.matchAll(/["'`]([\/a-z0-9._\-@]{6,120})["'`]/gi)].map(m => m[1]),
+    ]).filter(a => filtre.test(a));
+
+    if(trouvees.length){
+      console.log(`\n  ── ${src.split('/').pop()}`);
+      trouvees.slice(0, 20).forEach(a => console.log('     ' + a));
+      total += trouvees.length;
+    }
+  }
+  if(!total) console.log('  — aucune adresse ne correspond au filtre —');
 }
 
 const adresses = String(args.url ?? '').split(',').filter(Boolean);

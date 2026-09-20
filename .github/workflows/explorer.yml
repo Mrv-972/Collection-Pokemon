@@ -11,6 +11,15 @@ on:
         description: "Adresse(s) à explorer, séparées par des virgules"
         required: true
         default: 'https://pokemon-tcg-pocket.wiki/fr/cards'
+      suivre:
+        description: "Ouvrir aussi les scripts chargés par la page"
+        type: boolean
+        required: false
+        default: true
+      filtre:
+        description: "Ne garder que les adresses correspondant à ceci"
+        required: false
+        default: 'jsdelivr|/api/|\.json|githubusercontent|cdn\.'
 
 permissions:
   contents: read
@@ -23,4 +32,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node outils/explorer.mjs --url="${{ inputs.url }}"
+      - run: |
+          node outils/explorer.mjs \
+            --url="${{ inputs.url }}" \
+            --filtre="${{ inputs.filtre }}" \
+            ${{ inputs.suivre && '--suivre' || '' }}
