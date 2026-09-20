@@ -1,0 +1,18 @@
+# Pèse les visuels qu'on n'a pas encore copiés, avant de décider de le faire.
+name: Peser les visuels restants
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  peser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node outils/mesurer-visuels.mjs
