@@ -12,6 +12,27 @@
 //
 //     <footer data-note="…"></footer>
 
+// ---------------------------------------------------------- Soutien -----
+//
+// Un bouton pour qui veut aider à faire vivre le site. Pour l'allumer, colle
+// ici l'adresse de ta page de dons :
+//
+//   Ko-fi           https://ko-fi.com/tonpseudo
+//   Buy Me a Coffee https://buymeacoffee.com/tonpseudo
+//   Tipeee          https://fr.tipeee.com/tonprojet
+//   Liberapay       https://liberapay.com/tonpseudo
+//   GitHub Sponsors https://github.com/sponsors/Mrv-972
+//
+// Tant que « adresse » reste vide, RIEN ne s'affiche : mieux vaut pas de
+// bouton du tout qu'un bouton qui mène nulle part.
+const SOUTIEN = {
+  adresse: '',
+  libelle: 'Soutenir le site',
+  // Une phrase pour dire à quoi sert l'argent. Les gens donnent plus
+  // volontiers quand ils savent ce qu'ils paient.
+  phrase: "PokéClasseur est gratuit et le restera. Un coup de pouce aide à couvrir l'hébergement.",
+};
+
 const PIED_LIENS = [
   ['Explorer', [
     ['Par extension', 'series.html'],
@@ -43,6 +64,14 @@ const STYLE_PIED = `
                   text-decoration:none;transition:color .12s;}
   .pied-colonne a:hover{color:var(--text-on-ink)}
   .pied-note{margin:0 0 14px;color:var(--text-on-ink-dim)}
+  .pied-soutien{display:inline-flex;align-items:center;gap:8px;margin:14px 0 0;
+                padding:9px 16px;border-radius:999px;text-decoration:none;
+                font-size:13px;font-weight:600;color:var(--ink);
+                background:var(--gold);transition:filter .12s;}
+  .pied-soutien:hover{filter:brightness(1.1)}
+  .pied-soutien svg{width:15px;height:15px}
+  .pied-soutien-phrase{display:block;margin:9px 0 0;font-size:12px;line-height:1.5;
+                       color:var(--text-on-ink-dim);max-width:260px;}
   .pied-bas{font-size:12px;line-height:1.6;color:var(--text-on-ink-dim);opacity:.85;
             border-top:1px solid rgba(237,234,224,0.06);padding-top:16px;}
   .pied-bas p{margin:0 0 5px}
@@ -52,6 +81,17 @@ const STYLE_PIED = `
     .pied-colonnes{gap:30px}
   }
 `;
+
+// Le bouton ne s'affiche que si une adresse a été renseignée plus haut.
+function boutonSoutien(){
+  if(!SOUTIEN.adresse) return '';
+  const coeur = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9A5.4 5.4 0 0 1 12 6.5 5.4 5.4 0 0 1 21.6 12c-2.1 4.4-9.6 9-9.6 9z"/></svg>';
+  return `
+    <a class="pied-soutien" href="${SOUTIEN.adresse}" target="_blank" rel="noopener noreferrer">
+      ${coeur}${SOUTIEN.libelle}
+    </a>
+    ${SOUTIEN.phrase ? `<span class="pied-soutien-phrase">${SOUTIEN.phrase}</span>` : ''}`;
+}
 
 function poserPied(){
   const pied = document.querySelector('footer');
@@ -70,6 +110,7 @@ function poserPied(){
         <span class="nom">Poké<span>Classeur</span></span>
         Ta collection de cartes Pokémon, retrouvée d'un appareil à l'autre — et
         des collectionneurs près de chez toi.
+        ${boutonSoutien()}
       </div>
       <div class="pied-colonnes">
         ${PIED_LIENS.map(([titre, liens]) => `
