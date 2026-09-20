@@ -244,8 +244,10 @@ async function logoPocket(code){
   return null;
 }
 
-const EQUIVALENCES_SET = { 'PROMO-A': 'P-A', 'PROMO-B': 'P-B' };
-const idLocal = code => EQUIVALENCES_SET[code] ?? code;
+// « PROMO-A » chez la source, « P-A » chez nous. La règle vaut pour toute
+// lettre : le jour où une série C paraîtra, sa promo suivra sans qu'on ait
+// à revenir ici.
+const idLocal = code => String(code).replace(/^PROMO-([A-Z])$/, 'P-$1');
 
 const RARETES_POCKET = {
   C: 'Un Diamant', U: 'Deux Diamants', R: 'Trois Diamants', RR: 'Quatre Diamants',
@@ -416,11 +418,18 @@ const IDENTITE = {
 };
 
 const SOURCES_VISUELS = 'outils/sources-visuels.json';
-const CODES_DISTANTS = { 'P-A': 'PROMO-A', 'P-B': 'PROMO-B' };
+const codeDistant = id => String(id).replace(/^P-([A-Z])$/, 'PROMO-$1');
+
+function nomPromoWiki(id){
+  const m = String(id).match(/^P-([A-Z])$/);
+  if(!m) return null;
+  return m[1] === 'A' ? 'PROMO' : `PROMO${m[1]}`;
+}
 
 function gabarit(texte, { set, numero }){
   return texte
-    .replaceAll('{SETDIST}', CODES_DISTANTS[set] ?? set)
+    .replaceAll('{SETDIST}', codeDistant(set))
+    .replaceAll('{PROMO}', nomPromoWiki(set) ?? set)
     .replaceAll('{SETMAJ}', set.toUpperCase())
     .replaceAll('{SET}', set)
     .replaceAll('{NUM3}', String(numero).padStart(3, '0'))
@@ -588,8 +597,11 @@ async function recolterVisuelsFrancais(pocket){
 const DOSSIER_LOGOS = 'images/sets';
 const LOGOS_WIKI = 'https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/set';
 
-// Chez eux, nos deux séries de promos s'appellent PROMO et PROMOB.
-const NOM_DISTANT_LOGO = { 'P-A': 'PROMO', 'P-B': 'PROMOB' };
+// Chez le wiki, la promo de la série A s'appelle « PROMO » et celle de la
+// série B « PROMOB ». La règle se lit : « PROMO » suivi de la lettre, sauf
+// pour la première qui n'en porte pas. Une série C donnera « PROMOC » — ce
+// n'est pas vérifié, mais ce n'est pas un risque : une adresse fausse est
+// simplement écartée, et la carte garde le visuel qu'elle avait.
 
 async function recolterLogosFrancais(pocket){
   await mkdir(DOSSIER_LOGOS, { recursive: true });
@@ -605,7 +617,7 @@ async function recolterLogosFrancais(pocket){
     // mieux que de le remplacer par un logo générique ou de le laisser
     // pendre à un serveur extérieur.
     const candidates = [
-      `${LOGOS_WIKI}/LOGO_${NOM_DISTANT_LOGO[ext.id] ?? ext.id}_fr.png`,
+      `${LOGOS_WIKI}/LOGO_${nomPromoWiki(ext.id) ?? ext.id}_fr.png`,
       /^https?:/.test(String(ext.logo)) ? ext.logo : null,
     ].filter(Boolean);
 

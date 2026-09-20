@@ -20,6 +20,7 @@
     "",
     "Leçon du premier sondage : Limitless sert ses pages en français (?lang=fr)",
     "mais les images qu'elles portent s'appellent « B3_001_EN_SM.webp ». Une",
+    "  {PROMO}   le nom que le wiki donne à une extension promotionnelle",
     "image peut donc différer de notre témoin — c'est un format réduit — tout en",
     "restant anglaise. L'adresse le dit ; la sonde la lit désormais, et écarte",
     "tout marqueur de langue qui n'est pas le français.",
@@ -58,22 +59,16 @@
       "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/{SET}/{SET}-{NUM3}.webp"
     },
     {
+      "nom": "Wiki TCG Pocket — promos, qu'ils nomment « PROMO » puis « PROMOB »",
+      "genre": "motif",
+      "actif": true,
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/{PROMO}/{PROMO}-{NUM3}.webp"
+    },
+    {
       "nom": "Wiki TCG Pocket — stockage public, extensions promotionnelles",
       "genre": "motif",
       "actif": true,
       "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/{SETDIST}/{SETDIST}-{NUM3}.webp"
-    },
-    {
-      "nom": "Wiki TCG Pocket — P-B, qu'ils nomment « PROMOB »",
-      "genre": "motif",
-      "actif": true,
-      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/PROMOB/PROMOB-{NUM3}.webp"
-    },
-    {
-      "nom": "Wiki TCG Pocket — P-A, qu'ils nomment « PROMO »",
-      "genre": "motif",
-      "actif": true,
-      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/PROMO/PROMO-{NUM3}.webp"
     },
     {
       "nom": "Wiki TCG Pocket — stockage public, langue « fr-FR »",
