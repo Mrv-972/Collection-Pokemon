@@ -316,7 +316,16 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
       });
     }
   }
-  extensions.sort((a, b) => String(a.dateSortie ?? '').localeCompare(String(b.dateSortie ?? '')));
+  // Les extensions se suivent par date à l'intérieur d'une série, mais les
+  // promos passent devant : ce sont les cartes hors-boosters de la série, et
+  // les voir en tête fait comprendre d'un coup d'œil à quelle série elles
+  // appartiennent. Le tri porte donc sur trois critères, du plus général au
+  // plus fin : la série, puis le caractère promotionnel, puis la date.
+  const estPromo = e => /^P-/.test(e.id);
+  extensions.sort((a, b) =>
+    String(a.serieNom ?? '').localeCompare(String(b.serieNom ?? ''))
+    || (estPromo(b) - estPromo(a))
+    || String(a.dateSortie ?? '').localeCompare(String(b.dateSortie ?? '')));
 
   const cartesParSet = new Map();
   for(const ext of extensions){

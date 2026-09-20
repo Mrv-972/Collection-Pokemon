@@ -36,9 +36,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      # Les paramètres passent par des variables d'environnement plutôt que
+      # dans la ligne de commande : une parenthèse ou une apostrophe dans un
+      # motif de recherche suffisait à casser la commande avant même que
+      # l'outil ne démarre.
       - run: |
           node outils/explorer.mjs \
-            --url="${{ inputs.url }}" \
-            --filtre="${{ inputs.filtre }}" \
-            ${{ inputs.contexte && format('--contexte={0}', inputs.contexte) || '' }} \
-            ${{ inputs.suivre && '--suivre' || '' }}
+            --url="$URL" \
+            --filtre="$FILTRE" \
+            ${SUIVRE:+--suivre} \
+            ${CONTEXTE:+--contexte="$CONTEXTE"}
+        env:
+          URL: ${{ inputs.url }}
+          FILTRE: ${{ inputs.filtre }}
+          CONTEXTE: ${{ inputs.contexte }}
+          SUIVRE: ${{ inputs.suivre && '1' || '' }}
