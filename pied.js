@@ -26,7 +26,7 @@
 // Tant que « adresse » reste vide, RIEN ne s'affiche : mieux vaut pas de
 // bouton du tout qu'un bouton qui mène nulle part.
 const SOUTIEN = {
-  adresse: '',
+  adresse: 'https://ko-fi.com/mrv972',
   libelle: 'Soutenir le site',
   // Une phrase pour dire à quoi sert l'argent. Les gens donnent plus
   // volontiers quand ils savent ce qu'ils paient.
