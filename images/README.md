@@ -48,3 +48,12 @@ Une fois le fichier copié ici, il ne coûte plus rien à personne.
 
 Un fichier déjà présent n'est jamais redemandé, et une image que tu déposes
 toi-même n'est jamais écrasée : la récolte ne télécharge que ce qui manque.
+
+### Deux définitions par carte
+
+- `images/cards/A1-001.webp`    — la vignette, affichée dans les grilles
+- `images/cards/A1-001-hd.webp` — la haute définition, affichée au zoom
+
+Le suffixe `-hd` est la seule chose qui les distingue. Une carte sans fichier
+`-hd` affiche simplement sa vignette au zoom : c'est le cas des visuels venus
+du wiki francophone, qui n'existent qu'en une seule définition.

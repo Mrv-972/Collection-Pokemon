@@ -64,6 +64,19 @@ async function recenserVisuelsLocaux(){
   return parCarte;
 }
 
+// Le zoom réclame une définition supérieure, rangée sous « <carte>-hd ». La
+// distinction se fait ici, une fois : ailleurs, on se contente de demander
+// la vignette et la haute définition d'une carte.
+const SUFFIXE_HD = '-hd';
+function trierVisuels(parCarte){
+  const vignettes = new Map(), hautes = new Map();
+  for(const [nom, chemin] of parCarte){
+    if(nom.endsWith(SUFFIXE_HD)) hautes.set(nom.slice(0, -SUFFIXE_HD.length), chemin);
+    else vignettes.set(nom, chemin);
+  }
+  return { vignettes, hautes };
+}
+
 // ---------------------------------------------------- lecture des .ts ----
 //
 // Les fiches de TCGdex sont des fichiers TypeScript écrits à la main mais
@@ -543,6 +556,52 @@ async function recolterVisuelsFrancais(pocket){
   }
 }
 
+// ------------------------ copier chez nous le reste du catalogue Pocket ---
+//
+// Les extensions qui ne manquaient de rien tirent toujours leurs visuels de
+// TCGdex. Ça marche, mais ça veut dire qu'une page de ce site déclenche une
+// requête chez eux à chaque affichage, et que le jour où leur serveur bouge,
+// les cartes disparaissent.
+//
+// On copie donc les deux définitions : la vignette des grilles et la haute
+// définition du zoom. Les deux, parce que n'en prendre qu'une dégraderait
+// visiblement le zoom — mesuré à 310 Mo pour l'ensemble, ce qui reste très
+// en deçà de ce que GitHub Pages accepte.
+//
+// Comme ailleurs : rien n'est redemandé deux fois, et rien n'écrase un
+// fichier existant.
+
+async function copierLeResteDuCatalogue(pocket){
+  await mkdir(DOSSIER_VISUELS, { recursive: true });
+  const aFaire = [];
+  for(const cartes of pocket.cartesParSet.values()){
+    for(const carte of cartes){
+      if(/^https?:/.test(carte.image ?? '') && !existsSync(`${DOSSIER_VISUELS}/${carte.id}.webp`)){
+        aFaire.push({ adresse: carte.image, fichier: `${DOSSIER_VISUELS}/${carte.id}.webp` });
+      }
+      if(/^https?:/.test(carte.imageHaute ?? '') && carte.imageHaute !== carte.image
+         && !existsSync(`${DOSSIER_VISUELS}/${carte.id}${SUFFIXE_HD}.webp`)){
+        aFaire.push({ adresse: carte.imageHaute, fichier: `${DOSSIER_VISUELS}/${carte.id}${SUFFIXE_HD}.webp` });
+      }
+    }
+  }
+  if(!aFaire.length){ console.log('Reste du catalogue Pocket : tout est déjà dans le dépôt.'); return; }
+
+  console.log(`Copie du reste du catalogue Pocket — ${aFaire.length} fichiers à prendre…`);
+  let pris = 0, echecs = 0, octets = 0;
+  await parPaquets(aFaire, 8, async ({ adresse, fichier }) => {
+    try{
+      const r = await fetch(adresse, { redirect: 'follow', headers: IDENTITE });
+      if(!r.ok){ echecs++; return; }
+      const donnees = Buffer.from(await r.arrayBuffer());
+      await writeFile(fichier, donnees);
+      octets += donnees.length;
+      pris++;
+    }catch(err){ echecs++; }
+  });
+  console.log(`  ${pris} copiés (${(octets / 1048576).toFixed(0)} Mo), ${echecs} en échec`);
+}
+
 // ------------------------------- retrouver le Pokémon d'une carte Pocket --
 //
 // Le jeu de données de l'application ne porte pas le numéro de Pokédex, dont
@@ -634,23 +693,33 @@ async function principal(){
 
   await recolterVisuelsFrancais(pocket);
 
-  const visuelsLocaux = await recenserVisuelsLocaux();
-  if(visuelsLocaux.size){
-    let poses = 0;
+  await copierLeResteDuCatalogue(pocket);
+
+  const { vignettes, hautes } = trierVisuels(await recenserVisuelsLocaux());
+  if(vignettes.size){
+    let poses = 0, posesHd = 0;
     for(const lot of [physique, pocket]){
       for(const cartes of lot.cartesParSet.values()){
         for(const carte of cartes){
-          const local = visuelsLocaux.get(carte.id);
+          const local = vignettes.get(carte.id);
           if(!local) continue;
-          // Ce qui venait d'ailleurs devient le secours.
+          // Ce qui venait d'ailleurs devient le secours — l'adresse
+          // française qu'on servait jusqu'ici, pas l'anglaise plus ancienne :
+          // si le fichier local manquait, mieux vaut retomber sur la bonne
+          // langue.
           carte.imageSecours = carte.image;
           carte.image = local;
-          carte.imageHaute = local;
+          // Faute de haute définition locale, la vignette fait l'affaire :
+          // c'est ce qui se passait déjà pour les visuels du wiki, qui n'en
+          // ont qu'une seule.
+          const hd = hautes.get(carte.id);
+          carte.imageHaute = hd ?? local;
+          if(hd) posesHd++;
           poses++;
         }
       }
     }
-    console.log(`Visuels déposés à la main : ${poses} posés sur ${visuelsLocaux.size} fichiers trouvés`);
+    console.log(`Visuels servis depuis le dépôt : ${poses} cartes, dont ${posesHd} avec une haute définition`);
   }
 
   const bilanPhysique = await publier('physique', physique, SORTIE);
