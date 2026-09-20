@@ -89,6 +89,35 @@ function extraireExtensions(donnees, vus = new Set(), profondeur = 0){
   return vus;
 }
 
+// Nous séparons les promos en P-A et P-B ; eux n'ont qu'une série « PROMO »
+// à numérotation continue. Si la suite est simplement « P-A puis P-B », leur
+// PROMO-118 doit porter le nom de notre P-B-001. On ne le suppose pas : on
+// compare les noms, carte par carte.
+async function comparerLesPromos(base, cle){
+  const r = await demander(base, cle, '/cards', {});
+  if(r.statut !== 200) return console.log('Comparaison impossible : la liste des cartes ne répond pas.');
+
+  const plat = [];
+  (function parcourir(x, p = 0){
+    if(!x || p > 6) return;
+    if(Array.isArray(x)) return x.forEach(y => parcourir(y, p + 1));
+    if(typeof x === 'object'){
+      const id = x.id ?? x.code ?? x.card_id;
+      const nom = x.name ?? x.name_fr ?? x.title;
+      if(typeof id === 'string' && /^PROMO-\d+$/.test(id)) plat.push({ id, nom });
+      Object.values(x).forEach(y => parcourir(y, p + 1));
+    }
+  })(r.donnees);
+
+  const promos = [...new Map(plat.map(c => [c.id, c])).values()]
+    .sort((a, b) => Number(a.id.slice(6)) - Number(b.id.slice(6)));
+  console.log(`\n${promos.length} cartes PROMO chez eux.`);
+  console.log('Les leurs, autour du 118 :');
+  for(const c of promos.filter(c => { const n = Number(c.id.slice(6)); return n >= 115 && n <= 124; })){
+    console.log(`  ${c.id}  ${c.nom ?? '(sans nom)'}`);
+  }
+}
+
 async function principal(){
   console.log('Lecture du code du wiki…');
   const { base, cle } = await reperages();
@@ -99,15 +128,7 @@ async function principal(){
     : `  clé d'accès    : aucune trouvée — on demande sans, le point d'entrée est peut-être ouvert\n`);
 
   for(const [chemin, corps] of [
-    ['/expansions', null],
-    ['/sets', null],
-    ['/expansion', null],
-    ['/cards', { page: 1, pageSize: 3 }],
     ['/cards', {}],
-    ['', null],
-    ['/', null],
-    ['/expansions/list', null],
-    ['/card-list', null],
   ]){
     const r = await demander(base, cle, chemin, corps);
     console.log(`${corps ? 'POST' : 'GET '} ${chemin.padEnd(12)} → HTTP ${r.statut}`);
@@ -115,9 +136,8 @@ async function principal(){
 
     const extensions = [...extraireExtensions(r.donnees)].sort();
     if(extensions.length){
-      console.log(`     extensions vues : ${extensions.join(', ')}`);
-      const promos = extensions.filter(e => /p|promo/i.test(e));
-      if(promos.length) console.log(`     → candidates pour les promos : ${promos.join(', ')}`);
+      const series = [...new Set(extensions.map(e => e.replace(/-\d+$/, '')))].sort();
+      console.log(`     ${extensions.length} cartes, séries : ${series.join(', ')}`);
     }
     // Un chemin de visuel dans la réponse vaut mieux que toutes les déductions.
     const chemins = [...new Set(
@@ -130,7 +150,10 @@ async function principal(){
     if(!extensions.length && !chemins.length){
       console.log('     ' + JSON.stringify(r.donnees).slice(0, 400));
     }
+    break;   // un chemin qui répond suffit : inutile de les essayer tous
   }
+
+  await comparerLesPromos(base, cle);
 }
 
 principal().catch(err => { console.error('Échec :', err.message); process.exit(1); });
