@@ -299,6 +299,23 @@ function traduireNom(nom, traductions, nomsFrancais){
 // au pire on retombe sur ce qu'on affichait déjà.
 const TCGDEX_POCKET = 'https://assets.tcgdex.net/fr/tcgp';
 
+// Les extensions se suivent par date à l'intérieur d'une série, mais les
+// promos passent devant : ce sont les cartes hors-boosters de la série, et
+// les voir en tête fait comprendre d'un coup d'œil à quelle série elles
+// appartiennent. Le tri porte sur trois critères, du plus général au plus
+// fin : la série, puis le caractère promotionnel, puis la date.
+//
+// C'est une fonction plutôt qu'un tri écrit sur place, parce qu'il faut le
+// rejouer après avoir fusionné les extensions saisies à la main.
+function trierExtensionsPocket(extensions){
+  const estPromo = e => /^P-/.test(e.id);
+  extensions.sort((a, b) =>
+    String(a.serieNom ?? '').localeCompare(String(b.serieNom ?? ''))
+    || (estPromo(b) - estPromo(a))
+    || String(a.dateSortie ?? '').localeCompare(String(b.dateSortie ?? '')));
+  return extensions;
+}
+
 async function construirePocket(traductions = new Map(), nomsFrancais = new Set(), chezTcgdex = new Set()){
   const parSerie = await telecharger(`${POCKET_BASE}/sets.json`);
 
@@ -318,16 +335,7 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
       });
     }
   }
-  // Les extensions se suivent par date à l'intérieur d'une série, mais les
-  // promos passent devant : ce sont les cartes hors-boosters de la série, et
-  // les voir en tête fait comprendre d'un coup d'œil à quelle série elles
-  // appartiennent. Le tri porte donc sur trois critères, du plus général au
-  // plus fin : la série, puis le caractère promotionnel, puis la date.
-  const estPromo = e => /^P-/.test(e.id);
-  extensions.sort((a, b) =>
-    String(a.serieNom ?? '').localeCompare(String(b.serieNom ?? ''))
-    || (estPromo(b) - estPromo(a))
-    || String(a.dateSortie ?? '').localeCompare(String(b.dateSortie ?? '')));
+  trierExtensionsPocket(extensions);
 
   const cartesParSet = new Map();
   for(const ext of extensions){
@@ -579,6 +587,117 @@ async function recolterVisuelsFrancais(pocket){
   }
 }
 
+// ------------------------- les extensions saisies à la main --------------
+//
+// Filet de sécurité, pas outil du quotidien. Quand une extension paraît et
+// qu'aucune source ne la publie encore, il faut bien pouvoir la déclarer :
+// sans page d'extension, les visuels qu'on déposerait n'auraient nulle part
+// où s'afficher.
+//
+// Deux règles gouvernent cette fusion, et elles vont dans le même sens :
+//
+//   1. Les sources automatiques l'emportent. Une extension saisie ici
+//      disparaît d'elle-même dès qu'une source la publie — sinon une saisie
+//      d'aujourd'hui, forcément incomplète, figerait le catalogue et
+//      empêcherait la vraie donnée d'arriver demain.
+//
+//   2. Une saisie mal formée arrête la construction. Le jeu de données
+//      publié la veille reste alors en place, et l'erreur est visible dans
+//      l'onglet Actions. C'est préférable à un catalogue à moitié valide
+//      que personne ne remarquerait.
+
+const EXTENSIONS_MANUELLES = 'extensions-manuelles.json';
+
+function refuser(quoi, pourquoi){
+  throw new Error(
+    `${EXTENSIONS_MANUELLES} — ${quoi} : ${pourquoi}\n` +
+    `  Rien n'a été publié ; l'instantané de la veille reste en place.`
+  );
+}
+
+function verifierSaisie(ext, rang){
+  const ou = ext?.id ? `extension « ${ext.id} »` : `extension n°${rang + 1}`;
+  if(!ext || typeof ext !== 'object') refuser(ou, 'ce n\'est pas une fiche');
+  if(!/^[A-Za-z0-9-]+$/.test(String(ext.id ?? ''))) {
+    refuser(ou, 'il manque un « id », ou il contient autre chose que des lettres, chiffres et tirets');
+  }
+  if(!String(ext.name ?? '').trim()) refuser(ou, 'il manque le « name », le nom affiché de l\'extension');
+  if(!String(ext.serieNom ?? '').trim()) refuser(ou, 'il manque la « serieNom », par exemple « Série B »');
+  if(!Array.isArray(ext.cartes)) refuser(ou, 'il manque la liste « cartes » (un tableau, même vide)');
+
+  const vus = new Set();
+  for(const c of ext.cartes){
+    const numero = String(c?.localId ?? '').trim();
+    if(!/^\d+$/.test(numero)) refuser(ou, `une carte a un « localId » absent ou non numérique (« ${c?.localId} »)`);
+    if(vus.has(numero)) refuser(ou, `deux cartes portent le numéro ${numero}`);
+    vus.add(numero);
+    if(!String(c?.name ?? '').trim()) refuser(ou, `la carte ${numero} n'a pas de « name »`);
+  }
+}
+
+async function fusionnerExtensionsManuelles(pocket, dexDuNomDeCarte){
+  let saisies;
+  try{
+    saisies = JSON.parse(await readFile(EXTENSIONS_MANUELLES, 'utf8'));
+  }catch(err){
+    if(err.code === 'ENOENT') return;           // pas de fichier, rien à faire
+    refuser('lecture', `le fichier n'est pas du JSON valide (${err.message})`);
+  }
+  if(!Array.isArray(saisies)) refuser('lecture', 'le fichier doit contenir un tableau [ … ]');
+  if(!saisies.length) return;
+
+  const connues = new Set(pocket.extensions.map(e => e.id));
+  let ajoutees = 0, devancees = 0;
+
+  saisies.forEach((ext, rang) => {
+    verifierSaisie(ext, rang);
+
+    if(connues.has(ext.id)){
+      // La source l'a rattrapée : c'est elle qui fait foi désormais.
+      console.log(`  ${ext.id} : publiée par la source, la saisie manuelle est ignorée (tu peux la retirer)`);
+      devancees++;
+      return;
+    }
+
+    const cartes = ext.cartes
+      .map(c => {
+        const numero = String(c.localId).trim();
+        const id = `${ext.id}-${numero.padStart(3, '0')}`;
+        return {
+          id,
+          localId: numero,
+          name: String(c.name).trim(),
+          rarity: c.rarity ?? null,
+          // Le visuel suivra le chemin ordinaire : la récolte tentera les
+          // sources, et un fichier déposé à la main sera repris comme pour
+          // n'importe quelle autre carte.
+          dexId: dexDuNomDeCarte(String(c.name).trim()),
+          image: null,
+          imageHaute: null,
+          imageSecours: null,
+        };
+      })
+      .sort((a, b) => Number(a.localId) - Number(b.localId));
+
+    pocket.extensions.push({
+      id: ext.id,
+      name: String(ext.name).trim(),
+      cardCount: { official: ext.cardCount ?? (cartes.length || null) },
+      logo: null,
+      symbol: null,
+      serieNom: String(ext.serieNom).trim(),
+      dateSortie: ext.dateSortie ?? null,
+      saisieManuelle: true,
+    });
+    pocket.cartesParSet.set(ext.id, cartes);
+    connues.add(ext.id);
+    ajoutees++;
+  });
+
+  if(ajoutees) trierExtensionsPocket(pocket.extensions);
+  console.log(`Extensions saisies à la main : ${ajoutees} ajoutée(s), ${devancees} devancée(s) par la source`);
+}
+
 // ------------------------------------ les logos d'extension, en français ---
 //
 // Les logos venaient de flibustier, qui ne traduit que ce qu'il a eu le temps
@@ -765,6 +884,8 @@ async function principal(){
 
   console.log("Application — téléchargement du jeu de données…");
   const pocket = await construirePocket(physique.traductions, new Set(POKEDEX_FR), physique.pocketChezTcgdex);
+
+  await fusionnerExtensionsManuelles(pocket, dexDuNomDeCarte);
 
   console.log('Rattachement des cartes Pocket à leur Pokémon…');
   let rattachees = 0, orphelines = 0;
