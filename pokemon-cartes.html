@@ -89,6 +89,10 @@
      largeur de son texte, et les points de suspension ne servent à rien. */
   .card-num span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .rarity-symbol{color:var(--gold);letter-spacing:1px;flex-shrink:0;}
+  /* Les icônes suivent la taille du texte autour : une carte plus petite sur
+     téléphone garde des symboles proportionnés, sans règle supplémentaire. */
+  .icone-rarete{height:1.05em;width:auto;vertical-align:-.16em;display:inline-block}
+  .icone-rarete + .icone-rarete{margin-left:1px}
   .card-name{font-size:13px;font-weight:500;}
 
   .tag-row{margin-top:auto;display:flex;gap:5px;}
@@ -209,16 +213,16 @@
   <footer>PokéClasseur — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
 </div>
 
-<script src="univers.js?v=2026-09-20-ahu0"></script>
-<script src="catalogue.js?v=2026-09-20-ahu0"></script>
-<script src="pokedex-fr.js?v=2026-09-20-ahu0"></script>
-<script src="sets.js?v=2026-09-20-ahu0"></script>
-<script src="supabase-config.js?v=2026-09-20-ahu0"></script>
-<script src="admin.js?v=2026-09-20-ahu0"></script>
-<script src="tags.js?v=2026-09-20-ahu0"></script>
-<script src="cards.js?v=2026-09-20-ahu0"></script>
-<script src="prix.js?v=2026-09-20-ahu0"></script>
-<script src="compte.js?v=2026-09-20-ahu0"></script>
+<script src="univers.js?v=2026-09-20-d0z3"></script>
+<script src="catalogue.js?v=2026-09-20-d0z3"></script>
+<script src="pokedex-fr.js?v=2026-09-20-d0z3"></script>
+<script src="sets.js?v=2026-09-20-d0z3"></script>
+<script src="supabase-config.js?v=2026-09-20-d0z3"></script>
+<script src="admin.js?v=2026-09-20-d0z3"></script>
+<script src="tags.js?v=2026-09-20-d0z3"></script>
+<script src="cards.js?v=2026-09-20-d0z3"></script>
+<script src="prix.js?v=2026-09-20-d0z3"></script>
+<script src="compte.js?v=2026-09-20-d0z3"></script>
 <script>
 // Toutes les cartes d'un Pokémon, toutes extensions confondues, à partir de
 // son numéro du Pokédex national passé dans l'URL (?dex=25).

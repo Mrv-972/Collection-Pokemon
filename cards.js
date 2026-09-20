@@ -68,6 +68,36 @@ function raritySymbol(rarity){
   return '✦';
 }
 
+// Les vraies icônes du jeu, pour les vignettes.
+//
+// « raritySymbol » ci-dessus reste en caractères typographiques : il sert
+// aussi à remplir le menu déroulant des filtres, et un <option> ne peut pas
+// contenir d'image. Les deux cohabitent donc, chacun là où il fonctionne.
+//
+// Le jeu répète le même symbole — trois losanges pour « Trois Diamants ».
+// On fait pareil, plutôt que d'avoir un fichier par combinaison.
+const ICONES_RARETE = {
+  'Un Diamant':               ['losange', 1],
+  'Deux Diamants':            ['losange', 2],
+  'Trois Diamants':           ['losange', 3],
+  'Quatre Diamants':          ['losange', 4],
+  'Une Étoile':               ['etoile', 1],
+  'Deux Étoiles':             ['etoile', 2],
+  'Trois Étoiles':            ['etoile', 3],
+  'Couronne':                 ['couronne', 1],
+  'Chromatique':              ['chromatique', 1],
+  'Chromatique deux étoiles': ['chromatique', 2],
+};
+
+function rarityIcon(rarity){
+  const icone = ICONES_RARETE[rarity];
+  // Les quarante raretés du jeu physique n'ont pas d'icône : elles gardent
+  // le symbole typographique, qui vaut mieux qu'un vide.
+  if(!icone) return raritySymbol(rarity);
+  const [nom, nombre] = icone;
+  return `<img class="icone-rarete" src="images/raretes/${nom}.png" alt="" aria-hidden="true" loading="lazy">`.repeat(nombre);
+}
+
 // Ordre d'affichage dans le filtre : du plus commun au plus rare.
 const SYMBOL_RANK = { '': 0, '●': 1, '◆': 2, '★': 3, '★★': 4, '★★★': 5, '★★★★': 6, '✦': 7 };
 function rarityRank(rarity){
@@ -164,7 +194,7 @@ function cardTile(c, subtitle){
           ? `<img src="${c.image}" alt="${c.name}" loading="lazy" data-card-id="${c.id}" data-haute="${c.imageHaute ?? c.image}" data-fallback="${c.imageSecours ?? `images/cards/${c.id}.png`}" onerror="cardImgFallback(this)">`
           : `<img src="images/cards/${c.id}.png" alt="${c.name}" loading="lazy" data-card-id="${c.id}" onerror="cardImgFallback(this)">`}
       </div>
-      <div class="card-num"><span>${subtitle ?? '#' + c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
+      <div class="card-num"><span>${subtitle ?? '#' + c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${rarityIcon(c.rarity)}</span></div>
       <div class="card-name">${c.name}</div>
       ${coteVignette(c.id)}
       <div class="tag-row">${tagButtons(c)}</div>
