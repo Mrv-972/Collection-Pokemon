@@ -556,12 +556,7 @@ async function recolterVisuelsFrancais(pocket){
       });
 
       console.log(`  ${ext.id} : ${pris} visuels téléchargés, ${deja} déjà là, ${manques} introuvables (${source.nom})`);
-      if(!manques){
-        // Plus rien ne manque : le bandeau « visuels anglais » n'a plus lieu
-        // d'être, et les sources suivantes n'ont plus rien à apporter.
-        delete ext.visuelsAnglais;
-        break;
-      }
+      if(!manques) break;   // rien ne manque plus : sources suivantes inutiles
     }
   }
 }
@@ -730,6 +725,18 @@ async function principal(){
       }
     }
     console.log(`Visuels servis depuis le dépôt : ${poses} cartes, dont ${posesHd} avec une haute définition`);
+  }
+
+  // Le bandeau « visuels des cartes en anglais » se déduit de l'état final,
+  // jamais d'une intention prise en cours de route. Une extension dont
+  // chaque carte a son visuel chez nous est en français, point — et si
+  // demain une extension paraît sans visuel français, le bandeau
+  // réapparaîtra de lui-même.
+  for(const ext of pocket.extensions){
+    const cartes = pocket.cartesParSet.get(ext.id) ?? [];
+    const enAnglais = cartes.some(c => /^https?:/.test(c.image ?? ''));
+    if(enAnglais) ext.visuelsAnglais = true;
+    else delete ext.visuelsAnglais;
   }
 
   const bilanPhysique = await publier('physique', physique, SORTIE);
