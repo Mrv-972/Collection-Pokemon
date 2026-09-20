@@ -35,6 +35,9 @@ function saveTags(){
 }
 
 function toggleTag(cardId, tag){
+  // L'affichage désactive déjà le bouton ; cette garde couvre les autres
+  // chemins — marquage groupé, raccourci clavier, ou données héritées.
+  if(tag === 'ech' && raisonsParCarte.has(cardId)) return;
   if(!tagState[cardId]) tagState[cardId] = emptyTagState();
   tagState[cardId][tag] = !tagState[cardId][tag];
   saveTags();
@@ -44,6 +47,8 @@ function toggleTag(cardId, tag){
 // Applique un tag à un lot de cartes — ou le retire si elles le portent déjà
 // toutes, pour qu'un clic malheureux se défasse aussi vite qu'il s'est fait.
 function bulkToggleTag(cards, tag){
+  // « Tout marquer échangeable » ne doit pas contourner la règle.
+  if(tag === 'ech') cards = cards.filter(c => !raisonNonEchangeable(c));
   if(cards.length === 0) return;
   const allTagged = cards.every(c => tagState[c.id]?.[tag]);
   cards.forEach(c => {
@@ -67,8 +72,84 @@ function synchroniser(envoi){
     });
 }
 
+// --------------------------- ce qui ne s'échange pas dans TCG Pocket -----
+//
+// Le jeu interdit l'échange des cartes promotionnelles, des Trois Étoiles et
+// des Couronne. Proposer de les marquer « échangeable » ferait espérer des
+// échanges impossibles, et polluerait la mise en relation entre membres.
+//
+// Les marquer « recherchée » reste permis : on peut très bien vouloir une
+// carte qu'on ne pourra jamais obtenir par échange.
+//
+// La règle ne vaut que pour l'univers Pocket. Le jeu physique n'a ni ces
+// raretés ni cette contrainte — on n'y touche pas.
+
+const RARETES_NON_ECHANGEABLES = new Set(['Trois Étoiles', 'Couronne']);
+
+const RAISON_PROMO   = "Les cartes Promo ne sont pas échangeables dans Pokemon TCG Pocket";
+const RAISON_RARETE  = "Cette catégorie de carte n'est pas échangeable dans Pokemon TCG Pocket";
+
+function raisonNonEchangeable(carte){
+  if(!carte) return null;
+  if(typeof universActuel === 'function' && universActuel().cle !== 'pocket') return null;
+  // « P-A-001 », « P-B-034 » : les extensions promotionnelles.
+  if(/^P-[A-Z]-/.test(String(carte.id))) return RAISON_PROMO;
+  if(RARETES_NON_ECHANGEABLES.has(carte.rarity)) return RAISON_RARETE;
+  return null;
+}
+
+// Retenu au fil de l'affichage : le gestionnaire de clic ne connaît que
+// l'identifiant d'une carte, pas sa rareté.
+const raisonsParCarte = new Map();
+
+// Un membre a pu marquer une de ces cartes « échangeable » avant que la règle
+// existe. On efface ces marquages devenus faux — une fois par affichage, et
+// non carte par carte, pour n'écrire qu'une seule fois en base.
+const aNettoyer = new Set();
+let nettoyagePrevu = false;
+
+function prevoirNettoyage(){
+  if(nettoyagePrevu) return;
+  nettoyagePrevu = true;
+  queueMicrotask(() => {
+    nettoyagePrevu = false;
+    const ids = [...aNettoyer];
+    aNettoyer.clear();
+    if(!ids.length) return;
+    ids.forEach(id => { tagState[id].ech = false; });
+    saveTags();
+    synchroniser(() => enregistrerCartes(ids.map(id => [id, tagState[id]])));
+  });
+}
+
+function echapperAttribut(texte){
+  return String(texte).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 // Boutons de tag d'une vignette de carte.
-function tagButtons(cardId){
-  const state = tagState[cardId] || emptyTagState();
-  return TAGS.map(tag => `<button class="tag-toggle ${tag} ${state[tag] ? 'active' : ''}" data-id="${cardId}" data-tag="${tag}" title="${TAG_META[tag].label}" aria-label="${TAG_META[tag].label}">${TAG_META[tag].emoji}</button>`).join('');
+function tagButtons(carte){
+  // Les pages passent la carte entière ; un identifiant seul reste accepté,
+  // mais la règle d'échange a besoin de la rareté pour s'appliquer.
+  const c = typeof carte === 'string' ? { id: carte } : carte;
+  const state = tagState[c.id] || emptyTagState();
+  const raison = raisonNonEchangeable(c);
+
+  if(raison){
+    raisonsParCarte.set(c.id, raison);
+    if(state.ech){ aNettoyer.add(c.id); prevoirNettoyage(); }
+  }else{
+    raisonsParCarte.delete(c.id);
+  }
+
+  return TAGS.map(tag => {
+    if(tag === 'ech' && raison){
+      const texte = echapperAttribut(raison);
+      // Le bouton est désactivé, donc muet au clic. L'enveloppe, elle,
+      // reçoit le clic et sert à expliquer pourquoi — sans quoi un visiteur
+      // sur téléphone, qui n'a pas de survol, n'aurait aucune explication.
+      return `<span class="ech-bloque" data-raison="${texte}" title="${texte}"><button class="tag-toggle ech bloque" disabled aria-label="${texte}">${TAG_META.ech.emoji}</button></span>`;
+    }
+    return `<button class="tag-toggle ${tag} ${state[tag] ? 'active' : ''}" data-id="${c.id}" data-tag="${tag}" title="${TAG_META[tag].label}" aria-label="${TAG_META[tag].label}">${TAG_META[tag].emoji}</button>`;
+  }).join('');
 }

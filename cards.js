@@ -167,7 +167,7 @@ function cardTile(c, subtitle){
       <div class="card-num"><span>${subtitle ?? '#' + c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${raritySymbol(c.rarity)}</span></div>
       <div class="card-name">${c.name}</div>
       ${coteVignette(c.id)}
-      <div class="tag-row">${tagButtons(c.id)}</div>
+      <div class="tag-row">${tagButtons(c)}</div>
     </div>
   `;
 }
@@ -335,3 +335,38 @@ document.addEventListener('click', (e) => {
   const img = e.target.closest('.card-img-wrap img');
   if(img) openCardZoom(img);
 });
+
+
+// Message bref, affiché au bas de l'écran puis effacé.
+//
+// Il sert aux explications qu'un survol de souris donnerait, mais qu'un
+// téléphone ne peut pas montrer — par exemple pourquoi une carte ne peut pas
+// être marquée « échangeable ». Les styles sont posés ici plutôt que dans la
+// feuille de chaque page : le message doit pouvoir apparaître partout sans
+// qu'on ait à se souvenir d'ajouter du CSS.
+let messageFugaceElement = null;
+let messageFugaceMinuteur = null;
+
+function messageFugace(texte){
+  if(!texte) return;
+  if(!messageFugaceElement){
+    messageFugaceElement = document.createElement('div');
+    messageFugaceElement.setAttribute('role', 'status');
+    Object.assign(messageFugaceElement.style, {
+      position: 'fixed', left: '50%', bottom: '24px', transform: 'translateX(-50%)',
+      maxWidth: 'min(520px, calc(100vw - 32px))', padding: '12px 18px',
+      background: 'rgba(18,63,56,.97)', color: '#EDEAE0',
+      border: '1px solid rgba(255,255,255,.18)', borderRadius: '10px',
+      font: '14px/1.4 "IBM Plex Sans", sans-serif', textAlign: 'center',
+      zIndex: '9999', boxShadow: '0 8px 28px rgba(0,0,0,.45)',
+      opacity: '0', transition: 'opacity .18s',
+    });
+    document.body.appendChild(messageFugaceElement);
+  }
+  messageFugaceElement.textContent = texte;
+  requestAnimationFrame(() => { messageFugaceElement.style.opacity = '1'; });
+  clearTimeout(messageFugaceMinuteur);
+  messageFugaceMinuteur = setTimeout(() => {
+    messageFugaceElement.style.opacity = '0';
+  }, 3600);
+}

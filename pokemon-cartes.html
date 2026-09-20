@@ -100,6 +100,12 @@
   .tag-toggle.rech.active{background:rgba(168,67,28,0.16);border-color:rgba(168,67,28,0.5)}
   .tag-toggle.ech.active{background:rgba(31,111,99,0.18);border-color:rgba(31,111,99,0.5)}
   .tag-toggle:hover{border-color:rgba(237,234,224,0.35);opacity:1}
+  /* Le bouton « échangeable » bloqué vit dans une enveloppe qui reçoit le
+     clic à sa place : elle doit donc reprendre la largeur qu'il occupait. */
+  .ech-bloque{flex:1;display:flex;cursor:help}
+  .ech-bloque .tag-toggle{flex:1;cursor:help}
+  .tag-toggle.bloque,.tag-toggle.bloque:hover{opacity:.28;filter:grayscale(1);
+    border-style:dashed;border-color:rgba(237,234,224,0.14)}
 
   .skeleton{aspect-ratio:2.5/3.5;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;position:relative;overflow:hidden;}
   .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(237,234,224,0.06),transparent);animation:shine 1.4s infinite;}
@@ -203,16 +209,16 @@
   <footer>PokéClasseur — cartes et images fournies en direct par l'API TCGdex. Tes tags sont enregistrés dans ce navigateur, sur cet appareil.</footer>
 </div>
 
-<script src="univers.js?v=2026-09-20-wilu"></script>
-<script src="catalogue.js?v=2026-09-20-wilu"></script>
-<script src="pokedex-fr.js?v=2026-09-20-wilu"></script>
-<script src="sets.js?v=2026-09-20-wilu"></script>
-<script src="supabase-config.js?v=2026-09-20-wilu"></script>
-<script src="admin.js?v=2026-09-20-wilu"></script>
-<script src="tags.js?v=2026-09-20-wilu"></script>
-<script src="cards.js?v=2026-09-20-wilu"></script>
-<script src="prix.js?v=2026-09-20-wilu"></script>
-<script src="compte.js?v=2026-09-20-wilu"></script>
+<script src="univers.js?v=2026-09-20-ahu0"></script>
+<script src="catalogue.js?v=2026-09-20-ahu0"></script>
+<script src="pokedex-fr.js?v=2026-09-20-ahu0"></script>
+<script src="sets.js?v=2026-09-20-ahu0"></script>
+<script src="supabase-config.js?v=2026-09-20-ahu0"></script>
+<script src="admin.js?v=2026-09-20-ahu0"></script>
+<script src="tags.js?v=2026-09-20-ahu0"></script>
+<script src="cards.js?v=2026-09-20-ahu0"></script>
+<script src="prix.js?v=2026-09-20-ahu0"></script>
+<script src="compte.js?v=2026-09-20-ahu0"></script>
 <script>
 // Toutes les cartes d'un Pokémon, toutes extensions confondues, à partir de
 // son numéro du Pokédex national passé dans l'URL (?dex=25).
@@ -387,6 +393,11 @@ async function init(){
 }
 
 document.getElementById('content').addEventListener('click', (e) => {
+  // Un bouton désactivé n'émet pas de clic : c'est son enveloppe qui le
+  // reçoit, et qui porte la raison du refus.
+  const bloque = e.target.closest('.ech-bloque');
+  if(bloque){ messageFugace(bloque.dataset.raison); return; }
+
   const btn = e.target.closest('.tag-toggle');
   if(!btn) return;
   toggleTag(btn.dataset.id, btn.dataset.tag);
