@@ -30,22 +30,32 @@
     "",
     "Piste ajoutée le 20/09 : pokemon-tcg-pocket.wiki, qui répertorie les",
     "cartes en français. Sondée d'abord en reconnaissance — on ne connaît ni",
-    "l'adresse de ses images, ni la forme de ses pages."
+    "l'adresse de ses images, ni la forme de ses pages.",
+    "",
+    "Le wiki français sert ses visuels depuis son propre Supabase, selon la",
+    "forme lue dans son code :",
+    "  .../public_files/system/card/<langue>/<extension>/<carte>.webp",
+    "Le témoin « en » est là exprès : s'il répond et que « fr » ne répond pas,",
+    "c'est la langue qui manque, pas le chemin."
   ],
   "candidats": [
     {
-      "nom": "Wiki TCG Pocket — index français des cartes",
-      "genre": "page",
+      "nom": "Wiki TCG Pocket — stockage public, langue « fr »",
+      "genre": "motif",
       "actif": false,
-      "page": "https://pokemon-tcg-pocket.wiki/fr/cards",
-      "motifImage": "https://[^\"'\\s]+/{SET}[_\\-/]0*{NUM}[^\"'\\s]*\\.(?:webp|png|jpg)"
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/{SET}/{SET}-{NUM3}.webp"
     },
     {
-      "nom": "Wiki TCG Pocket — page française de l'extension",
-      "genre": "page",
+      "nom": "Wiki TCG Pocket — stockage public, langue « fr-FR »",
+      "genre": "motif",
       "actif": false,
-      "page": "https://pokemon-tcg-pocket.wiki/fr/cards/{SET}",
-      "motifImage": "https://[^\"'\\s]+/{SET}[_\\-/]0*{NUM}[^\"'\\s]*\\.(?:webp|png|jpg)"
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr-FR/{SET}/{SET}-{NUM3}.webp"
+    },
+    {
+      "nom": "Wiki TCG Pocket — stockage public, témoin « en »",
+      "genre": "motif",
+      "actif": false,
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/en/{SET}/{SET}-{NUM3}.webp"
     },
     {
       "nom": "Limitless Pocket — nommage réel, sans suffixe de taille",
