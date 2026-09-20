@@ -1,0 +1,22 @@
+# Demande au wiki francophone comment il nomme ses extensions.
+#
+# Lancé à la main, jamais par la construction nocturne : contrairement à la
+# lecture d'un dossier public, cet outil emploie la clé que leur site embarque
+# dans son code. Il ne l'affiche pas.
+name: Interroger le wiki
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  demander:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node outils/interroger-wiki.mjs
