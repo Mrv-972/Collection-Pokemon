@@ -22,6 +22,7 @@ const UNIVERS = {
     court: 'Physique',
     // Deux cartes l'une derrière l'autre.
     icone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="12" height="15" rx="2"/><path d="M8.5 3H18a2 2 0 0 1 2 2v11"/></svg>',
+    logo: 'images/jeux/tcg-physique.png',
   },
   pocket: {
     cle: 'pocket',
@@ -29,6 +30,7 @@ const UNIVERS = {
     court: 'Pocket',
     // Un téléphone.
     icone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.3h3"/></svg>',
+    logo: 'images/jeux/tcg-pocket.png',
   },
 };
 
@@ -120,7 +122,24 @@ const STYLE_RAIL = `
   .rail-item[data-cible="physique"]{--teinte:#C9A227;--teinte-rgb:201,162,39;}
   .rail-item[data-cible="pocket"]  {--teinte:#4B96D8;--teinte-rgb:75,150,216;}
 
+  /* Au survol, la barre s'élargit et montre les logos des deux jeux. Elle
+     passe PAR-DESSUS la page plutôt que de la pousser : « body » garde son
+     retrait de 56 px, donc rien ne se déplace sous le curseur.
+
+     « focus-within » accompagne « hover » : quelqu'un qui navigue au clavier
+     arrive dans la barre sans souris, et doit voir la même chose. */
+  .rail:hover,.rail:focus-within{width:196px}
+  .rail:hover .rail-compact,.rail:focus-within .rail-compact{opacity:0}
+  .rail:hover .rail-logo,.rail:focus-within .rail-logo{opacity:1}
+  /* Barre ouverte, on remonte l'univers qu'on ne lit pas de 42 % à 75 % :
+     à 42 %, son logo se devinait plus qu'il ne se lisait, ce qui vide
+     l'élargissement de son intérêt. L'écart avec l'univers courant, resté à
+     100 %, suffit à dire lequel est actif. */
+  .rail:hover .rail-item,.rail:focus-within .rail-item{opacity:.75}
+  .rail:hover .rail-item.on,.rail:focus-within .rail-item.on{opacity:1}
+
   .rail{position:fixed;left:0;top:0;bottom:0;width:56px;z-index:60;
+        transition:width .2s ease;
         display:flex;flex-direction:column;flex-wrap:nowrap;
         align-items:stretch;justify-content:stretch;gap:0;
         margin:0;padding:0;border-bottom:none;
@@ -141,6 +160,27 @@ const STYLE_RAIL = `
   .rail-item svg{width:21px;height:21px;display:block}
   .rail-nom{font-size:9.5px;letter-spacing:.2px;line-height:1;}
 
+  /* Les deux formes se superposent au même endroit et se croisent en
+     fondu : le logo est en position absolue pour que l'icône n'ait pas à
+     lui céder la place, ce qui ferait sauter la mise en page pendant
+     l'élargissement. */
+  .rail-item{position:relative;overflow:hidden}
+  .rail-compact{display:flex;flex-direction:column;align-items:center;gap:7px;
+                transition:opacity .16s;}
+  .rail-logo{position:absolute;width:150px;max-width:none;height:auto;
+             opacity:0;pointer-events:none;transition:opacity .2s;}
+
+  /* Sans souris ni clavier, une barre qui grandit ne sert à rien et pourrait
+     s'ouvrir sur un effleurement. Sur ces appareils, elle reste fixe. */
+  @media(hover:none){
+    .rail:hover,.rail:focus-within{width:56px}
+    .rail:hover .rail-compact,.rail:focus-within .rail-compact{opacity:1}
+    .rail-logo{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .rail,.rail-compact,.rail-logo{transition:none}
+  }
+
   /* Sur téléphone, une colonne de 56 px prendrait un septième de la largeur.
      La barre passe donc en haut, collée au défilement, en deux onglets. */
   @media(max-width:720px){
@@ -157,6 +197,11 @@ const STYLE_RAIL = `
     .rail-item.on{border-left-color:transparent;border-bottom-color:var(--teinte)}
     .rail-item svg{width:17px;height:17px}
     .rail-nom{font-size:12px}
+    /* En barre du haut, il n'y a pas de largeur à gagner : les logos
+       resteraient illisibles et la forme compacte dit déjà tout. */
+    .rail:hover,.rail:focus-within{width:100%}
+    .rail:hover .rail-compact,.rail:focus-within .rail-compact{opacity:1}
+    .rail-logo{display:none}
   }
 `;
 
@@ -178,7 +223,8 @@ function poserRail(){
     <a class="rail-item ${u.cle === universCourant ? 'on' : ''}" data-cible="${u.cle}"
        href="${cibleBascule(u.cle)}" title="${u.nom}"
        ${u.cle === universCourant ? 'aria-current="page"' : ''}>
-      ${u.icone}<span class="rail-nom">${u.court}</span>
+      <span class="rail-compact">${u.icone}<span class="rail-nom">${u.court}</span></span>
+      <img class="rail-logo" src="${u.logo}" alt="" aria-hidden="true" loading="lazy">
     </a>
   `).join('');
   document.body.prepend(rail);
