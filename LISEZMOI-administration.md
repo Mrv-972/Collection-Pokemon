@@ -6,8 +6,14 @@ une rareté, ajouter une carte, déclarer une extension.
 
 ## À faire une fois, avant tout
 
-**1. Exécuter le schéma.** Ouvre l'éditeur SQL de Supabase, colle le contenu
-de `supabase/schema.sql`, exécute. Le script peut être relancé sans risque.
+**1. Exécuter le SQL.** Ouvre l'éditeur SQL de Supabase et colle le contenu
+de **`supabase/administration.sql`**, puis exécute.
+
+Ce fichier ne contient que les ajouts liés à l'administration. Le reste du
+schéma est déjà en place dans ta base : le rejouer n'apporterait rien, et
+t'en dispenser évite de buter sur la façon dont l'éditeur découpe un long
+script. (`supabase/schema.sql` reste la référence complète, pour repartir de
+zéro.)
 
 **2. Te désigner administrateur.** Toujours dans l'éditeur SQL :
 

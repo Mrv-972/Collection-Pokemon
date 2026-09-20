@@ -547,10 +547,19 @@ begin
   insert into lectures (utilisateur_id, conversation_id, effacee_jusqua, dernier_message_lu, archivee_apres)
   values (auth.uid(), conversation, borne, borne, null)
   on conflict (utilisateur_id, conversation_id)
+  -- Deux règles dans le « do update set » ci-dessous, expliquées ici plutôt
+  -- qu'au milieu de l'instruction : « effacee_jusqua » ne recule jamais, ce
+  -- qui est effacé le reste ; et « dernier_message_lu » avance d'autant, pour
+  -- que ce qu'on vient d'effacer ne reste pas compté comme non lu.
+  --
+  -- Les commentaires sont sortis de l'instruction parce que l'éditeur SQL de
+  -- Supabase les retire avant d'analyser le script, et découpe alors
+  -- l'instruction au mauvais endroit : « syntax error at or near
+  -- effacee_jusqua ». Le SQL était correct — vérifié sur PostgreSQL 16 — mais
+  -- un commentaire au milieu d'une instruction n'apporte pas assez pour
+  -- valoir ce piège.
   do update set
-    -- Jamais en arrière : ce qui est effacé le reste.
     effacee_jusqua = greatest(coalesce(lectures.effacee_jusqua, 0), excluded.effacee_jusqua),
-    -- Ce qui vient d'être effacé ne doit pas rester compté comme non lu.
     dernier_message_lu = greatest(lectures.dernier_message_lu, excluded.dernier_message_lu),
     archivee_apres = null;
 end;
@@ -621,6 +630,10 @@ $$;
 -- carte. « cible » est l'identifiant visé : « B3-001 » pour une carte,
 -- « B5 » pour une extension.
 --
+-- La contrainte « unique » en fin de table dit qu'une seule correction vaut
+-- par cible et par genre : ressaisir remplace, plutôt que d'empiler des
+-- corrections contradictoires dont on ne saurait plus laquelle s'applique.
+--
 -- Le contenu vit dans « donnees », en JSON, plutôt que dans des colonnes
 -- fixes : les champs corrigibles diffèrent d'un genre à l'autre, et ils
 -- changeront. Une colonne par champ imposerait de modifier la base à chaque
@@ -634,9 +647,6 @@ create table if not exists corrections (
   image_chemin text,
   cree_le      timestamptz not null default now(),
   cree_par     uuid not null default auth.uid() references auth.users(id) on delete cascade,
-  -- Une seule correction en vigueur par cible et par genre : ressaisir
-  -- remplace, plutôt que d'empiler des corrections contradictoires dont on
-  -- ne saurait plus laquelle s'applique.
   unique (univers, genre, cible)
 );
 
