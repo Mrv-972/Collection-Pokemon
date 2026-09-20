@@ -493,6 +493,7 @@ async function recolterVisuelsFrancais(pocket){
   const sources = (config.candidats ?? []).filter(s => s.actif);
   if(!sources.length) return;
 
+  await mkdir(DOSSIER_VISUELS, { recursive: true });
   console.log(`Récolte des visuels français manquants — ${sources.length} source(s) allumée(s)…`);
 
   for(const ext of pocket.extensions){
@@ -511,17 +512,28 @@ async function recolterVisuelsFrancais(pocket){
         continue;
       }
 
-      let poses = 0;
-      for(const carte of cartes){
+      // On télécharge, on ne pointe pas. Pointer reviendrait à faire payer
+      // le trafic de ce site à celui qui héberge la source, à chaque page
+      // ouverte par un visiteur. Une fois copié chez nous, le fichier ne
+      // leur coûte plus rien — et le site ne dépend plus de leur serveur.
+      // Les fichiers déjà présents ne sont pas redemandés : la construction
+      // de demain ne repassera pas la commande d'aujourd'hui.
+      let pris = 0, deja = 0, manques = 0;
+      await parPaquets(cartes, 6, async carte => {
         const adresse = adresses.get(String(carte.localId));
-        if(!adresse) continue;
-        if(!carte.imageSecours) carte.imageSecours = carte.image;
-        carte.image = adresse;
-        carte.imageHaute = adresse;
-        poses++;
-      }
-      console.log(`  ${ext.id} : ${poses}/${cartes.length} visuels français depuis ${source.nom}`);
-      if(poses === cartes.length){
+        if(!adresse){ manques++; return; }
+        const fichier = `${DOSSIER_VISUELS}/${carte.id}.webp`;
+        if(existsSync(fichier)){ deja++; return; }
+        try{
+          const r = await fetch(adresse, { redirect: 'follow', headers: IDENTITE });
+          if(!r.ok){ manques++; return; }
+          await writeFile(fichier, Buffer.from(await r.arrayBuffer()));
+          pris++;
+        }catch(err){ manques++; }
+      });
+
+      console.log(`  ${ext.id} : ${pris} visuels téléchargés, ${deja} déjà là, ${manques} introuvables (${source.nom})`);
+      if(!manques){
         // Plus rien ne manque : le bandeau « visuels anglais » n'a plus lieu
         // d'être, et les sources suivantes n'ont plus rien à apporter.
         delete ext.visuelsAnglais;

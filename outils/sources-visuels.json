@@ -42,8 +42,14 @@
     {
       "nom": "Wiki TCG Pocket — stockage public, langue « fr »",
       "genre": "motif",
-      "actif": false,
+      "actif": true,
       "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/{SET}/{SET}-{NUM3}.webp"
+    },
+    {
+      "nom": "Wiki TCG Pocket — stockage public, extensions promotionnelles",
+      "genre": "motif",
+      "actif": true,
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/{SETDIST}/{SETDIST}-{NUM3}.webp"
     },
     {
       "nom": "Wiki TCG Pocket — stockage public, langue « fr-FR »",

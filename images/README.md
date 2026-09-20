@@ -34,3 +34,17 @@ Nom du fichier : l'identifiant de la carte, en `.png`. Il s'écrit
 Exemples :
 - `images/cards/base1-4.png` (Dracaufeu, carte n°4 du Set de Base)
 - `images/cards/mee-1.png` (carte n°1 de Méga-Évolution Énergie)
+
+## Visuels récoltés automatiquement
+
+Depuis le 20 septembre, la construction nocturne dépose elle aussi des fichiers
+dans `images/cards/` : les visuels français qu'elle trouve chez les sources
+allumées dans `outils/sources-visuels.json`.
+
+Ils sont **téléchargés, pas pointés**. Pointer reviendrait à faire payer le
+trafic de ce site à celui qui héberge la source, à chaque page ouverte par un
+visiteur ; et le site retomberait en panne le jour où cette source disparaît.
+Une fois le fichier copié ici, il ne coûte plus rien à personne.
+
+Un fichier déjà présent n'est jamais redemandé, et une image que tu déposes
+toi-même n'est jamais écrasée : la récolte ne télécharge que ce qui manque.
