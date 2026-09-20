@@ -15,6 +15,9 @@
 
 let dbAdmin = null;
 let jeSuisAdmin = false;
+// La page d'administration et le lien du menu posent la même question. On la
+// garde en mémoire pour n'interroger la base qu'une fois.
+let verificationEnCours = null;
 
 async function clientAdmin(){
   if(dbAdmin) return dbAdmin;
@@ -25,7 +28,11 @@ async function clientAdmin(){
 
 // La colonne « est_admin » n'est lisible par personne ; la base répond par
 // cette fonction, et seulement pour le compte qui la pose.
-async function verifierAdmin(){
+function verifierAdmin(){
+  return (verificationEnCours ??= demanderSiAdmin());
+}
+
+async function demanderSiAdmin(){
   try{
     const db = await clientAdmin();
     const { data: { session } } = await db.auth.getSession();
@@ -125,6 +132,10 @@ async function correctionAbsorbee(c){
 // sécurité : le masquer n'empêche personne d'ouvrir admin.html, et c'est
 // très bien ainsi — quiconque s'y rend sans les droits tombe sur un refus
 // poli, et la base refuserait de toute façon la moindre écriture.
+//
+// Il s'affiche aussi SUR la page d'administration. Le retirer là revenait à
+// faire disparaître le repère au moment précis où l'on s'en sert, et à
+// laisser croire qu'on a quitté le site.
 async function poserLienAdministration(){
   if(document.querySelector('[data-lien-admin]')) return;
   const etat = await verifierAdmin();
@@ -134,17 +145,21 @@ async function poserLienAdministration(){
   if(!liens) return;
   const a = document.createElement('a');
   a.href = 'admin.html';
-  a.textContent = 'Administration';
+  a.textContent = 'Administrateur';
   a.dataset.lienAdmin = '1';
   a.style.color = 'var(--gold)';
+  // Sur la page elle-même, le lien se marque comme les autres liens actifs du
+  // site : la classe « active » pour l'affichage, aria-current pour les
+  // lecteurs d'écran, qui annoncent alors « page actuelle ».
+  if(location.pathname.endsWith('admin.html')){
+    a.classList.add('active');
+    a.setAttribute('aria-current', 'page');
+  }
   liens.appendChild(a);
 }
 
-// Sur la page d'administration elle-même, la vérification a déjà lieu.
-if(!location.pathname.endsWith('admin.html')){
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', poserLienAdministration);
-  }else{
-    poserLienAdministration();
-  }
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', poserLienAdministration);
+}else{
+  poserLienAdministration();
 }
