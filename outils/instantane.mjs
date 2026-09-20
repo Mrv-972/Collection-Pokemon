@@ -570,6 +570,50 @@ async function recolterVisuelsFrancais(pocket){
   }
 }
 
+// ------------------------------------ les logos d'extension, en français ---
+//
+// Les logos venaient de flibustier, qui ne traduit que ce qu'il a eu le temps
+// de traduire : neuf extensions récentes s'affichaient avec leur logo anglais
+// au milieu d'un site français.
+//
+// Le wiki francophone les range dans le même stockage public que ses cartes,
+// sous une forme lue dans son code :
+//
+//     .../public_files/system/set/LOGO_<extension>_fr.png
+//
+// On prend les 23, pas seulement les 9 qui manquaient : une fois chez nous,
+// plus aucun logo ne dépend d'un serveur extérieur, et ils viennent tous de
+// la même source plutôt que de deux qui ne se ressemblent pas.
+
+const DOSSIER_LOGOS = 'images/sets';
+const LOGOS_WIKI = 'https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/set';
+
+// Chez eux, nos deux séries de promos s'appellent PROMO et PROMOB.
+const NOM_DISTANT_LOGO = { 'P-A': 'PROMO', 'P-B': 'PROMOB' };
+
+async function recolterLogosFrancais(pocket){
+  await mkdir(DOSSIER_LOGOS, { recursive: true });
+  let pris = 0, deja = 0, sansSuite = 0;
+
+  for(const ext of pocket.extensions){
+    const fichier = `${DOSSIER_LOGOS}/${ext.id}.png`;
+    if(existsSync(fichier)){ ext.logo = fichier; deja++; continue; }
+
+    const adresse = `${LOGOS_WIKI}/LOGO_${NOM_DISTANT_LOGO[ext.id] ?? ext.id}_fr.png`;
+    try{
+      const r = await fetch(adresse, { redirect: 'follow', headers: IDENTITE });
+      // Un stockage public répond volontiers 200 avec un message d'erreur en
+      // guise de fichier : on exige une vraie image.
+      if(!r.ok || !/image\//.test(r.headers.get('content-type') ?? '')){ sansSuite++; continue; }
+      await writeFile(fichier, Buffer.from(await r.arrayBuffer()));
+      ext.logo = fichier;
+      pris++;
+    }catch(err){ sansSuite++; }
+  }
+
+  console.log(`Logos d'extension : ${pris} récoltés, ${deja} déjà là, ${sansSuite} restés à leur source d'origine`);
+}
+
 // ------------------------ copier chez nous le reste du catalogue Pocket ---
 //
 // Les extensions qui ne manquaient de rien tirent toujours leurs visuels de
@@ -707,6 +751,7 @@ async function principal(){
 
   await recolterVisuelsFrancais(pocket);
 
+  await recolterLogosFrancais(pocket);
   await copierLeResteDuCatalogue(pocket);
 
   const { vignettes, hautes } = trierVisuels(await recenserVisuelsLocaux());
