@@ -36,7 +36,13 @@
     "forme lue dans son code :",
     "  .../public_files/system/card/<langue>/<extension>/<carte>.webp",
     "Le témoin « en » est là exprès : s'il répond et que « fr » ne répond pas,",
-    "c'est la langue qui manque, pas le chemin."
+    "c'est la langue qui manque, pas le chemin.",
+    "",
+    "P-B reste introuvable. Cinq graphies de son dossier ont été sondées ; les",
+    "cinq répondent 400, y compris avec la langue « en » qui fonctionne pour",
+    "toutes les autres extensions. Ce n'est donc pas la langue qui manque : le",
+    "wiki nomme cette extension d'une façon qu'on ne devine pas. Ses 78 cartes",
+    "restent en anglais, avec leur bandeau."
   ],
   "candidats": [
     {
@@ -50,36 +56,6 @@
       "genre": "motif",
       "actif": true,
       "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/{SETDIST}/{SETDIST}-{NUM3}.webp"
-    },
-    {
-      "nom": "P-B : dossier « PROMO-B », carte « PROMO-B-nnn »",
-      "genre": "motif",
-      "actif": false,
-      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/PROMO-B/PROMO-B-{NUM3}.webp"
-    },
-    {
-      "nom": "P-B : dossier « PROMO-B », carte « P-B-nnn »",
-      "genre": "motif",
-      "actif": false,
-      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/PROMO-B/P-B-{NUM3}.webp"
-    },
-    {
-      "nom": "P-B : dossier « Promo-B », carte « Promo-B-nnn »",
-      "genre": "motif",
-      "actif": false,
-      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/Promo-B/Promo-B-{NUM3}.webp"
-    },
-    {
-      "nom": "P-B : dossier « PB », carte « PB-nnn »",
-      "genre": "motif",
-      "actif": false,
-      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/PB/PB-{NUM3}.webp"
-    },
-    {
-      "nom": "P-B : dossier « promo-b », carte « promo-b-nnn »",
-      "genre": "motif",
-      "actif": false,
-      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/promo-b/promo-b-{NUM3}.webp"
     },
     {
       "nom": "Wiki TCG Pocket — stockage public, langue « fr-FR »",
