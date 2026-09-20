@@ -38,11 +38,13 @@
     "Le témoin « en » est là exprès : s'il répond et que « fr » ne répond pas,",
     "c'est la langue qui manque, pas le chemin.",
     "",
-    "P-B reste introuvable. Cinq graphies de son dossier ont été sondées ; les",
     "cinq répondent 400, y compris avec la langue « en » qui fonctionne pour",
     "toutes les autres extensions. Ce n'est donc pas la langue qui manque : le",
-    "wiki nomme cette extension d'une façon qu'on ne devine pas. Ses 78 cartes",
-    "restent en anglais, avec leur bandeau."
+    "",
+    "P-B : leur point d'entrée /cards, ouvert et sans clé, a livré la réponse.",
+    "Ils ont DEUX séries promotionnelles — « PROMO » (117 cartes, notre P-A) et",
+    "« PROMOB » (notre P-B). Aucun décalage de numérotation : PROMOB-001 est",
+    "bien notre P-B-001."
   ],
   "candidats": [
     {
@@ -56,6 +58,12 @@
       "genre": "motif",
       "actif": true,
       "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/{SETDIST}/{SETDIST}-{NUM3}.webp"
+    },
+    {
+      "nom": "Wiki TCG Pocket — P-B, qu'ils nomment « PROMOB »",
+      "genre": "motif",
+      "actif": true,
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/PROMOB/PROMOB-{NUM3}.webp"
     },
     {
       "nom": "Wiki TCG Pocket — stockage public, langue « fr-FR »",
