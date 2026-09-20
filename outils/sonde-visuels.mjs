@@ -170,13 +170,28 @@ async function sonderPage(candidat, ext, anglais){
     // Plutôt que de conclure « rien », on montre ce que la page contient
     // vraiment : c'est ce qui permet de corriger le motif de recherche au
     // lieu de le deviner une deuxième fois.
-    const echantillon = [...new Set(
+    const images = [...new Set(
       [...texte.matchAll(/https?:\/\/[^\s"'\\]+\.(?:webp|png|jpg|jpeg)/g)].map(m => m[0])
+    )].slice(0, 8);
+
+    // Beaucoup de sites modernes ne mettent pas les images dans le HTML :
+    // ils livrent un bloc de données que le navigateur dessine ensuite. Ce
+    // bloc est une bien meilleure source qu'une page — autant regarder s'il
+    // est là avant de conclure que la piste est morte.
+    const pistes = [];
+    if(/__NEXT_DATA__/.test(texte))  pistes.push('bloc __NEXT_DATA__ présent (site Next.js)');
+    if(/__NUXT__/.test(texte))       pistes.push('bloc __NUXT__ présent (site Nuxt)');
+    if(/application\/ld\+json/.test(texte)) pistes.push('données ld+json présentes');
+    const jsons = [...new Set(
+      [...texte.matchAll(/[\"'\(]((?:https?:\/\/[^\s"'\\]+|\/[^\s"'\\]*))\.json[^\s"'\\]*/g)].map(m => m[0].slice(1))
     )].slice(0, 6);
+
     return [
       { carte: '—', verdict: 'page lue, aucune image repérée',
         detail: `${texte.length} caractères — voici ce qu'elle contient :` },
-      ...echantillon.map(a => ({ carte: '  ex.', verdict: '', detail: a })),
+      ...images.map(a => ({ carte: '  img', verdict: '', detail: a })),
+      ...jsons.map(a  => ({ carte: '  json', verdict: '', detail: a })),
+      ...pistes.map(p => ({ carte: '  ind.', verdict: '', detail: p })),
     ];
   }
 

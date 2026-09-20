@@ -26,9 +26,27 @@
     "",
     "Deuxième leçon : Limitless écrit ses extensions telles quelles (« A4b »).",
     "Chercher « A4B » déclarait muettes les cinq extensions dont le nom porte",
-    "une minuscule — et c'était exactement ces cinq-là."
+    "une minuscule — et c'était exactement ces cinq-là.",
+    "",
+    "Piste ajoutée le 20/09 : pokemon-tcg-pocket.wiki, qui répertorie les",
+    "cartes en français. Sondée d'abord en reconnaissance — on ne connaît ni",
+    "l'adresse de ses images, ni la forme de ses pages."
   ],
   "candidats": [
+    {
+      "nom": "Wiki TCG Pocket — index français des cartes",
+      "genre": "page",
+      "actif": false,
+      "page": "https://pokemon-tcg-pocket.wiki/fr/cards",
+      "motifImage": "https://[^\"'\\s]+/{SET}[_\\-/]0*{NUM}[^\"'\\s]*\\.(?:webp|png|jpg)"
+    },
+    {
+      "nom": "Wiki TCG Pocket — page française de l'extension",
+      "genre": "page",
+      "actif": false,
+      "page": "https://pokemon-tcg-pocket.wiki/fr/cards/{SET}",
+      "motifImage": "https://[^\"'\\s]+/{SET}[_\\-/]0*{NUM}[^\"'\\s]*\\.(?:webp|png|jpg)"
+    },
     {
       "nom": "Limitless Pocket — nommage réel, sans suffixe de taille",
       "genre": "motif",
