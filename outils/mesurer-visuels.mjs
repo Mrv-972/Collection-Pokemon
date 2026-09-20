@@ -26,6 +26,33 @@ async function poids(adresse){
   }catch(err){ return null; }
 }
 
+// Un fichier qui n'a pas pu être copié, c'est soit une adresse qui n'existe
+// pas, soit un serveur qui nous a bridés. Les deux se soignent très
+// différemment : la première demande une autre source, la seconde demande
+// juste de la patience. Le code de réponse tranche.
+async function statut(adresse){
+  try{
+    const r = await fetch(adresse, { method: 'HEAD', redirect: 'follow', headers: IDENTITE });
+    return String(r.status);
+  }catch(err){ return 'injoignable'; }
+}
+
+async function diagnostiquerLesManquants(restantes){
+  const parSet = new Map();
+  for(const c of restantes){
+    const set = c.id.replace(/-\d+$/, '');
+    if(!parSet.has(set)) parSet.set(set, []);
+    parSet.get(set).push(c);
+  }
+  console.log('\nPourquoi ces cartes ne sont-elles pas copiées ?');
+  for(const [set, cartes] of parSet){
+    const echantillon = cartes.slice(0, 2);
+    const codes = await Promise.all(echantillon.map(c => statut(c.image)));
+    console.log(`  ${set.padEnd(5)} ${String(cartes.length).padStart(4)} cartes  →  ${codes.join(', ')}`);
+    console.log(`        ${echantillon[0].image}`);
+  }
+}
+
 const moyenne = t => t.length ? t.reduce((a, b) => a + b, 0) / t.length : 0;
 
 async function principal(){
@@ -40,6 +67,8 @@ async function principal(){
   console.log(`${dejaLa.size} visuels déjà dans le dépôt.`);
   console.log(`${restantes.length} cartes Pocket encore servies par un serveur extérieur.\n`);
   if(!restantes.length) return;
+
+  await diagnostiquerLesManquants(restantes);
 
   // Un échantillon réparti sur tout le catalogue, pas les trente premières :
   // les extensions récentes sont souvent plus lourdes que les anciennes.
