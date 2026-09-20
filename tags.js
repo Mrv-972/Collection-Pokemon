@@ -81,6 +81,11 @@ function synchroniser(envoi){
 // Les marquer « recherchée » reste permis : on peut très bien vouloir une
 // carte qu'on ne pourra jamais obtenir par échange.
 //
+// La liste s'arrête là, et c'est volontaire : les Deux Étoiles, les
+// Chromatique et les Chromatique deux étoiles S'ÉCHANGENT. Elles ne le
+// faisaient pas à une époque, ce qui rend l'erreur facile — ne les ajoute
+// pas ici sans avoir revérifié dans le jeu.
+//
 // La règle ne vaut que pour l'univers Pocket. Le jeu physique n'a ni ces
 // raretés ni cette contrainte — on n'y touche pas.
 
