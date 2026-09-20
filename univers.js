@@ -112,16 +112,32 @@ const STYLE_RAIL = `
      remises à zéro explicites, elle héritait du justify-content:space-between
      de la barre du haut et se retrouvait avec un univers en haut de l'écran
      et l'autre tout en bas. */
+  /* Chaque univers porte sa couleur, écrite en dur et non tirée de --gold :
+     cette variable vaut justement bleu quand on est côté Pocket, si bien que
+     les deux moitiés auraient viré ensemble. Ici on veut que le jaune
+     désigne toujours le jeu physique et le bleu toujours Pocket, quel que
+     soit celui où l'on se trouve — c'est ce qui en fait un repère. */
+  .rail-item[data-cible="physique"]{--teinte:#C9A227;--teinte-rgb:201,162,39;}
+  .rail-item[data-cible="pocket"]  {--teinte:#4B96D8;--teinte-rgb:75,150,216;}
+
   .rail{position:fixed;left:0;top:0;bottom:0;width:56px;z-index:60;
         display:flex;flex-direction:column;flex-wrap:nowrap;
-        align-items:center;justify-content:flex-start;gap:4px;
-        margin:0;padding:24px 0 0;border-bottom:none;
+        align-items:stretch;justify-content:stretch;gap:0;
+        margin:0;padding:0;border-bottom:none;
         border-right:1px solid rgba(140,140,140,0.16);background:var(--fond-rail,transparent);}
-  .rail-item{display:flex;flex-direction:column;align-items:center;gap:5px;
-             width:46px;padding:10px 0;border-radius:7px;color:inherit;opacity:.40;
-             text-decoration:none;transition:opacity .15s,background .15s;}
-  .rail-item:hover{opacity:.85;background:rgba(140,140,140,0.12)}
-  .rail-item.on{opacity:1;color:var(--gold);background:rgba(140,140,140,0.12)}
+
+  /* « flex:1 1 0 » et non « 1 1 auto » : sans base nulle, la moitié dont le
+     libellé est le plus long prendrait plus de place que l'autre. */
+  .rail-item{flex:1 1 0;display:flex;flex-direction:column;
+             align-items:center;justify-content:center;gap:7px;
+             width:auto;padding:0;border-radius:0;text-decoration:none;
+             color:var(--teinte);opacity:.42;
+             border-left:3px solid transparent;
+             transition:opacity .15s,background .15s,border-color .15s;}
+  .rail-item + .rail-item{border-top:1px solid rgba(140,140,140,0.22)}
+  .rail-item:hover{opacity:.78;background:rgba(var(--teinte-rgb),0.10)}
+  .rail-item.on{opacity:1;background:rgba(var(--teinte-rgb),0.15);
+                border-left-color:var(--teinte);}
   .rail-item svg{width:21px;height:21px;display:block}
   .rail-nom{font-size:9.5px;letter-spacing:.2px;line-height:1;}
 
@@ -132,8 +148,13 @@ const STYLE_RAIL = `
     .rail{position:sticky;top:0;left:auto;bottom:auto;width:100%;height:auto;
           flex-direction:row;flex-wrap:nowrap;justify-content:stretch;gap:0;padding:0;
           border-right:none;border-bottom:1px solid rgba(140,140,140,0.16);}
-    .rail-item{flex:1;flex-direction:row;justify-content:center;gap:8px;
-               width:auto;padding:13px 0;border-radius:0}
+    .rail-item{flex:1 1 0;flex-direction:row;justify-content:center;gap:8px;
+               width:auto;padding:13px 0;border-radius:0;
+               border-left:none;border-bottom:3px solid transparent}
+    /* La séparation et le repère actif tournent avec la barre : trait
+       vertical entre les deux moitiés, soulignement sous celle qu'on lit. */
+    .rail-item + .rail-item{border-top:none;border-left:1px solid rgba(140,140,140,0.22)}
+    .rail-item.on{border-left-color:transparent;border-bottom-color:var(--teinte)}
     .rail-item svg{width:17px;height:17px}
     .rail-nom{font-size:12px}
   }
