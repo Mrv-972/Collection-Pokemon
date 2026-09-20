@@ -42,9 +42,11 @@ async function reperages(){
     }catch(err){ continue; }
 
     base ??= code.match(/https:\/\/[a-z0-9.\-]+\/functions\/v1\/web_api/)?.[0] ?? null;
-    // Une clé d'accès Supabase est un jeton en trois morceaux séparés par
-    // des points, commençant par « eyJ ».
-    cle  ??= code.match(/eyJ[A-Za-z0-9_\-]{10,}\.eyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}/)?.[0] ?? null;
+    // Deux formats de clé coexistent : l'ancien est un jeton en trois
+    // morceaux commençant par « eyJ », le nouveau s'écrit « sb_publishable_ ».
+    cle ??= code.match(/eyJ[A-Za-z0-9_\-]{10,}\.eyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}/)?.[0]
+         ?? code.match(/sb_publishable_[A-Za-z0-9_\-]{10,}/)?.[0]
+         ?? null;
     if(base && cle) break;
   }
   return { base, cle };
@@ -53,7 +55,8 @@ async function reperages(){
 // ----------------------------------------------------- poser la question --
 
 async function demander(base, cle, chemin, corps){
-  const entetes = { ...IDENTITE, apikey: cle, Authorization: `Bearer ${cle}` };
+  const entetes = { ...IDENTITE };
+  if(cle){ entetes.apikey = cle; entetes.Authorization = `Bearer ${cle}`; }
   if(corps) entetes['Content-Type'] = 'application/json';
   const r = await fetch(base + chemin, {
     method: corps ? 'POST' : 'GET',
@@ -90,9 +93,10 @@ async function principal(){
   console.log('Lecture du code du wiki…');
   const { base, cle } = await reperages();
   if(!base){ console.error("Point d'entrée introuvable."); process.exit(1); }
-  if(!cle){ console.error("Clé d'accès introuvable."); process.exit(1); }
   console.log(`  point d'entrée : ${base}`);
-  console.log(`  clé d'accès    : trouvée (non affichée, volontairement)\n`);
+  console.log(cle
+    ? `  clé d'accès    : trouvée (non affichée, volontairement)\n`
+    : `  clé d'accès    : aucune trouvée — on demande sans, le point d'entrée est peut-être ouvert\n`);
 
   for(const [chemin, corps] of [
     ['/expansions', null],
@@ -100,6 +104,10 @@ async function principal(){
     ['/expansion', null],
     ['/cards', { page: 1, pageSize: 3 }],
     ['/cards', {}],
+    ['', null],
+    ['/', null],
+    ['/expansions/list', null],
+    ['/card-list', null],
   ]){
     const r = await demander(base, cle, chemin, corps);
     console.log(`${corps ? 'POST' : 'GET '} ${chemin.padEnd(12)} → HTTP ${r.statut}`);
