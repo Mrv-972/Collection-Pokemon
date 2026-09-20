@@ -52,6 +52,36 @@
       "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/{SETDIST}/{SETDIST}-{NUM3}.webp"
     },
     {
+      "nom": "P-B : dossier « PROMO-B », carte « PROMO-B-nnn »",
+      "genre": "motif",
+      "actif": false,
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/PROMO-B/PROMO-B-{NUM3}.webp"
+    },
+    {
+      "nom": "P-B : dossier « PROMO-B », carte « P-B-nnn »",
+      "genre": "motif",
+      "actif": false,
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/PROMO-B/P-B-{NUM3}.webp"
+    },
+    {
+      "nom": "P-B : dossier « Promo-B », carte « Promo-B-nnn »",
+      "genre": "motif",
+      "actif": false,
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/Promo-B/Promo-B-{NUM3}.webp"
+    },
+    {
+      "nom": "P-B : dossier « PB », carte « PB-nnn »",
+      "genre": "motif",
+      "actif": false,
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/PB/PB-{NUM3}.webp"
+    },
+    {
+      "nom": "P-B : dossier « promo-b », carte « promo-b-nnn »",
+      "genre": "motif",
+      "actif": false,
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/promo-b/promo-b-{NUM3}.webp"
+    },
+    {
       "nom": "Wiki TCG Pocket — stockage public, langue « fr-FR »",
       "genre": "motif",
       "actif": false,
