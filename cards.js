@@ -303,7 +303,10 @@ function setIdOfCard(cardId){
 
 document.head.appendChild(Object.assign(document.createElement('style'), { textContent: `
   .card-img-wrap img{cursor:zoom-in}
-  .card-zoom{position:fixed;inset:0;z-index:50;background:rgba(10,11,13,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;cursor:zoom-out;opacity:0;transition:opacity .15s;}
+  /* Au-dessus du rail des univers (z-index 60) : une vue agrandie doit
+     couvrir la page entière. Sans cela, le rail passait devant et masquait
+     la flèche de gauche. */
+  .card-zoom{position:fixed;inset:0;z-index:70;background:rgba(10,11,13,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;cursor:zoom-out;opacity:0;transition:opacity .15s;}
   .card-zoom.shown{opacity:1}
   .card-zoom img{max-width:min(460px,100%);max-height:78vh;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,0.6);}
   .card-zoom .caption{font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:#EDEAE0;text-align:center;}
