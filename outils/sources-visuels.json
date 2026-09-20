@@ -44,7 +44,11 @@
     "P-B : leur point d'entrée /cards, ouvert et sans clé, a livré la réponse.",
     "Ils ont DEUX séries promotionnelles — « PROMO » (117 cartes, notre P-A) et",
     "« PROMOB » (notre P-B). Aucun décalage de numérotation : PROMOB-001 est",
-    "bien notre P-B-001."
+    "bien notre P-B-001.",
+    "",
+    "P-A suit la même règle que P-B : ils l'appellent « PROMO ». La",
+    "correspondance est vérifiée sur trois noms consécutifs — Regigigas,",
+    "Shaymin, Absol en 115, 116, 117 des deux côtés."
   ],
   "candidats": [
     {
@@ -64,6 +68,12 @@
       "genre": "motif",
       "actif": true,
       "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/PROMOB/PROMOB-{NUM3}.webp"
+    },
+    {
+      "nom": "Wiki TCG Pocket — P-A, qu'ils nomment « PROMO »",
+      "genre": "motif",
+      "actif": true,
+      "motif": "https://ptcgp-wiki.metainnovation.site/storage/v1/object/public/public_files/system/card/fr/PROMO/PROMO-{NUM3}.webp"
     },
     {
       "nom": "Wiki TCG Pocket — stockage public, langue « fr-FR »",
