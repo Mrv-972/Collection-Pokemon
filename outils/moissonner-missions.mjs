@@ -144,8 +144,13 @@ async function principal(){
   for(const [numero, adresse] of guides){
     process.stdout.write(`Guide ${numero} — ${adresse}\n`);
     try{
-      const sections = analyser(partieUtile(enTexte(await lire(adresse))));
-      recolte.push({ guide: adresse, sections });
+      const texte = partieUtile(enTexte(await lire(adresse)));
+      const sections = analyser(texte);
+      // Un guide dont la mise en forme ne ressemble pas au moule attendu
+      // repart avec son texte : il sera relu à la main plutôt que perdu.
+      recolte.push(sections.length
+        ? { guide: adresse, sections }
+        : { guide: adresse, sections: [], texte: texte.slice(0, 40000) });
       const missions = sections.reduce((n, s) => n + s.missions.length, 0);
       console.log(`  ${sections.length} sections, ${missions} missions`);
       for(const s of sections){
