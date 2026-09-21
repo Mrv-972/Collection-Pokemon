@@ -141,9 +141,9 @@
   .mission .cartes{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0;padding:0;list-style:none}
   .mission .cartes li{font-size:12.5px;padding:3px 9px;border-radius:4px;
                       background:rgba(237,234,224,0.06);color:var(--text-on-ink);}
-  /* Les vignettes ne remplacent les noms que pour les missions courtes : au
-     delà, une mission réclame vingt-quatre cartes et la page devient un mur
-     d'images où l'on ne lit plus rien. */
+  /* Les missions qui réclament une liste de cartes la montrent en vignettes.
+     Celles qui demandent de compléter toute l'extension n'ont pas de liste :
+     elles restent une phrase, et c'est très bien ainsi. */
   .mission .visuels{display:flex;flex-wrap:wrap;gap:9px;margin:11px 0 0;padding:0;list-style:none}
   .mission .visuels li{width:78px}
   .mission .visuels img{width:78px;border-radius:5px;display:block;
@@ -207,15 +207,15 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-21-r4za"></script>
-<script src="catalogue.js?v=2026-09-21-r4za"></script>
-<script src="supabase-config.js?v=2026-09-21-r4za"></script>
-<script src="pied.js?v=2026-09-21-r4za"></script>
-<script src="admin.js?v=2026-09-21-r4za"></script>
-<script src="compte.js?v=2026-09-21-r4za"></script>
-<script src="progression.js?v=2026-09-21-r4za"></script>
-<script src="sets.js?v=2026-09-21-r4za"></script>
-<script src="missions.js?v=2026-09-21-r4za"></script>
+<script src="univers.js?v=2026-09-21-e4t2"></script>
+<script src="catalogue.js?v=2026-09-21-e4t2"></script>
+<script src="supabase-config.js?v=2026-09-21-e4t2"></script>
+<script src="pied.js?v=2026-09-21-e4t2"></script>
+<script src="admin.js?v=2026-09-21-e4t2"></script>
+<script src="compte.js?v=2026-09-21-e4t2"></script>
+<script src="progression.js?v=2026-09-21-e4t2"></script>
+<script src="sets.js?v=2026-09-21-e4t2"></script>
+<script src="missions.js?v=2026-09-21-e4t2"></script>
 <script>
 // Les missions secrètes n'existent que dans l'application mobile : du côté
 // du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
@@ -251,10 +251,6 @@ function echapper(t){
   return String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 }
 
-// Au-delà de ce nombre, on s'en tient aux noms. Six vignettes tiennent sur
-// une ligne d'écran ; vingt-quatre font un mur.
-const MAX_VISUELS = 6;
-
 function blocMission(idExt, mission, faites){
   const cle = cleMission(idExt, mission.nom);
   const faite = faites.has(cle);
@@ -267,10 +263,15 @@ function blocMission(idExt, mission, faites){
       </div>
       ${mission.condition ? `<p class="condition">${echapper(mission.condition)}</p>` : ''}
       ${mission.cartes?.length
-        ? `<ul class="cartes">${mission.cartes.map(c => `<li>${echapper(c)}</li>`).join('')}</ul>`
+        ? `<ul class="cartes">${mission.cartes.map((c, i) => {
+             // Quand deux cartes d'une extension portent le même nom ET la même
+             // rareté, aucun libellé ne peut les départager : le fichier donne
+             // alors l'identifiant exact, et il fait autorité.
+             const id = mission.ids?.[i];
+             return `<li${id ? ` data-id="${echapper(id)}"` : ''}>${echapper(c)}</li>`;
+           }).join('')}</ul>`
         : ''}
-      ${mission.cartes?.length && mission.cartes.length <= MAX_VISUELS
-        ? '<ul class="visuels" hidden></ul>' : ''}
+      ${mission.cartes?.length ? '<ul class="visuels" hidden></ul>' : ''}
       ${(mission.complement ?? []).map(c => `<p class="complement">${echapper(c)}</p>`).join('')}
       ${mission.recompense ? `<p class="recompense">→ ${echapper(mission.recompense)}</p>` : ''}
       ${mission.doute ? `<p class="doute">${echapper(mission.doute)}</p>` : ''}
@@ -399,8 +400,12 @@ async function poserLesVisuels(bloc){
     const liste = mission.querySelector('.visuels');
     if(!liste) return;
     const condition = mission.querySelector('.condition')?.textContent ?? '';
-    const noms = [...mission.querySelectorAll('.cartes li')].map(li => li.textContent);
-    const trouvees = noms.map(nom => [nom, trouverLaCarte(nom, condition, cartes)]);
+    const demandees = [...mission.querySelectorAll('.cartes li')]
+      .map(li => ({ nom: li.textContent, id: li.dataset.id ?? null }));
+    const trouvees = demandees.map(({ nom, id }) => [
+      nom,
+      id ? (cartes.find(c => c.id === id) ?? null) : trouverLaCarte(nom, condition, cartes),
+    ]);
 
     // Tout ou rien : une mission à moitié illustrée se lit plus mal que la
     // même en toutes lettres.

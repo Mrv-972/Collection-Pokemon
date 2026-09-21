@@ -136,10 +136,17 @@ function trouverLaCarte(libelle, condition, cartes){
   if(candidates.length === 1) return candidates[0];
 
   // La version demandée se lit derrière le nom, sinon dans la condition.
+  const indice = version || condition || '';
   const voulues = preferences(version) ?? preferences(condition) ?? [];
+
+  // Une même rareté peut couvrir deux cartes : Ogerpon Masque Turquoise-ex
+  // paraît deux fois en Deux Étoiles dans Parade Onirique, une fois en full
+  // art et une fois au cadre arc-en-ciel. Le jeu numérote toujours la
+  // seconde après la première, et c'est la seule chose qui les distingue.
+  const arcEnCiel = /rainbow|bordered/i.test(indice);
   for(const rarete of voulues){
-    const trouvee = candidates.find(c => c.rarity === rarete);
-    if(trouvee) return trouvee;
+    const memeRarete = candidates.filter(c => c.rarity === rarete);
+    if(memeRarete.length) return arcEnCiel ? memeRarete[memeRarete.length - 1] : memeRarete[0];
   }
 
   // Rien ne correspond : on montre la carte ordinaire. Le libellé affiché
