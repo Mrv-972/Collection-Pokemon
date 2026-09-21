@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missions secrètes — PokéClasseur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.tcgdex.net">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://raw.githubusercontent.com">
+<link rel="preconnect" href="https://assets.tcgdex.net">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B; --ink-soft:#20232A; --paper:#F1EBDC; --paper-line:#D9CFB6;
+    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair);
+    --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2,h3{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a.active{color:var(--text-on-ink)}
+  .navlinks a:hover{color:var(--text-on-ink)}
+
+  .page-head{padding:56px 0 36px;}
+  .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
+  .page-head h1{font-size:40px;}
+  .page-head p{color:var(--text-on-ink-dim);margin-top:14px;font-size:16px;max-width:60ch;}
+
+  .search-row{display:flex;gap:10px;padding-bottom:40px;}
+  .search-row input{flex:1;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  .search-row input::placeholder{color:var(--text-on-ink-dim)}
+
+  .series-block{padding:34px 0;border-top:1px solid rgba(237,234,224,0.08);}
+  .series-title{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;}
+  .series-title h2{font-size:22px;}
+  .series-title .count{font-size:13px;color:var(--text-on-ink-dim);}
+
+  .set-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+  @media(max-width:900px){.set-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media(max-width:640px){.set-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+  .set-card{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s;}
+  .set-card:hover{border-color:rgba(237,234,224,0.25)}
+  .set-logo{height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .set-logo .logo{min-width:0;max-width:100%;max-height:100%;object-fit:contain;object-position:left center;}
+  .set-logo .symbol{height:20px;width:20px;flex-shrink:0;object-fit:contain;opacity:.85;}
+  .set-logo .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:28px;line-height:1;}
+  .set-name{font-size:14.5px;font-weight:500;line-height:1.3;}
+  .set-meta{font-size:12px;color:var(--text-on-ink-dim);display:flex;justify-content:space-between;margin-top:auto;}
+  .set-meta .tag-count{color:var(--teal);font-weight:500}
+
+  .skeleton{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;height:118px;position:relative;overflow:hidden;}
+  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(237,234,224,0.06),transparent);animation:shine 1.4s infinite;}
+  @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+  .status-msg{color:var(--text-on-ink-dim);font-size:14px;padding:20px 0;}
+  .status-msg.err{color:#E08862}
+
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+
+  /* ========================= Téléphone =========================
+     Les liens de navigation passaient en display:none sous 720 px : depuis
+     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
+     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
+     visibles, et assez hauts pour être touchés sans viser. La règle de
+     débordement horizontal n'est là que pour les très petits écrans, où
+     quatre libellés ne tiennent plus côte à côte.
+
+     Le reste resserre des marges verticales taillées pour un grand écran,
+     et porte les commandes à une hauteur tactile confortable — en bas de
+     42 px, un doigt touche la voisine une fois sur trois. */
+  @media(max-width:720px){
+    nav{flex-wrap:wrap;padding:18px 0 0;}
+    .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
+              justify-content:space-between;overflow-x:auto;scrollbar-width:none;}
+    .navlinks::-webkit-scrollbar{display:none}
+    .navlinks a{white-space:nowrap;padding:12px 6px;border-bottom:2px solid transparent;}
+    .navlinks a.active{border-bottom-color:currentColor;}
+    .brand{font-size:19px;padding:6px 0}
+    .compte-lien{padding:11px 0 11px 12px}
+
+    .page-head{padding:30px 0 24px}
+    .page-head h1{font-size:27px}
+    .page-head p{font-size:14.5px}
+    .search-row input{min-height:44px}
+  }
+
+  /* ---------------------------------------------------- Missions -------- */
+  .avertissement{background:rgba(var(--gold-rgb),0.08);border:1px solid rgba(var(--gold-rgb),0.28);
+                 border-radius:6px;padding:14px 16px;font-size:13px;line-height:1.6;
+                 color:var(--text-on-ink-dim);margin:0 0 30px;}
+  .avertissement b{color:var(--text-on-ink);font-weight:600}
+  .avertissement a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:2px}
+
+  .ext-bloc{padding:28px 0;border-top:1px solid rgba(237,234,224,0.08);}
+  .ext-tete{display:flex;align-items:center;gap:14px;margin-bottom:6px;flex-wrap:wrap;}
+  .ext-tete img{height:34px;max-width:150px;object-fit:contain;object-position:left center;}
+  .ext-tete h2{font-size:21px}
+  .ext-tete .compte{font-size:13px;color:var(--text-on-ink-dim)}
+  .ext-bloc .progression{max-width:320px;margin-bottom:18px}
+
+  .mission{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);
+           border-radius:6px;padding:15px 17px;margin-bottom:10px;
+           transition:border-color .15s,opacity .15s;}
+  .mission.faite{opacity:.55;border-color:rgba(var(--gold-rgb),0.35)}
+  .mission-tete{display:flex;align-items:flex-start;gap:12px}
+  .mission-tete h3{font-size:15px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;
+                   flex:1;min-width:0;line-height:1.35;}
+  .mission.faite h3{text-decoration:line-through}
+  .mission-coche{flex-shrink:0;width:22px;height:22px;margin-top:1px;accent-color:var(--gold);cursor:pointer}
+  .mission .condition{font-size:13px;color:var(--text-on-ink-dim);margin:9px 0 0;line-height:1.5}
+  .mission .cartes{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0;padding:0;list-style:none}
+  .mission .cartes li{font-size:12.5px;padding:3px 9px;border-radius:4px;
+                      background:rgba(237,234,224,0.06);color:var(--text-on-ink);}
+  .mission .complement{font-size:12.5px;color:var(--text-on-ink-dim);margin:8px 0 0;
+                       padding-left:12px;border-left:2px solid rgba(237,234,224,0.14);line-height:1.5}
+  .mission .recompense{font-size:12.5px;color:var(--accent-clair);margin:11px 0 0;font-weight:500}
+  .mission .doute{font-size:12.5px;line-height:1.5;margin:10px 0 0;padding:8px 11px;border-radius:4px;
+                  background:rgba(224,136,98,0.10);border:1px solid rgba(224,136,98,0.3);color:#E0A88C;}
+
+  .manquantes{font-size:13px;color:var(--text-on-ink-dim);line-height:1.6;
+              padding:22px 0 0;border-top:1px solid rgba(237,234,224,0.08);margin-top:26px;}
+
+  @media(max-width:720px){
+    .mission-coche{width:26px;height:26px}
+    .ext-tete h2{font-size:18px}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="index.html">Poké<span>Classeur</span></a>
+    <div class="navlinks">
+      <a href="series.html">Par extension</a>
+      <a href="pokemon.html">Par Pokémon</a>
+      <a href="missions.html" class="lien-pocket active" aria-current="page">Missions secrètes</a>
+      <a href="echanges.html">Échanges</a>
+      <a href="discussions.html">Discussions</a>
+    </div>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
+  </nav>
+
+  <div class="page-head">
+    <div class="kicker">TCG Pocket</div>
+    <h1>Missions secrètes</h1>
+    <p>Chaque extension cache des missions qui n'apparaissent dans le jeu
+       qu'une fois accomplies. Les voici à l'avance, extension par extension,
+       avec les cartes qu'elles réclament et ce qu'elles rapportent.</p>
+  </div>
+
+  <div id="contenu">
+    <p class="status-msg">Chargement des missions…</p>
+  </div>
+
+  <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
+</div>
+
+<script src="univers.js?v=2026-09-21-90lf"></script>
+<script src="catalogue.js?v=2026-09-21-90lf"></script>
+<script src="supabase-config.js?v=2026-09-21-90lf"></script>
+<script src="pied.js?v=2026-09-21-90lf"></script>
+<script src="admin.js?v=2026-09-21-90lf"></script>
+<script src="compte.js?v=2026-09-21-90lf"></script>
+<script src="progression.js?v=2026-09-21-90lf"></script>
+<script src="sets.js?v=2026-09-21-90lf"></script>
+<script src="missions.js?v=2026-09-21-90lf"></script>
+<script>
+// Les missions secrètes n'existent que dans l'application mobile : du côté
+// du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
+// masquer l'onglet et de laisser un lien mort dans un signet, on le dit.
+function rendreHorsSujet(){
+  document.getElementById('contenu').innerHTML = `
+    <p class="status-msg">Les missions secrètes n'existent que dans Pokémon TCG
+    Pocket. Passe du côté Pocket par le bandeau de gauche pour les voir.</p>`;
+}
+
+function echapper(t){
+  return String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+}
+
+function blocMission(idExt, mission, faites){
+  const cle = cleMission(idExt, mission.nom);
+  const faite = faites.has(cle);
+  return `
+    <div class="mission${faite ? ' faite' : ''}" data-cle="${echapper(cle)}">
+      <div class="mission-tete">
+        <input class="mission-coche" type="checkbox" ${faite ? 'checked' : ''}
+               aria-label="Marquer « ${echapper(mission.nom)} » comme accomplie">
+        <h3>${echapper(mission.nom)}</h3>
+      </div>
+      ${mission.condition ? `<p class="condition">${echapper(mission.condition)}</p>` : ''}
+      ${mission.cartes?.length
+        ? `<ul class="cartes">${mission.cartes.map(c => `<li>${echapper(c)}</li>`).join('')}</ul>`
+        : ''}
+      ${(mission.complement ?? []).map(c => `<p class="complement">${echapper(c)}</p>`).join('')}
+      ${mission.recompense ? `<p class="recompense">→ ${echapper(mission.recompense)}</p>` : ''}
+      ${mission.doute ? `<p class="doute">${echapper(mission.doute)}</p>` : ''}
+    </div>`;
+}
+
+function blocExtension(ext, faites){
+  const total = ext.missions.length;
+  const accomplies = ext.missions.filter(m => faites.has(cleMission(ext.id, m.nom))).length;
+  return `
+    <div class="ext-bloc" data-ext="${echapper(ext.id)}">
+      <div class="ext-tete">
+        <img src="images/sets/${echapper(ext.id)}.png" alt="" loading="lazy"
+             onerror="this.remove()">
+        <h2>${echapper(ext.nom)}</h2>
+        <span class="compte">${total} mission${total > 1 ? 's' : ''}</span>
+      </div>
+      ${barreProgression({ obtenues: accomplies, total })}
+      ${ext.missions.map(m => blocMission(ext.id, m, faites)).join('')}
+    </div>`;
+}
+
+// La barre d'une extension se refait seule quand on coche : refaire toute la
+// page ferait sauter le défilement au premier clic.
+function rafraichirBarre(bloc){
+  const missions = [...bloc.querySelectorAll('.mission')];
+  const faites = missions.filter(m => m.classList.contains('faite')).length;
+  const ancienne = bloc.querySelector('.progression');
+  const neuve = barreProgression({ obtenues: faites, total: missions.length });
+  if(ancienne) ancienne.outerHTML = neuve;
+}
+
+async function construire(){
+  const contenu = document.getElementById('contenu');
+  if(!estPocket()) return rendreHorsSujet();
+
+  let donnees, extensionsConnues = [];
+  try{
+    [donnees, extensionsConnues] = await Promise.all([
+      chargerMissions(),
+      listerExtensions().catch(() => []),
+    ]);
+  }catch(err){
+    contenu.innerHTML = `<p class="status-msg err">Impossible de charger les missions.<br>
+      <span style="font-size:12px;opacity:.7">${echapper(err.message)}</span></p>`;
+    return;
+  }
+
+  // Le fichier des missions ne porte que des identifiants d'extension : le
+  // nom affiché et le logo viennent du catalogue, pour qu'ils restent les
+  // mêmes partout sur le site.
+  const parId = new Map(extensionsConnues.map(e => [e.id, e]));
+  const extensions = donnees.extensions
+    .map(e => ({ ...e, nom: parId.get(e.id)?.name ?? e.id }))
+    .reverse();   // les plus récentes d'abord, comme le catalogue
+
+  const faites = missionsFaites();
+  const sansMissions = extensionsConnues
+    .filter(e => !donnees.extensions.some(x => x.id === e.id))
+    .map(e => e.name);
+
+  contenu.innerHTML = `
+    <div class="avertissement">
+      <b>D'où viennent ces missions ?</b> Le jeu ne les publie nulle part, et
+      aucune base de données ouverte ne les répertorie. Elles ont été relevées
+      dans ${donnees.sources.map(s => `<a href="${echapper(s.adresse)}" target="_blank" rel="noopener noreferrer">${echapper(s.nom)}</a>`).join(' et ')},
+      puis recoupées à la main. Relevé du ${echapper(donnees.maj)}.
+      Si tu constates une erreur dans le jeu, signale-la : elle sera corrigée ici.
+    </div>
+    ${extensions.map(e => blocExtension(e, faites)).join('')}
+    ${sansMissions.length ? `<p class="manquantes"><b>Pas encore répertoriées :</b>
+      ${sansMissions.map(echapper).join(', ')}. Soit ces extensions n'ont pas de
+      mission secrète, soit aucun guide ne les a encore décrites.</p>` : ''}`;
+}
+
+document.getElementById('contenu').addEventListener('change', (e) => {
+  const coche = e.target.closest('.mission-coche');
+  if(!coche) return;
+  const bloc = coche.closest('.mission');
+  const faites = missionsFaites();
+  if(coche.checked) faites.add(bloc.dataset.cle);
+  else faites.delete(bloc.dataset.cle);
+  enregistrerMissionsFaites(faites);
+  bloc.classList.toggle('faite', coche.checked);
+  rafraichirBarre(bloc.closest('.ext-bloc'));
+});
+
+construire();
+initCompte().then(afficherEtatCompte);
+</script>
+
+</body>
+</html>

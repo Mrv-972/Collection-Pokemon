@@ -101,6 +101,8 @@ function memoriserUnivers(){
 // Le style est injecté ici plutôt que recopié dans les huit pages : une
 // seule définition à corriger le jour où elle bouge.
 const STYLE_RAIL = `
+  /* Un lien masqué le reste, quelle que soit la mise en page de la barre. */
+  .navlinks a[hidden]{display:none !important}
   /* L'accent du site change avec l'univers : doré pour le carton, bleu pour
      l'application. C'est le signal le plus économique pour savoir d'un coup
      d'œil de quel côté on se trouve — plus sûr qu'un libellé qu'on finit par
@@ -248,9 +250,20 @@ function propagerUnivers(){
   document.querySelectorAll('a[href]').forEach(propagerLien);
 }
 
+// Certains liens n'ont de sens que d'un côté : les missions secrètes sont
+// une mécanique de l'application mobile, et n'existent pas dans le jeu de
+// cartes physique. On les retire de la barre plutôt que d'y laisser un
+// onglet qui mène à une page vide.
+function masquerLiensHorsUnivers(){
+  document.querySelectorAll('.lien-pocket').forEach(a => {
+    a.hidden = !estPocket();
+  });
+}
+
 function initUnivers(){
   poserRail();
   propagerUnivers();
+  masquerLiensHorsUnivers();
 
   // Les pages construisent l'essentiel de leurs liens après coup : vignettes
   // d'extensions, boutons « Lui écrire »... On repasse donc à chaque arrivée
