@@ -173,8 +173,11 @@
               flex-direction:column;padding:28px;cursor:zoom-out;
               opacity:0;transition:opacity .15s;}
   .zoom-carte.vue{opacity:1}
-  .zoom-carte img{max-width:min(440px,100%);max-height:78vh;border-radius:12px;
-                  box-shadow:0 24px 70px rgba(0,0,0,0.6);cursor:default;}
+  .zoom-carte > img{max-width:min(440px,100%);max-height:78vh;border-radius:12px;
+                    box-shadow:0 24px 70px rgba(0,0,0,0.6);cursor:default;
+                    /* Agrandie, une carte se regarde en couleur même si sa
+                       vignette est grise : c'est l'illustration qu'on veut voir. */
+                    filter:none;opacity:1;}
   .zoom-carte .legende{font-size:13.5px;color:#EDEAE0;text-align:center;line-height:1.6}
   .zoom-carte .legende .sous{display:block;margin-top:6px;font-size:11.5px;color:#9B9E9C}
   .zoom-carte .legende b{font-weight:600}
@@ -241,16 +244,16 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-21-okv1"></script>
-<script src="catalogue.js?v=2026-09-21-okv1"></script>
-<script src="supabase-config.js?v=2026-09-21-okv1"></script>
-<script src="pied.js?v=2026-09-21-okv1"></script>
-<script src="admin.js?v=2026-09-21-okv1"></script>
-<script src="compte.js?v=2026-09-21-okv1"></script>
-<script src="progression.js?v=2026-09-21-okv1"></script>
-<script src="sets.js?v=2026-09-21-okv1"></script>
-<script src="raretes.js?v=2026-09-21-okv1"></script>
-<script src="missions.js?v=2026-09-21-okv1"></script>
+<script src="univers.js?v=2026-09-21-7usz"></script>
+<script src="catalogue.js?v=2026-09-21-7usz"></script>
+<script src="supabase-config.js?v=2026-09-21-7usz"></script>
+<script src="pied.js?v=2026-09-21-7usz"></script>
+<script src="admin.js?v=2026-09-21-7usz"></script>
+<script src="compte.js?v=2026-09-21-7usz"></script>
+<script src="progression.js?v=2026-09-21-7usz"></script>
+<script src="sets.js?v=2026-09-21-7usz"></script>
+<script src="raretes.js?v=2026-09-21-7usz"></script>
+<script src="missions.js?v=2026-09-21-7usz"></script>
 <script>
 // Les missions secrètes n'existent que dans l'application mobile : du côté
 // du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
@@ -294,6 +297,12 @@ function nomDeLaVersion(carte, cartes){
 // « ★★ Arc-En-Ciel · Source Secrète · n° 87 » : la rareté en icônes du jeu,
 // puis où trouver la carte. Les guides parlent de « rainbow bordered art » ;
 // le jeu, lui, n'affiche que des étoiles.
+// Une carte qu'on n'a pas encore s'affiche en noir et blanc, ici comme dans
+// les grilles du catalogue.
+function classeObtention(carteId){
+  return estObtenue(carteId) ? '' : CLASSE_NON_OBTENUE;
+}
+
 function ficheDeLaCarte(carte, nomExtension, cartes){
   const version = nomDeLaVersion(carte, cartes);
   return `${rarityIcon(carte.rarity)}${version ? ' ' + version : ''} · ${nomExtension} · n° ${carte.localId}`;
@@ -381,6 +390,7 @@ async function construire(){
   // icônes de rareté arrive donc avec elles.
   document.head.appendChild(Object.assign(document.createElement('style'),
     { textContent: STYLE_RARETES }));
+  poserStyleNonObtenue();
   if(!estPocket()) return rendreHorsSujet();
 
   let donnees, extensionsConnues = [];
@@ -474,7 +484,7 @@ async function poserLesVisuels(bloc){
     liste.innerHTML = trouvees.map(([nom, carte]) => `
       <li>
         ${carte
-          ? `<img class="carte" src="${echapper(carte.image)}" alt="${echapper(carte.name)}"
+          ? `<img class="carte ${classeObtention(carte.id)}" src="${echapper(carte.image)}" alt="${echapper(carte.name)}"
                   loading="lazy" title="${echapper(nom)}" data-fiche="${echapper(ficheDeLaCarte(carte, nomExtension, cartes))}"
                   onerror="this.replaceWith(Object.assign(document.createElement('span'),
                            { className: 'sans-visuel', textContent: '?' }))">`

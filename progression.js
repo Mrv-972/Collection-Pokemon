@@ -95,3 +95,31 @@ function barreProgression({ obtenues, total }, { large = false } = {}){
       <div class="chiffres"><span><b>${obtenues}</b> / ${total}</span><span>${part} %</span></div>
     </div>`;
 }
+
+// ------------------------------------------- cartes obtenues ou non ------
+//
+// Une carte qu'on n'a pas encore s'affiche en noir et blanc. Le classeur se
+// lit alors d'un coup d'œil : ce qui reste en couleur est ce qu'on possède.
+
+function estObtenue(idCarte){
+  return Boolean(marquages()[idCarte]?.obt);
+}
+
+const CLASSE_NON_OBTENUE = 'non-obtenue';
+
+// La transition évite le clignotement quand on coche : la couleur revient en
+// fondu plutôt que d'un coup.
+const STYLE_NON_OBTENUE = `
+  img.${CLASSE_NON_OBTENUE}{filter:grayscale(1);opacity:.78;transition:filter .2s,opacity .2s}
+  @media(prefers-reduced-motion:reduce){
+    img.${CLASSE_NON_OBTENUE}{transition:none}
+  }
+`;
+
+function poserStyleNonObtenue(){
+  if(document.getElementById('style-non-obtenue')) return;
+  const style = document.createElement('style');
+  style.id = 'style-non-obtenue';
+  style.textContent = STYLE_NON_OBTENUE;
+  document.head.appendChild(style);
+}

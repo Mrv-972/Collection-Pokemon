@@ -167,13 +167,20 @@ function cardImgFallback(img){
 
 // Vignette d'une carte. `subtitle` remplace le numéro quand la grille mélange
 // plusieurs extensions (page d'un Pokémon), où le seul numéro ne dit rien.
+// Une carte qu'on n'a pas encore s'affiche en noir et blanc. La règle vit
+// dans progression.js, avec le reste de ce qui touche à la collection ; si
+// ce fichier n'est pas chargé, la grille reste simplement en couleur.
+function classeObtention(carteId){
+  return typeof estObtenue === 'function' && !estObtenue(carteId) ? CLASSE_NON_OBTENUE : '';
+}
+
 function cardTile(c, subtitle){
   return `
     <div class="card-tile">
       <div class="card-img-wrap">
         ${c.image
-          ? `<img src="${c.image}" alt="${c.name}" loading="lazy" data-card-id="${c.id}" data-haute="${c.imageHaute ?? c.image}" data-fallback="${c.imageSecours ?? `images/cards/${c.id}.png`}" onerror="cardImgFallback(this)">`
-          : `<img src="images/cards/${c.id}.png" alt="${c.name}" loading="lazy" data-card-id="${c.id}" onerror="cardImgFallback(this)">`}
+          ? `<img class="${classeObtention(c.id)}" src="${c.image}" alt="${c.name}" loading="lazy" data-card-id="${c.id}" data-haute="${c.imageHaute ?? c.image}" data-fallback="${c.imageSecours ?? `images/cards/${c.id}.png`}" onerror="cardImgFallback(this)">`
+          : `<img class="${classeObtention(c.id)}" src="images/cards/${c.id}.png" alt="${c.name}" loading="lazy" data-card-id="${c.id}" onerror="cardImgFallback(this)">`}
       </div>
       <div class="card-num"><span>${subtitle ?? '#' + c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${rarityIcon(c.rarity)}</span></div>
       <div class="card-name">${c.name}</div>
@@ -282,8 +289,13 @@ function setIdOfCard(cardId){
 // Le composant est autonome (styles compris) pour que les deux grilles en
 // bénéficient sans dupliquer de CSS dans chaque page.
 
+// La règle du noir et blanc vient de progression.js, quand la page le charge.
+if(typeof poserStyleNonObtenue === 'function') poserStyleNonObtenue();
+
 document.head.appendChild(Object.assign(document.createElement('style'), { textContent: `
   .card-img-wrap img{cursor:zoom-in}
+  /* Une carte agrandie se regarde en couleur, meme si sa vignette est grise. */
+  .card-zoom img{filter:none !important;opacity:1 !important}
   /* Au-dessus du rail des univers (z-index 60) : une vue agrandie doit
      couvrir la page entière. Sans cela, le rail passait devant et masquait
      la flèche de gauche. */
