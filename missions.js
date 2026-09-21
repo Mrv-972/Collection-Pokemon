@@ -38,3 +38,21 @@ async function chargerMissions(){
   if(!r.ok) throw new Error(`Fichier des missions indisponible (HTTP ${r.status}).`);
   return r.json();
 }
+
+// ------------------------------------------- extensions dépliées ou non ----
+//
+// Cent cinq missions déroulées d'un coup ne se lisent pas. La page les replie
+// par extension, et se souvient de celles qu'on avait ouvertes : on revient
+// souvent sur la même, celle qu'on est en train de jouer.
+
+const CLE_EXTENSIONS_OUVERTES = 'pokeclasseur-missions-ouvertes';
+
+function extensionsOuvertes(){
+  try{ return new Set(JSON.parse(localStorage.getItem(CLE_EXTENSIONS_OUVERTES)) || []); }
+  catch{ return new Set(); }
+}
+
+function enregistrerExtensionsOuvertes(ouvertes){
+  try{ localStorage.setItem(CLE_EXTENSIONS_OUVERTES, JSON.stringify([...ouvertes])); }
+  catch(err){ /* sans mémoire, tout se rouvrira fermé : pas de quoi gêner */ }
+}

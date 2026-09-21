@@ -102,14 +102,32 @@
   .avertissement b{color:var(--text-on-ink);font-weight:600}
   .avertissement a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:2px}
 
-  .ext-bloc{padding:28px 0;border-top:1px solid rgba(237,234,224,0.08);}
-  .ext-tete{display:flex;align-items:center;gap:14px;margin-bottom:6px;flex-wrap:wrap;}
-  .ext-tete img{height:34px;max-width:150px;object-fit:contain;object-position:left center;}
-  .ext-tete h2{font-size:21px}
-  .ext-tete .compte{font-size:13px;color:var(--text-on-ink-dim)}
-  .ext-bloc .progression{max-width:320px;margin-bottom:18px}
+  /* Une extension par ligne, repliée. Cent cinq missions déroulées d'un coup
+     ne se lisent pas : on ouvre celle qu'on joue. */
+  .ext-bloc{border:1px solid rgba(237,234,224,0.08);border-radius:6px;
+            background:var(--ink-soft);margin-bottom:8px;overflow:hidden;}
+  .ext-bloc[open]{border-color:rgba(var(--gold-rgb),0.30)}
+  .ext-tete{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+            padding:14px 17px;cursor:pointer;list-style:none;
+            transition:background .12s;}
+  .ext-tete::-webkit-details-marker{display:none}
+  .ext-tete:hover{background:rgba(237,234,224,0.04)}
+  .ext-tete img{height:30px;max-width:120px;object-fit:contain;object-position:left center;flex-shrink:0;}
+  .ext-tete h2{font-size:18px;flex:1;min-width:140px}
+  .ext-tete .compte{font-size:12.5px;color:var(--text-on-ink-dim)}
+  /* Le chevron dit dans quel sens ça va s'ouvrir, sans texte à traduire. */
+  .ext-tete .chevron{flex-shrink:0;width:11px;height:11px;margin-left:2px;
+                     border-right:2px solid var(--text-on-ink-dim);
+                     border-bottom:2px solid var(--text-on-ink-dim);
+                     transform:rotate(45deg);transition:transform .18s;}
+  .ext-bloc[open] .chevron{transform:rotate(-135deg)}
+  .ext-tete .progression{width:150px;flex-shrink:0;margin:0}
+  .ext-corps{padding:4px 17px 15px}
+  @media(prefers-reduced-motion:reduce){
+    .ext-tete .chevron{transition:none}
+  }
 
-  .mission{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);
+  .mission{background:rgba(237,234,224,0.03);border:1px solid rgba(237,234,224,0.08);
            border-radius:6px;padding:15px 17px;margin-bottom:10px;
            transition:border-color .15s,opacity .15s;}
   .mission.faite{opacity:.55;border-color:rgba(var(--gold-rgb),0.35)}
@@ -133,7 +151,10 @@
 
   @media(max-width:720px){
     .mission-coche{width:26px;height:26px}
-    .ext-tete h2{font-size:18px}
+    .ext-tete{padding:13px 14px;gap:10px}
+    .ext-tete h2{font-size:16px;min-width:0}
+    .ext-tete .progression{width:100%;order:9}
+    .ext-corps{padding:4px 14px 13px}
   }
 </style>
 </head>
@@ -167,15 +188,15 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-21-90lf"></script>
-<script src="catalogue.js?v=2026-09-21-90lf"></script>
-<script src="supabase-config.js?v=2026-09-21-90lf"></script>
-<script src="pied.js?v=2026-09-21-90lf"></script>
-<script src="admin.js?v=2026-09-21-90lf"></script>
-<script src="compte.js?v=2026-09-21-90lf"></script>
-<script src="progression.js?v=2026-09-21-90lf"></script>
-<script src="sets.js?v=2026-09-21-90lf"></script>
-<script src="missions.js?v=2026-09-21-90lf"></script>
+<script src="univers.js?v=2026-09-21-uuw0"></script>
+<script src="catalogue.js?v=2026-09-21-uuw0"></script>
+<script src="supabase-config.js?v=2026-09-21-uuw0"></script>
+<script src="pied.js?v=2026-09-21-uuw0"></script>
+<script src="admin.js?v=2026-09-21-uuw0"></script>
+<script src="compte.js?v=2026-09-21-uuw0"></script>
+<script src="progression.js?v=2026-09-21-uuw0"></script>
+<script src="sets.js?v=2026-09-21-uuw0"></script>
+<script src="missions.js?v=2026-09-21-uuw0"></script>
 <script>
 // Les missions secrètes n'existent que dans l'application mobile : du côté
 // du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
@@ -210,20 +231,26 @@ function blocMission(idExt, mission, faites){
     </div>`;
 }
 
-function blocExtension(ext, faites){
+// <details> plutôt qu'un dépliage écrit à la main : le clavier l'ouvre déjà,
+// les lecteurs d'écran l'annoncent déjà, et la recherche du navigateur
+// (Ctrl+F) y trouve le texte replié.
+function blocExtension(ext, faites, ouverte){
   const total = ext.missions.length;
   const accomplies = ext.missions.filter(m => faites.has(cleMission(ext.id, m.nom))).length;
   return `
-    <div class="ext-bloc" data-ext="${echapper(ext.id)}">
-      <div class="ext-tete">
+    <details class="ext-bloc" data-ext="${echapper(ext.id)}" ${ouverte ? 'open' : ''}>
+      <summary class="ext-tete">
+        <span class="chevron" aria-hidden="true"></span>
         <img src="images/sets/${echapper(ext.id)}.png" alt="" loading="lazy"
              onerror="this.remove()">
         <h2>${echapper(ext.nom)}</h2>
         <span class="compte">${total} mission${total > 1 ? 's' : ''}</span>
+        ${barreProgression({ obtenues: accomplies, total })}
+      </summary>
+      <div class="ext-corps">
+        ${ext.missions.map(m => blocMission(ext.id, m, faites)).join('')}
       </div>
-      ${barreProgression({ obtenues: accomplies, total })}
-      ${ext.missions.map(m => blocMission(ext.id, m, faites)).join('')}
-    </div>`;
+    </details>`;
 }
 
 // La barre d'une extension se refait seule quand on coche : refaire toute la
@@ -261,6 +288,7 @@ async function construire(){
     .reverse();   // les plus récentes d'abord, comme le catalogue
 
   const faites = missionsFaites();
+  const ouvertes = extensionsOuvertes();
   const sansMissions = extensionsConnues
     .filter(e => !donnees.extensions.some(x => x.id === e.id))
     .map(e => e.name);
@@ -273,11 +301,21 @@ async function construire(){
       puis recoupées à la main. Relevé du ${echapper(donnees.maj)}.
       Si tu constates une erreur dans le jeu, signale-la : elle sera corrigée ici.
     </div>
-    ${extensions.map(e => blocExtension(e, faites)).join('')}
+    ${extensions.map(e => blocExtension(e, faites, ouvertes.has(e.id))).join('')}
     ${sansMissions.length ? `<p class="manquantes"><b>Pas encore répertoriées :</b>
       ${sansMissions.map(echapper).join(', ')}. Soit ces extensions n'ont pas de
       mission secrète, soit aucun guide ne les a encore décrites.</p>` : ''}`;
 }
+
+// Ce qu'on avait ouvert se retrouve ouvert au retour : on revient souvent
+// sur la même extension, celle qu'on est en train de jouer.
+document.getElementById('contenu').addEventListener('toggle', (e) => {
+  const bloc = e.target.closest('.ext-bloc');
+  if(!bloc) return;
+  const ouvertes = extensionsOuvertes();
+  if(bloc.open) ouvertes.add(bloc.dataset.ext); else ouvertes.delete(bloc.dataset.ext);
+  enregistrerExtensionsOuvertes(ouvertes);
+}, true);   // <details> n'émet pas d'événement qui remonte : on l'attrape à la descente
 
 document.getElementById('contenu').addEventListener('change', (e) => {
   const coche = e.target.closest('.mission-coche');
