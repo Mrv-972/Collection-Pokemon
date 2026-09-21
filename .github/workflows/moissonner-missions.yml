@@ -1,0 +1,32 @@
+# Lit les guides francophones sur les missions secrètes et recrache leur
+# texte dans le journal. Lancé à la main : le tri se fait ensuite à la main,
+# en recoupant plusieurs guides.
+name: Moissonner les missions secrètes
+
+on:
+  workflow_dispatch:
+    inputs:
+      guide:
+        description: "Numéro du guide (vide = tous)"
+        required: false
+        default: ''
+      limite:
+        description: "Caractères imprimés par guide"
+        required: false
+        default: '28000'
+
+permissions:
+  contents: read
+
+jobs:
+  moissonner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - env:
+          GUIDE: ${{ inputs.guide }}
+          LIMITE_CARACTERES: ${{ inputs.limite }}
+        run: node outils/moissonner-missions.mjs $GUIDE
