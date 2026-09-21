@@ -214,19 +214,19 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-21-7usz"></script>
-<script src="catalogue.js?v=2026-09-21-7usz"></script>
-<script src="pokedex-fr.js?v=2026-09-21-7usz"></script>
-<script src="sets.js?v=2026-09-21-7usz"></script>
-<script src="supabase-config.js?v=2026-09-21-7usz"></script>
-<script src="pied.js?v=2026-09-21-7usz"></script>
-<script src="admin.js?v=2026-09-21-7usz"></script>
-<script src="tags.js?v=2026-09-21-7usz"></script>
-<script src="raretes.js?v=2026-09-21-7usz"></script>
-<script src="progression.js?v=2026-09-21-7usz"></script>
-<script src="cards.js?v=2026-09-21-7usz"></script>
-<script src="prix.js?v=2026-09-21-7usz"></script>
-<script src="compte.js?v=2026-09-21-7usz"></script>
+<script src="univers.js?v=2026-09-21-p6m4"></script>
+<script src="catalogue.js?v=2026-09-21-p6m4"></script>
+<script src="pokedex-fr.js?v=2026-09-21-p6m4"></script>
+<script src="sets.js?v=2026-09-21-p6m4"></script>
+<script src="supabase-config.js?v=2026-09-21-p6m4"></script>
+<script src="pied.js?v=2026-09-21-p6m4"></script>
+<script src="admin.js?v=2026-09-21-p6m4"></script>
+<script src="tags.js?v=2026-09-21-p6m4"></script>
+<script src="raretes.js?v=2026-09-21-p6m4"></script>
+<script src="progression.js?v=2026-09-21-p6m4"></script>
+<script src="cards.js?v=2026-09-21-p6m4"></script>
+<script src="prix.js?v=2026-09-21-p6m4"></script>
+<script src="compte.js?v=2026-09-21-p6m4"></script>
 <script>
 // Toutes les cartes d'un Pokémon, toutes extensions confondues, à partir de
 // son numéro du Pokédex national passé dans l'URL (?dex=25).
@@ -415,9 +415,16 @@ document.getElementById('content').addEventListener('click', (e) => {
 document.getElementById('filter-input').addEventListener('input', applyFilters);
 document.getElementById('rarity-filter').addEventListener('change', applyFilters);
 
+// Un clic sur ces boutons touche toute la grille : on demande confirmation
+// avant, plutôt que de laisser quelqu'un défaire cent marquages à la main.
 document.querySelectorAll('.bulk-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    bulkToggleTag(filteredCards(), btn.dataset.bulk);
+  btn.addEventListener('click', async () => {
+    // La grille est relue une seule fois : entre la question et la réponse,
+    // rien ne peut la changer, mais marquer un autre lot que celui annoncé
+    // serait le genre de surprise qu'on cherche justement à éviter.
+    const lot = filteredCards();
+    if(!(await confirmerMarquageGroupe(lot, btn.dataset.bulk))) return;
+    bulkToggleTag(lot, btn.dataset.bulk);
     applyFilters();
   });
 });

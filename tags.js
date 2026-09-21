@@ -44,11 +44,23 @@ function toggleTag(cardId, tag){
   synchroniser(() => enregistrerCarte(cardId, tagState[cardId]));
 }
 
+// Sur quelles cartes un marquage groupé va réellement porter. « Tout marquer
+// échangeable » ne doit pas contourner la règle des cartes non échangeables.
+function cartesDuLot(cards, tag){
+  return tag === 'ech' ? cards.filter(c => !raisonNonEchangeable(c)) : cards;
+}
+
+// Un lot déjà entièrement marqué se démarque : c'est ce qui permet de
+// défaire un clic malheureux aussi vite qu'il s'est fait.
+function leLotRetire(cards, tag){
+  const lot = cartesDuLot(cards, tag);
+  return lot.length > 0 && lot.every(c => tagState[c.id]?.[tag]);
+}
+
 // Applique un tag à un lot de cartes — ou le retire si elles le portent déjà
-// toutes, pour qu'un clic malheureux se défasse aussi vite qu'il s'est fait.
+// toutes.
 function bulkToggleTag(cards, tag){
-  // « Tout marquer échangeable » ne doit pas contourner la règle.
-  if(tag === 'ech') cards = cards.filter(c => !raisonNonEchangeable(c));
+  cards = cartesDuLot(cards, tag);
   if(cards.length === 0) return;
   const allTagged = cards.every(c => tagState[c.id]?.[tag]);
   cards.forEach(c => {
@@ -157,4 +169,122 @@ function tagButtons(carte){
     }
     return `<button class="tag-toggle ${tag} ${state[tag] ? 'active' : ''}" data-id="${c.id}" data-tag="${tag}" title="${TAG_META[tag].label}" aria-label="${TAG_META[tag].label}">${TAG_META[tag].emoji}</button>`;
   }).join('');
+}
+
+// ------------------------------- confirmation d'un marquage groupé -------
+//
+// Les trois boutons « Marquer d'un coup » touchent cent cartes d'un clic.
+// Cliqués par mégarde, ils obligeaient à repasser sur chaque carte pour
+// défaire. On demande donc confirmation, en disant exactement ce qui va se
+// passer : le nombre de cartes concernées, et dans quel sens.
+//
+// Une fenêtre à nous plutôt que celle du navigateur : celle-ci se traduit,
+// se met aux couleurs du site, et certains navigateurs bloquent l'autre.
+
+const STYLE_CONFIRMATION = `
+  .confirmation{position:fixed;inset:0;z-index:75;display:flex;align-items:center;
+                justify-content:center;padding:24px;background:rgba(10,11,13,0.72);
+                opacity:0;transition:opacity .15s;}
+  .confirmation.vue{opacity:1}
+  .confirmation .boite{background:#15171B;border:1px solid rgba(237,234,224,0.14);
+                       border-radius:10px;padding:22px 24px;max-width:420px;width:100%;
+                       box-shadow:0 24px 60px rgba(0,0,0,0.55);
+                       font-family:'IBM Plex Sans',sans-serif;}
+  .confirmation h2{font-family:'Newsreader',serif;font-size:20px;font-weight:500;
+                   color:var(--text-on-ink,#EDEAE0);margin:0 0 10px;}
+  .confirmation p{font-size:13.5px;line-height:1.6;color:var(--text-on-ink-dim,#9B9E9C);margin:0}
+  .confirmation p b{color:var(--text-on-ink,#EDEAE0);font-weight:600}
+  .confirmation .boutons{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+  .confirmation button{font-family:inherit;font-size:13.5px;padding:9px 18px;border-radius:5px;
+                       cursor:pointer;border:1px solid rgba(237,234,224,0.16);
+                       background:transparent;color:var(--text-on-ink,#EDEAE0);transition:.12s;}
+  .confirmation button:hover{background:rgba(237,234,224,0.07)}
+  .confirmation button.principal{background:var(--gold,#C9A227);border-color:transparent;
+                                 color:var(--ink,#15171B);font-weight:600;}
+  .confirmation button.principal:hover{filter:brightness(1.1);background:var(--gold,#C9A227)}
+  @media(max-width:520px){
+    .confirmation .boutons{flex-direction:column-reverse}
+    .confirmation button{width:100%;min-height:44px}
+  }
+  @media(prefers-reduced-motion:reduce){ .confirmation{transition:none} }
+`;
+
+function demanderConfirmation({ titre, message, action }){
+  return new Promise(resolve => {
+    if(!document.getElementById('style-confirmation')){
+      const style = document.createElement('style');
+      style.id = 'style-confirmation';
+      style.textContent = STYLE_CONFIRMATION;
+      document.head.appendChild(style);
+    }
+
+    const voile = document.createElement('div');
+    voile.className = 'confirmation';
+    voile.setAttribute('role', 'dialog');
+    voile.setAttribute('aria-modal', 'true');
+    voile.innerHTML = `
+      <div class="boite">
+        <h2>${titre}</h2>
+        <p>${message}</p>
+        <div class="boutons">
+          <button class="annuler" type="button">Annuler</button>
+          <button class="principal" type="button">${action}</button>
+        </div>
+      </div>`;
+
+    const rendreLaMain = document.activeElement;
+    function fermer(reponse){
+      document.removeEventListener('keydown', auClavier);
+      voile.classList.remove('vue');
+      setTimeout(() => voile.remove(), 160);
+      // Le focus revient au bouton d'où l'on vient : sans cela, il repartait
+      // en haut de page et la navigation au clavier perdait le fil.
+      if(rendreLaMain?.focus) rendreLaMain.focus();
+      resolve(reponse);
+    }
+    function auClavier(e){
+      if(e.key === 'Escape') fermer(false);
+      // Entrée confirme : le bouton principal a le focus, mais on couvre
+      // aussi le cas où il l'aurait perdu.
+      if(e.key === 'Enter' && !e.target.classList?.contains('annuler')) fermer(true);
+    }
+
+    voile.querySelector('.annuler').addEventListener('click', () => fermer(false));
+    voile.querySelector('.principal').addEventListener('click', () => fermer(true));
+    // Cliquer à côté vaut annulation : c'est le geste de qui se ravise.
+    voile.addEventListener('click', e => { if(e.target === voile) fermer(false); });
+    document.addEventListener('keydown', auClavier);
+
+    document.body.appendChild(voile);
+    requestAnimationFrame(() => {
+      voile.classList.add('vue');
+      voile.querySelector('.principal').focus();
+    });
+  });
+}
+
+// Le libellé dit ce qui va arriver, pas ce qu'on demande : « Marquer les 105
+// cartes comme obtenues » se relit avant de cliquer.
+async function confirmerMarquageGroupe(cartes, tag){
+  const lot = cartesDuLot(cartes, tag);
+  if(lot.length === 0) return false;
+
+  const retrait = leLotRetire(lot, tag);
+  const libelle = TAG_META[tag]?.label?.toLowerCase() ?? tag;
+  const nombre = `<b>${lot.length} carte${lot.length > 1 ? 's' : ''}</b>`;
+  // Le décompte des cartes écartées se dit : sans quoi « 105 cartes » à
+  // l'écran et 98 marquées passeraient pour une erreur.
+  const ecartees = cartes.length - lot.length;
+  const reserve = ecartees > 0
+    ? ` ${ecartees} carte${ecartees > 1 ? 's' : ''} non échangeable${ecartees > 1 ? 's' : ''} `
+      + `${ecartees > 1 ? 'sont écartées' : 'est écartée'} du lot.`
+    : '';
+
+  return demanderConfirmation({
+    titre: retrait ? 'Retirer le marquage ?' : 'Marquer toutes ces cartes ?',
+    message: retrait
+      ? `Le marquage « ${libelle} » va être retiré de ${nombre}.${reserve}`
+      : `${nombre} vont être marquées « ${libelle} ».${reserve}`,
+    action: retrait ? 'Retirer' : 'Marquer',
+  });
 }
