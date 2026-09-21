@@ -141,6 +141,22 @@
   .mission .cartes{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0;padding:0;list-style:none}
   .mission .cartes li{font-size:12.5px;padding:3px 9px;border-radius:4px;
                       background:rgba(237,234,224,0.06);color:var(--text-on-ink);}
+  /* Les vignettes ne remplacent les noms que pour les missions courtes : au
+     delà, une mission réclame vingt-quatre cartes et la page devient un mur
+     d'images où l'on ne lit plus rien. */
+  .mission .visuels{display:flex;flex-wrap:wrap;gap:9px;margin:11px 0 0;padding:0;list-style:none}
+  .mission .visuels li{width:78px}
+  .mission .visuels img{width:78px;border-radius:5px;display:block;
+                        background:rgba(237,234,224,0.05);aspect-ratio:367/512;
+                        object-fit:cover;}
+  .mission .visuels .nom{display:block;font-size:11px;line-height:1.3;margin-top:4px;
+                         color:var(--text-on-ink-dim);word-break:break-word;}
+  .mission .visuels .sans-visuel{display:flex;align-items:center;justify-content:center;
+                                 width:78px;aspect-ratio:367/512;border-radius:5px;
+                                 background:rgba(237,234,224,0.05);
+                                 border:1px dashed rgba(237,234,224,0.16);
+                                 color:#5A5D63;font-size:20px;font-family:'Newsreader',serif;
+                                 font-style:italic;}
   .mission .complement{font-size:12.5px;color:var(--text-on-ink-dim);margin:8px 0 0;
                        padding-left:12px;border-left:2px solid rgba(237,234,224,0.14);line-height:1.5}
   .mission .recompense{font-size:12.5px;color:var(--accent-clair);margin:11px 0 0;font-weight:500}
@@ -152,6 +168,7 @@
 
   @media(max-width:720px){
     .mission-coche{width:26px;height:26px}
+    .mission .visuels li,.mission .visuels img,.mission .visuels .sans-visuel{width:66px}
     .ext-tete{padding:13px 14px;gap:10px}
     .ext-tete h3{font-size:15.5px;min-width:0}
     .serie-tete h2{font-size:17px}
@@ -190,15 +207,15 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-21-uo6d"></script>
-<script src="catalogue.js?v=2026-09-21-uo6d"></script>
-<script src="supabase-config.js?v=2026-09-21-uo6d"></script>
-<script src="pied.js?v=2026-09-21-uo6d"></script>
-<script src="admin.js?v=2026-09-21-uo6d"></script>
-<script src="compte.js?v=2026-09-21-uo6d"></script>
-<script src="progression.js?v=2026-09-21-uo6d"></script>
-<script src="sets.js?v=2026-09-21-uo6d"></script>
-<script src="missions.js?v=2026-09-21-uo6d"></script>
+<script src="univers.js?v=2026-09-21-r4za"></script>
+<script src="catalogue.js?v=2026-09-21-r4za"></script>
+<script src="supabase-config.js?v=2026-09-21-r4za"></script>
+<script src="pied.js?v=2026-09-21-r4za"></script>
+<script src="admin.js?v=2026-09-21-r4za"></script>
+<script src="compte.js?v=2026-09-21-r4za"></script>
+<script src="progression.js?v=2026-09-21-r4za"></script>
+<script src="sets.js?v=2026-09-21-r4za"></script>
+<script src="missions.js?v=2026-09-21-r4za"></script>
 <script>
 // Les missions secrètes n'existent que dans l'application mobile : du côté
 // du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
@@ -234,6 +251,10 @@ function echapper(t){
   return String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 }
 
+// Au-delà de ce nombre, on s'en tient aux noms. Six vignettes tiennent sur
+// une ligne d'écran ; vingt-quatre font un mur.
+const MAX_VISUELS = 6;
+
 function blocMission(idExt, mission, faites){
   const cle = cleMission(idExt, mission.nom);
   const faite = faites.has(cle);
@@ -248,6 +269,8 @@ function blocMission(idExt, mission, faites){
       ${mission.cartes?.length
         ? `<ul class="cartes">${mission.cartes.map(c => `<li>${echapper(c)}</li>`).join('')}</ul>`
         : ''}
+      ${mission.cartes?.length && mission.cartes.length <= MAX_VISUELS
+        ? '<ul class="visuels" hidden></ul>' : ''}
       ${(mission.complement ?? []).map(c => `<p class="complement">${echapper(c)}</p>`).join('')}
       ${mission.recompense ? `<p class="recompense">→ ${echapper(mission.recompense)}</p>` : ''}
       ${mission.doute ? `<p class="doute">${echapper(mission.doute)}</p>` : ''}
@@ -351,6 +374,56 @@ async function construire(){
       mission secrète, soit aucun guide ne les a encore décrites.</p>` : ''}`;
 }
 
+// Les visuels ne sont cherchés qu'à l'ouverture d'une extension, et une
+// seule fois : charger les cartes des dix-huit extensions au chargement de
+// la page ferait attendre pour des images que personne ne regarde encore.
+const cartesParExtension = new Map();
+
+async function poserLesVisuels(bloc){
+  if(bloc.dataset.visuels) return;
+  bloc.dataset.visuels = 'en cours';
+
+  const id = bloc.dataset.ext;
+  let cartes;
+  try{
+    if(!cartesParExtension.has(id)) cartesParExtension.set(id, await cartesDeLExtension(id));
+    cartes = cartesParExtension.get(id);
+  }catch(err){
+    // Sans les cartes, les noms restent : la mission se lit quand même.
+    console.warn(`Cartes de ${id} indisponibles`, err);
+    bloc.dataset.visuels = 'échec';
+    return;
+  }
+
+  bloc.querySelectorAll('.mission').forEach(mission => {
+    const liste = mission.querySelector('.visuels');
+    if(!liste) return;
+    const condition = mission.querySelector('.condition')?.textContent ?? '';
+    const noms = [...mission.querySelectorAll('.cartes li')].map(li => li.textContent);
+    const trouvees = noms.map(nom => [nom, trouverLaCarte(nom, condition, cartes)]);
+
+    // Tout ou rien : une mission à moitié illustrée se lit plus mal que la
+    // même en toutes lettres.
+    if(!trouvees.some(([, c]) => c)) return;
+
+    liste.innerHTML = trouvees.map(([nom, carte]) => `
+      <li>
+        ${carte
+          ? `<img src="${echapper(carte.image)}" alt="${echapper(carte.name)}"
+                  loading="lazy" title="${echapper(nom)}"
+                  onerror="this.replaceWith(Object.assign(document.createElement('span'),
+                           { className: 'sans-visuel', textContent: '?' }))">`
+          : `<span class="sans-visuel" title="Carte non retrouvée dans le catalogue">?</span>`}
+        <span class="nom">${echapper(nom)}</span>
+      </li>`).join('');
+    liste.hidden = false;
+    // Les noms sont maintenant sous les vignettes : la liste de texte ferait double emploi.
+    mission.querySelector('.cartes')?.remove();
+  });
+
+  bloc.dataset.visuels = 'fait';
+}
+
 // Ce qu'on avait ouvert se retrouve ouvert au retour : on revient souvent
 // sur la même extension, celle qu'on est en train de jouer.
 document.getElementById('contenu').addEventListener('toggle', (e) => {
@@ -359,6 +432,7 @@ document.getElementById('contenu').addEventListener('toggle', (e) => {
   const ouvertes = extensionsOuvertes();
   if(bloc.open) ouvertes.add(bloc.dataset.ext); else ouvertes.delete(bloc.dataset.ext);
   enregistrerExtensionsOuvertes(ouvertes);
+  if(bloc.open) poserLesVisuels(bloc);
 }, true);   // <details> n'émet pas d'événement qui remonte : on l'attrape à la descente
 
 document.getElementById('contenu').addEventListener('change', (e) => {
@@ -373,7 +447,11 @@ document.getElementById('contenu').addEventListener('change', (e) => {
   rafraichirBarre(bloc.closest('.ext-bloc'));
 });
 
-construire();
+construire().then(() => {
+  // Une extension rouverte depuis la dernière visite n'émet pas d'événement
+  // d'ouverture : elle naît ouverte. On lui pose ses visuels à la main.
+  document.querySelectorAll('.ext-bloc[open]').forEach(poserLesVisuels);
+});
 initCompte().then(afficherEtatCompte);
 </script>
 

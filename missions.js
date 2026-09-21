@@ -56,3 +56,93 @@ function enregistrerExtensionsOuvertes(ouvertes){
   try{ localStorage.setItem(CLE_EXTENSIONS_OUVERTES, JSON.stringify([...ouvertes])); }
   catch(err){ /* sans mémoire, tout se rouvrira fermé : pas de quoi gêner */ }
 }
+
+// --------------------------------------------- retrouver les visuels ------
+//
+// Une mission nomme ses cartes en toutes lettres — « Azurill », « Méga-
+// Florizarre ex (full art) » — là où le site les connaît par identifiant.
+// Il faut donc rapprocher les deux.
+//
+// Le nom seul ne suffit pas : Azurill existe deux fois dans Source Secrète,
+// en Trois Diamants et en Une Étoile, et une mission « full art » réclame
+// la seconde. La version demandée se lit soit entre parenthèses derrière le
+// nom, soit dans la condition de la mission. À défaut de certitude, on
+// n'affiche pas de visuel : une mauvaise image ferait chercher la mauvaise
+// carte, ce qui est pire que pas d'image du tout.
+
+// Dans l'application, « full art » ne désigne pas la même rareté selon la
+// carte : une étoile pour un Pokémon ordinaire ou un Dresseur, deux pour une
+// carte ex, qui n'a pas de version une étoile. On donne donc un ordre de
+// préférence plutôt qu'une rareté unique, et on prend la première qui existe.
+const PREFERENCES_PAR_VERSION = [
+  [/gold\s*crown|couronne/i,                 ['Couronne']],
+  [/immersive/i,                             ['Trois Étoiles']],
+  [/rainbow|bordered|2\s*★|deux\s*étoiles/i, ['Deux Étoiles', 'Une Étoile']],
+  [/full\s*art|1\s*★|une\s*étoile/i,        ['Une Étoile', 'Deux Étoiles']],
+  [/shiny|chromatique/i,                     ['Chromatique', 'Chromatique deux étoiles']],
+];
+
+// Du plus courant au plus rare. Sert de repli quand la version demandée
+// n'existe pas pour cette carte, et de choix par défaut quand rien n'est
+// précisé : une carte nommée sans façon, c'est la carte ordinaire.
+const ORDRE_DES_RARETES = [
+  'Un Diamant', 'Deux Diamants', 'Trois Diamants', 'Quatre Diamants',
+  'Une Étoile', 'Deux Étoiles', 'Chromatique', 'Chromatique deux étoiles',
+  'Trois Étoiles', 'Couronne',
+];
+
+const rangDeRarete = r => {
+  const i = ORDRE_DES_RARETES.indexOf(r);
+  return i === -1 ? ORDRE_DES_RARETES.length : i;
+};
+
+function preferences(texte){
+  if(!texte) return null;
+  for(const [motif, raretes] of PREFERENCES_PAR_VERSION){
+    if(motif.test(texte)) return raretes;
+  }
+  return null;
+}
+
+// « Milobellus (72/71) » → { nom: 'Milobellus', numero: '72' }
+// « Méga-Florizarre ex (full art) » → { nom: 'Méga-Florizarre ex', version: 'full art' }
+function lireLaCarteDemandee(libelle){
+  const m = String(libelle).match(/^(.*?)\s*\(([^)]*)\)\s*$/);
+  if(!m) return { nom: libelle.trim(), numero: null, version: null };
+  const dedans = m[2].trim();
+  const numero = dedans.match(/^(\d+)\s*\/\s*\d+$/);
+  return numero
+    ? { nom: m[1].trim(), numero: numero[1], version: null }
+    : { nom: m[1].trim(), numero: null, version: dedans };
+}
+
+// Les guides écrivent « Évoli Ex », le catalogue « Évoli-ex » ; l'un met un
+// tiret là où l'autre met une espace. On compare sur une forme rabotée.
+function formeComparable(nom){
+  return String(nom).toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function trouverLaCarte(libelle, condition, cartes){
+  const { nom, numero, version } = lireLaCarteDemandee(libelle);
+
+  // Un numéro d'extension ne laisse aucune place au doute.
+  if(numero) return cartes.find(c => c.localId === String(Number(numero))) ?? null;
+
+  const candidates = cartes.filter(c => formeComparable(c.name) === formeComparable(nom));
+  if(candidates.length === 0) return null;
+  if(candidates.length === 1) return candidates[0];
+
+  // La version demandée se lit derrière le nom, sinon dans la condition.
+  const voulues = preferences(version) ?? preferences(condition) ?? [];
+  for(const rarete of voulues){
+    const trouvee = candidates.find(c => c.rarity === rarete);
+    if(trouvee) return trouvee;
+  }
+
+  // Rien ne correspond : on montre la carte ordinaire. Le libellé affiché
+  // sous la vignette garde, lui, la version exacte que la mission réclame.
+  return candidates.slice().sort((a, b) => rangDeRarete(a.rarity) - rangDeRarete(b.rarity))[0];
+}
