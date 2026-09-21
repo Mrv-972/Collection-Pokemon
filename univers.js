@@ -71,12 +71,17 @@ function avecUnivers(href, cle = universCourant){
   }
 }
 
-// Où mène la bascule d'univers. Une page attachée à une extension précise
-// n'a pas d'équivalent en face : on retombe alors sur le catalogue. Une page
-// de Pokémon, si — le même Pokémon existe des deux côtés.
+// Où mène la bascule d'univers. Certaines pages n'ont pas d'équivalent en
+// face : une extension précise, et les missions secrètes, qui sont une
+// mécanique propre à l'application mobile. On retombe alors sur le
+// catalogue. Une page de Pokémon, elle, a son équivalent : le même Pokémon
+// existe des deux côtés.
 function cibleBascule(cle){
   const page = window.location.pathname.split('/').pop() || 'index.html';
   if(page === 'extension.html') return avecUnivers('series.html', cle);
+  // Les missions n'existent que du côté Pocket : passer en face mène au
+  // catalogue, mais rester de son côté doit laisser la page où elle est.
+  if(page === 'missions.html' && cle !== universCourant) return avecUnivers('series.html', cle);
   return avecUnivers(window.location.pathname + window.location.search, cle);
 }
 
