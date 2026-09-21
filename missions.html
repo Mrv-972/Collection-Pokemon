@@ -146,11 +146,14 @@
      elles restent une phrase, et c'est très bien ainsi. */
   .mission .visuels{display:flex;flex-wrap:wrap;gap:9px;margin:11px 0 0;padding:0;list-style:none}
   .mission .visuels li{width:78px}
-  .mission .visuels img{width:78px;border-radius:5px;display:block;
+  .mission .visuels img.carte{width:78px;border-radius:5px;display:block;
                         background:rgba(237,234,224,0.05);aspect-ratio:367/512;
                         object-fit:cover;}
-  .mission .visuels .nom{display:block;font-size:11px;line-height:1.3;margin-top:4px;
-                         color:var(--text-on-ink-dim);word-break:break-word;}
+  .mission .visuels .nom{display:block;font-size:11.5px;line-height:1.3;margin-top:4px;
+                         color:var(--text-on-ink);word-break:break-word;}
+  .mission .visuels .fiche{display:block;font-size:10.5px;line-height:1.4;margin-top:2px;
+                           color:var(--text-on-ink-dim);}
+  .mission .visuels .fiche .ext{display:block}
   .mission .visuels .sans-visuel{display:flex;align-items:center;justify-content:center;
                                  width:78px;aspect-ratio:367/512;border-radius:5px;
                                  background:rgba(237,234,224,0.05);
@@ -173,7 +176,8 @@
   .zoom-carte img{max-width:min(440px,100%);max-height:78vh;border-radius:12px;
                   box-shadow:0 24px 70px rgba(0,0,0,0.6);cursor:default;}
   .zoom-carte .legende{font-size:13.5px;color:#EDEAE0;text-align:center;line-height:1.6}
-  .zoom-carte .legende .sous{display:block;margin-top:4px;font-size:11.5px;color:#9B9E9C}
+  .zoom-carte .legende .sous{display:block;margin-top:6px;font-size:11.5px;color:#9B9E9C}
+  .zoom-carte .legende b{font-weight:600}
   .zoom-carte .fleche{position:fixed;top:50%;transform:translateY(-50%);
                       width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;
                       background:rgba(237,234,224,0.10);color:#EDEAE0;font-size:26px;
@@ -183,7 +187,7 @@
   .zoom-carte .fleche:disabled{opacity:.25;cursor:default}
   .zoom-carte .fleche.avant{left:72px}
   .zoom-carte .fleche.apres{right:24px}
-  .mission .visuels img{cursor:zoom-in}
+  .mission .visuels img.carte{cursor:zoom-in}
   @media(max-width:720px){
     .zoom-carte .fleche{width:52px;height:52px}
     .zoom-carte .fleche.avant{left:10px}
@@ -198,7 +202,7 @@
 
   @media(max-width:720px){
     .mission-coche{width:26px;height:26px}
-    .mission .visuels li,.mission .visuels img,.mission .visuels .sans-visuel{width:66px}
+    .mission .visuels li,.mission .visuels img.carte,.mission .visuels .sans-visuel{width:66px}
     .ext-tete{padding:13px 14px;gap:10px}
     .ext-tete h3{font-size:15.5px;min-width:0}
     .serie-tete h2{font-size:17px}
@@ -237,15 +241,16 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-21-7thw"></script>
-<script src="catalogue.js?v=2026-09-21-7thw"></script>
-<script src="supabase-config.js?v=2026-09-21-7thw"></script>
-<script src="pied.js?v=2026-09-21-7thw"></script>
-<script src="admin.js?v=2026-09-21-7thw"></script>
-<script src="compte.js?v=2026-09-21-7thw"></script>
-<script src="progression.js?v=2026-09-21-7thw"></script>
-<script src="sets.js?v=2026-09-21-7thw"></script>
-<script src="missions.js?v=2026-09-21-7thw"></script>
+<script src="univers.js?v=2026-09-21-b1hj"></script>
+<script src="catalogue.js?v=2026-09-21-b1hj"></script>
+<script src="supabase-config.js?v=2026-09-21-b1hj"></script>
+<script src="pied.js?v=2026-09-21-b1hj"></script>
+<script src="admin.js?v=2026-09-21-b1hj"></script>
+<script src="compte.js?v=2026-09-21-b1hj"></script>
+<script src="progression.js?v=2026-09-21-b1hj"></script>
+<script src="sets.js?v=2026-09-21-b1hj"></script>
+<script src="raretes.js?v=2026-09-21-b1hj"></script>
+<script src="missions.js?v=2026-09-21-b1hj"></script>
 <script>
 // Les missions secrètes n'existent que dans l'application mobile : du côté
 // du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
@@ -275,6 +280,23 @@ function poserCreditDesSources(donnees){
   const posee = pied.querySelector('.pied-note');
   if(posee) posee.innerHTML = note;
   else pied.dataset.note = note;
+}
+
+// Deux cartes deux étoiles peuvent porter le même nom : la première est la
+// Full Art, la seconde celle au cadre arc-en-ciel. Le jeu ne les distingue
+// que par leur numéro ; on leur rend un nom lisible.
+function nomDeLaVersion(carte, cartes){
+  if(carte.rarity !== 'Deux Étoiles') return null;
+  const soeurs = cartes.filter(c => c.name === carte.name && c.rarity === 'Deux Étoiles');
+  return soeurs.length > 1 && carte === soeurs[soeurs.length - 1] ? 'Arc-En-Ciel' : 'Full Art';
+}
+
+// « ★★ Arc-En-Ciel · Source Secrète · n° 87 » : la rareté en icônes du jeu,
+// puis où trouver la carte. Les guides parlent de « rainbow bordered art » ;
+// le jeu, lui, n'affiche que des étoiles.
+function ficheDeLaCarte(carte, nomExtension, cartes){
+  const version = nomDeLaVersion(carte, cartes);
+  return `${rarityIcon(carte.rarity)}${version ? ' ' + version : ''} · ${nomExtension} · n° ${carte.localId}`;
 }
 
 function echapper(t){
@@ -355,6 +377,10 @@ function rafraichirBarre(bloc){
 
 async function construire(){
   const contenu = document.getElementById('contenu');
+  // Cette page n'a pas de grille de cartes : la règle qui dimensionne les
+  // icônes de rareté arrive donc avec elles.
+  document.head.appendChild(Object.assign(document.createElement('style'),
+    { textContent: STYLE_RARETES }));
   if(!estPocket()) return rendreHorsSujet();
 
   let donnees, extensionsConnues = [];
@@ -426,6 +452,10 @@ async function poserLesVisuels(bloc){
     return;
   }
 
+  // Le nom lisible de l'extension est déjà affiché en tête du bloc : on le
+  // reprend plutôt que de le redemander au catalogue.
+  const nomExtension = bloc.querySelector('.ext-tete h3')?.textContent?.trim() ?? id;
+
   bloc.querySelectorAll('.mission').forEach(mission => {
     const liste = mission.querySelector('.visuels');
     if(!liste) return;
@@ -444,12 +474,15 @@ async function poserLesVisuels(bloc){
     liste.innerHTML = trouvees.map(([nom, carte]) => `
       <li>
         ${carte
-          ? `<img src="${echapper(carte.image)}" alt="${echapper(carte.name)}"
-                  loading="lazy" title="${echapper(nom)}"
+          ? `<img class="carte" src="${echapper(carte.image)}" alt="${echapper(carte.name)}"
+                  loading="lazy" title="${echapper(nom)}" data-fiche="${echapper(ficheDeLaCarte(carte, nomExtension, cartes))}"
                   onerror="this.replaceWith(Object.assign(document.createElement('span'),
                            { className: 'sans-visuel', textContent: '?' }))">`
           : `<span class="sans-visuel" title="Carte non retrouvée dans le catalogue">?</span>`}
-        <span class="nom">${echapper(nom)}</span>
+        <span class="nom">${echapper(carte ? carte.name : nom)}</span>
+        ${carte ? `<span class="fiche">${rarityIcon(carte.rarity)}
+          ${echapper(nomDeLaVersion(carte, cartes) ?? '')}
+          <span class="ext">${echapper(nomExtension)} · n° ${echapper(carte.localId)}</span></span>` : ''}
       </li>`).join('');
     liste.hidden = false;
     // Les noms sont maintenant sous les vignettes : la liste de texte ferait double emploi.
@@ -474,7 +507,7 @@ document.getElementById('contenu').addEventListener('toggle', (e) => {
 // la page entière : ce sont les cartes d'une même mission qu'on veut
 // comparer, et une mission en réclame parfois vingt-quatre.
 function agrandirLaCarte(vignette){
-  const soeurs = [...vignette.closest('.visuels').querySelectorAll('img')];
+  const soeurs = [...vignette.closest('.visuels').querySelectorAll('img.carte')];
   let position = soeurs.indexOf(vignette);
 
   const voile = document.createElement('div');
@@ -496,9 +529,9 @@ function agrandirLaCarte(vignette){
     const source = soeurs[position];
     image.src = source.currentSrc || source.src;
     image.alt = source.alt;
-    // Le libellé de la mission dit la version exacte réclamée ; le titre de
-    // l'image dit la carte. Les deux valent mieux que l'un des deux.
-    titre.textContent = source.title || source.alt;
+    // Le nom de la carte, puis sa rareté et son extension : de quoi la
+    // retrouver dans le jeu sans connaître le vocabulaire des guides.
+    titre.innerHTML = `<b>${echapper(source.alt)}</b><br>${source.dataset.fiche ?? ''}`;
     avant.disabled = position === 0;
     apres.disabled = position === soeurs.length - 1;
   }
@@ -528,7 +561,7 @@ function agrandirLaCarte(vignette){
 }
 
 document.getElementById('contenu').addEventListener('click', (e) => {
-  const vignette = e.target.closest('.visuels img');
+  const vignette = e.target.closest('.visuels img.carte');
   if(vignette) agrandirLaCarte(vignette);
 });
 

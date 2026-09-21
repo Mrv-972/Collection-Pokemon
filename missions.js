@@ -77,8 +77,8 @@ function enregistrerExtensionsOuvertes(ouvertes){
 const PREFERENCES_PAR_VERSION = [
   [/gold\s*crown|couronne/i,                 ['Couronne']],
   [/immersive/i,                             ['Trois Étoiles']],
-  [/rainbow|bordered|2\s*★|deux\s*étoiles/i, ['Deux Étoiles', 'Une Étoile']],
-  [/full\s*art|1\s*★|une\s*étoile/i,        ['Une Étoile', 'Deux Étoiles']],
+  [/arc.?en.?ciel|rainbow|bordered|2\s*★|deux\s*étoiles/i, ['Deux Étoiles', 'Une Étoile']],
+  [/full\s*art|1\s*★|une\s*étoile/i,                      ['Une Étoile', 'Deux Étoiles']],
   [/shiny|chromatique/i,                     ['Chromatique', 'Chromatique deux étoiles']],
 ];
 
@@ -143,7 +143,7 @@ function trouverLaCarte(libelle, condition, cartes){
   // paraît deux fois en Deux Étoiles dans Parade Onirique, une fois en full
   // art et une fois au cadre arc-en-ciel. Le jeu numérote toujours la
   // seconde après la première, et c'est la seule chose qui les distingue.
-  const arcEnCiel = /rainbow|bordered/i.test(indice);
+  const arcEnCiel = /arc.?en.?ciel|rainbow|bordered/i.test(indice);
   for(const rarete of voulues){
     const memeRarete = candidates.filter(c => c.rarity === rarete);
     if(memeRarete.length) return arcEnCiel ? memeRarete[memeRarete.length - 1] : memeRarete[0];

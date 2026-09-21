@@ -76,27 +76,8 @@ function raritySymbol(rarity){
 //
 // Le jeu répète le même symbole — trois losanges pour « Trois Diamants ».
 // On fait pareil, plutôt que d'avoir un fichier par combinaison.
-const ICONES_RARETE = {
-  'Un Diamant':               ['losange', 1],
-  'Deux Diamants':            ['losange', 2],
-  'Trois Diamants':           ['losange', 3],
-  'Quatre Diamants':          ['losange', 4],
-  'Une Étoile':               ['etoile', 1],
-  'Deux Étoiles':             ['etoile', 2],
-  'Trois Étoiles':            ['etoile', 3],
-  'Couronne':                 ['couronne', 1],
-  'Chromatique':              ['chromatique', 1],
-  'Chromatique deux étoiles': ['chromatique', 2],
-};
-
-function rarityIcon(rarity){
-  const icone = ICONES_RARETE[rarity];
-  // Les quarante raretés du jeu physique n'ont pas d'icône : elles gardent
-  // le symbole typographique, qui vaut mieux qu'un vide.
-  if(!icone) return raritySymbol(rarity);
-  const [nom, nombre] = icone;
-  return `<img class="icone-rarete" src="images/raretes/${nom}.png" alt="" aria-hidden="true" loading="lazy">`.repeat(nombre);
-}
+// Les icônes de rareté vivent dans raretes.js, que la page des missions
+// partage avec les grilles de cartes.
 
 // Ordre d'affichage dans le filtre : du plus commun au plus rare.
 const SYMBOL_RANK = { '': 0, '●': 1, '◆': 2, '★': 3, '★★': 4, '★★★': 5, '★★★★': 6, '✦': 7 };
