@@ -96,11 +96,11 @@
   }
 
   /* ---------------------------------------------------- Missions -------- */
-  .avertissement{background:rgba(var(--gold-rgb),0.08);border:1px solid rgba(var(--gold-rgb),0.28);
-                 border-radius:6px;padding:14px 16px;font-size:13px;line-height:1.6;
-                 color:var(--text-on-ink-dim);margin:0 0 30px;}
-  .avertissement b{color:var(--text-on-ink);font-weight:600}
-  .avertissement a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:2px}
+  .serie-bloc{margin:0 0 26px}
+  .serie-tete{display:flex;align-items:baseline;gap:12px;margin:0 0 12px;
+              padding-bottom:9px;border-bottom:1px solid rgba(237,234,224,0.08);}
+  .serie-tete h2{font-size:20px}
+  .serie-tete .compte{font-size:13px;color:var(--text-on-ink-dim)}
 
   /* Une extension par ligne, repliée. Cent cinq missions déroulées d'un coup
      ne se lisent pas : on ouvre celle qu'on joue. */
@@ -113,7 +113,8 @@
   .ext-tete::-webkit-details-marker{display:none}
   .ext-tete:hover{background:rgba(237,234,224,0.04)}
   .ext-tete img{height:30px;max-width:120px;object-fit:contain;object-position:left center;flex-shrink:0;}
-  .ext-tete h2{font-size:18px;flex:1;min-width:140px}
+  .ext-tete h3{font-size:17px;font-family:'Newsreader',serif;font-weight:500;
+               flex:1;min-width:140px;}
   .ext-tete .compte{font-size:12.5px;color:var(--text-on-ink-dim)}
   /* Le chevron dit dans quel sens ça va s'ouvrir, sans texte à traduire. */
   .ext-tete .chevron{flex-shrink:0;width:11px;height:11px;margin-left:2px;
@@ -152,7 +153,8 @@
   @media(max-width:720px){
     .mission-coche{width:26px;height:26px}
     .ext-tete{padding:13px 14px;gap:10px}
-    .ext-tete h2{font-size:16px;min-width:0}
+    .ext-tete h3{font-size:15.5px;min-width:0}
+    .serie-tete h2{font-size:17px}
     .ext-tete .progression{width:100%;order:9}
     .ext-corps{padding:4px 14px 13px}
   }
@@ -188,15 +190,15 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-21-uuw0"></script>
-<script src="catalogue.js?v=2026-09-21-uuw0"></script>
-<script src="supabase-config.js?v=2026-09-21-uuw0"></script>
-<script src="pied.js?v=2026-09-21-uuw0"></script>
-<script src="admin.js?v=2026-09-21-uuw0"></script>
-<script src="compte.js?v=2026-09-21-uuw0"></script>
-<script src="progression.js?v=2026-09-21-uuw0"></script>
-<script src="sets.js?v=2026-09-21-uuw0"></script>
-<script src="missions.js?v=2026-09-21-uuw0"></script>
+<script src="univers.js?v=2026-09-21-uo6d"></script>
+<script src="catalogue.js?v=2026-09-21-uo6d"></script>
+<script src="supabase-config.js?v=2026-09-21-uo6d"></script>
+<script src="pied.js?v=2026-09-21-uo6d"></script>
+<script src="admin.js?v=2026-09-21-uo6d"></script>
+<script src="compte.js?v=2026-09-21-uo6d"></script>
+<script src="progression.js?v=2026-09-21-uo6d"></script>
+<script src="sets.js?v=2026-09-21-uo6d"></script>
+<script src="missions.js?v=2026-09-21-uo6d"></script>
 <script>
 // Les missions secrètes n'existent que dans l'application mobile : du côté
 // du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
@@ -205,6 +207,27 @@ function rendreHorsSujet(){
   document.getElementById('contenu').innerHTML = `
     <p class="status-msg">Les missions secrètes n'existent que dans Pokémon TCG
     Pocket. Passe du côté Pocket par le bandeau de gauche pour les voir.</p>`;
+}
+
+// Le pied de page porte déjà la note propre à chaque page : on y ajoute la
+// provenance des missions, sans encombrer le haut de l'écran.
+function poserCreditDesSources(donnees){
+  const pied = document.querySelector('footer');
+  if(!pied) return;
+  const liens = donnees.sources
+    .map(s => `<a href="${echapper(s.adresse)}" target="_blank" rel="noopener noreferrer">${echapper(s.nom)}</a>`)
+    .join(' et ');
+  const note = `Missions relevées dans ${liens} et recoupées à la main `
+    + `(relevé du ${echapper(donnees.maj)}) : le jeu ne les publie nulle part. `
+    + `Les coches sont enregistrées dans ce navigateur, sur cet appareil.`;
+
+  // Le fichier des missions arrive après coup : le pied de page est déjà
+  // construit, et changer son data-note ne le referait pas. On écrit donc
+  // dans la note posée, et on retombe sur l'attribut si elle n'existe pas
+  // encore — selon lequel des deux est prêt le premier.
+  const posee = pied.querySelector('.pied-note');
+  if(posee) posee.innerHTML = note;
+  else pied.dataset.note = note;
 }
 
 function echapper(t){
@@ -231,6 +254,19 @@ function blocMission(idExt, mission, faites){
     </div>`;
 }
 
+// Le catalogue range les extensions de l'application en grandes séries — A,
+// B — et la page des extensions les présente ainsi. Les missions suivent le
+// même découpage, pour qu'on s'y retrouve d'une page à l'autre.
+function parSerie(extensions){
+  const groupes = new Map();
+  for(const e of extensions){
+    const serie = e.serieNom ?? 'Autres';
+    if(!groupes.has(serie)) groupes.set(serie, []);
+    groupes.get(serie).push(e);
+  }
+  return [...groupes];
+}
+
 // <details> plutôt qu'un dépliage écrit à la main : le clavier l'ouvre déjà,
 // les lecteurs d'écran l'annoncent déjà, et la recherche du navigateur
 // (Ctrl+F) y trouve le texte replié.
@@ -243,7 +279,7 @@ function blocExtension(ext, faites, ouverte){
         <span class="chevron" aria-hidden="true"></span>
         <img src="images/sets/${echapper(ext.id)}.png" alt="" loading="lazy"
              onerror="this.remove()">
-        <h2>${echapper(ext.nom)}</h2>
+        <h3>${echapper(ext.nom)}</h3>
         <span class="compte">${total} mission${total > 1 ? 's' : ''}</span>
         ${barreProgression({ obtenues: accomplies, total })}
       </summary>
@@ -284,7 +320,11 @@ async function construire(){
   // mêmes partout sur le site.
   const parId = new Map(extensionsConnues.map(e => [e.id, e]));
   const extensions = donnees.extensions
-    .map(e => ({ ...e, nom: parId.get(e.id)?.name ?? e.id }))
+    .map(e => ({
+      ...e,
+      nom: parId.get(e.id)?.name ?? e.id,
+      serieNom: parId.get(e.id)?.serieNom ?? guessSeriesName(e.id),
+    }))
     .reverse();   // les plus récentes d'abord, comme le catalogue
 
   const faites = missionsFaites();
@@ -293,15 +333,19 @@ async function construire(){
     .filter(e => !donnees.extensions.some(x => x.id === e.id))
     .map(e => e.name);
 
+  // Les guides ont fait le travail de relevé : le crédit descend dans le pied
+  // de page plutôt que de tenir un encadré en haut de l'écran.
+  poserCreditDesSources(donnees);
+
   contenu.innerHTML = `
-    <div class="avertissement">
-      <b>D'où viennent ces missions ?</b> Le jeu ne les publie nulle part, et
-      aucune base de données ouverte ne les répertorie. Elles ont été relevées
-      dans ${donnees.sources.map(s => `<a href="${echapper(s.adresse)}" target="_blank" rel="noopener noreferrer">${echapper(s.nom)}</a>`).join(' et ')},
-      puis recoupées à la main. Relevé du ${echapper(donnees.maj)}.
-      Si tu constates une erreur dans le jeu, signale-la : elle sera corrigée ici.
-    </div>
-    ${extensions.map(e => blocExtension(e, faites, ouvertes.has(e.id))).join('')}
+    ${parSerie(extensions).map(([serie, liste]) => `
+      <div class="serie-bloc">
+        <div class="serie-tete">
+          <h2>${echapper(serie)}</h2>
+          <span class="compte">${liste.length} extension${liste.length > 1 ? 's' : ''}</span>
+        </div>
+        ${liste.map(e => blocExtension(e, faites, ouvertes.has(e.id))).join('')}
+      </div>`).join('')}
     ${sansMissions.length ? `<p class="manquantes"><b>Pas encore répertoriées :</b>
       ${sansMissions.map(echapper).join(', ')}. Soit ces extensions n'ont pas de
       mission secrète, soit aucun guide ne les a encore décrites.</p>` : ''}`;
