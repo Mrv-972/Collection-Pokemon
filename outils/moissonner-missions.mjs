@@ -42,7 +42,9 @@ function enTexte(html){
     .replace(/<svg[\s\S]*?<\/svg>/gi, ' ')
     .replace(/<!--[\s\S]*?-->/g, ' ')
     .replace(/<\/(h[1-6]|p|li|tr|div|section|table)>/gi, '\n')
-    .replace(/<(h[1-6])[^>]*>/gi, '\n## ')
+    // Le niveau de titre est ce qui distingue une extension d'une mission :
+    // on le garde, sous forme de dièses, plutôt que de tout aplatir.
+    .replace(/<h([1-6])[^>]*>/gi, (_, n) => '\n' + '#'.repeat(Number(n)) + ' ')
     .replace(/<li[^>]*>/gi, '\n  - ')
     .replace(/<(br|td|th)[^>]*>/gi, ' | ')
     .replace(/<[^>]+>/g, ' ')
@@ -69,25 +71,98 @@ async function lire(adresse){
   return await r.text();
 }
 
-async function principal(){
-  const choisi = process.argv[2] ? Number(process.argv[2]) : null;
-  const limite = Number(process.env.LIMITE_CARACTERES || 28000);
-  const guides = choisi !== null ? [GUIDES[choisi]] : GUIDES;
+// ------------------------------------------------------- mise en forme ----
+//
+// Le guide écrit toujours la même chose, dans le même ordre :
+//
+//     ## Musée de la Source Secrète 1
+//       - Carte(s) à obtenir : Milobellus (72/071), Limonde (73/071)…
+//       - Récompenses : 12 sabliers booster, 36 sabliers miracle…
+//
+// Un titre suivi d'une ligne « Carte(s) à obtenir » est donc une mission ;
+// tout autre titre est une section, et la plus proche au-dessus donne
+// l'extension. On ne devine rien de plus : ce qui ne rentre pas dans ce
+// moule est laissé de côté plutôt que deviné de travers.
 
-  for(const [i, adresse] of guides.entries()){
-    const numero = choisi !== null ? choisi : i;
-    console.log(`\n${'='.repeat(74)}\n=== GUIDE ${numero} : ${adresse}\n${'='.repeat(74)}`);
+function lignes(texte){
+  return texte.split('\n').map(l => l.trim()).filter(Boolean);
+}
+
+// « Milobellus (72/071) » → { nom: 'Milobellus', numero: 72, total: 71 }
+function cartesDeLaLigne(ligne){
+  const apres = ligne.replace(/^[-•\s]*Cartes?\(?s?\)?\s*à obtenir\s*:\s*/i, '');
+  const cartes = [];
+  for(const m of apres.matchAll(/([^,()]+?)\s*\((\d+)\s*\/\s*(\d+)\)/g)){
+    const nom = m[1].replace(/^(et|ou)\s+/i, '').replace(/^[-–—\s]+/, '').trim();
+    if(nom) cartes.push({ nom, numero: Number(m[2]), total: Number(m[3]) });
+  }
+  // Certaines missions ne listent pas des cartes nommées mais une condition
+  // (« trois cartes chromatiques deux étoiles ») : on garde la phrase telle
+  // quelle, à charge pour la relecture de décider quoi en faire.
+  return cartes.length ? cartes : [{ condition: apres.trim() }];
+}
+
+function analyser(texte){
+  const sections = [];
+  let section = null, mission = null;
+  const brut = lignes(texte);
+
+  brut.forEach((ligne, i) => {
+    const titre = ligne.match(/^(#{1,6})\s+(.*)$/);
+    if(titre){
+      const suivante = brut[i + 1] ?? '';
+      if(/Cartes?\(?s?\)?\s*à obtenir/i.test(suivante)){
+        mission = { nom: titre[2].trim(), cartes: [], recompense: null };
+        (section ?? (sections.push(section = { titre: '(sans section)', missions: [] }), section))
+          .missions.push(mission);
+      }else{
+        sections.push(section = { titre: titre[2].trim(), niveau: titre[1].length, missions: [] });
+        mission = null;
+      }
+      return;
+    }
+    if(!mission) return;
+    if(/Cartes?\(?s?\)?\s*à obtenir/i.test(ligne)) mission.cartes = cartesDeLaLigne(ligne);
+    else if(/^[-•\s]*Récompenses?\s*:/i.test(ligne)){
+      mission.recompense = ligne.replace(/^[-•\s]*Récompenses?\s*:\s*/i, '').replace(/\s*\|\s*$/, '').trim();
+    }
+  });
+
+  return sections.filter(s => s.missions.length);
+}
+
+import { writeFileSync, mkdirSync } from 'node:fs';
+
+const SORTIE = 'donnees/missions-brutes.json';
+
+async function principal(){
+  const choisi = process.argv[2] !== undefined && process.argv[2] !== ''
+    ? Number(process.argv[2]) : null;
+  const guides = choisi !== null ? [[choisi, GUIDES[choisi]]] : GUIDES.entries();
+
+  const recolte = [];
+  for(const [numero, adresse] of guides){
+    process.stdout.write(`Guide ${numero} — ${adresse}\n`);
     try{
-      const texte = partieUtile(enTexte(await lire(adresse)));
-      console.log(`(${texte.length} caractères utiles)\n`);
-      console.log(texte.slice(0, limite));
-      if(texte.length > limite){
-        console.log(`\n[…coupé à ${limite} caractères. Relancer avec LIMITE_CARACTERES plus grand.]`);
+      const sections = analyser(partieUtile(enTexte(await lire(adresse))));
+      recolte.push({ guide: adresse, sections });
+      const missions = sections.reduce((n, s) => n + s.missions.length, 0);
+      console.log(`  ${sections.length} sections, ${missions} missions`);
+      for(const s of sections){
+        console.log(`    ${String(s.missions.length).padStart(3)} × ${s.titre.slice(0, 60)}`);
       }
     }catch(err){
-      console.log(`Lecture impossible : ${err.message}`);
+      console.log(`  lecture impossible : ${err.message}`);
     }
   }
+
+  mkdirSync('donnees', { recursive: true });
+  writeFileSync(SORTIE, JSON.stringify({
+    releve: new Date().toISOString().slice(0, 10),
+    avertissement: "Relevé brut de guides rédigés à la main. À relire avant usage : aucune de ces lignes n'a été vérifiée dans le jeu.",
+    recolte,
+  }, null, 2) + '\n');
+  console.log(`\nÉcrit dans ${SORTIE}`);
 }
 
 principal().catch(err => { console.error(err); process.exit(1); });

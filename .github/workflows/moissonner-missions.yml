@@ -1,6 +1,9 @@
-# Lit les guides francophones sur les missions secrètes et recrache leur
-# texte dans le journal. Lancé à la main : le tri se fait ensuite à la main,
-# en recoupant plusieurs guides.
+# Lit les guides francophones sur les missions secrètes et dépose le relevé
+# brut dans donnees/missions-brutes.json, pour relecture.
+#
+# Lancé à la main : c'est une lecture ponctuelle, pas une dépendance du site.
+# Le fichier produit est un relevé, pas une vérité — rien ne s'en sert tant
+# qu'il n'a pas été relu.
 name: Moissonner les missions secrètes
 
 on:
@@ -10,13 +13,9 @@ on:
         description: "Numéro du guide (vide = tous)"
         required: false
         default: ''
-      limite:
-        description: "Caractères imprimés par guide"
-        required: false
-        default: '28000'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   moissonner:
@@ -28,5 +27,11 @@ jobs:
           node-version: '22'
       - env:
           GUIDE: ${{ inputs.guide }}
-          LIMITE_CARACTERES: ${{ inputs.limite }}
         run: node outils/moissonner-missions.mjs $GUIDE
+      - name: Déposer le relevé
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add donnees/missions-brutes.json
+          git diff --cached --quiet || git commit -m "Relevé des guides sur les missions secrètes"
+          git push
