@@ -163,6 +163,36 @@
   .mission .doute{font-size:12.5px;line-height:1.5;margin:10px 0 0;padding:8px 11px;border-radius:4px;
                   background:rgba(224,136,98,0.10);border:1px solid rgba(224,136,98,0.3);color:#E0A88C;}
 
+  /* Agrandissement d'une carte. Le bandeau des univers monte à 60 : on passe
+     au-dessus, sans quoi la flèche de gauche disparaîtrait derrière lui. */
+  .zoom-carte{position:fixed;inset:0;z-index:70;background:rgba(10,11,13,0.88);
+              display:flex;align-items:center;justify-content:center;gap:14px;
+              flex-direction:column;padding:28px;cursor:zoom-out;
+              opacity:0;transition:opacity .15s;}
+  .zoom-carte.vue{opacity:1}
+  .zoom-carte img{max-width:min(440px,100%);max-height:78vh;border-radius:12px;
+                  box-shadow:0 24px 70px rgba(0,0,0,0.6);cursor:default;}
+  .zoom-carte .legende{font-size:13.5px;color:#EDEAE0;text-align:center;line-height:1.6}
+  .zoom-carte .legende .sous{display:block;margin-top:4px;font-size:11.5px;color:#9B9E9C}
+  .zoom-carte .fleche{position:fixed;top:50%;transform:translateY(-50%);
+                      width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;
+                      background:rgba(237,234,224,0.10);color:#EDEAE0;font-size:26px;
+                      line-height:1;display:flex;align-items:center;justify-content:center;
+                      transition:background .12s,opacity .12s;}
+  .zoom-carte .fleche:hover{background:rgba(237,234,224,0.20)}
+  .zoom-carte .fleche:disabled{opacity:.25;cursor:default}
+  .zoom-carte .fleche.avant{left:72px}
+  .zoom-carte .fleche.apres{right:24px}
+  .mission .visuels img{cursor:zoom-in}
+  @media(max-width:720px){
+    .zoom-carte .fleche{width:52px;height:52px}
+    .zoom-carte .fleche.avant{left:10px}
+    .zoom-carte .fleche.apres{right:10px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .zoom-carte{transition:none}
+  }
+
   .manquantes{font-size:13px;color:var(--text-on-ink-dim);line-height:1.6;
               padding:22px 0 0;border-top:1px solid rgba(237,234,224,0.08);margin-top:26px;}
 
@@ -207,15 +237,15 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-21-e4t2"></script>
-<script src="catalogue.js?v=2026-09-21-e4t2"></script>
-<script src="supabase-config.js?v=2026-09-21-e4t2"></script>
-<script src="pied.js?v=2026-09-21-e4t2"></script>
-<script src="admin.js?v=2026-09-21-e4t2"></script>
-<script src="compte.js?v=2026-09-21-e4t2"></script>
-<script src="progression.js?v=2026-09-21-e4t2"></script>
-<script src="sets.js?v=2026-09-21-e4t2"></script>
-<script src="missions.js?v=2026-09-21-e4t2"></script>
+<script src="univers.js?v=2026-09-21-7thw"></script>
+<script src="catalogue.js?v=2026-09-21-7thw"></script>
+<script src="supabase-config.js?v=2026-09-21-7thw"></script>
+<script src="pied.js?v=2026-09-21-7thw"></script>
+<script src="admin.js?v=2026-09-21-7thw"></script>
+<script src="compte.js?v=2026-09-21-7thw"></script>
+<script src="progression.js?v=2026-09-21-7thw"></script>
+<script src="sets.js?v=2026-09-21-7thw"></script>
+<script src="missions.js?v=2026-09-21-7thw"></script>
 <script>
 // Les missions secrètes n'existent que dans l'application mobile : du côté
 // du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
@@ -439,6 +469,68 @@ document.getElementById('contenu').addEventListener('toggle', (e) => {
   enregistrerExtensionsOuvertes(ouvertes);
   if(bloc.open) poserLesVisuels(bloc);
 }, true);   // <details> n'émet pas d'événement qui remonte : on l'attrape à la descente
+
+// Agrandir une carte. On défile à l'intérieur de la mission cliquée, pas de
+// la page entière : ce sont les cartes d'une même mission qu'on veut
+// comparer, et une mission en réclame parfois vingt-quatre.
+function agrandirLaCarte(vignette){
+  const soeurs = [...vignette.closest('.visuels').querySelectorAll('img')];
+  let position = soeurs.indexOf(vignette);
+
+  const voile = document.createElement('div');
+  voile.className = 'zoom-carte';
+  voile.innerHTML = `
+    <button class="fleche avant" aria-label="Carte précédente">‹</button>
+    <img alt="">
+    <p class="legende"><span class="titre"></span>
+       <span class="sous">Flèches ← → pour défiler · Échap pour fermer</span></p>
+    <button class="fleche apres" aria-label="Carte suivante">›</button>`;
+
+  const image  = voile.querySelector('img');
+  const titre  = voile.querySelector('.titre');
+  const avant  = voile.querySelector('.fleche.avant');
+  const apres  = voile.querySelector('.fleche.apres');
+
+  function afficher(indice){
+    position = indice;
+    const source = soeurs[position];
+    image.src = source.currentSrc || source.src;
+    image.alt = source.alt;
+    // Le libellé de la mission dit la version exacte réclamée ; le titre de
+    // l'image dit la carte. Les deux valent mieux que l'un des deux.
+    titre.textContent = source.title || source.alt;
+    avant.disabled = position === 0;
+    apres.disabled = position === soeurs.length - 1;
+  }
+
+  function fermer(){
+    document.removeEventListener('keydown', auClavier);
+    voile.classList.remove('vue');
+    setTimeout(() => voile.remove(), 180);
+  }
+
+  function auClavier(e){
+    if(e.key === 'Escape') return fermer();
+    if(e.key === 'ArrowLeft'  && position > 0) afficher(position - 1);
+    if(e.key === 'ArrowRight' && position < soeurs.length - 1) afficher(position + 1);
+  }
+
+  avant.addEventListener('click', e => { e.stopPropagation(); afficher(position - 1); });
+  apres.addEventListener('click', e => { e.stopPropagation(); afficher(position + 1); });
+  // Cliquer à côté referme ; cliquer sur la carte elle-même, non.
+  image.addEventListener('click', e => e.stopPropagation());
+  voile.addEventListener('click', fermer);
+  document.addEventListener('keydown', auClavier);
+
+  afficher(position);
+  document.body.appendChild(voile);
+  requestAnimationFrame(() => voile.classList.add('vue'));
+}
+
+document.getElementById('contenu').addEventListener('click', (e) => {
+  const vignette = e.target.closest('.visuels img');
+  if(vignette) agrandirLaCarte(vignette);
+});
 
 document.getElementById('contenu').addEventListener('change', (e) => {
   const coche = e.target.closest('.mission-coche');
