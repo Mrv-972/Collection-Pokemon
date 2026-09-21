@@ -62,14 +62,21 @@
   .bulk-btn{font-size:14px;line-height:1.2;padding:4px 12px;border-radius:3px;cursor:pointer;border:1px solid rgba(237,234,224,0.14);background:transparent;font-family:inherit;transition:.12s;}
   .bulk-btn:hover{border-color:rgba(237,234,224,0.35);background:rgba(237,234,224,0.04)}
 
-  .card-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:16px;padding-bottom:60px;}
+  /* Cinq cartes par ligne, comme l'application TCG Pocket : retrouver une
+     carte au même endroit d'une grille à l'autre compte plus que d'en voir
+     une de plus. */
+  .card-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;padding-bottom:60px;}
   @media(max-width:960px){.card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-  @media(max-width:640px){.card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-  /* Deux colonnes en dessous de 430 px. À trois, la carte tombe à 83 px
-     et ses trois boutons de tag à 24 px de large : marquer une carte,
-     qui est le geste principal du site, devient un jeu d'adresse.
-     On voit moins de cartes à la fois, mais on les marque juste. */
-  @media(max-width:430px){.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  /* Trois colonnes sur téléphone. L'écart entre cartes se resserre pour leur
+     rendre la largeur perdue : les trois boutons de tag tiennent alors dans
+     le pouce, ce qui est le geste principal du site. */
+  @media(max-width:720px){
+    .card-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  }
+  /* En dessous de 360 px, trois colonnes ramèneraient la carte à 95 px et
+     ses boutons à 28 px : on repasse à deux, quitte à voir moins de cartes
+     à la fois. */
+  @media(max-width:360px){.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
   .card-tile{display:flex;flex-direction:column;gap:8px;height:100%;}
   /* flex:none empêche la boîte d'être comprimée par un nom sur trois
@@ -214,19 +221,19 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-21-p6m4"></script>
-<script src="catalogue.js?v=2026-09-21-p6m4"></script>
-<script src="pokedex-fr.js?v=2026-09-21-p6m4"></script>
-<script src="sets.js?v=2026-09-21-p6m4"></script>
-<script src="supabase-config.js?v=2026-09-21-p6m4"></script>
-<script src="pied.js?v=2026-09-21-p6m4"></script>
-<script src="admin.js?v=2026-09-21-p6m4"></script>
-<script src="tags.js?v=2026-09-21-p6m4"></script>
-<script src="raretes.js?v=2026-09-21-p6m4"></script>
-<script src="progression.js?v=2026-09-21-p6m4"></script>
-<script src="cards.js?v=2026-09-21-p6m4"></script>
-<script src="prix.js?v=2026-09-21-p6m4"></script>
-<script src="compte.js?v=2026-09-21-p6m4"></script>
+<script src="univers.js?v=2026-09-21-8qew"></script>
+<script src="catalogue.js?v=2026-09-21-8qew"></script>
+<script src="pokedex-fr.js?v=2026-09-21-8qew"></script>
+<script src="sets.js?v=2026-09-21-8qew"></script>
+<script src="supabase-config.js?v=2026-09-21-8qew"></script>
+<script src="pied.js?v=2026-09-21-8qew"></script>
+<script src="admin.js?v=2026-09-21-8qew"></script>
+<script src="tags.js?v=2026-09-21-8qew"></script>
+<script src="raretes.js?v=2026-09-21-8qew"></script>
+<script src="progression.js?v=2026-09-21-8qew"></script>
+<script src="cards.js?v=2026-09-21-8qew"></script>
+<script src="prix.js?v=2026-09-21-8qew"></script>
+<script src="compte.js?v=2026-09-21-8qew"></script>
 <script>
 // Toutes les cartes d'un Pokémon, toutes extensions confondues, à partir de
 // son numéro du Pokédex national passé dans l'URL (?dex=25).
