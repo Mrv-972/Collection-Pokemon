@@ -45,6 +45,14 @@ const PIED_LIENS = [
   ['Ton compte', [
     ['Mon compte', 'connexion.html'],
   ]],
+  // Les trois pages que tout site accessible au public doit tenir à
+  // disposition. Elles se rejoignent depuis n'importe où, ce qui est
+  // précisément ce qu'on attend d'elles.
+  ['Le site', [
+    ['Mentions légales', 'mentions-legales.html'],
+    ['Confidentialité', 'confidentialite.html'],
+    ["Conditions d'utilisation", 'cgu.html'],
+  ]],
 ];
 
 const STYLE_PIED = `

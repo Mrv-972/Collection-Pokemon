@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentions légales — PokéClasseur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.tcgdex.net">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://raw.githubusercontent.com">
+<link rel="preconnect" href="https://assets.tcgdex.net">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B; --ink-soft:#20232A; --paper:#F1EBDC; --paper-line:#D9CFB6;
+    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair);
+    --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2,h3{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a.active{color:var(--text-on-ink)}
+  .navlinks a:hover{color:var(--text-on-ink)}
+
+  .page-head{padding:56px 0 36px;}
+  .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
+  .page-head h1{font-size:40px;}
+  .page-head p{color:var(--text-on-ink-dim);margin-top:14px;font-size:16px;max-width:60ch;}
+
+  .search-row{display:flex;gap:10px;padding-bottom:40px;}
+  .search-row input{flex:1;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  .search-row input::placeholder{color:var(--text-on-ink-dim)}
+
+  .series-block{padding:34px 0;border-top:1px solid rgba(237,234,224,0.08);}
+  .series-title{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;}
+  .series-title h2{font-size:22px;}
+  .series-title .count{font-size:13px;color:var(--text-on-ink-dim);}
+
+  .set-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
+  @media(max-width:900px){.set-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media(max-width:640px){.set-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+  .set-card{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s;}
+  .set-card:hover{border-color:rgba(237,234,224,0.25)}
+  .set-logo{height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .set-logo .logo{min-width:0;max-width:100%;max-height:100%;object-fit:contain;object-position:left center;}
+  .set-logo .symbol{height:20px;width:20px;flex-shrink:0;object-fit:contain;opacity:.85;}
+  .set-logo .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:28px;line-height:1;}
+  .set-name{font-size:14.5px;font-weight:500;line-height:1.3;}
+  .set-meta{font-size:12px;color:var(--text-on-ink-dim);display:flex;justify-content:space-between;margin-top:auto;}
+  .set-meta .tag-count{color:var(--teal);font-weight:500}
+
+  .skeleton{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;height:118px;position:relative;overflow:hidden;}
+  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(237,234,224,0.06),transparent);animation:shine 1.4s infinite;}
+  @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+  .status-msg{color:var(--text-on-ink-dim);font-size:14px;padding:20px 0;}
+  .status-msg.err{color:#E08862}
+
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+
+  /* ========================= Téléphone =========================
+     Les liens de navigation passaient en display:none sous 720 px : depuis
+     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
+     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
+     visibles, et assez hauts pour être touchés sans viser. La règle de
+     débordement horizontal n'est là que pour les très petits écrans, où
+     quatre libellés ne tiennent plus côte à côte.
+
+     Le reste resserre des marges verticales taillées pour un grand écran,
+     et porte les commandes à une hauteur tactile confortable — en bas de
+     42 px, un doigt touche la voisine une fois sur trois. */
+  @media(max-width:720px){
+    nav{flex-wrap:wrap;padding:18px 0 0;}
+    .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
+              justify-content:space-between;overflow-x:auto;scrollbar-width:none;}
+    .navlinks::-webkit-scrollbar{display:none}
+    .navlinks a{white-space:nowrap;padding:12px 6px;border-bottom:2px solid transparent;}
+    .navlinks a.active{border-bottom-color:currentColor;}
+    .brand{font-size:19px;padding:6px 0}
+    .compte-lien{padding:11px 0 11px 12px}
+
+    .page-head{padding:30px 0 24px}
+    .page-head h1{font-size:27px}
+    .page-head p{font-size:14.5px}
+    .search-row input{min-height:44px}
+  }
+
+  /* ------------------------------------------------ pages légales ------- */
+  .legal{max-width:74ch;padding-bottom:60px}
+  .legal h2{font-size:22px;margin:38px 0 12px;padding-top:22px;
+            border-top:1px solid rgba(237,234,224,0.08);}
+  .legal h2:first-of-type{border-top:0;padding-top:0;margin-top:26px}
+  .legal h3{font-size:16px;font-weight:600;font-family:'IBM Plex Sans',sans-serif;
+            margin:24px 0 8px;color:var(--text-on-ink);}
+  .legal p,.legal li{font-size:14.5px;line-height:1.7;color:var(--text-on-ink-dim)}
+  .legal p{margin:0 0 12px}
+  .legal ul{margin:0 0 12px;padding-left:20px}
+  .legal li{margin-bottom:6px}
+  .legal b,.legal strong{color:var(--text-on-ink);font-weight:600}
+  .legal a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:2px}
+  .legal .encadre{background:rgba(var(--gold-rgb),0.07);
+                  border:1px solid rgba(var(--gold-rgb),0.26);
+                  border-radius:6px;padding:14px 17px;margin:0 0 22px;}
+  .legal .encadre p:last-child{margin-bottom:0}
+  .legal dl{margin:0 0 16px}
+  .legal dt{font-size:14.5px;font-weight:600;color:var(--text-on-ink);margin-top:12px}
+  .legal dd{font-size:14.5px;line-height:1.7;color:var(--text-on-ink-dim);margin:2px 0 0 0}
+  .legal table{width:100%;border-collapse:collapse;margin:0 0 18px;font-size:13.5px}
+  .legal th,.legal td{text-align:left;padding:9px 10px;vertical-align:top;
+                      border-bottom:1px solid rgba(237,234,224,0.08);}
+  .legal th{color:var(--text-on-ink);font-weight:600;font-size:12.5px;
+            text-transform:uppercase;letter-spacing:.3px;}
+  .legal td{color:var(--text-on-ink-dim);line-height:1.6}
+  .legal .maj{font-size:12.5px;color:var(--text-on-ink-dim);opacity:.8;margin-top:30px}
+  @media(max-width:640px){
+    .legal h2{font-size:19px}
+    .legal table,.legal thead,.legal tbody,.legal tr,.legal th,.legal td{display:block}
+    .legal thead{display:none}
+    .legal tr{border-bottom:1px solid rgba(237,234,224,0.10);padding:8px 0}
+    .legal td{border:0;padding:3px 0}
+    .legal td::before{content:attr(data-colonne) " : ";color:var(--text-on-ink);font-weight:600}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="index.html">Poké<span>Classeur</span></a>
+    <div class="navlinks">
+      <a href="series.html">Par extension</a>
+      <a href="pokemon.html">Par Pokémon</a>
+      <a href="missions.html" class="lien-pocket">Missions secrètes</a>
+      <a href="echanges.html">Échanges</a>
+      <a href="discussions.html">Discussions</a>
+    </div>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
+  </nav>
+
+  <div class="page-head">
+    <div class="kicker">Informations légales</div>
+    <h1>Mentions légales</h1>
+    <p>Qui édite ce site, qui l'héberge, et comment le joindre. Ces informations sont obligatoires pour tout site accessible au public en France.</p>
+  </div>
+
+  <div class="legal">
+    <h2>Éditeur du site</h2>
+    <p>Le site <b><span data-legal="siteNom"></span></b>, accessible à l'adresse
+       <span data-legal="siteAdresse"></span>, est édité par
+       <b><span data-legal="nom"></span></b>, à titre personnel et non professionnel.</p>
+
+    <div data-si-anonymat="non">
+      <p>Adresse : <span data-legal="adresse"></span></p>
+    </div>
+    <div data-si-anonymat="oui">
+      <p>L'éditeur publie ce site à titre non professionnel et a choisi de ne pas
+         rendre publiques ses coordonnées postales, comme l'y autorise l'article 6
+         de la loi du 21 juin 2004 pour la confiance dans l'économie numérique.
+         Son identité complète a été communiquée à l'hébergeur, qui la conserve et
+         la tient à la disposition de l'autorité judiciaire.</p>
+    </div>
+
+    <p>Contact : <span data-legal="email"></span></p>
+    <p>Directeur de la publication : <span data-legal="directeur"></span></p>
+
+    <h2>Hébergement</h2>
+    <p>Le site est hébergé par <b><span data-legal="hebergeur"></span></b>,
+       <span data-legal="hebergeurAdresse"></span>.</p>
+    <p>Les comptes des membres et leurs données sont hébergés par
+       <b><span data-legal="baseNom"></span></b>. Le détail des traitements figure
+       dans la <a href="confidentialite.html">politique de confidentialité</a>.</p>
+
+    <h2>Signaler un contenu</h2>
+    <p>Tout contenu illicite — propos injurieux ou haineux, usurpation d'identité,
+       tentative d'escroquerie, atteinte aux droits d'un tiers — peut être signalé
+       à l'adresse <span data-legal="signalement"></span>.</p>
+    <p>Pour être traité rapidement, un signalement gagne à préciser la page ou le
+       message concerné, la date, et ce qui est reproché.</p>
+
+    <h2>Propriété intellectuelle</h2>
+    <p><b>Ce site n'est affilié ni à The Pokémon Company, ni à Nintendo, ni à
+       Creatures Inc., ni à GAME FREAK inc.</b> Il s'agit d'un projet indépendant
+       réalisé par un collectionneur.</p>
+    <p>Pokémon, Pokémon TCG et Pokémon TCG Pocket sont des marques déposées de
+       Nintendo, Creatures Inc. et GAME FREAK inc. Les noms de cartes, les visuels
+       et les symboles de rareté reproduits sur ce site restent la propriété de
+       leurs ayants droit et sont montrés à titre informatif, pour permettre à un
+       collectionneur de tenir l'inventaire de sa collection.</p>
+    <p>Toute demande relative à ces contenus peut être adressée à
+       <span data-legal="email"></span> : les éléments concernés seront retirés
+       sans délai.</p>
+    <p>Le code du site, ses textes et sa mise en forme sont l'œuvre de l'éditeur.</p>
+
+    <h2>Sources des données</h2>
+    <p>Le catalogue des cartes est constitué à partir de
+       <a href="https://tcgdex.dev" rel="noopener" target="_blank">TCGdex</a>,
+       du jeu de données de
+       <a href="https://github.com/flibustier/pokemon-tcg-pocket-database" rel="noopener" target="_blank">flibustier</a>
+       et du
+       <a href="https://pokemon-tcg-pocket.wiki" rel="noopener" target="_blank">wiki francophone TCG Pocket</a>.
+       Les missions secrètes ont été relevées dans des guides francophones, cités
+       en bas de la page qui les présente.</p>
+    <p class="maj">Dernière mise à jour : <span data-legal="miseAJour"></span>.</p>
+  </div>
+
+  <footer></footer>
+</div>
+
+<script src="univers.js?v=2026-09-22-4qz5"></script>
+<script src="supabase-config.js?v=2026-09-22-4qz5"></script>
+<script src="legal.js?v=2026-09-22-4qz5"></script>
+<script src="pied.js?v=2026-09-22-4qz5"></script>
+<script src="admin.js?v=2026-09-22-4qz5"></script>
+<script src="compte.js?v=2026-09-22-4qz5"></script>
+<script src="sets.js?v=2026-09-22-4qz5"></script>
+<script>
+initCompte().then(afficherEtatCompte);
+</script>
+
+</body>
+</html>
