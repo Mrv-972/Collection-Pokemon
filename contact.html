@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Conditions d'utilisation — PokéClasseur</title>
+<title>Nous écrire — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -130,6 +130,26 @@
     .legal td{border:0;padding:3px 0}
     .legal td::before{content:attr(data-colonne) " : ";color:var(--text-on-ink);font-weight:600}
   }
+
+  .sujets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 6px}
+  .sujet{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-radius:6px;
+         background:var(--ink-soft);border:1px solid rgba(237,234,224,0.10);
+         text-decoration:none;transition:border-color .12s,background .12s;}
+  .sujet:hover{border-color:rgba(var(--gold-rgb),0.45);background:rgba(var(--gold-rgb),0.06)}
+  .sujet .titre{font-size:14.5px;font-weight:600;color:var(--text-on-ink)}
+  .sujet .aide{font-size:12.5px;line-height:1.5;color:var(--text-on-ink-dim)}
+  .adresse-contact{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .adresse-contact code{font-size:14.5px;padding:8px 12px;border-radius:5px;
+                        background:rgba(237,234,224,0.06);color:var(--accent-clair);
+                        border:1px solid rgba(237,234,224,0.12);}
+  #copier-adresse{font-family:inherit;font-size:13px;padding:9px 15px;border-radius:5px;
+                  cursor:pointer;background:transparent;color:var(--text-on-ink);
+                  border:1px solid rgba(237,234,224,0.18);transition:.12s;}
+  #copier-adresse:hover{background:rgba(237,234,224,0.07)}
+  @media(max-width:640px){
+    .sujets{grid-template-columns:1fr}
+    #copier-adresse{min-height:44px}
+  }
 </style>
 </head>
 <body>
@@ -148,128 +168,106 @@
   </nav>
 
   <div class="page-head">
-    <div class="kicker">Les règles du jeu</div>
-    <h1>Conditions d'utilisation</h1>
-    <p>Ce que le site propose, ce qu'on attend de toi en l'utilisant, et ce dont il ne répond pas.</p>
+    <div class="kicker">Contact</div>
+    <h1>Nous écrire</h1>
+    <p>Une question, une erreur repérée dans le catalogue, une idée pour améliorer le site, ou un membre à signaler : tout arrive à la même adresse.</p>
   </div>
 
   <div class="legal">
-    <h2>Objet</h2>
-    <p>Ces conditions régissent l'utilisation du site
-       <b><span data-legal="siteNom"></span></b>, qui permet à des collectionneurs
-       de cartes Pokémon de tenir l'inventaire de leur collection et d'entrer en
-       relation pour échanger des cartes.</p>
-    <p>Utiliser le site, avec ou sans compte, vaut acceptation de ces conditions.</p>
+    <div id="zone-contact">
+      <h2>À quel sujet ?</h2>
+      <p>Choisis ce qui correspond le mieux : le message arrivera avec un objet
+         déjà rempli, ce qui fait gagner du temps des deux côtés.</p>
 
-    <h2>Accès au service</h2>
-    <p>Le site est gratuit. Il peut être consulté sans compte : les marquages de
-       cartes sont alors conservés dans le navigateur, sur l'appareil utilisé.</p>
-    <p>La création d'un compte permet de retrouver sa collection d'un appareil à
-       l'autre et d'entrer en relation avec d'autres membres.</p>
-    <p>L'éditeur s'efforce de maintenir le site accessible, sans y être tenu : il
-       peut être interrompu pour maintenance, en raison d'une panne d'un
-       prestataire, ou définitivement.</p>
+      <div class="sujets" id="sujets"></div>
 
-    <h2>Le compte</h2>
-    <ul>
-      <li>L'inscription est réservée aux personnes âgées <b>d'au moins 15 ans</b>.</li>
-      <li>Les informations fournies doivent être exactes, et tenues à jour.</li>
-      <li>Un seul compte par personne.</li>
-      <li>Le mot de passe est personnel : toute action faite depuis un compte est
-          réputée faite par son titulaire.</li>
-      <li>Un compte peut être supprimé à tout moment, depuis la page du compte ou
-          en écrivant à <span data-legal="email"></span>.</li>
-    </ul>
+      <h2>L'adresse</h2>
+      <p>Si ton ordinateur n'ouvre pas de logiciel de courrier quand tu cliques,
+         écris directement à cette adresse :</p>
+      <p class="adresse-contact">
+        <code id="adresse-copiable" data-legal="email"></code>
+        <button type="button" id="copier-adresse">Copier</button>
+      </p>
 
-    <h2>Ce qui est attendu de chacun</h2>
-    <p>Le site met des collectionneurs en relation. Pour que cela reste vivable,
-       il est interdit d'y :</p>
-    <ul>
-      <li>tenir des propos injurieux, haineux, menaçants ou discriminatoires ;</li>
-      <li>harceler un autre membre, ou le solliciter après qu'il a demandé
-          d'arrêter ;</li>
-      <li>usurper l'identité d'un tiers, ou se faire passer pour l'éditeur du site ;</li>
-      <li>tromper un autre membre sur l'état ou l'existence d'une carte ;</li>
-      <li>diffuser des contenus publicitaires, des liens frauduleux ou des
-          logiciels malveillants ;</li>
-      <li>collecter les données des autres membres, par quelque moyen automatisé
-          que ce soit ;</li>
-      <li>tenter de contourner les protections du site ou d'accéder à des données
-          qui ne sont pas les siennes.</li>
-    </ul>
+      <h2>Ce qui aide à répondre vite</h2>
+      <ul>
+        <li><b>Une erreur dans une carte</b> : son nom, son extension et son
+            numéro — par exemple « Azurill, Source Secrète, n° 77 ».</li>
+        <li><b>Une mission secrète inexacte</b> : son nom et l'extension, avec
+            ce que le jeu affiche réellement.</li>
+        <li><b>Un problème technique</b> : la page concernée, ce que tu faisais,
+            et ce qui s'est passé à la place de ce que tu attendais.</li>
+        <li><b>Un signalement</b> : le pseudo concerné et la date, sans oublier
+            ce qui est reproché.</li>
+      </ul>
 
-    <h2>Les échanges entre membres</h2>
-    <div class="encadre">
-      <p><b>Point important.</b> Le site met en relation, et rien de plus. Il
-      n'est <b>pas partie</b> aux échanges convenus entre membres : il ne les
-      organise pas, ne les garantit pas, ne perçoit rien dessus et n'intervient
-      pas en cas de litige.</p>
+      <h2>Le délai</h2>
+      <p>Ce site est tenu par une seule personne, sur son temps libre : une
+         réponse peut prendre quelques jours. Les demandes qui relèvent de tes
+         droits sur tes données reçoivent, elles, une réponse dans le mois,
+         comme l'exige le règlement européen.</p>
+      <p>Les signalements de contenus illicites sont traités en priorité.</p>
     </div>
-    <p>Un échange se conclut entre deux personnes, sous leur seule responsabilité.
-       Il leur revient de convenir des modalités, de s'assurer de la bonne foi de
-       l'autre, et d'en assumer les suites.</p>
-    <p>Quelques précautions valent d'être rappelées : échanger en main propre dans
-       un lieu public plutôt que par courrier quand c'est possible, se méfier de
-       toute demande de paiement, et ne jamais communiquer de coordonnées
-       bancaires.</p>
-    <p>Le site est destiné à l'échange entre particuliers. Il n'est pas une place
-       de marché : l'utiliser pour une activité commerciale de vente n'entre pas
-       dans son objet.</p>
 
-    <h2>Signalement et modération</h2>
-    <p>Tout contenu ou comportement contraire à ces conditions peut être signalé à
-       <span data-legal="signalement"></span>. Un signalement gagne à préciser le
-       membre ou le message concerné, la date, et ce qui est reproché.</p>
-    <p>L'éditeur peut, après examen, retirer un contenu, suspendre ou supprimer un
-       compte. Une suppression pour manquement grave — harcèlement, escroquerie,
-       contenu illicite — peut intervenir sans préavis. Le membre concerné en est
-       informé et peut contester la décision à la même adresse.</p>
+    <script>
+    // Les objets proposés. Chacun ouvre le logiciel de courrier avec l'objet
+    // déjà rempli : c'est peu de chose, mais un message dont l'objet dit de
+    // quoi il retourne se traite bien plus vite.
+    const SUJETS = [
+      ['Une idée pour le site',        "Suggestion d'amélioration",
+       "Dis-moi ce qui te manque, ou ce qui te semble mal fichu."],
+      ['Une erreur dans le catalogue', 'Erreur dans une carte ou une extension',
+       "Une carte au mauvais nom, un visuel qui manque, une rareté fausse."],
+      ['Une mission secrète inexacte', 'Correction sur une mission secrète',
+       "Les missions viennent de guides écrits à la main : elles peuvent se tromper."],
+      ['Un problème technique',        'Problème technique',
+       "Une page qui ne s'affiche pas, un bouton qui ne répond plus."],
+      ['Signaler un membre',           'Signalement',
+       "Un comportement contraire aux conditions d'utilisation."],
+      ['Mes données personnelles',     'Demande relative à mes données',
+       "Accès, correction, suppression, portabilité : tes droits sur tes données."],
+    ];
 
-    <h2>Contenus des membres</h2>
-    <p>Chaque membre reste responsable de ce qu'il écrit. En publiant un
-       pseudonyme, une ville ou un message, il autorise le site à les afficher
-       dans la seule mesure nécessaire au fonctionnement du service.</p>
+    function poserLesSujets(){
+      const boite = document.getElementById('sujets');
+      if(!boite || !IDENTITE.email) return;
+      boite.innerHTML = SUJETS.map(([titre, objet, aide]) => `
+        <a class="sujet" href="mailto:${IDENTITE.email}?subject=${encodeURIComponent('[PokéClasseur] ' + objet)}">
+          <span class="titre">${titre}</span>
+          <span class="aide">${aide}</span>
+        </a>`).join('');
+    }
 
-    <h2>Propriété intellectuelle</h2>
-    <p>Les noms, visuels et symboles des cartes Pokémon appartiennent à leurs
-       ayants droit et sont reproduits à titre informatif. Le site n'est affilié
-       ni à The Pokémon Company, ni à Nintendo, ni à Creatures Inc., ni à
-       GAME FREAK inc. Le détail figure dans les
-       <a href="mentions-legales.html">mentions légales</a>.</p>
+    // Copier l'adresse évite de la recopier à la main, et donc de se tromper.
+    function installerLaCopie(){
+      const bouton = document.getElementById('copier-adresse');
+      const adresse = document.getElementById('adresse-copiable');
+      if(!bouton || !adresse) return;
+      bouton.addEventListener('click', async () => {
+        try{
+          await navigator.clipboard.writeText(adresse.textContent);
+          bouton.textContent = 'Copiée ✓';
+        }catch(err){
+          // Le presse-papiers peut être refusé : on sélectionne le texte, ce
+          // qui laisse au moins un Ctrl+C à portée.
+          const selection = window.getSelection();
+          const plage = document.createRange();
+          plage.selectNodeContents(adresse);
+          selection.removeAllRanges();
+          selection.addRange(plage);
+          bouton.textContent = 'Fais Ctrl+C';
+        }
+        setTimeout(() => { bouton.textContent = 'Copier'; }, 2500);
+      });
+    }
 
-    <h2>Responsabilité</h2>
-    <p>Le site est fourni en l'état. L'éditeur ne garantit ni l'exactitude
-       complète du catalogue de cartes — constitué à partir de sources publiques
-       et de relevés faits à la main — ni la disponibilité permanente du service.</p>
-    <p>Il ne répond pas des dommages résultant d'un échange conclu entre membres,
-       du comportement d'un membre, ou d'une interruption du service.</p>
-    <p>Aucune de ces limitations ne joue en cas de faute intentionnelle de
-       l'éditeur, ni ne prive un consommateur des droits que la loi lui reconnaît.</p>
-
-    <h2>Données personnelles</h2>
-    <p>Le traitement des données est décrit dans la
-       <a href="confidentialite.html">politique de confidentialité</a>, qui fait
-       partie intégrante des présentes conditions.</p>
-
-    <h2>Dons</h2>
-    <p>Le site est gratuit et le restera. Un bouton permet de soutenir
-       financièrement son hébergement, par l'intermédiaire d'une plateforme
-       extérieure. Un don est <b>libre et sans contrepartie</b> : il n'ouvre droit
-       à aucun avantage, fonctionnalité ou service supplémentaire.</p>
-
-    <h2>Modification des conditions</h2>
-    <p>Ces conditions peuvent évoluer. La date de dernière mise à jour figure en
-       bas de page ; une modification substantielle sera signalée aux membres.
-       Continuer à utiliser le site après une modification vaut acceptation de la
-       nouvelle version.</p>
-
-    <h2>Droit applicable</h2>
-    <p>Ces conditions sont soumises au droit français. En cas de différend, une
-       solution amiable sera recherchée en premier lieu, en écrivant à
-       <span data-legal="email"></span>.</p>
-    <p>Un consommateur peut également recourir gratuitement à la plateforme
-       européenne de règlement en ligne des litiges, ou saisir la juridiction
-       compétente.</p>
+    // legal.js remplit l'adresse au chargement : on passe après lui.
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', () => { poserLesSujets(); installerLaCopie(); });
+    }else{
+      poserLesSujets(); installerLaCopie();
+    }
+    </script>
     <p class="maj">Dernière mise à jour : <span data-legal="miseAJour"></span>.</p>
   </div>
 

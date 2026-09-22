@@ -49,6 +49,7 @@ const PIED_LIENS = [
   // disposition. Elles se rejoignent depuis n'importe où, ce qui est
   // précisément ce qu'on attend d'elles.
   ['Le site', [
+    ['Nous écrire', 'contact.html'],
     ['Mentions légales', 'mentions-legales.html'],
     ['Confidentialité', 'confidentialite.html'],
     ["Conditions d'utilisation", 'cgu.html'],

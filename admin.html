@@ -109,6 +109,32 @@
   }
 
   /* --- Espace d'administration --------------------------------------- */
+  #filtre-comptes{width:100%;box-sizing:border-box;margin:0 0 16px;font-family:inherit;
+                  font-size:14px;padding:11px 13px;border-radius:5px;
+                  background:rgba(237,234,224,0.05);color:var(--text-on-ink);
+                  border:1px solid rgba(237,234,224,0.14);}
+  .table-comptes{width:100%;border-collapse:collapse;font-size:13px}
+  .table-comptes th{text-align:left;padding:8px 9px;font-size:11.5px;text-transform:uppercase;
+                    letter-spacing:.3px;color:var(--text-on-ink);
+                    border-bottom:1px solid rgba(237,234,224,0.14);}
+  .table-comptes td{padding:9px;color:var(--text-on-ink-dim);vertical-align:top;
+                    border-bottom:1px solid rgba(237,234,224,0.07);}
+  .table-comptes td b{color:var(--text-on-ink)}
+  .table-comptes .detail{font-size:11.5px;opacity:.75}
+  .etiquette-admin{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;
+                   font-size:10.5px;background:rgba(var(--gold-rgb),.16);color:var(--accent-clair);}
+  /* Sur écran étroit, chaque compte devient une fiche : un tableau de huit
+     colonnes n'y entrerait pas, et le réduire le rendrait illisible. */
+  @media(max-width:860px){
+    .table-comptes,.table-comptes tbody,.table-comptes tr,.table-comptes td{display:block}
+    .table-comptes thead{display:none}
+    .table-comptes tr{border:1px solid rgba(237,234,224,0.10);border-radius:6px;
+                      padding:10px 12px;margin-bottom:10px;}
+    .table-comptes td{border:0;padding:3px 0}
+    .table-comptes td[data-colonne]:not([data-colonne=""])::before{
+      content:attr(data-colonne) " : ";color:var(--text-on-ink);font-weight:600;}
+  }
+
   .admin-onglets{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 24px}
   .admin-onglets button{background:none;border:1px solid rgba(255,255,255,.14);color:var(--text-on-ink-dim);
     padding:9px 16px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px;min-height:40px}
@@ -162,11 +188,13 @@
   <footer data-note="Une correction saisie ici prend effet tout de suite, puis la construction nocturne l'inscrit dans les fichiers du site."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-22-ofuc"></script>
-<script src="supabase-config.js?v=2026-09-22-ofuc"></script>
-<script src="pied.js?v=2026-09-22-ofuc"></script>
-<script src="catalogue.js?v=2026-09-22-ofuc"></script>
-<script src="admin.js?v=2026-09-22-ofuc"></script>
+<script src="univers.js?v=2026-09-22-tetr"></script>
+<script src="supabase-config.js?v=2026-09-22-tetr"></script>
+<script src="pied.js?v=2026-09-22-tetr"></script>
+<script src="catalogue.js?v=2026-09-22-tetr"></script>
+<script src="confirmation.js?v=2026-09-22-tetr"></script>
+<script src="compte.js?v=2026-09-22-tetr"></script>
+<script src="admin.js?v=2026-09-22-tetr"></script>
 <script>
 const panel = document.getElementById('panel');
 let ongletActif = 'visuel';
@@ -177,6 +205,7 @@ const ONGLETS = [
   { cle: 'ajout',     titre: 'Ajouter une carte' },
   { cle: 'extension', titre: 'Ajouter une extension' },
   { cle: 'liste',     titre: 'Corrections en cours' },
+  { cle: 'comptes',   titre: 'Comptes' },
 ];
 
 function message(texte, type){
@@ -339,12 +368,135 @@ async function afficherListe(){
   }
 }
 
+// --------------------------------------------------------- les comptes ---
+//
+// La liste vient de la base, par une fonction qui vérifie elle-même que
+// l'appelant est administrateur : masquer l'onglet ne protégerait rien.
+
+let comptesCharges = [];
+
+const jamais = '—';
+const dateCourte = d => d ? new Date(d).toLocaleDateString('fr-FR') : jamais;
+
+function ligneCompte(c){
+  return `
+    <tr data-id="${c.id}">
+      <td data-colonne="Pseudo">
+        <b>${c.pseudo ?? '<i>profil non terminé</i>'}</b>
+        ${c.est_admin ? '<span class="etiquette-admin">admin</span>' : ''}
+      </td>
+      <td data-colonne="E-mail">${c.email ?? jamais}
+        ${c.email_confirme ? '' : '<span class="detail"> · non confirmé</span>'}</td>
+      <td data-colonne="Ville">${c.ville ?? jamais}</td>
+      <td data-colonne="Inscrit le">${dateCourte(c.inscrit_le)}</td>
+      <td data-colonne="Dernière visite">${dateCourte(c.derniere_visite)}</td>
+      <td data-colonne="Cartes">${c.nb_cartes ?? 0}</td>
+      <td data-colonne="Conditions">${c.cgu_acceptees_le
+          ? dateCourte(c.cgu_acceptees_le) + (c.cgu_version ? ` <span class="detail">(v. ${c.cgu_version})</span>` : '')
+          : '<span class="detail">avant la case</span>'}</td>
+      <td data-colonne="">
+        ${c.est_admin
+          ? '<span class="detail">—</span>'
+          : `<button class="retour" data-supprimer="${c.id}">Supprimer</button>`}
+      </td>
+    </tr>`;
+}
+
+function dessinerComptes(liste){
+  const zone = document.getElementById('zone-comptes');
+  if(!zone) return;
+  if(!liste.length){
+    zone.innerHTML = '<p class="intro">Aucun compte ne correspond.</p>';
+    return;
+  }
+  zone.innerHTML = `
+    <p class="aide">${liste.length} compte${liste.length > 1 ? 's' : ''} sur ${comptesCharges.length}.</p>
+    <table class="table-comptes">
+      <thead><tr>
+        <th>Pseudo</th><th>E-mail</th><th>Ville</th><th>Inscrit le</th>
+        <th>Dernière visite</th><th>Cartes</th><th>Conditions</th><th></th>
+      </tr></thead>
+      <tbody>${liste.map(ligneCompte).join('')}</tbody>
+    </table>`;
+
+  zone.querySelectorAll('[data-supprimer]').forEach(b => {
+    b.onclick = () => supprimerLeCompte(b.dataset.supprimer, b);
+  });
+}
+
+async function afficherComptes(){
+  const zone = document.getElementById('zone-comptes');
+  try{
+    const db = await clientSupabase();
+    const { data, error } = await db.rpc('admin_liste_comptes');
+    if(error) throw error;
+    comptesCharges = data ?? [];
+    dessinerComptes(comptesCharges);
+  }catch(err){
+    zone.innerHTML = `<p class="msg ko">Lecture impossible : ${err.message}</p>
+      <p class="aide">Si le message parle d'une fonction introuvable, le fichier
+         <b>supabase/administration-comptes.sql</b> n'a pas encore été exécuté.</p>`;
+    return;
+  }
+
+  const filtre = document.getElementById('filtre-comptes');
+  filtre.oninput = () => {
+    const q = filtre.value.trim().toLowerCase();
+    dessinerComptes(!q ? comptesCharges : comptesCharges.filter(c =>
+      [c.pseudo, c.email, c.ville].some(x => (x ?? '').toLowerCase().includes(q))));
+  };
+}
+
+// Supprimer le compte de quelqu'un d'autre ne se défait pas, et ne prévient
+// pas l'intéressé. On annonce donc ce qui disparaît, et on demande de
+// recopier le pseudo — de quoi rendre impossible la suppression du voisin
+// de ligne par un clic mal visé.
+async function supprimerLeCompte(id, bouton){
+  const c = comptesCharges.find(x => x.id === id);
+  if(!c) return;
+  const nom = c.pseudo || c.email || 'ce compte';
+
+  const accord = await demanderConfirmation({
+    titre: 'Supprimer ce compte ?',
+    message: `Le compte de <b>${nom}</b>, sa collection de ${c.nb_cartes ?? 0} carte(s),
+              ses échanges et toutes ses discussions vont être effacés.
+              <b>Cette action est définitive</b>, et le membre n'en sera pas averti.
+              La suppression sera inscrite au journal d'administration.`,
+    action: 'Supprimer ce compte',
+    saisieAttendue: c.pseudo || undefined,
+    danger: true,
+  });
+  if(!accord) return;
+
+  bouton.disabled = true;
+  bouton.textContent = 'Suppression…';
+  try{
+    const db = await clientSupabase();
+    const { error } = await db.rpc('admin_supprimer_compte', { cible: id, motif: null });
+    if(error) throw error;
+    comptesCharges = comptesCharges.filter(x => x.id !== id);
+    dessinerComptes(comptesCharges);
+    message(`Le compte de ${nom} a été supprimé.`, 'ok');
+  }catch(err){
+    bouton.disabled = false;
+    bouton.textContent = 'Supprimer';
+    message(`Suppression impossible : ${err.message}`, 'ko');
+  }
+}
+
 function dessiner(){
   const onglets = `<div class="admin-onglets">` + ONGLETS.map(o =>
     `<button data-onglet="${o.cle}" aria-selected="${o.cle === ongletActif}">${o.titre}</button>`).join('') + '</div>';
 
   const corps = ongletActif === 'liste'
     ? `<h2>Corrections en cours</h2><div id="zone-liste"><p class="intro">Chargement…</p></div>`
+    : ongletActif === 'comptes'
+    ? `<h2>Comptes</h2>
+       <p class="intro">Tous les comptes du site. Cette page ne montre ni les
+          messages privés des membres, ni leur localisation précise : être
+          administrateur n'est pas une raison suffisante de tout voir.</p>
+       <input id="filtre-comptes" type="text" placeholder="Filtrer par pseudo, e-mail ou ville…">
+       <div id="zone-comptes"><p class="intro">Chargement…</p></div>`
     : FORMULAIRES[ongletActif]();
 
   panel.innerHTML = onglets + corps;
@@ -354,6 +506,7 @@ function dessiner(){
   });
 
   if(ongletActif === 'liste') afficherListe();
+  else if(ongletActif === 'comptes') afficherComptes();
   else document.getElementById('valider').onclick = enregistrer;
 }
 
