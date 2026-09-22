@@ -20,7 +20,7 @@ const IDENTITE = {
   //   — soit tu mets ton nom complet ici ;
   //   — soit tu mets ton pseudo, et tu coches « anonymat » ci-dessous.
   nom: '',
-  anonymat: false,
+  anonymat: true,
 
   // Une adresse de contact est obligatoire dans tous les cas, y compris si
   // tu restes anonyme. Une adresse dédiée au site évite de donner ta
