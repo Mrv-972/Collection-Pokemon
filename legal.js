@@ -97,7 +97,15 @@ function remplirLesBlancs(){
       { id: 'style-legal-manquant', textContent: STYLE_LEGAL_MANQUANT }));
   }
 
+  // Les passages qui ne valent que dans un cas se règlent d'abord : sans
+  // quoi l'adresse postale, masquée par l'anonymat, serait quand même
+  // signalée « à compléter » — un trou dans une phrase que personne ne lit.
+  document.querySelectorAll('[data-si-anonymat]').forEach(el => {
+    el.hidden = el.dataset.siAnonymat === 'oui' ? !IDENTITE.anonymat : IDENTITE.anonymat;
+  });
+
   document.querySelectorAll('[data-legal]').forEach(el => {
+    if(el.closest('[hidden]')) return;
     const valeur = valeurLegale(el.dataset.legal);
     if(valeur){
       el.textContent = valeur;
@@ -106,13 +114,6 @@ function remplirLesBlancs(){
       el.textContent = '[à compléter dans legal.js]';
       el.classList.add('legal-manquant');
     }
-  });
-
-  // Les passages qui ne valent que dans un cas : l'adresse postale
-  // disparaît si l'éditeur reste anonyme, et l'explication correspondante
-  // apparaît à sa place.
-  document.querySelectorAll('[data-si-anonymat]').forEach(el => {
-    el.hidden = el.dataset.siAnonymat === 'oui' ? !IDENTITE.anonymat : IDENTITE.anonymat;
   });
 }
 

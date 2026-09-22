@@ -84,6 +84,12 @@ async function chargerProfil(){
 // membre, une fois sa session ouverte.
 const PSEUDO_EN_ATTENTE = 'pokeclasseur_profil_en_attente';
 
+// La version des conditions acceptée par le membre. Le jour où les
+// conditions changent, cette valeur change aussi, et l'on sait alors qui a
+// accepté quoi — c'est ce que le RGPD appelle pouvoir démontrer le
+// consentement. Elle doit suivre la date de « miseAJour » dans legal.js.
+const VERSION_CONDITIONS = '2026-09-22';
+
 async function sInscrire(email, motDePasse, pseudo, contact, dateNaissance){
   const refus = refusAge(dateNaissance);
   if(refus) throw new Error(refus);
@@ -93,7 +99,13 @@ async function sInscrire(email, motDePasse, pseudo, contact, dateNaissance){
   const { data, error } = await db.auth.signUp({ email, password: motDePasse });
   if(error) throw error;
 
-  const profilVoulu = { pseudo: pseudo.trim(), contact: contact.trim() || null, ne_le: dateNaissance };
+  const profilVoulu = {
+    pseudo: pseudo.trim(),
+    contact: contact.trim() || null,
+    ne_le: dateNaissance,
+    cgu_acceptees_le: new Date().toISOString(),
+    cgu_version: VERSION_CONDITIONS,
+  };
 
   // Sans session, aucune écriture n'est possible : la base ne saurait pas
   // qui écrit.
@@ -108,11 +120,17 @@ async function sInscrire(email, motDePasse, pseudo, contact, dateNaissance){
   return membre;
 }
 
-async function creerProfil({ pseudo, contact, ne_le }){
+async function creerProfil({ pseudo, contact, ne_le, cgu_acceptees_le, cgu_version }){
   const refus = refusAge(ne_le);
   if(refus) throw new Error(refus);
   const db = await clientSupabase();
-  const { error } = await db.from('profils').insert({ id: membre.id, pseudo, contact, ne_le });
+  const { error } = await db.from('profils').insert({
+    id: membre.id, pseudo, contact, ne_le,
+    // Une inscription passée par la confirmation d'e-mail revient ici plus
+    // tard : l'accord date alors du formulaire, pas du retour.
+    cgu_acceptees_le: cgu_acceptees_le ?? new Date().toISOString(),
+    cgu_version: cgu_version ?? VERSION_CONDITIONS,
+  });
   // Un pseudo déjà pris est le seul cas courant : on le dit clairement
   // plutôt que de laisser remonter un message technique.
   if(error){
@@ -409,4 +427,42 @@ async function afficherNonLus(){
   }catch(err){
     console.warn('Compte des non-lus indisponible', err);
   }
+}
+
+// ------------------------------------------ suppression de son compte ----
+//
+// Le droit à l'effacement (RGPD, article 17) donne à chacun le droit de
+// faire disparaître ses données. Un bouton vaut mieux qu'un courriel à
+// traiter à la main : le membre n'attend pas, et rien ne se perd en route.
+//
+// Le travail se fait côté base, par la fonction « supprimer_mon_compte »
+// (voir supabase/rgpd.sql). Elle efface la ligne du compte ; toutes les
+// tables du site pointent dessus en cascade, si bien que le profil, les
+// cartes, les conversations, les messages, les blocages, les signalements
+// et les lectures s'en vont avec — sans qu'on puisse en oublier une.
+async function supprimerMonCompte(){
+  if(!estConnecte()) throw new Error('Aucune session ouverte.');
+
+  const db = await clientSupabase();
+  const { error } = await db.rpc('supprimer_mon_compte');
+  if(error) throw error;
+
+  // Le compte n'existe plus : la session en mémoire ne vaut plus rien, et
+  // la collection gardée localement appartenait à quelqu'un qui n'est plus
+  // là. On nettoie les deux avant de rendre la main.
+  try{
+    await db.auth.signOut();
+  }catch(err){
+    // La session est déjà invalide côté serveur : ce n'est pas un échec.
+    console.warn('Déconnexion après suppression', err);
+  }
+  membre = null;
+  profil = null;
+  // La page du compte ne charge pas tags.js : on nomme la clé quand elle
+  // n'est pas là, plutôt que d'y faire dépendre la suppression.
+  const cleDesTags = typeof TAG_STORAGE_KEY === 'string' ? TAG_STORAGE_KEY : 'pokeclasseur_tags';
+  try{
+    localStorage.removeItem(cleDesTags);
+    localStorage.removeItem(PSEUDO_EN_ATTENTE);
+  }catch(err){ /* stockage refusé : rien à nettoyer */ }
 }

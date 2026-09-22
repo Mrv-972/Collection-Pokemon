@@ -37,6 +37,25 @@
   label{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:16px 0 6px;}
   input{width:100%;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   input:focus{outline:none;border-color:rgba(var(--gold-rgb),0.5)}
+  /* La case n'est jamais pré-cochée : un consentement pré-coché n'en est
+     pas un, et ne prouve rien. Les liens s'ouvrent dans un nouvel onglet
+     pour qu'on ne perde pas ce qu'on vient de saisir. */
+  /* Séparée du reste par un trait et par sa couleur : on ne tombe pas sur ce
+     bouton en visant « Enregistrer ». */
+  .danger-zone{margin-top:40px;padding-top:24px;border-top:1px solid rgba(192,57,43,0.35)}
+  .danger-zone h2{font-family:'Newsreader',serif;font-size:18px;font-weight:500;
+                  color:#E08862;margin:0 0 8px;}
+  .danger-zone p{font-size:13px;line-height:1.6;color:var(--text-on-ink-dim);margin:0 0 14px}
+  .destructeur{font-family:inherit;font-size:13.5px;padding:10px 18px;border-radius:5px;
+               cursor:pointer;background:transparent;color:#E08862;
+               border:1px solid rgba(192,57,43,0.5);transition:.12s;}
+  .destructeur:hover{background:rgba(192,57,43,0.14);color:#F0A088}
+
+  .consentement{display:flex;align-items:flex-start;gap:10px;margin:20px 0 4px;
+                font-size:13.5px;line-height:1.55;color:var(--text-on-ink-dim);cursor:pointer;}
+  .consentement input{width:19px;height:19px;flex-shrink:0;margin:1px 0 0;accent-color:var(--gold);cursor:pointer}
+  .consentement a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:2px}
+
   .aide{font-size:12px;color:var(--text-on-ink-dim);margin-top:6px;}
 
   button.principal{width:100%;margin-top:26px;background:var(--teal);border:none;color:#EDF5F3;padding:12px;border-radius:3px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}
@@ -131,14 +150,15 @@
   <footer data-note="Ton compte sert à retrouver ta collection sur tous tes appareils et à te mettre en relation avec d'autres collectionneurs."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-22-vcaf"></script>
-<script src="supabase-config.js?v=2026-09-22-vcaf"></script>
-<script src="pied.js?v=2026-09-22-vcaf"></script>
-<script src="admin.js?v=2026-09-22-vcaf"></script>
-<script src="tags.js?v=2026-09-22-vcaf"></script>
-<script src="localisation.js?v=2026-09-22-vcaf"></script>
-<script src="compte.js?v=2026-09-22-vcaf"></script>
-<script src="messagerie.js?v=2026-09-22-vcaf"></script>
+<script src="univers.js?v=2026-09-22-ofuc"></script>
+<script src="supabase-config.js?v=2026-09-22-ofuc"></script>
+<script src="pied.js?v=2026-09-22-ofuc"></script>
+<script src="admin.js?v=2026-09-22-ofuc"></script>
+<script src="tags.js?v=2026-09-22-ofuc"></script>
+<script src="localisation.js?v=2026-09-22-ofuc"></script>
+<script src="confirmation.js?v=2026-09-22-ofuc"></script>
+<script src="compte.js?v=2026-09-22-ofuc"></script>
+<script src="messagerie.js?v=2026-09-22-ofuc"></script>
 <script>
 let ongletActif = 'connexion';
 let motDePasseOublie = false;
@@ -238,11 +258,20 @@ function rendre(){
 
       <div class="zone" id="zone"></div>
       <div class="bloques" id="bloques"></div>
+
+      <div class="danger-zone">
+        <h2>Supprimer mon compte</h2>
+        <p>Ton compte, ta collection, tes échanges et tes discussions seront
+           effacés définitivement. Cette action ne peut pas être annulée, et
+           rien ne pourra être restauré ensuite.</p>
+        <button class="destructeur" id="btn-supprimer-compte">Supprimer définitivement mon compte</button>
+      </div>
     `;
     afficherZone();
     afficherBloques();
     document.getElementById('btn-maj').addEventListener('click', enregistrerProfil);
     document.getElementById('btn-deconnexion').addEventListener('click', deconnexion);
+    document.getElementById('btn-supprimer-compte').addEventListener('click', supprimerCompte);
     return;
   }
 
@@ -295,6 +324,14 @@ function rendre(){
       <label for="contact">Comment te joindre (facultatif)</label>
       <input id="contact" type="text" placeholder="Pseudo Discord, e-mail...">
       <div class="aide">Affiché uniquement aux membres avec qui un échange est possible. Tu pourras le renseigner plus tard.</div>
+
+      <label class="consentement" for="accord">
+        <input id="accord" type="checkbox">
+        <span>J'ai lu et j'accepte les
+          <a href="cgu.html" target="_blank" rel="noopener">conditions d'utilisation</a>
+          et la
+          <a href="confidentialite.html" target="_blank" rel="noopener">politique de confidentialité</a>.</span>
+      </label>
     ` : ''}
 
     <button class="principal" id="btn-valider">${inscription ? 'Créer mon compte' : 'Se connecter'}</button>
@@ -323,6 +360,12 @@ async function valider(){
   const pseudo = inscription ? document.getElementById('pseudo').value.trim() : '';
   if(inscription && !pseudo){
     afficherMessage('Choisis un pseudo : c\'est ce que verront les autres collectionneurs.', 'err');
+    return;
+  }
+  // Sans accord, pas de compte : c'est la seule preuve qu'on ait que les
+  // conditions ont été portées à la connaissance du membre.
+  if(inscription && !document.getElementById('accord').checked){
+    afficherMessage("Il faut accepter les conditions d'utilisation et la politique de confidentialité pour créer un compte.", 'err');
     return;
   }
 
@@ -566,6 +609,38 @@ async function enregistrerProfil(){
     afficherMessage('Profil enregistré.', 'ok');
   }catch(err){
     afficherMessage(messageLisible(err), 'err');
+  }
+}
+
+// Deux barrières avant l'irréversible : une fenêtre qui dit ce qui va
+// disparaître, puis son pseudo à recopier. Recopier son propre pseudo oblige
+// à lire, ce qu'un second « êtes-vous sûr ? » n'obtient plus de personne.
+async function supprimerCompte(){
+  const pseudo = profil?.pseudo ?? '';
+  const accord = await demanderConfirmation({
+    titre: 'Supprimer définitivement ton compte ?',
+    message: `Ton profil, ta collection, tes échanges possibles et toutes tes
+              discussions vont être effacés. <b>Cette action est définitive :
+              rien ne pourra être restauré.</b>`,
+    action: 'Supprimer mon compte',
+    saisieAttendue: pseudo || undefined,
+    danger: true,
+  });
+  if(!accord) return;
+
+  const bouton = document.getElementById('btn-supprimer-compte');
+  bouton.disabled = true;
+  bouton.textContent = 'Suppression…';
+  try{
+    await supprimerMonCompte();
+    afficherEtatCompte();
+    rendre();
+    afficherMessage('Ton compte a été supprimé. Merci d\'être passé par là.', 'ok');
+  }catch(err){
+    console.warn(err);
+    bouton.disabled = false;
+    bouton.textContent = 'Supprimer définitivement mon compte';
+    afficherMessage("La suppression n'a pas abouti : " + messageLisible(err), 'err');
   }
 }
 
