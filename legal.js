@@ -19,13 +19,13 @@ const IDENTITE = {
   // justice. Deux possibilités, donc :
   //   — soit tu mets ton nom complet ici ;
   //   — soit tu mets ton pseudo, et tu coches « anonymat » ci-dessous.
-  nom: '',
+  nom: 'Mrv972',
   anonymat: true,
 
   // Une adresse de contact est obligatoire dans tous les cas, y compris si
   // tu restes anonyme. Une adresse dédiée au site évite de donner ta
   // messagerie personnelle.
-  email: '',
+  email: 'mrv972.contact@gmail.com',
 
   // L'adresse postale. Facultative si « anonymat » est vrai.
   adresse: '',
