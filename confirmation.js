@@ -48,14 +48,20 @@ const STYLE_CONFIRMATION = `
 // « saisieAttendue » ajoute un champ où il faut recopier un mot avant que le
 // bouton s'active. Réservé à ce qui ne se défait pas : on ne supprime pas un
 // compte par un clic de trop.
+// La feuille de style vit à part : d'autres fenêtres que celle-ci s'en
+// servent — la demande de motif, dans l'administration. Sans cet appel,
+// elles s'affichaient en pleine page, au fil du texte.
+function poserStyleConfirmation(){
+  if(document.getElementById('style-confirmation')) return;
+  const style = document.createElement('style');
+  style.id = 'style-confirmation';
+  style.textContent = STYLE_CONFIRMATION;
+  document.head.appendChild(style);
+}
+
 function demanderConfirmation({ titre, message, action, saisieAttendue = null, danger = false }){
   return new Promise(resolve => {
-    if(!document.getElementById('style-confirmation')){
-      const style = document.createElement('style');
-      style.id = 'style-confirmation';
-      style.textContent = STYLE_CONFIRMATION;
-      document.head.appendChild(style);
-    }
+    poserStyleConfirmation();
 
     const voile = document.createElement('div');
     voile.className = 'confirmation';

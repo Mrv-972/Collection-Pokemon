@@ -217,8 +217,14 @@
         <tr>
           <td data-colonne="Donnée"><b>Messages échangés</b></td>
           <td data-colonne="À quoi elle sert">Te permettre de convenir d'un échange</td>
-          <td data-colonne="Base légale">Exécution du service demandé</td>
+          <td data-colonne="Base légale">Exécution du service demandé ; intérêt légitime et obligation légale pour l'accès décrit plus bas</td>
           <td data-colonne="Conservation">Tant que le compte existe, ou jusqu'à suppression de la discussion</td>
+        </tr>
+        <tr>
+          <td data-colonne="Donnée"><b>Journal d'administration</b> (motif, date, comptes concernés)</td>
+          <td data-colonne="À quoi elle sert">Garder trace des accès de l'administrateur à une discussion et des suppressions de comptes</td>
+          <td data-colonne="Base légale">Intérêt légitime : rendre ces actes vérifiables</td>
+          <td data-colonne="Conservation">Trois ans</td>
         </tr>
       </tbody>
     </table>
@@ -237,7 +243,34 @@
        ton code postal exact ni tes coordonnées géographiques. Ces informations
        sont protégées au niveau de la base de données elle-même, et pas seulement
        par ce que l'écran affiche.</p>
-    <p>Tes messages ne sont lisibles que par toi et par ton interlocuteur.</p>
+    <p>Tes messages ne sont lisibles que par toi et par ton interlocuteur, sous
+       la réserve exposée ci-dessous.</p>
+
+    <h3>L'accès de l'administrateur aux discussions</h3>
+    <p>L'administrateur du site peut, <b>dans des cas précis et limités</b>,
+       ouvrir une discussion :</p>
+    <ul>
+      <li>pour instruire un <b>signalement</b> reçu au sujet d'un membre ;</li>
+      <li>pour répondre à une <b>plainte</b> ou à une mise en cause mettant en
+          jeu la responsabilité du site ;</li>
+      <li>pour donner suite à une <b>demande de l'autorité judiciaire</b> ou de
+          toute autorité légalement habilitée ;</li>
+      <li>lorsqu'il existe un motif sérieux de penser qu'une <b>infraction</b> se
+          prépare ou vient d'être commise — menaces, harcèlement, escroquerie.</li>
+    </ul>
+    <p>Cet accès ne sert à rien d'autre. Il n'est employé ni pour la curiosité,
+       ni pour la statistique, ni pour améliorer le site.</p>
+    <p><b>Chaque ouverture laisse une trace.</b> Elle exige un motif écrit, qui
+       est enregistré avec la date et l'identifiant de l'administrateur dans un
+       journal que celui-ci ne peut pas modifier ni effacer. Ce journal peut
+       être produit à ta demande, ou à celle d'une autorité.</p>
+    <p>La base légale de cet accès est l'intérêt légitime de l'éditeur à assurer
+       la sécurité des membres et à répondre des contenus qu'il héberge, ainsi
+       que le respect de ses obligations légales lorsqu'une autorité le
+       sollicite.</p>
+    <p>Rien d'autre ne permet de lire une discussion : les règles de la base de
+       données empêchent tout autre membre d'y accéder, quelle que soit la
+       manière dont il s'y prendrait.</p>
 
     <h2>Qui d'autre intervient</h2>
     <p>Deux prestataires techniques interviennent, sans jamais utiliser tes
@@ -305,13 +338,13 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-09-22-tetr"></script>
-<script src="supabase-config.js?v=2026-09-22-tetr"></script>
-<script src="legal.js?v=2026-09-22-tetr"></script>
-<script src="pied.js?v=2026-09-22-tetr"></script>
-<script src="admin.js?v=2026-09-22-tetr"></script>
-<script src="compte.js?v=2026-09-22-tetr"></script>
-<script src="sets.js?v=2026-09-22-tetr"></script>
+<script src="univers.js?v=2026-09-22-os92"></script>
+<script src="supabase-config.js?v=2026-09-22-os92"></script>
+<script src="legal.js?v=2026-09-22-os92"></script>
+<script src="pied.js?v=2026-09-22-os92"></script>
+<script src="admin.js?v=2026-09-22-os92"></script>
+<script src="compte.js?v=2026-09-22-os92"></script>
+<script src="sets.js?v=2026-09-22-os92"></script>
 <script>
 initCompte().then(afficherEtatCompte);
 </script>

@@ -109,6 +109,23 @@
   }
 
   /* --- Espace d'administration --------------------------------------- */
+  .discret-admin{font-family:inherit;font-size:12.5px;padding:5px 11px;border-radius:4px;
+                 cursor:pointer;background:transparent;color:var(--text-on-ink-dim);
+                 border:1px solid rgba(237,234,224,0.16);transition:.12s;margin-right:6px;}
+  .discret-admin:hover{background:rgba(237,234,224,0.07);color:var(--text-on-ink)}
+  .panneau-discussions{border:1px solid rgba(var(--gold-rgb),0.30);border-radius:6px;
+                       padding:16px 18px;margin:0 0 20px;background:rgba(var(--gold-rgb),0.04);}
+  .panneau-discussions .tete{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+  .panneau-discussions h3{font-family:'Newsreader',serif;font-weight:500;font-size:18px;margin:0 0 6px}
+  .liste-discussions{list-style:none;margin:12px 0 0;padding:0}
+  .liste-discussions li{display:flex;align-items:center;justify-content:space-between;gap:12px;
+                        padding:9px 0;border-bottom:1px solid rgba(237,234,224,0.07);}
+  .fil{margin:12px 0;max-height:460px;overflow-y:auto}
+  .bulle{padding:9px 12px;border-radius:6px;background:rgba(237,234,224,0.05);margin-bottom:8px}
+  .bulle .qui{font-size:12px;font-weight:600;color:var(--text-on-ink);margin-bottom:4px}
+  .bulle .qui .detail{font-weight:400;opacity:.7;margin-left:8px}
+  .bulle .texte{font-size:13.5px;line-height:1.55;color:var(--text-on-ink-dim);white-space:pre-wrap}
+
   #filtre-comptes{width:100%;box-sizing:border-box;margin:0 0 16px;font-family:inherit;
                   font-size:14px;padding:11px 13px;border-radius:5px;
                   background:rgba(237,234,224,0.05);color:var(--text-on-ink);
@@ -188,13 +205,13 @@
   <footer data-note="Une correction saisie ici prend effet tout de suite, puis la construction nocturne l'inscrit dans les fichiers du site."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-22-tetr"></script>
-<script src="supabase-config.js?v=2026-09-22-tetr"></script>
-<script src="pied.js?v=2026-09-22-tetr"></script>
-<script src="catalogue.js?v=2026-09-22-tetr"></script>
-<script src="confirmation.js?v=2026-09-22-tetr"></script>
-<script src="compte.js?v=2026-09-22-tetr"></script>
-<script src="admin.js?v=2026-09-22-tetr"></script>
+<script src="univers.js?v=2026-09-22-os92"></script>
+<script src="supabase-config.js?v=2026-09-22-os92"></script>
+<script src="pied.js?v=2026-09-22-os92"></script>
+<script src="catalogue.js?v=2026-09-22-os92"></script>
+<script src="confirmation.js?v=2026-09-22-os92"></script>
+<script src="compte.js?v=2026-09-22-os92"></script>
+<script src="admin.js?v=2026-09-22-os92"></script>
 <script>
 const panel = document.getElementById('panel');
 let ongletActif = 'visuel';
@@ -395,8 +412,9 @@ function ligneCompte(c){
           ? dateCourte(c.cgu_acceptees_le) + (c.cgu_version ? ` <span class="detail">(v. ${c.cgu_version})</span>` : '')
           : '<span class="detail">avant la case</span>'}</td>
       <td data-colonne="">
+        <button class="discret-admin" data-discussions="${c.id}">Discussions</button>
         ${c.est_admin
-          ? '<span class="detail">—</span>'
+          ? ''
           : `<button class="retour" data-supprimer="${c.id}">Supprimer</button>`}
       </td>
     </tr>`;
@@ -421,6 +439,9 @@ function dessinerComptes(liste){
 
   zone.querySelectorAll('[data-supprimer]').forEach(b => {
     b.onclick = () => supprimerLeCompte(b.dataset.supprimer, b);
+  });
+  zone.querySelectorAll('[data-discussions]').forEach(b => {
+    b.onclick = () => ouvrirLesDiscussions(b.dataset.discussions);
   });
 }
 
@@ -482,6 +503,144 @@ async function supprimerLeCompte(id, bouton){
     bouton.textContent = 'Supprimer';
     message(`Suppression impossible : ${err.message}`, 'ko');
   }
+}
+
+// ------------------------------------------------- les discussions ------
+//
+// Les discussions appartiennent à leurs deux participants. Cet accès existe
+// pour répondre à un signalement, à une plainte ou à une réquisition —
+// pas pour lire par-dessus l'épaule des membres.
+//
+// Il est donc payant : un motif écrit est exigé, et chaque ouverture laisse
+// au journal une trace que l'administrateur ne peut pas effacer. La
+// politique de confidentialité annonce exactement cela.
+
+async function ouvrirLesDiscussions(idMembre){
+  const c = comptesCharges.find(x => x.id === idMembre);
+  const zone = document.getElementById('zone-comptes');
+  zone.insertAdjacentHTML('afterbegin',
+    `<div class="panneau-discussions" id="panneau-discussions">
+       <div class="tete">
+         <h3>Discussions de ${c?.pseudo ?? 'ce membre'}</h3>
+         <button class="discret-admin" id="fermer-discussions">Fermer</button>
+       </div>
+       <p class="aide">Ouvrir une discussion exige un motif, et laisse une trace
+          au journal. Cet accès est réservé au traitement d'un signalement, d'une
+          plainte ou d'une demande de l'autorité judiciaire.</p>
+       <div id="liste-discussions"><p class="intro">Chargement…</p></div>
+     </div>`);
+  document.getElementById('fermer-discussions').onclick = () =>
+    document.getElementById('panneau-discussions').remove();
+
+  const liste = document.getElementById('liste-discussions');
+  try{
+    const db = await clientSupabase();
+    const { data, error } = await db.rpc('admin_discussions_du_membre', { membre: idMembre });
+    if(error) throw error;
+    if(!data?.length){
+      liste.innerHTML = '<p class="intro">Ce membre n\'a aucune discussion.</p>';
+      return;
+    }
+    liste.innerHTML = '<ul class="liste-discussions">' + data.map(d => `
+      <li>
+        <span class="quoi">
+          <span class="cible">avec ${d.avec_pseudo ?? 'un membre supprimé'}</span>
+          <span class="detail"> — ${d.nb_messages} message(s)
+            · dernier le ${d.dernier_le ? new Date(d.dernier_le).toLocaleDateString('fr-FR') : '—'}</span>
+        </span>
+        <button class="discret-admin" data-lire="${d.conversation_id}">Lire</button>
+      </li>`).join('') + '</ul>';
+
+    liste.querySelectorAll('[data-lire]').forEach(b => {
+      b.onclick = () => lireLaDiscussion(b.dataset.lire, c?.pseudo ?? '');
+    });
+  }catch(err){
+    liste.innerHTML = `<p class="msg ko">Lecture impossible : ${err.message}</p>`;
+  }
+}
+
+async function lireLaDiscussion(idConversation, pseudo){
+  const motif = await demanderMotif();
+  if(!motif) return;
+
+  const liste = document.getElementById('liste-discussions');
+  try{
+    const db = await clientSupabase();
+    const { data, error } = await db.rpc('admin_lire_discussion',
+      { conversation: idConversation, motif });
+    if(error) throw error;
+
+    liste.innerHTML = `
+      <p class="aide">Lecture inscrite au journal : « ${motif} »</p>
+      <div class="fil">` + (data ?? []).map(m => `
+        <div class="bulle">
+          <div class="qui">${m.auteur_pseudo ?? 'membre supprimé'}
+            <span class="detail">${new Date(m.envoye_le).toLocaleString('fr-FR')}</span></div>
+          <div class="texte"></div>
+        </div>`).join('') + '</div>' +
+      `<button class="discret-admin" id="retour-discussions">Revenir aux discussions</button>`;
+
+    // Le texte d'un membre n'est jamais interprété comme du HTML : il se pose
+    // par textContent, sans quoi un message pourrait faire tourner du code
+    // dans la page d'administration, qui est la dernière où le vouloir.
+    liste.querySelectorAll('.bulle .texte').forEach((el, i) => {
+      el.textContent = (data ?? [])[i]?.texte ?? '';
+    });
+
+    document.getElementById('retour-discussions').onclick = () => {
+      document.getElementById('panneau-discussions').remove();
+      ouvrirLesDiscussions(comptesCharges.find(x => x.pseudo === pseudo)?.id);
+    };
+  }catch(err){
+    liste.insertAdjacentHTML('afterbegin', `<p class="msg ko">${err.message}</p>`);
+  }
+}
+
+// Le motif se saisit dans la fenêtre de confirmation, qui sait déjà demander
+// un texte. Dix caractères au moins : la base refuse en dessous, autant le
+// dire ici plutôt que de laisser partir un appel voué à l'échec.
+function demanderMotif(){
+  return new Promise(resolve => {
+    poserStyleConfirmation();
+    const voile = document.createElement('div');
+    voile.className = 'confirmation';
+    voile.innerHTML = `
+      <div class="boite">
+        <h2>Pourquoi ouvrir cette discussion ?</h2>
+        <p>Cet accès est réservé au traitement d'un signalement, d'une plainte ou
+           d'une demande de l'autorité judiciaire. Le motif sera inscrit au
+           journal, avec la date et ton pseudo, et ne pourra pas être effacé.</p>
+        <label class="recopie" for="motif-lecture">Motif (dix caractères au moins)</label>
+        <input id="motif-lecture" type="text" placeholder="Signalement du 22/09 pour menaces">
+        <div class="boutons">
+          <button class="annuler" type="button">Annuler</button>
+          <button class="principal" type="button" disabled>Ouvrir et consigner</button>
+        </div>
+      </div>`;
+
+    const champ = voile.querySelector('#motif-lecture');
+    const valider = voile.querySelector('.principal');
+    champ.addEventListener('input', () => {
+      valider.disabled = champ.value.trim().length < 10;
+    });
+
+    function fermer(reponse){
+      document.removeEventListener('keydown', auClavier);
+      voile.remove();
+      resolve(reponse);
+    }
+    function auClavier(e){
+      if(e.key === 'Escape') fermer(null);
+      if(e.key === 'Enter' && !valider.disabled) fermer(champ.value.trim());
+    }
+    voile.querySelector('.annuler').onclick = () => fermer(null);
+    valider.onclick = () => { if(!valider.disabled) fermer(champ.value.trim()); };
+    voile.addEventListener('click', e => { if(e.target === voile) fermer(null); });
+    document.addEventListener('keydown', auClavier);
+
+    document.body.appendChild(voile);
+    requestAnimationFrame(() => { voile.classList.add('vue'); champ.focus(); });
+  });
 }
 
 function dessiner(){
