@@ -150,6 +150,13 @@
   .case.pleine:active{cursor:grabbing}
   .case img{width:100%;height:100%;object-fit:contain;border-radius:5px;display:block}
   .case.survolee{border-color:var(--gold);background:rgba(var(--gold-rgb),0.22)}
+  /* La case qui attend sa carte : elle clignote doucement, pour qu'on la
+     retrouve après avoir descendu les yeux vers le tiroir. */
+  .case.visee{border-color:var(--gold);border-style:solid;
+              background:rgba(var(--gold-rgb),0.18);
+              animation:attente 1.5s ease-in-out infinite;}
+  @keyframes attente{50%{background:rgba(var(--gold-rgb),0.34)}}
+  @media(prefers-reduced-motion:reduce){ .case.visee{animation:none} }
   /* Quand aucun visuel n'arrive, la case porte le nom de la carte : sans
      cela, elle paraîtrait vide alors qu'une carte s'y trouve. Le nom vient
      du style et non d'un nœud ajouté, pour ne pas perturber un glisser en
@@ -221,15 +228,9 @@
                            font-size:10.5px;color:rgba(0,0,0,0.40);}
   .page-livre.verso .numero-page{font-style:italic;color:rgba(0,0,0,0.30)}
 
-  /* Le dos d'une carte. Dessiné plutôt que reproduit : le vrai dos des
-     cartes Pokémon est une illustration protégée, et ce qu'on a besoin de
-     voir ici, c'est seulement qu'une pochette est occupée. */
-  .case.dos{background:
-      repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0 6px, transparent 6px 12px),
-      radial-gradient(circle at 50% 42%, #3E6FA8 0 26%, #2B4F79 26% 52%, #1F3A5C 52% 100%);
-      border-color:rgba(0,0,0,0.22);position:relative;}
-  .case.dos::after{content:'';position:absolute;inset:14%;border-radius:50%;
-                   border:2px solid rgba(255,255,255,0.22);}
+  /* Le dos d'une carte, tel qu'on le voit en retournant la feuille. */
+  .case.dos{border-color:rgba(0,0,0,0.22);overflow:hidden}
+  .case.dos img{width:100%;height:100%;object-fit:cover;border-radius:5px;display:block}
   .livre .feuillet{width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;flex-shrink:0;
                    background:rgba(237,234,224,0.10);color:#EDEAE0;font-size:26px;line-height:1;
                    display:flex;align-items:center;justify-content:center;transition:.12s;}
@@ -307,18 +308,18 @@
   <footer data-note="Tes classeurs sont enregistrés dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-23-2bg6"></script>
-<script src="catalogue.js?v=2026-09-23-2bg6"></script>
-<script src="supabase-config.js?v=2026-09-23-2bg6"></script>
-<script src="pied.js?v=2026-09-23-2bg6"></script>
-<script src="admin.js?v=2026-09-23-2bg6"></script>
-<script src="compte.js?v=2026-09-23-2bg6"></script>
-<script src="confirmation.js?v=2026-09-23-2bg6"></script>
-<script src="progression.js?v=2026-09-23-2bg6"></script>
-<script src="raretes.js?v=2026-09-23-2bg6"></script>
-<script src="sets.js?v=2026-09-23-2bg6"></script>
-<script src="classeurs.js?v=2026-09-23-2bg6"></script>
-<script src="classeurs-page.js?v=2026-09-23-2bg6"></script>
+<script src="univers.js?v=2026-09-23-y5bu"></script>
+<script src="catalogue.js?v=2026-09-23-y5bu"></script>
+<script src="supabase-config.js?v=2026-09-23-y5bu"></script>
+<script src="pied.js?v=2026-09-23-y5bu"></script>
+<script src="admin.js?v=2026-09-23-y5bu"></script>
+<script src="compte.js?v=2026-09-23-y5bu"></script>
+<script src="confirmation.js?v=2026-09-23-y5bu"></script>
+<script src="progression.js?v=2026-09-23-y5bu"></script>
+<script src="raretes.js?v=2026-09-23-y5bu"></script>
+<script src="sets.js?v=2026-09-23-y5bu"></script>
+<script src="classeurs.js?v=2026-09-23-y5bu"></script>
+<script src="classeurs-page.js?v=2026-09-23-y5bu"></script>
 
 </body>
 </html>

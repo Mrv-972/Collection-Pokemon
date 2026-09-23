@@ -109,8 +109,9 @@ function tiroirDesCartes(){
   return `
     <div class="tiroir">
       <h2>Ajouter des cartes</h2>
-      <p class="vide" style="padding:0;font-size:13.5px">Clique une carte pour la poser
-         dans la première case libre, puis fais-la glisser où tu veux.</p>
+      <p class="vide" style="padding:0;font-size:13.5px" id="mot-du-tiroir">Clique une carte
+         pour la poser dans la première case libre — ou clique d'abord une case vide
+         du classeur pour choisir où elle ira.</p>
       <div class="choix">
         <select id="choix-extension">
           <option value="">Choisis une extension…</option>
@@ -238,6 +239,11 @@ function brancherLesGestes(){
     });
   }));
 
+  // La case visée est redessinée comme les autres : on lui remet sa marque.
+  if(caseVisee && caseVisee.page === pageActive){
+    zone.querySelector(`.case[data-case="${caseVisee.case}"]`)?.classList.add('visee');
+  }
+
   brancherLeGlisser(zone);
   brancherLeTiroir(zone);
 }
@@ -252,11 +258,21 @@ function brancherLesGestes(){
 // téléphone serait impossible.
 let caseChoisie = null;
 
+// La case vide qu'on vient de désigner : la prochaine carte choisie dans le
+// tiroir s'y posera. Sans cela, il fallait poser la carte à la suite puis la
+// déplacer — deux gestes pour un.
+let caseVisee = null;
+
 function choisirOuEchanger(index, el){
   const c = actif();
   if(caseChoisie === null){
-    // Rien à déplacer depuis une case vide.
-    if(!c.pages[pageActive][index]) return;
+    // Une case vide ne se déplace pas : elle se désigne, pour y poser une
+    // carte ensuite.
+    if(!c.pages[pageActive][index]){
+      viserLaCase(index, el);
+      return;
+    }
+    caseVisee = null;
     caseChoisie = { page: pageActive, case: index };
     el.classList.add('survolee');
     messageFugace('Carte prise. Touche la case où la poser.');
@@ -337,6 +353,46 @@ async function retirerLaPage(){
   modifier(x => ({ ...x, pages: x.pages.filter((_, i) => i !== pageActive) }));
   pageActive = Math.max(0, Math.min(pageActive, actif().pages.length - 1));
   dessiner();
+}
+
+// Désigner une case vide, puis choisir sa carte dans le tiroir. Recliquer
+// dessus annule.
+function viserLaCase(index, el){
+  const dejaVisee = caseVisee && caseVisee.page === pageActive && caseVisee.case === index;
+  contenu().querySelectorAll('.case.visee').forEach(x => x.classList.remove('visee'));
+  if(dejaVisee){
+    caseVisee = null;
+    messageFugace('Case libérée.');
+    return;
+  }
+  caseVisee = { page: pageActive, case: index };
+  el.classList.add('visee');
+  messageFugace('Case choisie. Prends une carte ci-dessous pour l\'y poser.');
+  // Le tiroir est plus bas : on l'amène sous les yeux plutôt que de laisser
+  // chercher où cliquer ensuite.
+  document.getElementById('choix-extension')?.scrollIntoView({
+    behavior: mouvementReduit() ? 'auto' : 'smooth', block: 'center' });
+}
+
+// Poser une carte : dans la case visée si l'on en a désigné une, à la suite
+// sinon.
+function poserLaCarte(carteId){
+  const cible = caseVisee;
+  caseVisee = null;
+  if(!cible){
+    modifier(c => poserALaSuite(c, carteId));
+    messageFugace('Carte ajoutée à la première case libre.');
+    return;
+  }
+  modifier(c => {
+    const pages = c.pages.map(p => [...p]);
+    // La page visée a pu disparaître entre-temps : on retombe alors sur le
+    // comportement ordinaire plutôt que d'écrire à côté.
+    if(!pages[cible.page]) return poserALaSuite(c, carteId);
+    pages[cible.page][cible.case] = carteId;
+    return { ...c, pages };
+  });
+  messageFugace(`Carte posée en case ${cible.case + 1} de la page ${cible.page + 1}.`);
 }
 
 // ------------------------------------------------------------ le tiroir ---
@@ -443,8 +499,7 @@ function dessinerLeTiroir(){
       : '');
 
   grille.querySelectorAll('[data-poser]').forEach(b => b.addEventListener('click', () => {
-    modifier(c => poserALaSuite(c, b.dataset.poser));
-    messageFugace('Carte ajoutée à la première case libre.');
+    poserLaCarte(b.dataset.poser);
   }));
 }
 
@@ -607,8 +662,11 @@ function grilleDePage(c, page, numero, { dos = false } = {}){
   // place disponible, et les deux pages restent identiques.
   const rapport = (f.colonnes * 2.5) / (f.lignes * 3.5);
   const cases = dos
-    ? enMiroir(page, f.colonnes).map(carteId =>
-        `<div class="case ${carteId ? 'pleine dos' : ''}"></div>`).join('')
+    ? enMiroir(page, f.colonnes).map(carteId => carteId
+        ? `<div class="case pleine dos">
+             <img src="images/cartes/dos.webp" alt="Dos d'une carte" loading="lazy">
+           </div>`
+        : '<div class="case"></div>').join('')
     : page.map(carteId => caseDeLecture(c, carteId)).join('');
 
   return `
