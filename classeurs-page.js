@@ -98,6 +98,7 @@ function pageDuClasseur(c){
       <button id="page-apres" ${pageActive >= c.pages.length - 1 ? 'disabled' : ''} aria-label="Page suivante">›</button>
       <button class="ajouter" id="ajouter-page">+ une page</button>
       ${c.pages.length > 1 ? '<button class="ajouter" id="retirer-page">Retirer cette page</button>' : ''}
+      <button class="ajouter voir" id="voir-le-livre">Visualiser mon classeur</button>
     </div>
     <div class="page-classeur" style="grid-template-columns:repeat(${f.colonnes},minmax(0,1fr))">
       ${cases}
@@ -208,8 +209,16 @@ function brancherLesGestes(){
 
   // Une carte prise reste prise d'une page à l'autre : c'est justement
   // ainsi qu'on la déplace vers une autre page.
-  zone.querySelector('#page-avant')?.addEventListener('click', () => { pageActive--; dessiner(); });
-  zone.querySelector('#page-apres')?.addEventListener('click', () => { pageActive++; dessiner(); });
+  zone.querySelector('#page-avant')?.addEventListener('click', () => allerALaPage(pageActive - 1, -1));
+  zone.querySelector('#page-apres')?.addEventListener('click', () => allerALaPage(pageActive + 1, 1));
+  zone.querySelector('#voir-le-livre')?.addEventListener('click', ouvrirLeLivre);
+
+  const page = zone.querySelector('.page-classeur');
+  if(page){
+    brancherLeBalayage(page,
+      () => allerALaPage(pageActive - 1, -1),
+      () => allerALaPage(pageActive + 1, 1));
+  }
 
   zone.querySelector('#ajouter-page')?.addEventListener('click', () => {
     modifier(c => ({ ...c, pages: [...c.pages, pageVide(c.format)] }));
@@ -485,3 +494,216 @@ async function demarrer(){
 
 demarrer();
 initCompte().then(afficherEtatCompte);
+
+// ------------------------------------------------- feuilleter les pages ---
+//
+// Un classeur se feuillette : on ne va pas chercher un bouton à chaque page.
+// Trois gestes mènent à la page suivante — la flèche du clavier, le doigt
+// qui balaie, et les boutons, qui restent pour qui préfère viser.
+
+function allerALaPage(numero, sens){
+  const c = actif();
+  if(!c) return false;
+  const voulu = Math.max(0, Math.min(numero, c.pages.length - 1));
+  if(voulu === pageActive) return false;
+  pageActive = voulu;
+  dessiner();
+  // Le mouvement dit dans quel sens on a tourné, comme une page qui bascule.
+  const page = contenu().querySelector('.page-classeur');
+  if(page && !mouvementReduit()){
+    page.animate(
+      [{ opacity: 0, transform: `translateX(${sens > 0 ? 26 : -26}px)` },
+       { opacity: 1, transform: 'none' }],
+      { duration: 190, easing: 'ease-out' });
+  }
+  return true;
+}
+
+const mouvementReduit = () =>
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+// Le balayage au doigt. On exige un mouvement franc et surtout plus
+// horizontal que vertical : sans cela, un simple défilement de la page
+// tournerait un feuillet au passage.
+function brancherLeBalayage(element, surGauche, surDroite){
+  let depart = null;
+  element.addEventListener('touchstart', e => {
+    depart = e.touches.length === 1
+      ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : null;
+  }, { passive: true });
+  element.addEventListener('touchend', e => {
+    if(!depart) return;
+    const fin = e.changedTouches[0];
+    const dx = fin.clientX - depart.x;
+    const dy = fin.clientY - depart.y;
+    depart = null;
+    if(Math.abs(dx) < 55 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+    (dx < 0 ? surDroite : surGauche)();
+  }, { passive: true });
+}
+
+// Les flèches du clavier ne doivent pas tourner la page pendant qu'on écrit
+// le nom du classeur ou qu'on filtre les cartes.
+function saisieEnCours(){
+  const el = document.activeElement;
+  return el && (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA');
+}
+
+document.addEventListener('keydown', e => {
+  if(livreOuvert()) return;                       // la vue livre a ses propres touches
+  if(saisieEnCours() || !actif()) return;
+  if(e.key === 'ArrowLeft')  allerALaPage(pageActive - 1, -1);
+  if(e.key === 'ArrowRight') allerALaPage(pageActive + 1, 1);
+});
+
+// ------------------------------------------------------- la vue « livre » ---
+//
+// Le classeur ouvert à plat : deux pages en vis-à-vis, comme on le regarde
+// vraiment. C'est là qu'on juge un rangement — une page seule ne dit pas ce
+// que donne la double page, et c'est pourtant ce qu'on a sous les yeux quand
+// on ouvre le classeur.
+//
+// On y regarde, on n'y touche pas : les cases n'y sont ni déplaçables ni
+// supprimables. La vue sert à décider, l'édition à faire.
+
+// L'index de la page de gauche en vue double, ou de la seule page montrée
+// sur un écran étroit. Deux pages côte à côte y seraient illisibles ; on
+// feuillette alors page par page, plutôt que de masquer une page sur deux —
+// ce qui rendrait les pages paires introuvables.
+let pageLivre = 0;
+
+const livreOuvert = () => Boolean(document.getElementById('livre'));
+const livreEnDouble = () => window.matchMedia?.('(min-width: 821px)').matches ?? true;
+
+function grilleDeLecture(c, page, numero){
+  if(!page){
+    // Le dos de la dernière feuille : on montre le vide plutôt que rien, pour
+    // que la double page garde son équilibre.
+    return '<div class="page-livre absente" aria-hidden="true"></div>';   // dimensionnée par sa voisine
+  }
+  const f = FORMATS[c.format];
+  // Une page de C colonnes sur L lignes de cartes 2,5 × 3,5 a ce rapport-là.
+  // Posé sur la page elle-même, il lui donne sa forme quelle que soit la
+  // place disponible, et les deux pages restent identiques.
+  const rapport = (f.colonnes * 2.5) / (f.lignes * 3.5);
+  return `
+    <div class="page-livre" style="--rapport:${rapport.toFixed(4)};--lignes:${f.lignes}">
+      <div class="page-classeur" style="grid-template-columns:repeat(${f.colonnes},minmax(0,1fr))">
+        ${page.map(carteId => {
+          const carte = carteId ? carteConnue(carteId) : null;
+          return `<div class="case ${carteId ? 'pleine' : ''}">
+            ${carte
+              ? `<img src="${echapper(carte.image ?? `images/cards/${carteId}.png`)}"
+                      alt="${echapper(carte.name)}" loading="lazy"
+                      data-secours="${echapper(carte.imageSecours ?? '')}"
+                      onerror="visuelDeSecours(this)"
+                      class="${typeof estObtenue === 'function' && !estObtenue(carteId) ? CLASSE_NON_OBTENUE : ''}">`
+              : ''}
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="numero-page">${numero}</div>
+    </div>`;
+}
+
+function dessinerLeLivre(){
+  const c = actif();
+  const livre = document.getElementById('livre');
+  if(!c || !livre) return;
+
+  const double = livreEnDouble();
+  // En vue double, la page de gauche est toujours impaire à l'affichage :
+  // un classeur s'ouvre sur les pages 1-2, 3-4, et non 2-3.
+  if(double && pageLivre % 2 !== 0) pageLivre--;
+
+  const grilles = double
+    ? grilleDeLecture(c, c.pages[pageLivre], pageLivre + 1)
+      + grilleDeLecture(c, c.pages[pageLivre + 1] ?? null, pageLivre + 2)
+    : grilleDeLecture(c, c.pages[pageLivre], pageLivre + 1);
+
+  livre.querySelector('.double-page').innerHTML = grilles;
+
+  const derniere = double
+    ? Math.min(pageLivre + 2, c.pages.length)
+    : pageLivre + 1;
+  livre.querySelector('.compteur').textContent =
+    double && derniere > pageLivre + 1
+      ? `Pages ${pageLivre + 1}–${derniere} sur ${c.pages.length}`
+      : `Page ${pageLivre + 1} sur ${c.pages.length}`;
+
+  livre.querySelector('.feuillet.avant').disabled = pageLivre === 0;
+  livre.querySelector('.feuillet.apres').disabled =
+    pageLivre + (double ? 2 : 1) >= c.pages.length;
+
+  if(!mouvementReduit()){
+    livre.querySelector('.double-page').animate(
+      [{ opacity: 0.35 }, { opacity: 1 }], { duration: 170, easing: 'ease-out' });
+  }
+}
+
+function tournerLeFeuillet(sens){
+  const c = actif();
+  if(!c) return;
+  const pas = livreEnDouble() ? 2 : 1;
+  const voulu = Math.max(0, Math.min(pageLivre + sens * pas, c.pages.length - 1));
+  if(voulu === pageLivre) return;
+  pageLivre = voulu;
+  dessinerLeLivre();
+}
+
+function ouvrirLeLivre(){
+  const c = actif();
+  if(!c) return;
+  pageLivre = pageActive;
+
+  const livre = document.createElement('div');
+  livre.id = 'livre';
+  livre.className = 'livre';
+  livre.setAttribute('role', 'dialog');
+  livre.setAttribute('aria-modal', 'true');
+  livre.setAttribute('aria-label', `Classeur ${c.nom}`);
+  livre.innerHTML = `
+    <div class="livre-tete">
+      <span class="titre">${echapper(c.nom)}</span>
+      <button class="fermer" aria-label="Fermer la vue">Fermer</button>
+    </div>
+    <button class="feuillet avant" aria-label="Feuillet précédent">‹</button>
+    <div class="double-page"></div>
+    <button class="feuillet apres" aria-label="Feuillet suivant">›</button>
+    <div class="livre-pied">
+      <span class="compteur"></span>
+      <span class="aide">Flèches ← → ou balayage pour feuilleter · Échap pour fermer</span>
+    </div>`;
+
+  document.body.appendChild(livre);
+  document.body.style.overflow = 'hidden';
+  dessinerLeLivre();
+
+  livre.querySelector('.fermer').addEventListener('click', fermerLeLivre);
+  livre.querySelector('.feuillet.avant').addEventListener('click', () => tournerLeFeuillet(-1));
+  livre.querySelector('.feuillet.apres').addEventListener('click', () => tournerLeFeuillet(1));
+  brancherLeBalayage(livre, () => tournerLeFeuillet(-1), () => tournerLeFeuillet(1));
+  // Pivoter son téléphone change le nombre de pages qui tiennent : la vue
+  // s'y refait, plutôt que de rester dans l'état de l'orientation d'avant.
+  window.addEventListener('resize', dessinerLeLivre);
+  document.addEventListener('keydown', auClavierDuLivre);
+  livre.querySelector('.fermer').focus();
+}
+
+function auClavierDuLivre(e){
+  if(!livreOuvert()) return;
+  if(e.key === 'Escape')     { e.preventDefault(); fermerLeLivre(); }
+  if(e.key === 'ArrowLeft')  { e.preventDefault(); tournerLeFeuillet(-1); }
+  if(e.key === 'ArrowRight') { e.preventDefault(); tournerLeFeuillet(1); }
+}
+
+function fermerLeLivre(){
+  document.removeEventListener('keydown', auClavierDuLivre);
+  window.removeEventListener('resize', dessinerLeLivre);
+  document.getElementById('livre')?.remove();
+  document.body.style.overflow = '';
+  // On repart de la page qu'on regardait : fermer la vue ne doit pas faire
+  // perdre l'endroit où l'on en était.
+  pageActive = Math.min(pageLivre, (actif()?.pages.length ?? 1) - 1);
+  dessiner();
+}
