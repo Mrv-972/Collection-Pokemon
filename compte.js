@@ -414,9 +414,25 @@ async function totalNonLus(){
 // chose à lire : une pastille à zéro n'apprend rien. Elle vit ici, et non
 // dans le module de messagerie, pour s'afficher sur toutes les pages : ce
 // module-là n'est chargé que par celles qui manipulent des conversations.
+// La pastille des non-lus n'était mise en forme que sur la page des
+// discussions : ailleurs, elle sortait en texte nu au milieu du lien. Le
+// style voyage donc avec elle, pour toutes les pages qui l'affichent.
+const STYLE_PASTILLE = `
+  nav .pastille{display:inline-block;min-width:18px;padding:1px 5px;margin-left:6px;
+                border-radius:9px;background:#A8431C;color:#F6EFEA;font-size:11px;
+                font-weight:600;line-height:16px;text-align:center;vertical-align:1px;}
+`;
+
+function poserStylePastille(){
+  if(document.getElementById('style-pastille')) return;
+  document.head.appendChild(Object.assign(document.createElement('style'),
+    { id: 'style-pastille', textContent: STYLE_PASTILLE }));
+}
+
 async function afficherNonLus(){
   const lien = document.querySelector('nav a[href="discussions.html"]');
   if(!lien) return;
+  poserStylePastille();
   try{
     const nombre = await totalNonLus();
     lien.querySelector('.pastille')?.remove();

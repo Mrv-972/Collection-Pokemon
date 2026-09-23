@@ -28,6 +28,10 @@
   body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
   h1,h2,h3{font-family:'Newsreader',serif;font-weight:500;margin:0;}
   a{color:inherit}
+  /* La barre du haut se lit comme sur les autres pages : le lien du compte
+     y remplace un bouton, qui n'était pas souligné. La règle s'arrête à la
+     barre — ailleurs, un lien souligné se voit, et c'est ce qu'on veut. */
+  nav a{text-decoration:none}
   .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
   @media(max-width:640px){.wrap{padding:0 20px}}
 
@@ -144,7 +148,7 @@
       <a href="echanges.html">Échanges</a>
       <a href="discussions.html">Discussions</a>
     </div>
-    <a class="cta-btn" href="series.html">Créer mon classeur</a>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
   </nav>
 
   <div class="hero">
@@ -238,13 +242,13 @@
   <footer></footer>
 </div>
 
-<script src="sets.js?v=2026-09-22-os92"></script>
-<script src="univers.js?v=2026-09-22-os92"></script>
-<script src="catalogue.js?v=2026-09-22-os92"></script>
-<script src="supabase-config.js?v=2026-09-22-os92"></script>
-<script src="pied.js?v=2026-09-22-os92"></script>
-<script src="admin.js?v=2026-09-22-os92"></script>
-<script src="compte.js?v=2026-09-22-os92"></script>
+<script src="sets.js?v=2026-09-23-j28t"></script>
+<script src="univers.js?v=2026-09-23-j28t"></script>
+<script src="catalogue.js?v=2026-09-23-j28t"></script>
+<script src="supabase-config.js?v=2026-09-23-j28t"></script>
+<script src="pied.js?v=2026-09-23-j28t"></script>
+<script src="admin.js?v=2026-09-23-j28t"></script>
+<script src="compte.js?v=2026-09-23-j28t"></script>
 <script>
 // Les dernières extensions de l'univers courant, avec leurs vrais noms.
 // Les nommer en dur voulait dire les retaper à chaque sortie, et inventer
