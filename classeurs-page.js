@@ -70,23 +70,46 @@ function reglagesDuClasseur(c){
     </div>`;
 }
 
+// Ce qu'on met dans une case : une carte du catalogue, ou une image
+// importée. Les deux se rangent pareil, seul le contenu diffère.
+function contenuDeLaCase(c, valeur){
+  if(!valeur) return null;
+  if(estImage(valeur)){
+    const donnees = imageDuClasseur(c, valeur);
+    return donnees
+      ? { genre: 'image', nom: 'Image personnelle', source: donnees }
+      : null;
+  }
+  const carte = carteConnue(valeur);
+  return carte
+    ? { genre: 'carte', nom: carte.name, source: carte.image ?? `images/cards/${valeur}.png`,
+        secours: carte.imageSecours ?? '', id: valeur }
+    : { genre: 'carte', nom: valeur, source: `images/cards/${valeur}.png`, secours: '', id: valeur };
+}
+
+function imageDeLaCase(contenu){
+  if(contenu.genre === 'image'){
+    return `<img src="${echapper(contenu.source)}" alt="Image importée" class="image-importee">`;
+  }
+  const grise = typeof estObtenue === 'function' && !estObtenue(contenu.id) ? CLASSE_NON_OBTENUE : '';
+  return `<img src="${echapper(contenu.source)}" alt="${echapper(contenu.nom)}" loading="lazy"
+               data-secours="${echapper(contenu.secours)}" onerror="visuelDeSecours(this)"
+               class="${grise}">`;
+}
+
 function pageDuClasseur(c){
   const f = FORMATS[c.format];
   const page = c.pages[pageActive] ?? [];
-  const cases = page.map((carteId, index) => {
-    const carte = carteId ? carteConnue(carteId) : null;
+  const cases = page.map((valeur, index) => {
+    const dedans = valeur ? contenuDeLaCase(c, valeur) : null;
     return `
-      <div class="case ${carteId ? 'pleine' : ''}" data-case="${index}"
-           ${carteId ? 'draggable="true"' : ''}
+      <div class="case ${valeur ? 'pleine' : ''}" data-case="${index}"
+           ${valeur ? 'draggable="true"' : ''}
            role="button" tabindex="0"
-           aria-label="${carte ? echapper(carte.name) : 'Case vide'}">
-        ${carte
-          ? `<img src="${echapper(carte.image ?? `images/cards/${carteId}.png`)}"
-                  alt="${echapper(carte.name)}" loading="lazy"
-                  data-secours="${echapper(carte.imageSecours ?? '')}"
-                  onerror="visuelDeSecours(this)"
-                  class="${typeof estObtenue === 'function' && !estObtenue(carteId) ? CLASSE_NON_OBTENUE : ''}">
-             <button class="retirer" data-retirer="${index}" aria-label="Retirer cette carte">×</button>`
+           aria-label="${dedans ? echapper(dedans.nom) : 'Case vide'}">
+        ${dedans
+          ? imageDeLaCase(dedans)
+            + `<button class="retirer" data-retirer="${index}" aria-label="Retirer">×</button>`
           : '+'}
       </div>`;
   }).join('');
@@ -111,8 +134,11 @@ function tiroirDesCartes(){
       <h2>Ajouter des cartes</h2>
       <p class="vide" style="padding:0;font-size:13.5px" id="mot-du-tiroir">Clique une carte
          pour la poser dans la première case libre — ou clique d'abord une case vide
-         du classeur pour choisir où elle ira.</p>
+         du classeur pour choisir où elle ira. Tu peux aussi glisser ta propre image
+         dans une pochette : une illustration, une photo, un intercalaire.</p>
       <div class="choix">
+        <label class="importer" for="fichier-image">Importer une image…</label>
+        <input id="fichier-image" type="file" accept="image/*" hidden>
         <select id="choix-extension">
           <option value="">Choisis une extension…</option>
           ${extensionsPhysiques.map(e =>
@@ -235,7 +261,7 @@ function brancherLesGestes(){
     modifier(c => {
       const pages = c.pages.map(p => [...p]);
       pages[pageActive][index] = null;
-      return { ...c, pages };
+      return oublierLesImagesInutiles({ ...c, pages });
     });
   }));
 
@@ -350,7 +376,8 @@ async function retirerLaPage(){
     });
     if(!accord) return;
   }
-  modifier(x => ({ ...x, pages: x.pages.filter((_, i) => i !== pageActive) }));
+  modifier(x => oublierLesImagesInutiles(
+    { ...x, pages: x.pages.filter((_, i) => i !== pageActive) }));
   pageActive = Math.max(0, Math.min(pageActive, actif().pages.length - 1));
   dessiner();
 }
@@ -393,6 +420,84 @@ function poserLaCarte(carteId){
     return { ...c, pages };
   });
   messageFugace(`Carte posée en case ${cible.case + 1} de la page ${cible.page + 1}.`);
+}
+
+// ---------------------------------------------------- importer une image ---
+//
+// Une photo de téléphone pèse trois ou quatre méga-octets, là où la mémoire
+// d'un navigateur en offre cinq pour tout le site. On réduit donc l'image
+// avant de l'enregistrer : 500 px de large suffisent pour une case qui en
+// fait 220, et le WebP ramène le poids à quelques dizaines de kilo-octets.
+const LARGEUR_IMAGE_IMPORTEE = 500;
+
+function reduireLImage(fichier){
+  return new Promise((resoudre, rejeter) => {
+    const lecteur = new FileReader();
+    lecteur.onerror = () => rejeter(new Error('Lecture du fichier impossible.'));
+    lecteur.onload = () => {
+      const img = new Image();
+      img.onerror = () => rejeter(new Error("Ce fichier n'est pas une image lisible."));
+      img.onload = () => {
+        const largeur = Math.min(LARGEUR_IMAGE_IMPORTEE, img.width);
+        const hauteur = Math.round(img.height * (largeur / img.width));
+        const toile = document.createElement('canvas');
+        toile.width = largeur;
+        toile.height = hauteur;
+        const ctx = toile.getContext('2d');
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, largeur, hauteur);
+        // Le WebP n'existe pas partout : on retombe sur le JPEG, qui oui.
+        const donnees = toile.toDataURL('image/webp', 0.86);
+        resoudre(donnees.startsWith('data:image/webp')
+          ? donnees : toile.toDataURL('image/jpeg', 0.86));
+      };
+      img.src = lecteur.result;
+    };
+    lecteur.readAsDataURL(fichier);
+  });
+}
+
+async function importerUneImage(fichier){
+  if(!fichier) return;
+  if(!fichier.type.startsWith('image/')){
+    messageFugace("Ce fichier n'est pas une image.");
+    return;
+  }
+  messageFugace('Lecture de l\'image…');
+  let donnees;
+  try{
+    donnees = await reduireLImage(fichier);
+  }catch(err){
+    messageFugace(err.message);
+    return;
+  }
+
+  const cible = caseVisee;
+  caseVisee = null;
+  // On garde de quoi revenir en arrière : si l'enregistrement échoue faute
+  // de place, le classeur doit rester tel qu'il était.
+  const avant = actif();
+  modifier(c => {
+    const { cle, classeur } = ajouterUneImage(c, donnees);
+    if(cible && classeur.pages[cible.page]){
+      const pages = classeur.pages.map(x => [...x]);
+      pages[cible.page][cible.case] = cle;
+      return { ...classeur, pages };
+    }
+    return poserALaSuite(classeur, cle);
+  });
+
+  // Une image de plus peut faire déborder la mémoire du navigateur. Si rien
+  // n'a pu être écrit, on remet le classeur d'avant plutôt que de laisser
+  // croire que l'image est enregistrée.
+  if(!enregistrerLesClasseurs(classeurs)){
+    classeurs = classeurs.map(x => (x.id === avant.id ? avant : x));
+    enregistrerLesClasseurs(classeurs);
+    dessiner();
+    messageFugace("Mémoire du navigateur pleine : l'image n'a pas pu être gardée.");
+    return;
+  }
+  messageFugace(cible ? 'Image posée dans la case choisie.' : 'Image ajoutée au classeur.');
 }
 
 // ------------------------------------------------------------ le tiroir ---
@@ -465,6 +570,14 @@ function brancherLeTiroir(zone){
 
   filtre?.addEventListener('input', dessinerLeTiroir);
   seulement?.addEventListener('change', dessinerLeTiroir);
+
+  const fichier = zone.querySelector('#fichier-image');
+  fichier?.addEventListener('change', async e => {
+    await importerUneImage(e.target.files?.[0]);
+    // Le champ se vide : sans cela, réimporter le même fichier ne
+    // déclencherait rien, le navigateur n'y voyant aucun changement.
+    e.target.value = '';
+  });
 }
 
 function dessinerLeTiroir(){
@@ -642,16 +755,10 @@ function enMiroir(page, colonnes){
   return miroir;
 }
 
-function caseDeLecture(c, carteId){
-  const carte = carteId ? carteConnue(carteId) : null;
-  return `<div class="case ${carteId ? 'pleine' : ''}">
-    ${carte
-      ? `<img src="${echapper(carte.image ?? `images/cards/${carteId}.png`)}"
-              alt="${echapper(carte.name)}" loading="lazy"
-              data-secours="${echapper(carte.imageSecours ?? '')}"
-              onerror="visuelDeSecours(this)"
-              class="${typeof estObtenue === 'function' && !estObtenue(carteId) ? CLASSE_NON_OBTENUE : ''}">`
-      : ''}
+function caseDeLecture(c, valeur){
+  const dedans = valeur ? contenuDeLaCase(c, valeur) : null;
+  return `<div class="case ${valeur ? 'pleine' : ''}">
+    ${dedans ? imageDeLaCase(dedans) : ''}
   </div>`;
 }
 
@@ -662,11 +769,16 @@ function grilleDePage(c, page, numero, { dos = false } = {}){
   // place disponible, et les deux pages restent identiques.
   const rapport = (f.colonnes * 2.5) / (f.lignes * 3.5);
   const cases = dos
-    ? enMiroir(page, f.colonnes).map(carteId => carteId
-        ? `<div class="case pleine dos">
-             <img src="images/cartes/dos.webp" alt="Dos d'une carte" loading="lazy">
-           </div>`
-        : '<div class="case"></div>').join('')
+    ? enMiroir(page, f.colonnes).map(valeur => {
+        if(!valeur) return '<div class="case"></div>';
+        // Une image importée n'a pas le dos d'une carte Pokémon : on montre
+        // un verso neutre, qui est ce qu'on voit vraiment en retournant une
+        // photo ou un dessin glissé dans la pochette.
+        if(estImage(valeur)) return '<div class="case pleine dos-neutre"></div>';
+        return `<div class="case pleine dos">
+                  <img src="images/cartes/dos.webp" alt="Dos d'une carte" loading="lazy">
+                </div>`;
+      }).join('')
     : page.map(carteId => caseDeLecture(c, carteId)).join('');
 
   return `

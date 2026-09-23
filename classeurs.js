@@ -73,6 +73,8 @@ function classeurNeuf(nom){
     couleur: COULEURS[0].cle,
     // Une page vide pour commencer : un classeur sans page ne se regarde pas.
     pages: [pageVide(FORMAT_PAR_DEFAUT)],
+    // Les images importées par le membre, rangées par clé.
+    images: {},
     creeLe: new Date().toISOString(),
   };
 }
@@ -91,7 +93,7 @@ function changerLeFormat(classeur, format){
     pages.push(page);
   }
   if(!pages.length) pages.push(pageVide(format));
-  return { ...classeur, format, pages };
+  return { ...classeur, format, pages };   // « images » suit, par la copie
 }
 
 // Poser une carte dans la première case libre, en créant une page au besoin.
@@ -121,4 +123,41 @@ function echangerDeuxCases(classeur, a, b){
 
 function compterLesCartes(classeur){
   return classeur.pages.flat().filter(Boolean).length;
+}
+
+// ------------------------------------------ les images personnelles ------
+//
+// Tout le monde ne remplit pas ses pochettes de cartes : on y glisse aussi
+// une illustration, une photo, un intercalaire dessiné à la main. Une case
+// peut donc contenir, au lieu d'un identifiant de carte, la clé d'une image
+// rangée dans le classeur lui-même.
+//
+// Les images vivent à part, dans « classeur.images », et les cases n'en
+// gardent que la clé. Deux cases peuvent ainsi montrer la même image sans
+// la stocker deux fois, et le format des pages se change sans y toucher.
+
+const PREFIXE_IMAGE = 'img_';
+const estImage = valeur => String(valeur).startsWith(PREFIXE_IMAGE);
+
+const nouvelleCleImage = () =>
+  PREFIXE_IMAGE + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+function ajouterUneImage(classeur, donnees){
+  const cle = nouvelleCleImage();
+  return { cle, classeur: { ...classeur, images: { ...(classeur.images ?? {}), [cle]: donnees } } };
+}
+
+const imageDuClasseur = (classeur, cle) => classeur?.images?.[cle] ?? null;
+
+// Une image dont plus aucune case ne se sert n'a pas à rester : la mémoire
+// du navigateur est petite, et un classeur qu'on remanie longtemps finirait
+// par la remplir de ce qu'on a retiré.
+function oublierLesImagesInutiles(classeur){
+  const images = classeur.images ?? {};
+  const utilisees = new Set(classeur.pages.flat().filter(v => v && estImage(v)));
+  const gardees = {};
+  for(const [cle, donnees] of Object.entries(images)){
+    if(utilisees.has(cle)) gardees[cle] = donnees;
+  }
+  return { ...classeur, images: gardees };
 }
