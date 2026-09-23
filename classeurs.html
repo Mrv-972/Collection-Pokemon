@@ -209,11 +209,27 @@
                           box-shadow:inset -9px 0 13px -11px rgba(0,0,0,0.34), 0 12px 40px rgba(0,0,0,0.5);}
   .page-livre:last-child{border-radius:0 8px 8px 0;
                          box-shadow:inset 9px 0 13px -11px rgba(0,0,0,0.34), 0 12px 40px rgba(0,0,0,0.5);}
-  .page-livre.absente{background:#D8D1C1}
+  /* L'intérieur de la couverture, à gauche du tout premier feuillet : il
+     n'y a jamais rien de ce côté-là. */
+  .page-livre.couverture{background:#CFC7B5;aspect-ratio:var(--rapport,0.71);
+                         height:min(74vh,760px);max-width:min(45vw,560px);}
+  /* Le verso d'une feuille : on n'y voit que le dos des cartes. */
+  .page-livre.verso .case{cursor:default}
   .page-livre .page-classeur{background:none;box-shadow:none;padding:0;margin:0;gap:9px}
   .page-livre .case{cursor:default}
   .page-livre .numero-page{position:absolute;bottom:3px;left:0;right:0;text-align:center;
                            font-size:10.5px;color:rgba(0,0,0,0.40);}
+  .page-livre.verso .numero-page{font-style:italic;color:rgba(0,0,0,0.30)}
+
+  /* Le dos d'une carte. Dessiné plutôt que reproduit : le vrai dos des
+     cartes Pokémon est une illustration protégée, et ce qu'on a besoin de
+     voir ici, c'est seulement qu'une pochette est occupée. */
+  .case.dos{background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0 6px, transparent 6px 12px),
+      radial-gradient(circle at 50% 42%, #3E6FA8 0 26%, #2B4F79 26% 52%, #1F3A5C 52% 100%);
+      border-color:rgba(0,0,0,0.22);position:relative;}
+  .case.dos::after{content:'';position:absolute;inset:14%;border-radius:50%;
+                   border:2px solid rgba(255,255,255,0.22);}
   .livre .feuillet{width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;flex-shrink:0;
                    background:rgba(237,234,224,0.10);color:#EDEAE0;font-size:26px;line-height:1;
                    display:flex;align-items:center;justify-content:center;transition:.12s;}
@@ -291,18 +307,18 @@
   <footer data-note="Tes classeurs sont enregistrés dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-23-unix"></script>
-<script src="catalogue.js?v=2026-09-23-unix"></script>
-<script src="supabase-config.js?v=2026-09-23-unix"></script>
-<script src="pied.js?v=2026-09-23-unix"></script>
-<script src="admin.js?v=2026-09-23-unix"></script>
-<script src="compte.js?v=2026-09-23-unix"></script>
-<script src="confirmation.js?v=2026-09-23-unix"></script>
-<script src="progression.js?v=2026-09-23-unix"></script>
-<script src="raretes.js?v=2026-09-23-unix"></script>
-<script src="sets.js?v=2026-09-23-unix"></script>
-<script src="classeurs.js?v=2026-09-23-unix"></script>
-<script src="classeurs-page.js?v=2026-09-23-unix"></script>
+<script src="univers.js?v=2026-09-23-2bg6"></script>
+<script src="catalogue.js?v=2026-09-23-2bg6"></script>
+<script src="supabase-config.js?v=2026-09-23-2bg6"></script>
+<script src="pied.js?v=2026-09-23-2bg6"></script>
+<script src="admin.js?v=2026-09-23-2bg6"></script>
+<script src="compte.js?v=2026-09-23-2bg6"></script>
+<script src="confirmation.js?v=2026-09-23-2bg6"></script>
+<script src="progression.js?v=2026-09-23-2bg6"></script>
+<script src="raretes.js?v=2026-09-23-2bg6"></script>
+<script src="sets.js?v=2026-09-23-2bg6"></script>
+<script src="classeurs.js?v=2026-09-23-2bg6"></script>
+<script src="classeurs-page.js?v=2026-09-23-2bg6"></script>
 
 </body>
 </html>

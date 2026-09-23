@@ -566,45 +566,65 @@ document.addEventListener('keydown', e => {
 // On y regarde, on n'y touche pas : les cases n'y sont ni déplaçables ni
 // supprimables. La vue sert à décider, l'édition à faire.
 
-// L'index de la page de gauche en vue double, ou de la seule page montrée
-// sur un écran étroit. Deux pages côte à côte y seraient illisibles ; on
-// feuillette alors page par page, plutôt que de masquer une page sur deux —
-// ce qui rendrait les pages paires introuvables.
+// Le numéro de la page montrée à droite. Dans un classeur, tout se passe à
+// droite : la première feuille s'ouvre de ce côté, et la page de gauche ne
+// montre que le dos des cartes de la feuille précédente, puisqu'une pochette
+// ne se remplit que d'un côté. On avance donc d'une page à la fois, en vue
+// double comme sur un écran étroit.
 let pageLivre = 0;
 
 const livreOuvert = () => Boolean(document.getElementById('livre'));
 const livreEnDouble = () => window.matchMedia?.('(min-width: 821px)').matches ?? true;
 
-function grilleDeLecture(c, page, numero){
-  if(!page){
-    // Le dos de la dernière feuille : on montre le vide plutôt que rien, pour
-    // que la double page garde son équilibre.
-    return '<div class="page-livre absente" aria-hidden="true"></div>';   // dimensionnée par sa voisine
+// Retourner une feuille inverse la gauche et la droite : la carte qui était
+// au bord extérieur se retrouve près de la pliure. Les dos se lisent donc en
+// miroir, ligne par ligne — c'est ce qu'on voit vraiment en tournant la page.
+function enMiroir(page, colonnes){
+  const miroir = [];
+  for(let i = 0; i < page.length; i += colonnes){
+    miroir.push(...page.slice(i, i + colonnes).reverse());
   }
+  return miroir;
+}
+
+function caseDeLecture(c, carteId){
+  const carte = carteId ? carteConnue(carteId) : null;
+  return `<div class="case ${carteId ? 'pleine' : ''}">
+    ${carte
+      ? `<img src="${echapper(carte.image ?? `images/cards/${carteId}.png`)}"
+              alt="${echapper(carte.name)}" loading="lazy"
+              data-secours="${echapper(carte.imageSecours ?? '')}"
+              onerror="visuelDeSecours(this)"
+              class="${typeof estObtenue === 'function' && !estObtenue(carteId) ? CLASSE_NON_OBTENUE : ''}">`
+      : ''}
+  </div>`;
+}
+
+function grilleDePage(c, page, numero, { dos = false } = {}){
   const f = FORMATS[c.format];
   // Une page de C colonnes sur L lignes de cartes 2,5 × 3,5 a ce rapport-là.
   // Posé sur la page elle-même, il lui donne sa forme quelle que soit la
   // place disponible, et les deux pages restent identiques.
   const rapport = (f.colonnes * 2.5) / (f.lignes * 3.5);
+  const cases = dos
+    ? enMiroir(page, f.colonnes).map(carteId =>
+        `<div class="case ${carteId ? 'pleine dos' : ''}"></div>`).join('')
+    : page.map(carteId => caseDeLecture(c, carteId)).join('');
+
   return `
-    <div class="page-livre" style="--rapport:${rapport.toFixed(4)};--lignes:${f.lignes}">
+    <div class="page-livre${dos ? ' verso' : ''}"
+         style="--rapport:${rapport.toFixed(4)};--lignes:${f.lignes}">
       <div class="page-classeur" style="grid-template-columns:repeat(${f.colonnes},minmax(0,1fr))">
-        ${page.map(carteId => {
-          const carte = carteId ? carteConnue(carteId) : null;
-          return `<div class="case ${carteId ? 'pleine' : ''}">
-            ${carte
-              ? `<img src="${echapper(carte.image ?? `images/cards/${carteId}.png`)}"
-                      alt="${echapper(carte.name)}" loading="lazy"
-                      data-secours="${echapper(carte.imageSecours ?? '')}"
-                      onerror="visuelDeSecours(this)"
-                      class="${typeof estObtenue === 'function' && !estObtenue(carteId) ? CLASSE_NON_OBTENUE : ''}">`
-              : ''}
-          </div>`;
-        }).join('')}
+        ${cases}
       </div>
-      <div class="numero-page">${numero}</div>
+      <div class="numero-page">${dos ? `dos de la page ${numero}` : numero}</div>
     </div>`;
 }
+
+// La page de gauche du tout premier feuillet : l'intérieur de la couverture,
+// où il n'y a jamais rien.
+const couvertureInterieure = () =>
+  '<div class="page-livre couverture" aria-hidden="true"></div>';
 
 function dessinerLeLivre(){
   const c = actif();
@@ -612,28 +632,19 @@ function dessinerLeLivre(){
   if(!c || !livre) return;
 
   const double = livreEnDouble();
-  // En vue double, la page de gauche est toujours impaire à l'affichage :
-  // un classeur s'ouvre sur les pages 1-2, 3-4, et non 2-3.
-  if(double && pageLivre % 2 !== 0) pageLivre--;
+  const gauche = double
+    ? (pageLivre > 0
+        ? grilleDePage(c, c.pages[pageLivre - 1], pageLivre, { dos: true })
+        : couvertureInterieure())
+    : '';
 
-  const grilles = double
-    ? grilleDeLecture(c, c.pages[pageLivre], pageLivre + 1)
-      + grilleDeLecture(c, c.pages[pageLivre + 1] ?? null, pageLivre + 2)
-    : grilleDeLecture(c, c.pages[pageLivre], pageLivre + 1);
+  livre.querySelector('.double-page').innerHTML =
+    gauche + grilleDePage(c, c.pages[pageLivre], pageLivre + 1);
 
-  livre.querySelector('.double-page').innerHTML = grilles;
-
-  const derniere = double
-    ? Math.min(pageLivre + 2, c.pages.length)
-    : pageLivre + 1;
   livre.querySelector('.compteur').textContent =
-    double && derniere > pageLivre + 1
-      ? `Pages ${pageLivre + 1}–${derniere} sur ${c.pages.length}`
-      : `Page ${pageLivre + 1} sur ${c.pages.length}`;
-
+    `Page ${pageLivre + 1} sur ${c.pages.length}`;
   livre.querySelector('.feuillet.avant').disabled = pageLivre === 0;
-  livre.querySelector('.feuillet.apres').disabled =
-    pageLivre + (double ? 2 : 1) >= c.pages.length;
+  livre.querySelector('.feuillet.apres').disabled = pageLivre >= c.pages.length - 1;
 
   if(!mouvementReduit()){
     livre.querySelector('.double-page').animate(
@@ -644,8 +655,7 @@ function dessinerLeLivre(){
 function tournerLeFeuillet(sens){
   const c = actif();
   if(!c) return;
-  const pas = livreEnDouble() ? 2 : 1;
-  const voulu = Math.max(0, Math.min(pageLivre + sens * pas, c.pages.length - 1));
+  const voulu = Math.max(0, Math.min(pageLivre + sens, c.pages.length - 1));
   if(voulu === pageLivre) return;
   pageLivre = voulu;
   dessinerLeLivre();
