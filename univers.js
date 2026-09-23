@@ -79,9 +79,13 @@ function avecUnivers(href, cle = universCourant){
 function cibleBascule(cle){
   const page = window.location.pathname.split('/').pop() || 'index.html';
   if(page === 'extension.html') return avecUnivers('series.html', cle);
-  // Les missions n'existent que du côté Pocket : passer en face mène au
-  // catalogue, mais rester de son côté doit laisser la page où elle est.
-  if(page === 'missions.html' && cle !== universCourant) return avecUnivers('series.html', cle);
+  // Les missions n'existent que du côté Pocket, les classeurs que du côté
+  // physique : passer en face mène au catalogue, mais rester de son côté
+  // doit laisser la page où elle est.
+  const PROPRES_A_UN_UNIVERS = ['missions.html', 'classeurs.html'];
+  if(PROPRES_A_UN_UNIVERS.includes(page) && cle !== universCourant){
+    return avecUnivers('series.html', cle);
+  }
   return avecUnivers(window.location.pathname + window.location.search, cle);
 }
 
@@ -256,13 +260,12 @@ function propagerUnivers(){
 }
 
 // Certains liens n'ont de sens que d'un côté : les missions secrètes sont
-// une mécanique de l'application mobile, et n'existent pas dans le jeu de
-// cartes physique. On les retire de la barre plutôt que d'y laisser un
-// onglet qui mène à une page vide.
+// une mécanique de l'application mobile, et les classeurs n'existent que
+// pour des cartes qu'on peut tenir dans la main. On les retire de la barre
+// plutôt que d'y laisser un onglet qui mène à une page vide.
 function masquerLiensHorsUnivers(){
-  document.querySelectorAll('.lien-pocket').forEach(a => {
-    a.hidden = !estPocket();
-  });
+  document.querySelectorAll('.lien-pocket').forEach(a => { a.hidden = !estPocket(); });
+  document.querySelectorAll('.lien-physique').forEach(a => { a.hidden = estPocket(); });
 }
 
 function initUnivers(){
