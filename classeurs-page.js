@@ -10,6 +10,10 @@ let pageActive = 0;
 let cartesDuTiroir = [];
 let extensionChoisie = '';
 let extensionsPhysiques = [];
+// Le catalogue livre les extensions de la plus ancienne à la plus récente ;
+// la liste déroulante les montre dans l'autre sens. On garde donc l'ordre
+// d'origine à part, pour ranger les cartes d'un Pokémon dans le temps.
+let rangDeLExtension = new Map();
 
 const contenu = () => document.getElementById('contenu');
 const actif = () => classeurs.find(c => c.id === idActif) ?? null;
@@ -162,7 +166,8 @@ function tiroirDesCartes(){
           : `<input type="text" id="recherche-pokemon" autocomplete="off"
                     placeholder="Nom d'un Pokémon, ou son numéro…"
                     value="${echapper(pokemonChoisi?.name ?? '')}">`}
-        <input type="text" id="filtre-carte" placeholder="Filtrer par nom ou numéro…">
+        <input type="text" id="filtre-carte" placeholder="${parExtension
+          ? 'Filtrer par nom ou numéro…' : 'Filtrer par extension…'}">
         <label class="filtre"><input type="checkbox" id="seulement-obtenues"> Seulement mes cartes obtenues</label>
       </div>
       ${parExtension ? '' : '<div id="suggestions-pokemon"></div>'}
@@ -608,6 +613,9 @@ function brancherLeTiroir(zone){
   });
 }
 
+const nomDeLExtension = id =>
+  extensionsPhysiques.find(e => e.id === id)?.name ?? null;
+
 function dessinerLeTiroir(){
   const grille = document.getElementById('grille-choix');
   if(!grille) return;
@@ -615,7 +623,17 @@ function dessinerLeTiroir(){
   const seulementObtenues = document.getElementById('seulement-obtenues')?.checked;
 
   let liste = cartesDuTiroir;
-  if(q) liste = liste.filter(c => c.name.toLowerCase().includes(q) || (c.localId ?? '').includes(q));
+  // Par extension, on cherche une carte dans une extension : le filtre porte
+  // sur son nom et son numéro. Par Pokémon, toutes les cartes portent le même
+  // nom — le filtre porte alors sur l'extension, seule chose qui les sépare.
+  if(q){
+    liste = modeTiroir === 'extension'
+      ? liste.filter(c => c.name.toLowerCase().includes(q) || (c.localId ?? '').includes(q))
+      : liste.filter(c => {
+          const nom = nomDeLExtension(extensionDeLaCarte(c.id)) ?? '';
+          return nom.toLowerCase().includes(q) || (c.localId ?? '').includes(q);
+        });
+  }
   if(seulementObtenues && typeof estObtenue === 'function') liste = liste.filter(c => estObtenue(c.id));
 
   if(!cartesDuTiroir.length){
@@ -630,20 +648,19 @@ function dessinerLeTiroir(){
     return;
   }
 
-  const nomsDExtensions = new Map(extensionsPhysiques.map(e => [e.id, e.name]));
   const direLExtension = modeTiroir === 'pokemon';
 
   grille.innerHTML = '<div class="grille-choix">' + liste.slice(0, 240).map(c => `
     <button data-poser="${echapper(c.id)}"
             title="${echapper(c.name)}${direLExtension
-              ? ' — ' + echapper(nomsDExtensions.get(extensionDeLaCarte(c.id)) ?? '')
+              ? ' — ' + echapper(nomDeLExtension(extensionDeLaCarte(c.id)) ?? '')
               : ''}">
       <img src="${echapper(c.image ?? `images/cards/${c.id}.png`)}" alt="${echapper(c.name)}"
            loading="lazy" data-secours="${echapper(c.imageSecours ?? '')}"
            onerror="visuelDeSecours(this)"
            class="${typeof estObtenue === 'function' && !estObtenue(c.id) ? CLASSE_NON_OBTENUE : ''}">
       <span class="nom">${direLExtension
-        ? echapper(nomsDExtensions.get(extensionDeLaCarte(c.id)) ?? c.name)
+        ? echapper(nomDeLExtension(extensionDeLaCarte(c.id)) ?? c.name)
         : echapper(c.name)}</span>
     </button>`).join('') + '</div>'
     + (liste.length > 240
@@ -690,7 +707,9 @@ async function demarrer(){
 
   try{
     const toutes = await listerExtensions();
-    extensionsPhysiques = toutes.filter(e => appartientAUnivers(e.id)).reverse();
+    const duCote = toutes.filter(e => appartientAUnivers(e.id));
+    rangDeLExtension = new Map(duCote.map((e, i) => [e.id, i]));
+    extensionsPhysiques = duCote.slice().reverse();
   }catch(err){
     console.warn('Catalogue indisponible', err);
   }
@@ -991,7 +1010,17 @@ async function choisirLePokemon(dexId){
     const cartes = await cartesDuPokemon(dexId);
     // Une carte d'un Pokémon existe des deux côtés du site : on ne garde
     // que celles du jeu physique, seul univers où un classeur a un sens.
-    cartesDuTiroir = cartes.filter(c => appartientAUnivers(extensionDeLaCarte(c.id) ?? ''));
+    cartesDuTiroir = cartes
+      .filter(c => appartientAUnivers(extensionDeLaCarte(c.id) ?? ''))
+      .sort((a, b) => {
+        // De la plus ancienne extension à la plus récente, puis par numéro :
+        // un Pikachu se cherche dans l'ordre où il est sorti.
+        const ra = rangDeLExtension.get(extensionDeLaCarte(a.id)) ?? Infinity;
+        const rb = rangDeLExtension.get(extensionDeLaCarte(b.id)) ?? Infinity;
+        if(ra !== rb) return ra - rb;
+        return String(a.localId ?? '').localeCompare(String(b.localId ?? ''),
+          'fr', { numeric: true });
+      });
     retenirLesCartes(cartesDuTiroir);
   }catch(err){
     grille.innerHTML = `<p class="vide" style="padding:14px 0">Recherche impossible : ${echapper(err.message)}</p>`;
