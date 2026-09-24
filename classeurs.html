@@ -285,6 +285,21 @@
         border:1px solid rgba(237,234,224,0.14);}
   .tiroir input[type="text"]{flex:1;min-width:160px}
   .tiroir label.filtre{display:flex;align-items:center;gap:7px;cursor:pointer}
+  .modes-tiroir{display:flex;gap:6px;margin:14px 0 0}
+  .modes-tiroir button{font-family:inherit;font-size:13px;padding:7px 14px;border-radius:5px;
+                       cursor:pointer;background:transparent;color:var(--text-on-ink-dim);
+                       border:1px solid rgba(237,234,224,0.14);transition:.12s;}
+  .modes-tiroir button[aria-selected="true"]{color:var(--text-on-ink);
+                                             border-color:rgba(var(--gold-rgb),0.45);
+                                             background:rgba(var(--gold-rgb),0.08);}
+  #suggestions-pokemon{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 16px}
+  #suggestions-pokemon button{font-family:inherit;font-size:13px;padding:7px 12px;border-radius:5px;
+                              cursor:pointer;background:var(--ink-soft);color:var(--text-on-ink);
+                              border:1px solid rgba(237,234,224,0.12);transition:.12s;}
+  #suggestions-pokemon button:hover{border-color:rgba(var(--gold-rgb),0.5)}
+  #suggestions-pokemon .numero{color:var(--text-on-ink-dim);font-size:11.5px;margin-left:5px}
+  #recherche-pokemon{flex:1;min-width:190px}
+
   .tiroir label.importer{font-family:inherit;font-size:13.5px;padding:9px 14px;border-radius:5px;
                          cursor:pointer;background:transparent;color:var(--accent-clair);
                          border:1px dashed rgba(var(--gold-rgb),0.45);transition:.12s;}
@@ -337,18 +352,19 @@
   <footer data-note="Tes classeurs sont enregistrés dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-23-jn52"></script>
-<script src="catalogue.js?v=2026-09-23-jn52"></script>
-<script src="supabase-config.js?v=2026-09-23-jn52"></script>
-<script src="pied.js?v=2026-09-23-jn52"></script>
-<script src="admin.js?v=2026-09-23-jn52"></script>
-<script src="compte.js?v=2026-09-23-jn52"></script>
-<script src="confirmation.js?v=2026-09-23-jn52"></script>
-<script src="progression.js?v=2026-09-23-jn52"></script>
-<script src="raretes.js?v=2026-09-23-jn52"></script>
-<script src="sets.js?v=2026-09-23-jn52"></script>
-<script src="classeurs.js?v=2026-09-23-jn52"></script>
-<script src="classeurs-page.js?v=2026-09-23-jn52"></script>
+<script src="univers.js?v=2026-09-23-bptw"></script>
+<script src="catalogue.js?v=2026-09-23-bptw"></script>
+<script src="supabase-config.js?v=2026-09-23-bptw"></script>
+<script src="pied.js?v=2026-09-23-bptw"></script>
+<script src="admin.js?v=2026-09-23-bptw"></script>
+<script src="compte.js?v=2026-09-23-bptw"></script>
+<script src="confirmation.js?v=2026-09-23-bptw"></script>
+<script src="progression.js?v=2026-09-23-bptw"></script>
+<script src="raretes.js?v=2026-09-23-bptw"></script>
+<script src="pokedex-fr.js?v=2026-09-23-bptw"></script>
+<script src="sets.js?v=2026-09-23-bptw"></script>
+<script src="classeurs.js?v=2026-09-23-bptw"></script>
+<script src="classeurs-page.js?v=2026-09-23-bptw"></script>
 
 </body>
 </html>

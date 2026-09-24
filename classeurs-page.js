@@ -8,6 +8,7 @@ let classeurs = [];
 let idActif = null;
 let pageActive = 0;
 let cartesDuTiroir = [];
+let extensionChoisie = '';
 let extensionsPhysiques = [];
 
 const contenu = () => document.getElementById('contenu');
@@ -128,7 +129,14 @@ function pageDuClasseur(c){
     </div>`;
 }
 
+// Deux façons de chercher une carte. Par extension, quand on range une
+// extension. Par Pokémon, quand on veut réunir tous ses Pikachu sur une
+// page — et là, passer les extensions une à une serait intenable.
+let modeTiroir = 'extension';
+let pokemonChoisi = null;
+
 function tiroirDesCartes(){
+  const parExtension = modeTiroir === 'extension';
   return `
     <div class="tiroir">
       <h2>Ajouter des cartes</h2>
@@ -136,17 +144,28 @@ function tiroirDesCartes(){
          pour la poser dans la première case libre — ou clique d'abord une case vide
          du classeur pour choisir où elle ira. Tu peux aussi glisser ta propre image
          dans une pochette : une illustration, une photo, un intercalaire.</p>
+
+      <div class="modes-tiroir">
+        <button data-mode="extension" aria-selected="${parExtension}">Par extension</button>
+        <button data-mode="pokemon" aria-selected="${!parExtension}">Par Pokémon</button>
+      </div>
+
       <div class="choix">
         <label class="importer" for="fichier-image">Importer une image…</label>
         <input id="fichier-image" type="file" accept="image/*" hidden>
-        <select id="choix-extension">
-          <option value="">Choisis une extension…</option>
-          ${extensionsPhysiques.map(e =>
-            `<option value="${echapper(e.id)}">${echapper(e.name)}</option>`).join('')}
-        </select>
+        ${parExtension
+          ? `<select id="choix-extension">
+               <option value="">Choisis une extension…</option>
+               ${extensionsPhysiques.map(e =>
+                 `<option value="${echapper(e.id)}" ${e.id === extensionChoisie ? 'selected' : ''}>${echapper(e.name)}</option>`).join('')}
+             </select>`
+          : `<input type="text" id="recherche-pokemon" autocomplete="off"
+                    placeholder="Nom d'un Pokémon, ou son numéro…"
+                    value="${echapper(pokemonChoisi?.name ?? '')}">`}
         <input type="text" id="filtre-carte" placeholder="Filtrer par nom ou numéro…">
         <label class="filtre"><input type="checkbox" id="seulement-obtenues"> Seulement mes cartes obtenues</label>
       </div>
+      ${parExtension ? '' : '<div id="suggestions-pokemon"></div>'}
       <div id="grille-choix"></div>
     </div>`;
 }
@@ -544,13 +563,20 @@ function extensionDeLaCarte(carteId){
 }
 
 function brancherLeTiroir(zone){
-  const choix = zone.querySelector('#choix-extension');
   const filtre = zone.querySelector('#filtre-carte');
   const seulement = zone.querySelector('#seulement-obtenues');
-  if(!choix) return;
 
-  choix.addEventListener('change', async () => {
+  zone.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => {
+    if(modeTiroir === b.dataset.mode) return;
+    modeTiroir = b.dataset.mode;
+    cartesDuTiroir = [];
+    dessiner();
+  }));
+
+  const choix = zone.querySelector('#choix-extension');
+  choix?.addEventListener('change', async () => {
     const id = choix.value;
+    extensionChoisie = id;
     if(!id){ cartesDuTiroir = []; dessinerLeTiroir(); return; }
     const grille = document.getElementById('grille-choix');
     grille.innerHTML = '<p class="vide" style="padding:14px 0">Chargement…</p>';
@@ -567,6 +593,8 @@ function brancherLeTiroir(zone){
     }
     dessinerLeTiroir();
   });
+
+  brancherLaRecherchePokemon(zone);
 
   filtre?.addEventListener('input', dessinerLeTiroir);
   seulement?.addEventListener('change', dessinerLeTiroir);
@@ -591,7 +619,10 @@ function dessinerLeTiroir(){
   if(seulementObtenues && typeof estObtenue === 'function') liste = liste.filter(c => estObtenue(c.id));
 
   if(!cartesDuTiroir.length){
-    grille.innerHTML = '<p class="vide" style="padding:14px 0">Choisis une extension pour voir ses cartes.</p>';
+    grille.innerHTML = modeTiroir === 'extension'
+      ? '<p class="vide" style="padding:14px 0">Choisis une extension pour voir ses cartes.</p>'
+      : `<p class="vide" style="padding:14px 0">Tape le nom d'un Pokémon : toutes ses cartes
+         apparaîtront, quelle que soit leur extension.</p>`;
     return;
   }
   if(!liste.length){
@@ -599,13 +630,21 @@ function dessinerLeTiroir(){
     return;
   }
 
+  const nomsDExtensions = new Map(extensionsPhysiques.map(e => [e.id, e.name]));
+  const direLExtension = modeTiroir === 'pokemon';
+
   grille.innerHTML = '<div class="grille-choix">' + liste.slice(0, 240).map(c => `
-    <button data-poser="${echapper(c.id)}" title="${echapper(c.name)}">
+    <button data-poser="${echapper(c.id)}"
+            title="${echapper(c.name)}${direLExtension
+              ? ' — ' + echapper(nomsDExtensions.get(extensionDeLaCarte(c.id)) ?? '')
+              : ''}">
       <img src="${echapper(c.image ?? `images/cards/${c.id}.png`)}" alt="${echapper(c.name)}"
            loading="lazy" data-secours="${echapper(c.imageSecours ?? '')}"
            onerror="visuelDeSecours(this)"
            class="${typeof estObtenue === 'function' && !estObtenue(c.id) ? CLASSE_NON_OBTENUE : ''}">
-      <span class="nom">${echapper(c.name)}</span>
+      <span class="nom">${direLExtension
+        ? echapper(nomsDExtensions.get(extensionDeLaCarte(c.id)) ?? c.name)
+        : echapper(c.name)}</span>
     </button>`).join('') + '</div>'
     + (liste.length > 240
       ? '<p class="vide" style="padding:12px 0 0;font-size:12.5px">240 premières cartes affichées. Affine le filtre pour voir les suivantes.</p>'
@@ -886,4 +925,77 @@ function fermerLeLivre(){
   // perdre l'endroit où l'on en était.
   pageActive = Math.min(pageLivre, (actif()?.pages.length ?? 1) - 1);
   dessiner();
+}
+
+// ------------------------------------------- chercher par Pokémon --------
+//
+// Réunir tous ses Pikachu sur une page demandait jusqu'ici d'ouvrir les
+// extensions une par une, en espérant s'en souvenir. Le site sait déjà
+// retrouver toutes les cartes d'un Pokémon, quelle que soit son extension :
+// c'est ce savoir-là qu'on amène dans le tiroir.
+
+const MAX_SUGGESTIONS = 10;
+
+function pokemonQuiCorrespondent(q){
+  const requete = q.trim().toLowerCase();
+  if(requete.length < 2 && !/^\d+$/.test(requete)) return [];
+  const trouves = [];
+  for(let i = 0; i < POKEDEX_FR.length; i++){
+    const nom = POKEDEX_FR[i];
+    const dexId = i + 1;
+    if(nom.toLowerCase().includes(requete) || String(dexId) === requete){
+      trouves.push({ dexId, name: nom });
+      if(trouves.length >= MAX_SUGGESTIONS) break;
+    }
+  }
+  return trouves;
+}
+
+function brancherLaRecherchePokemon(zone){
+  const champ = zone.querySelector('#recherche-pokemon');
+  if(!champ) return;
+
+  const suggestions = zone.querySelector('#suggestions-pokemon');
+  const proposer = () => {
+    const trouves = pokemonQuiCorrespondent(champ.value);
+    if(!trouves.length){ suggestions.innerHTML = ''; return; }
+    suggestions.innerHTML = trouves.map(p => `
+      <button data-dex="${p.dexId}">${echapper(p.name)}
+        <span class="numero">n° ${p.dexId}</span></button>`).join('');
+    suggestions.querySelectorAll('[data-dex]').forEach(b =>
+      b.addEventListener('click', () => choisirLePokemon(Number(b.dataset.dex))));
+  };
+
+  champ.addEventListener('input', proposer);
+  // Entrée prend la première proposition : on tape un nom, on valide.
+  champ.addEventListener('keydown', e => {
+    if(e.key !== 'Enter') return;
+    e.preventDefault();
+    const premier = pokemonQuiCorrespondent(champ.value)[0];
+    if(premier) choisirLePokemon(premier.dexId);
+  });
+
+  if(pokemonChoisi) proposer();
+}
+
+async function choisirLePokemon(dexId){
+  pokemonChoisi = { dexId, name: POKEDEX_FR[dexId - 1] };
+  const champ = document.getElementById('recherche-pokemon');
+  if(champ) champ.value = pokemonChoisi.name;
+  document.getElementById('suggestions-pokemon').innerHTML = '';
+
+  const grille = document.getElementById('grille-choix');
+  grille.innerHTML = `<p class="vide" style="padding:14px 0">Recherche des cartes de
+    ${echapper(pokemonChoisi.name)} dans toutes les extensions…</p>`;
+  try{
+    const cartes = await cartesDuPokemon(dexId);
+    // Une carte d'un Pokémon existe des deux côtés du site : on ne garde
+    // que celles du jeu physique, seul univers où un classeur a un sens.
+    cartesDuTiroir = cartes.filter(c => appartientAUnivers(extensionDeLaCarte(c.id) ?? ''));
+    retenirLesCartes(cartesDuTiroir);
+  }catch(err){
+    grille.innerHTML = `<p class="vide" style="padding:14px 0">Recherche impossible : ${echapper(err.message)}</p>`;
+    return;
+  }
+  dessinerLeTiroir();
 }
