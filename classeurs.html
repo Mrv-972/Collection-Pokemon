@@ -131,7 +131,7 @@
                 background:transparent;color:#E08862;border:1px solid rgba(192,57,43,0.42);}
   .danger-leger:hover{background:rgba(192,57,43,0.13)}
 
-  .navigation-pages{display:flex;align-items:center;gap:12px;margin:0 0 14px;
+  .navigation-pages{display:flex;align-items:center;gap:12px;margin:0 0 14px;flex-wrap:wrap;
                     font-size:13.5px;color:var(--text-on-ink-dim)}
   .navigation-pages button{font-family:inherit;font-size:15px;width:34px;height:34px;
                            border-radius:5px;cursor:pointer;background:transparent;
@@ -197,6 +197,39 @@
   /* Sans souris, il n'y a pas de survol : le bouton resterait introuvable,
      et l'on ne pourrait plus vider une pochette depuis un téléphone. */
   @media(hover:none){ .case.pleine .retirer{display:flex} }
+
+  /* La bascule recto / verso, à droite de la navigation : on tourne la
+     feuille, on ne change pas de page. */
+  .faces{display:flex;gap:4px;margin-left:auto}
+  /* Sur écran étroit, la bascule passe à la ligne plutôt que de pousser la
+     barre hors de l'écran. */
+  @media(max-width:640px){ .faces{margin-left:0} }
+  .faces button{font-family:inherit;font-size:12.5px;padding:6px 13px;border-radius:5px;
+                cursor:pointer;background:transparent;color:var(--text-on-ink-dim);
+                border:1px solid rgba(237,234,224,0.16);transition:.12s;}
+  .faces button[aria-selected="true"]{color:var(--text-on-ink);
+                                      border-color:rgba(var(--gold-rgb),0.45);
+                                      background:rgba(var(--gold-rgb),0.09);}
+  .mot-du-verso{font-size:12.5px;line-height:1.6;color:var(--text-on-ink-dim);
+                margin:0 0 12px;padding:9px 13px;border-radius:5px;
+                background:rgba(237,234,224,0.04);
+                border-left:2px solid rgba(var(--gold-rgb),0.4);}
+
+  /* Les trois façons de remplir une pochette de verso. */
+  .choix-verso{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0 0}
+  .choix-verso button{display:flex;flex-direction:column;align-items:center;gap:8px;
+                      padding:14px 10px;border-radius:7px;cursor:pointer;
+                      background:rgba(237,234,224,0.04);color:var(--text-on-ink);
+                      border:1px solid rgba(237,234,224,0.14);font-family:inherit;
+                      font-size:12.5px;line-height:1.35;text-align:center;transition:.12s;}
+  .choix-verso button:hover{border-color:rgba(var(--gold-rgb),0.55);
+                            background:rgba(var(--gold-rgb),0.08)}
+  .choix-verso img{width:44px;border-radius:4px;display:block}
+  .choix-verso .pictogramme{font-size:30px;line-height:44px;height:44px;opacity:.75}
+  @media(max-width:520px){ .choix-verso{grid-template-columns:1fr;gap:8px}
+                           .choix-verso button{flex-direction:row;justify-content:flex-start;gap:12px}
+                           .choix-verso img,.choix-verso .pictogramme{width:32px;font-size:22px;
+                                                                     line-height:32px;height:32px} }
 
   .navigation-pages .voir{border-color:rgba(var(--gold-rgb),0.45);color:var(--accent-clair)}
   .navigation-pages .voir:hover{background:rgba(var(--gold-rgb),0.09)}
@@ -352,19 +385,19 @@
   <footer data-note="Tes classeurs sont enregistrés dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-24-avs9"></script>
-<script src="catalogue.js?v=2026-09-24-avs9"></script>
-<script src="supabase-config.js?v=2026-09-24-avs9"></script>
-<script src="pied.js?v=2026-09-24-avs9"></script>
-<script src="admin.js?v=2026-09-24-avs9"></script>
-<script src="compte.js?v=2026-09-24-avs9"></script>
-<script src="confirmation.js?v=2026-09-24-avs9"></script>
-<script src="progression.js?v=2026-09-24-avs9"></script>
-<script src="raretes.js?v=2026-09-24-avs9"></script>
-<script src="pokedex-fr.js?v=2026-09-24-avs9"></script>
-<script src="sets.js?v=2026-09-24-avs9"></script>
-<script src="classeurs.js?v=2026-09-24-avs9"></script>
-<script src="classeurs-page.js?v=2026-09-24-avs9"></script>
+<script src="univers.js?v=2026-09-24-nu86"></script>
+<script src="catalogue.js?v=2026-09-24-nu86"></script>
+<script src="supabase-config.js?v=2026-09-24-nu86"></script>
+<script src="pied.js?v=2026-09-24-nu86"></script>
+<script src="admin.js?v=2026-09-24-nu86"></script>
+<script src="compte.js?v=2026-09-24-nu86"></script>
+<script src="confirmation.js?v=2026-09-24-nu86"></script>
+<script src="progression.js?v=2026-09-24-nu86"></script>
+<script src="raretes.js?v=2026-09-24-nu86"></script>
+<script src="pokedex-fr.js?v=2026-09-24-nu86"></script>
+<script src="sets.js?v=2026-09-24-nu86"></script>
+<script src="classeurs.js?v=2026-09-24-nu86"></script>
+<script src="classeurs-page.js?v=2026-09-24-nu86"></script>
 
 </body>
 </html>

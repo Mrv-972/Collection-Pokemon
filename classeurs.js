@@ -75,6 +75,9 @@ function classeurNeuf(nom){
     pages: [pageVide(FORMAT_PAR_DEFAUT)],
     // Les images importées par le membre, rangées par clé.
     images: {},
+    // Ce que le membre a choisi de mettre au dos de chaque page. Vide tant
+    // qu'il n'y a rien choisi : le dos des cartes du recto suffit.
+    versos: [],
     creeLe: new Date().toISOString(),
   };
 }
@@ -93,7 +96,8 @@ function changerLeFormat(classeur, format){
     pages.push(page);
   }
   if(!pages.length) pages.push(pageVide(format));
-  return { ...classeur, format, pages };   // « images » suit, par la copie
+  // Le nombre de pages et de cases change : les versos doivent suivre.
+  return accorderLesVersos({ ...classeur, format, pages });
 }
 
 // Poser une carte dans la première case libre, en créant une page au besoin.
@@ -160,4 +164,85 @@ function oublierLesImagesInutiles(classeur){
     if(utilisees.has(cle)) gardees[cle] = donnees;
   }
   return { ...classeur, images: gardees };
+}
+
+// --------------------------------------------------------- les versos ----
+//
+// Une feuille de classeur a deux faces. Longtemps, le verso n'a été que le
+// dos des cartes du recto — c'est ce que montre une feuille à pochettes
+// simple face. Mais on peut aussi vouloir y mettre quelque chose : une carte
+// à voir des deux côtés, une illustration, un intercalaire.
+//
+// Le verso d'une page est donc rangé à part, dans « classeur.versos », et
+// chaque case y vaut :
+//
+//   null        → on laisse faire : le dos de la carte du recto, s'il y en
+//                 a une, et rien sinon ;
+//   'dos'       → un dos de carte, même si le recto est vide ;
+//   un id carte → une carte, montrée à l'endroit ;
+//   une clé img → une image importée.
+//
+// Les cases d'un verso sont rangées dans l'ordre où on les VOIT en
+// retournant la feuille, donc en miroir du recto. C'est ce qui permet de
+// composer un verso sans avoir à faire l'inversion de tête.
+
+const DOS_DE_CARTE = 'dos';
+// Une pochette qu'on a explicitement laissée nue, à distinguer du « null »
+// qui, lui, veut dire « laisse faire le dos automatique ».
+const VERSO_VIDE = 'vide';
+// Le dos d'une image importée : du papier. Retourner une photo glissée dans
+// une pochette ne montre pas le dos d'une carte Pokémon.
+const VERSO_PAPIER = 'papier';
+
+// Retourner une feuille inverse la gauche et la droite : la carte du bord
+// extérieur se retrouve près de la pliure.
+function enMiroirDeLaPage(page, colonnes){
+  const miroir = [];
+  for(let i = 0; i < page.length; i += colonnes){
+    miroir.push(...page.slice(i, i + colonnes).reverse());
+  }
+  return miroir;
+}
+
+// Ce qu'on voit vraiment au dos d'une page, une fois les choix du membre
+// appliqués par-dessus le dos automatique.
+function versoDeLaPage(classeur, index){
+  const recto = classeur.pages[index] ?? [];
+  const colonnes = FORMATS[classeur.format].colonnes;
+  const automatique = enMiroirDeLaPage(recto, colonnes).map(valeur => {
+    if(!valeur) return null;
+    return estImage(valeur) ? VERSO_PAPIER : DOS_DE_CARTE;
+  });
+  const choisis = classeur.versos?.[index] ?? [];
+  return automatique.map((defaut, i) => {
+    const choix = choisis[i];
+    if(choix === VERSO_VIDE) return null;
+    return choix ?? defaut;
+  });
+}
+
+// Poser un choix dans une case de verso. « null » rend la case à son dos
+// automatique, ce qui n'est pas la même chose que la vider.
+function poserAuVerso(classeur, index, caseIndex, valeur){
+  const parPage = casesParPage(classeur.format);
+  const versos = (classeur.versos ?? []).map(v => (v ? [...v] : null));
+  while(versos.length < classeur.pages.length) versos.push(null);
+  if(!versos[index]) versos[index] = new Array(parPage).fill(null);
+  versos[index][caseIndex] = valeur;
+  return { ...classeur, versos };
+}
+
+// Les versos suivent les pages : ni plus, ni moins, et de la bonne taille.
+function accorderLesVersos(classeur){
+  const parPage = casesParPage(classeur.format);
+  const versos = classeur.pages.map((_, i) => {
+    const v = classeur.versos?.[i];
+    if(!v) return null;
+    const ajuste = v.slice(0, parPage);
+    while(ajuste.length < parPage) ajuste.push(null);
+    // Un verso entièrement laissé au dos automatique ne vaut pas la peine
+    // d'être gardé : on le remet à rien.
+    return ajuste.some(x => x !== null) ? ajuste : null;
+  });
+  return { ...classeur, versos };
 }

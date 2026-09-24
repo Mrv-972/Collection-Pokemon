@@ -7,6 +7,7 @@
 let classeurs = [];
 let idActif = null;
 let pageActive = 0;
+let faceActive = 'recto';        // 'recto' ou 'verso'
 let cartesDuTiroir = [];
 let extensionChoisie = '';
 let extensionsPhysiques = [];
@@ -79,6 +80,12 @@ function reglagesDuClasseur(c){
 // importée. Les deux se rangent pareil, seul le contenu diffère.
 function contenuDeLaCase(c, valeur){
   if(!valeur) return null;
+  if(valeur === DOS_DE_CARTE){
+    return { genre: 'dos', nom: "Dos d'une carte", source: 'images/cartes/dos.webp' };
+  }
+  if(valeur === VERSO_PAPIER){
+    return { genre: 'papier', nom: "Dos d'une image" };
+  }
   if(estImage(valeur)){
     const donnees = imageDuClasseur(c, valeur);
     return donnees
@@ -93,6 +100,10 @@ function contenuDeLaCase(c, valeur){
 }
 
 function imageDeLaCase(contenu){
+  if(contenu.genre === 'papier') return '';
+  if(contenu.genre === 'dos'){
+    return `<img src="images/cartes/dos.webp" alt="Dos d'une carte" class="image-importee">`;
+  }
   if(contenu.genre === 'image'){
     return `<img src="${echapper(contenu.source)}" alt="Image importée" class="image-importee">`;
   }
@@ -104,11 +115,12 @@ function imageDeLaCase(contenu){
 
 function pageDuClasseur(c){
   const f = FORMATS[c.format];
-  const page = c.pages[pageActive] ?? [];
+  const auVerso = faceActive === 'verso';
+  const page = auVerso ? versoDeLaPage(c, pageActive) : (c.pages[pageActive] ?? []);
   const cases = page.map((valeur, index) => {
     const dedans = valeur ? contenuDeLaCase(c, valeur) : null;
     return `
-      <div class="case ${valeur ? 'pleine' : ''}" data-case="${index}"
+      <div class="case ${valeur ? 'pleine' : ''}${dedans?.genre === 'papier' ? ' dos-neutre' : ''}" data-case="${index}"
            ${valeur ? 'draggable="true"' : ''}
            role="button" tabindex="0"
            aria-label="${dedans ? echapper(dedans.nom) : 'Case vide'}">
@@ -127,7 +139,15 @@ function pageDuClasseur(c){
       <button class="ajouter" id="ajouter-page">+ une page</button>
       ${c.pages.length > 1 ? '<button class="ajouter" id="retirer-page">Retirer cette page</button>' : ''}
       <button class="ajouter voir" id="voir-le-livre">Visualiser mon classeur</button>
+      <div class="faces">
+        <button data-face="recto" aria-selected="${!auVerso}">Recto</button>
+        <button data-face="verso" aria-selected="${auVerso}">Verso</button>
+      </div>
     </div>
+    ${auVerso ? `<p class="mot-du-verso">Le dos de la page ${pageActive + 1}, vu en
+       retournant la feuille — les cases sont donc inversées de gauche à droite.
+       Chaque pochette montre le dos de la carte d'en face ; clique-la pour y mettre
+       autre chose.</p>` : ''}
     <div class="page-classeur" style="grid-template-columns:repeat(${f.colonnes},minmax(0,1fr))">
       ${cases}
     </div>`;
@@ -263,6 +283,13 @@ function brancherLesGestes(){
   zone.querySelector('#page-avant')?.addEventListener('click', () => allerALaPage(pageActive - 1, -1));
   zone.querySelector('#page-apres')?.addEventListener('click', () => allerALaPage(pageActive + 1, 1));
   zone.querySelector('#voir-le-livre')?.addEventListener('click', ouvrirLeLivre);
+  zone.querySelectorAll('[data-face]').forEach(b => b.addEventListener('click', () => {
+    if(faceActive === b.dataset.face) return;
+    faceActive = b.dataset.face;
+    caseChoisie = null;
+    caseVisee = null;
+    dessiner();
+  }));
 
   const page = zone.querySelector('.page-classeur');
   if(page){
@@ -282,6 +309,12 @@ function brancherLesGestes(){
   zone.querySelectorAll('[data-retirer]').forEach(b => b.addEventListener('click', e => {
     e.stopPropagation();
     const index = Number(b.dataset.retirer);
+    if(faceActive === 'verso'){
+      // Au verso, vider veut dire « plus rien du tout », et non « revenir au
+      // dos automatique » — sinon la case se remplirait à nouveau aussitôt.
+      modifier(c => oublierLesImagesInutiles(poserAuVerso(c, pageActive, index, VERSO_VIDE)));
+      return;
+    }
     modifier(c => {
       const pages = c.pages.map(p => [...p]);
       pages[pageActive][index] = null;
@@ -290,7 +323,8 @@ function brancherLesGestes(){
   }));
 
   // La case visée est redessinée comme les autres : on lui remet sa marque.
-  if(caseVisee && caseVisee.page === pageActive){
+  if(caseVisee && caseVisee.page === pageActive
+     && (caseVisee.face ?? 'recto') === faceActive){
     zone.querySelector(`.case[data-case="${caseVisee.case}"]`)?.classList.add('visee');
   }
 
@@ -358,12 +392,17 @@ function brancherLeGlisser(zone){
       }catch(err){ /* déposé depuis ailleurs : on ignore */ }
     });
 
-    // Au clic — donc aussi au doigt — et à la touche Entrée.
-    el.addEventListener('click', () => choisirOuEchanger(index, el));
+    // Au clic — donc aussi au doigt — et à la touche Entrée. Au verso, le
+    // clic ouvre le choix du contenu plutôt que de déplacer : on n'y range
+    // pas une collection, on y compose une face.
+    const agir = () => (faceActive === 'verso'
+      ? choisirLeContenuDuVerso(index)
+      : choisirOuEchanger(index, el));
+    el.addEventListener('click', agir);
     el.addEventListener('keydown', e => {
       if(e.key !== 'Enter' && e.key !== ' ') return;
       e.preventDefault();
-      choisirOuEchanger(index, el);
+      agir();
     });
   });
 }
@@ -416,7 +455,7 @@ function viserLaCase(index, el){
     messageFugace('Case libérée.');
     return;
   }
-  caseVisee = { page: pageActive, case: index };
+  caseVisee = { page: pageActive, case: index, face: 'recto' };
   el.classList.add('visee');
   messageFugace('Case choisie. Prends une carte ci-dessous pour l\'y poser.');
   // Le tiroir est plus bas : on l'amène sous les yeux plutôt que de laisser
@@ -436,14 +475,17 @@ function poserLaCarte(carteId){
     return;
   }
   modifier(c => {
-    const pages = c.pages.map(p => [...p]);
     // La page visée a pu disparaître entre-temps : on retombe alors sur le
     // comportement ordinaire plutôt que d'écrire à côté.
-    if(!pages[cible.page]) return poserALaSuite(c, carteId);
+    if(!c.pages[cible.page]) return poserALaSuite(c, carteId);
+    if(cible.face === 'verso') return poserAuVerso(c, cible.page, cible.case, carteId);
+    const pages = c.pages.map(p => [...p]);
     pages[cible.page][cible.case] = carteId;
     return { ...c, pages };
   });
-  messageFugace(`Carte posée en case ${cible.case + 1} de la page ${cible.page + 1}.`);
+  messageFugace(cible.face === 'verso'
+    ? `Carte posée au dos de la page ${cible.page + 1}.`
+    : `Carte posée en case ${cible.case + 1} de la page ${cible.page + 1}.`);
 }
 
 // ---------------------------------------------------- importer une image ---
@@ -504,6 +546,7 @@ async function importerUneImage(fichier){
   modifier(c => {
     const { cle, classeur } = ajouterUneImage(c, donnees);
     if(cible && classeur.pages[cible.page]){
+      if(cible.face === 'verso') return poserAuVerso(classeur, cible.page, cible.case, cle);
       const pages = classeur.pages.map(x => [...x]);
       pages[cible.page][cible.case] = cle;
       return { ...classeur, pages };
@@ -802,20 +845,10 @@ let pageLivre = 0;
 const livreOuvert = () => Boolean(document.getElementById('livre'));
 const livreEnDouble = () => window.matchMedia?.('(min-width: 821px)').matches ?? true;
 
-// Retourner une feuille inverse la gauche et la droite : la carte qui était
-// au bord extérieur se retrouve près de la pliure. Les dos se lisent donc en
-// miroir, ligne par ligne — c'est ce qu'on voit vraiment en tournant la page.
-function enMiroir(page, colonnes){
-  const miroir = [];
-  for(let i = 0; i < page.length; i += colonnes){
-    miroir.push(...page.slice(i, i + colonnes).reverse());
-  }
-  return miroir;
-}
-
 function caseDeLecture(c, valeur){
   const dedans = valeur ? contenuDeLaCase(c, valeur) : null;
-  return `<div class="case ${valeur ? 'pleine' : ''}">
+  const papier = dedans?.genre === 'papier' ? ' dos-neutre' : '';
+  return `<div class="case ${valeur ? 'pleine' : ''}${papier}">
     ${dedans ? imageDeLaCase(dedans) : ''}
   </div>`;
 }
@@ -826,18 +859,9 @@ function grilleDePage(c, page, numero, { dos = false } = {}){
   // Posé sur la page elle-même, il lui donne sa forme quelle que soit la
   // place disponible, et les deux pages restent identiques.
   const rapport = (f.colonnes * 2.5) / (f.lignes * 3.5);
-  const cases = dos
-    ? enMiroir(page, f.colonnes).map(valeur => {
-        if(!valeur) return '<div class="case"></div>';
-        // Une image importée n'a pas le dos d'une carte Pokémon : on montre
-        // un verso neutre, qui est ce qu'on voit vraiment en retournant une
-        // photo ou un dessin glissé dans la pochette.
-        if(estImage(valeur)) return '<div class="case pleine dos-neutre"></div>';
-        return `<div class="case pleine dos">
-                  <img src="images/cartes/dos.webp" alt="Dos d'une carte" loading="lazy">
-                </div>`;
-      }).join('')
-    : page.map(carteId => caseDeLecture(c, carteId)).join('');
+  // Le verso est une face à part entière : son contenu, dos automatique
+  // compris, est déjà calculé par versoDeLaPage. Il ne reste qu'à l'afficher.
+  const cases = page.map(valeur => caseDeLecture(c, valeur)).join('');
 
   return `
     <div class="page-livre${dos ? ' verso' : ''}"
@@ -862,7 +886,7 @@ function dessinerLeLivre(){
   const double = livreEnDouble();
   const gauche = double
     ? (pageLivre > 0
-        ? grilleDePage(c, c.pages[pageLivre - 1], pageLivre, { dos: true })
+        ? grilleDePage(c, versoDeLaPage(c, pageLivre - 1), pageLivre, { dos: true })
         : couvertureInterieure())
     : '';
 
@@ -1027,4 +1051,89 @@ async function choisirLePokemon(dexId){
     return;
   }
   dessinerLeTiroir();
+}
+
+// --------------------------------------- choisir ce qu'on met au verso ---
+//
+// Trois façons de remplir une pochette de verso, et une pour la vider :
+//
+//   — le dos d'une carte, ce qu'on voit d'ordinaire en retournant la feuille ;
+//   — une carte à l'endroit, pour qui veut la voir des deux côtés ;
+//   — une image importée ;
+//   — rien du tout.
+//
+// Ce choix n'existe qu'au verso. Au recto, une pochette se remplit d'une
+// carte ou d'une image, et poser la question à chaque clic alourdirait le
+// geste le plus fréquent du site.
+
+function choisirLeContenuDuVerso(index){
+  const c = actif();
+  if(!c) return;
+  const actuel = versoDeLaPage(c, pageActive)[index];
+
+  const voile = document.createElement('div');
+  voile.className = 'confirmation';
+  voile.innerHTML = `
+    <div class="boite">
+      <h2>Que mettre dans cette pochette ?</h2>
+      <p>Au dos de la page ${pageActive + 1}, case ${index + 1}.</p>
+      <div class="choix-verso">
+        <button data-choix="dos">
+          <img src="images/cartes/dos.webp" alt="">
+          <span>Le dos d'une carte</span>
+        </button>
+        <button data-choix="carte">
+          <span class="pictogramme">▧</span>
+          <span>Une carte</span>
+        </button>
+        <button data-choix="image">
+          <span class="pictogramme">🖼</span>
+          <span>Une image</span>
+        </button>
+      </div>
+      <div class="boutons">
+        ${actuel ? '<button class="annuler" data-choix="vide">Laisser vide</button>' : ''}
+        <button class="annuler" data-choix="rien">Annuler</button>
+      </div>
+    </div>`;
+
+  function fermer(){
+    document.removeEventListener('keydown', auClavier);
+    voile.remove();
+  }
+  function auClavier(e){ if(e.key === 'Escape') fermer(); }
+
+  voile.addEventListener('click', e => { if(e.target === voile) fermer(); });
+  document.addEventListener('keydown', auClavier);
+
+  voile.querySelectorAll('[data-choix]').forEach(b => b.addEventListener('click', () => {
+    const choix = b.dataset.choix;
+    fermer();
+    if(choix === 'rien') return;
+    if(choix === 'dos'){
+      modifier(x => oublierLesImagesInutiles(poserAuVerso(x, pageActive, index, DOS_DE_CARTE)));
+      return;
+    }
+    if(choix === 'vide'){
+      modifier(x => oublierLesImagesInutiles(poserAuVerso(x, pageActive, index, VERSO_VIDE)));
+      return;
+    }
+    // Carte ou image : la case est désignée, et le tiroir prend la suite.
+    caseVisee = { page: pageActive, case: index, face: 'verso' };
+    if(choix === 'image'){
+      document.getElementById('fichier-image')?.click();
+      return;
+    }
+    const laCase = contenu().querySelector(`.case[data-case="${index}"]`);
+    laCase?.classList.add('visee');
+    messageFugace('Case choisie. Prends une carte ci-dessous pour l\'y poser.');
+    document.getElementById('choix-extension')
+      ?.scrollIntoView({ behavior: mouvementReduit() ? 'auto' : 'smooth', block: 'center' });
+    document.getElementById('recherche-pokemon')
+      ?.scrollIntoView({ behavior: mouvementReduit() ? 'auto' : 'smooth', block: 'center' });
+  }));
+
+  poserStyleConfirmation();
+  document.body.appendChild(voile);
+  requestAnimationFrame(() => voile.classList.add('vue'));
 }
