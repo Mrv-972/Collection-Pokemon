@@ -161,7 +161,10 @@
   .champ span{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:0 0 6px}
   .champ input,.champ select{width:100%;background:rgba(255,255,255,.05);color:var(--text-on-ink);
     border:1px solid rgba(255,255,255,.16);border-radius:8px;padding:10px 12px;font:inherit;min-height:44px}
-  .champ .aide{font-size:12px;color:var(--text-on-ink-dim);margin:6px 0 0}
+  .champ .aide{font-size:12.5px;line-height:1.65;color:var(--text-on-ink-dim);margin:6px 0 0}
+  .champ .aide code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+    background:rgba(237,234,224,0.07);padding:1px 5px;border-radius:3px;}
+  .champ .aide strong{color:var(--text-on-ink);font-weight:600}
   .bouton-fort{background:var(--teal);color:#fff;border:0;border-radius:8px;padding:12px 22px;
     font:inherit;font-weight:600;cursor:pointer;min-height:44px}
   .bouton-fort[disabled]{opacity:.5;cursor:default}
@@ -206,13 +209,13 @@
   <footer data-note="Une correction saisie ici prend effet tout de suite, puis la construction nocturne l'inscrit dans les fichiers du site."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-oz3k"></script>
-<script src="supabase-config.js?v=2026-09-27-oz3k"></script>
-<script src="pied.js?v=2026-09-27-oz3k"></script>
-<script src="catalogue.js?v=2026-09-27-oz3k"></script>
-<script src="confirmation.js?v=2026-09-27-oz3k"></script>
-<script src="compte.js?v=2026-09-27-oz3k"></script>
-<script src="admin.js?v=2026-09-27-oz3k"></script>
+<script src="univers.js?v=2026-09-27-x7z8"></script>
+<script src="supabase-config.js?v=2026-09-27-x7z8"></script>
+<script src="pied.js?v=2026-09-27-x7z8"></script>
+<script src="catalogue.js?v=2026-09-27-x7z8"></script>
+<script src="confirmation.js?v=2026-09-27-x7z8"></script>
+<script src="compte.js?v=2026-09-27-x7z8"></script>
+<script src="admin.js?v=2026-09-27-x7z8"></script>
 <script>
 const panel = document.getElementById('panel');
 let ongletActif = 'visuel';
@@ -237,7 +240,11 @@ function champ(nom, etiquette, { type = 'text', aide = '', obligatoire = false, 
     ${aide ? `<p class="aide">${aide}</p>` : ''}</label>`;
 }
 
-const AIDE_CARTE = 'L\'identifiant se lit dans l\'adresse d\'une page d\'extension, par exemple <strong>B3-001</strong> pour la première carte d\'Aura Palpitante.';
+const AIDE_CARTE = `Il s'écrit <strong>extension-numéro</strong>, et se reconstitue en deux temps :
+  <br>1. Ouvre la page de l'extension. Dans l'adresse du navigateur, après <code>set=</code>,
+  se trouve l'identifiant de l'extension — par exemple <code>…extension.html?set=<strong>B3</strong></code>.
+  <br>2. Sous chaque carte de la page, son numéro est écrit précédé d'un dièse — par exemple <strong>#001</strong>.
+  <br>Colle les deux avec un tiret, sans le dièse : <strong>B3-001</strong>.`;
 
 // Le formulaire des visuels sert trois cibles ; le choix survit à son
 // redessin, sans quoi il reviendrait sur « carte » à chaque changement.
@@ -259,22 +266,36 @@ const FORMULAIRES = {
   visuel: () => {
     const q = quoiVisuel();
     const dit = {
-      carte:     { quoi: 'une carte',     etiquette: "Identifiant de la carte",
-                   aide: AIDE_CARTE },
-      extension: { quoi: 'une extension', etiquette: "Identifiant de l'extension",
-                   aide: "Il se lit dans l'adresse de la page de l'extension, après « set= » — par exemple <strong>sv01</strong>." },
-      serie:     { quoi: 'une série',     etiquette: 'Nom de la série',
-                   aide: "Le nom tel qu'il s'affiche dans « Par extension », accents compris — par exemple <strong>Écarlate et Violet</strong>. Une série n'a pas d'identifiant : c'est son nom qui la désigne." },
+      carte:     { etiquette: "Identifiant de la carte", aide: AIDE_CARTE },
+      extension: { etiquette: "Identifiant de l'extension",
+                   aide: `Ouvre la page de l'extension depuis « Par extension ». Dans l'adresse du
+                     navigateur, l'identifiant est ce qui suit <code>set=</code> —
+                     <code>…extension.html?set=<strong>sv01</strong></code> donne <strong>sv01</strong>.
+                     <br>Il est court et sans espace : <strong>sv01</strong>, <strong>swsh1</strong>,
+                     <strong>A1</strong>.` },
+      serie:     { etiquette: 'Nom de la série',
+                   aide: `Une série n'a pas d'identifiant : c'est son nom qui la désigne. Recopie-le
+                     <strong>exactement</strong> comme il s'affiche en titre dans « Par extension »,
+                     accents et majuscules compris — <strong>Écarlate et Violet</strong>,
+                     <strong>Épée et Bouclier</strong>, <strong>Noir &amp; Blanc</strong>.
+                     <br>Au moindre écart, la correction viserait une série qui n'existe pas et rien
+                     ne changerait à l'écran.` },
     }[q];
     return `
-    <h2>Remplacer le visuel ${dit.quoi.replace(/^une /, "d'une ")}</h2>
-    <p class="intro">La nouvelle image s'affiche immédiatement sur le site.</p>
+    <h2>Remplacer un visuel</h2>
+    <p class="intro">Le visuel d'une carte, le logo d'une extension ou celui d'une série.
+       La nouvelle image s'affiche immédiatement sur le site.</p>
     <label class="champ"><span>Quoi ?</span><select id="quoi-visuel">
       <option value="carte" ${q === 'carte' ? 'selected' : ''}>Une carte</option>
       <option value="extension" ${q === 'extension' ? 'selected' : ''}>Le logo d'une extension</option>
       <option value="serie" ${q === 'serie' ? 'selected' : ''}>Le logo d'une série</option>
     </select></label>
     ${choixUnivers()}
+    ${q === 'serie'
+      ? `<p class="aide" style="margin:-8px 0 16px">Seul le TCG physique affiche un logo de
+           série. Côté TCG Pocket, « Série A » et « Série B » n'en ont pas : un remplacement y
+           serait enregistré sans rien changer à l'écran.</p>`
+      : ''}
     ${champ('cible', dit.etiquette, { obligatoire: true, aide: dit.aide })}
     ${champ('fichier', 'Image', { type: 'file', obligatoire: true, aide: 'WebP, PNG ou JPEG, 5 Mo maximum.' })}
     <button class="bouton-fort" id="valider">Remplacer le visuel</button>
