@@ -1,0 +1,37 @@
+# Sonde ponctuelle : quelles séries ont un logo chez TCGdex ?
+#
+# Le bac à sable de développement n'atteint pas ce domaine ; un exécuteur
+# GitHub, si. On lance donc la sonde ici et on lit le journal. Rien n'est
+# écrit dans le dépôt.
+name: Sonde des logos de série
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sonder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le site
+        uses: actions/checkout@v4
+
+      - name: Récupérer les données de TCGdex
+        run: |
+          git clone --depth 1 --filter=blob:none --no-checkout \
+            https://github.com/tcgdex/cards-database tcgdex
+          cd tcgdex
+          git sparse-checkout init --cone
+          git sparse-checkout set data meta
+          git checkout
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # L'instantané du dépôt ne porte pas encore les identifiants de série :
+      # on le reconstruit sur place, sans rien publier.
+      - name: Reconstruire l'instantané
+        run: node outils/instantane.mjs --tcgdex tcgdex --sortie /tmp/instantane
+
+      - name: Sonder les logos
+        run: node outils/sonde-logos-series.mjs --instantane /tmp/instantane

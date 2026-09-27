@@ -182,6 +182,7 @@ async function construirePhysique(){
         cardCount: { official: compte ? Number(compte[1]) : null },
         logo: `${base('fr')}/logo.png`,
         symbol: `${base('fr')}/symbol.png`,
+        serieId,
         serieNom: serieNom.fr || serieNom.en || serie.name,
         dateSortie: champTexte(sourceSet, 'releaseDate'),
       });
