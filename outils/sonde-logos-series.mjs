@@ -29,6 +29,13 @@ async function existe(adresse){
 }
 
 const extensions = JSON.parse(await readFile(`${dossier}/physique/extensions.json`, 'utf8'));
+
+// Un témoin : le logo d'une extension, dont on sait qu'il existe. Sans lui,
+// « aucune série n'a de logo » pourrait vouloir dire « la sonde ne sonde
+// rien » — un refus du réseau ressemble à une absence.
+const temoin = extensions.find(e => e.logo)?.logo;
+console.log(`Témoin (logo d'extension) ${temoin}`);
+console.log(`  → ${await existe(temoin) ? 'trouvé' : 'ABSENT : la sonde ne prouve rien'}\n`);
 const series = new Map();
 for(const e of extensions){
   if(e.serieId && !series.has(e.serieId)) series.set(e.serieId, e.serieNom);
@@ -36,11 +43,21 @@ for(const e of extensions){
 
 console.log(`${series.size} séries à sonder.\n`);
 const avec = [], sans = [];
+const FORMES = id => [
+  `https://assets.tcgdex.net/fr/${id}/logo.png`,
+  `https://assets.tcgdex.net/fr/${id}/logo.webp`,
+  `https://assets.tcgdex.net/fr/${id}/logo`,
+  `https://assets.tcgdex.net/en/${id}/logo.png`,
+  `https://assets.tcgdex.net/fr/${id}/symbol.png`,
+];
+
 for(const [id, nom] of series){
-  const adresse = `https://assets.tcgdex.net/fr/${id}/logo.png`;
-  const ok = await existe(adresse);
-  (ok ? avec : sans).push(`${id} — ${nom}`);
-  console.log(`${ok ? 'oui' : 'non'}  ${id.padEnd(16)} ${nom}`);
+  let trouvee = null;
+  for(const adresse of FORMES(id)){
+    if(await existe(adresse)){ trouvee = adresse; break; }
+  }
+  (trouvee ? avec : sans).push(`${id} — ${nom}${trouvee ? ' → ' + trouvee : ''}`);
+  console.log(`${trouvee ? 'oui' : 'non'}  ${id.padEnd(16)} ${nom}${trouvee ? '  ' + trouvee : ''}`);
 }
 
 console.log(`\n${avec.length} avec logo, ${sans.length} sans.`);

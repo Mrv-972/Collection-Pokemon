@@ -46,6 +46,15 @@
   .series-title::-webkit-details-marker{display:none}
   .series-title:hover{background:rgba(237,234,224,0.03)}
   .series-title h2{font-size:22px;}
+  /* Le logo de la série, à la place du titre quand il existe. Une hauteur
+     fixe : les logos vont du carré au bandeau très large, et sans elle la
+     rangée des titres sautait d'une série à l'autre. */
+  .logo-serie{height:38px;max-width:230px;object-fit:contain;object-position:left center;
+              flex-shrink:0;}
+  /* Le titre reste dans le document — pour les lecteurs d'écran et pour
+     Ctrl+F — mais s'efface à l'œil dès que le logo est là. */
+  .series-title.illustree h2{position:absolute;width:1px;height:1px;overflow:hidden;
+                             clip-path:inset(50%);white-space:nowrap;}
   .series-title .count{font-size:13px;color:var(--text-on-ink-dim);}
   /* Le chevron dit dans quel sens ça va s'ouvrir, sans texte à traduire. */
   .series-title .chevron{flex-shrink:0;width:10px;height:10px;margin-left:2px;
@@ -142,14 +151,14 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-so9n"></script>
-<script src="catalogue.js?v=2026-09-27-so9n"></script>
-<script src="supabase-config.js?v=2026-09-27-so9n"></script>
-<script src="pied.js?v=2026-09-27-so9n"></script>
-<script src="admin.js?v=2026-09-27-so9n"></script>
-<script src="compte.js?v=2026-09-27-so9n"></script>
-<script src="progression.js?v=2026-09-27-so9n"></script>
-<script src="sets.js?v=2026-09-27-so9n"></script>
+<script src="univers.js?v=2026-09-27-4gzs"></script>
+<script src="catalogue.js?v=2026-09-27-4gzs"></script>
+<script src="supabase-config.js?v=2026-09-27-4gzs"></script>
+<script src="pied.js?v=2026-09-27-4gzs"></script>
+<script src="admin.js?v=2026-09-27-4gzs"></script>
+<script src="compte.js?v=2026-09-27-4gzs"></script>
+<script src="progression.js?v=2026-09-27-4gzs"></script>
+<script src="sets.js?v=2026-09-27-4gzs"></script>
 <script>
 // Récupère la liste complète des extensions depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), puis les regroupe par série (Écarlate et
@@ -243,13 +252,37 @@ function setLogoFallback(img){
 function groupBySeries(sets){
   const groups = {};
   const order = [];
+  const ids = {};
   sets.forEach(s => {
     // Le catalogue livre déjà chaque extension avec sa série.
     const seriesName = s.serieNom;
     if(!groups[seriesName]){ groups[seriesName] = []; order.push(seriesName); }
     groups[seriesName].push(s);
+    if(s.serieId && !ids[seriesName]) ids[seriesName] = s.serieId;
   });
-  return { groups, order };
+  return { groups, order, ids };
+}
+
+// Le logo d'une série se range chez TCGdex au même endroit que celui d'une
+// extension, mais d'un cran plus haut. Toutes n'en ont pas, et les séries de
+// l'application n'en ont aucune : le titre reste alors seul, sans image
+// cassée — c'est le rôle de « onerror ».
+function logoDeSerie(serieId, nom){
+  if(!serieId) return '';
+  return `<img class="logo-serie" src="https://assets.tcgdex.net/fr/${serieId}/logo.png"
+               alt="" loading="lazy" onerror="this.remove()"
+               data-serie-logo="${serieId}">`;
+}
+
+// Le logo dit déjà le nom de la série ; l'écrire à côté ferait doublon pour
+// qui voit, et l'alt vide le tait pour qui écoute. On garde donc le titre,
+// mais on l'efface visuellement quand le logo est arrivé.
+function marquerLesSeriesIllustrees(){
+  document.querySelectorAll('.logo-serie').forEach(img => {
+    const poser = () => img.closest('.series-title')?.classList.add('illustree');
+    if(img.complete && img.naturalWidth) poser();
+    else img.addEventListener('load', poser, { once: true });
+  });
 }
 
 // Une recherche est-elle en cours ? Le rendu s'en sert pour tout ouvrir.
@@ -261,7 +294,7 @@ function renderSets(sets){
     content.innerHTML = '<p class="status-msg">Aucune extension ne correspond à ta recherche.</p>';
     return;
   }
-  const { groups, order } = groupBySeries(sets);
+  const { groups, order, ids } = groupBySeries(sets);
   // Une seule lecture des marquages pour toute la page : les recompter à
   // chaque vignette relirait le stockage cent fois pour le même résultat.
   const obtenues = compterObtenuesParExtension(sets.map(s => s.id));
@@ -300,6 +333,7 @@ function renderSets(sets){
                ${ouverte ? 'open' : ''}>
         <summary class="series-title">
           <span class="chevron" aria-hidden="true"></span>
+          ${logoDeSerie(ids[seriesName], seriesName)}
           <h2>${seriesName}</h2>
           <span class="count">${setsInSeries.length} extension${setsInSeries.length > 1 ? 's' : ''}</span>
         </summary>
@@ -307,6 +341,7 @@ function renderSets(sets){
       </details>
     `;
   }).join('');
+  marquerLesSeriesIllustrees();
 }
 
 // Ce qu'on avait replié le reste au retour. On garde les séries FERMÉES, pas
