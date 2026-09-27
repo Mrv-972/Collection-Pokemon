@@ -148,14 +148,14 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-gc2w"></script>
-<script src="catalogue.js?v=2026-09-27-gc2w"></script>
-<script src="supabase-config.js?v=2026-09-27-gc2w"></script>
-<script src="pied.js?v=2026-09-27-gc2w"></script>
-<script src="admin.js?v=2026-09-27-gc2w"></script>
-<script src="compte.js?v=2026-09-27-gc2w"></script>
-<script src="progression.js?v=2026-09-27-gc2w"></script>
-<script src="sets.js?v=2026-09-27-gc2w"></script>
+<script src="univers.js?v=2026-09-27-oz3k"></script>
+<script src="catalogue.js?v=2026-09-27-oz3k"></script>
+<script src="supabase-config.js?v=2026-09-27-oz3k"></script>
+<script src="pied.js?v=2026-09-27-oz3k"></script>
+<script src="admin.js?v=2026-09-27-oz3k"></script>
+<script src="compte.js?v=2026-09-27-oz3k"></script>
+<script src="progression.js?v=2026-09-27-oz3k"></script>
+<script src="sets.js?v=2026-09-27-oz3k"></script>
 <script>
 // Récupère la liste complète des extensions depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), puis les regroupe par série (Écarlate et
@@ -204,6 +204,10 @@ async function loadSets(){
 
   try{
     const sets = await listerExtensions();
+    // Les logos posés depuis l'administration, lus une fois pour la page.
+    // Un échec ici ne doit pas priver le visiteur du catalogue : on se
+    // contente alors des logos déduits.
+    try{ logosCorriges = await logosDeSeriesCorriges(); }catch(err){}
     // Chaque univers son catalogue : les extensions de l'application mobile
     // et celles du jeu de cartes physique ne se mélangent pas. Le filtre se
     // fait ici, jamais dans le cache : celui-ci porte le catalogue entier,
@@ -287,8 +291,15 @@ const cotePocket = () =>
   (typeof estPocket === 'function' && estPocket())
   || document.documentElement.dataset.univers === 'pocket';
 
-function logoDeSerie(setsDeLaSerie){
+let logosCorriges = new Map();
+
+function logoDeSerie(nomSerie, setsDeLaSerie){
   if(cotePocket()) return '';
+  const pose = logosCorriges.get(nomSerie);
+  if(pose){
+    return `<img class="logo-serie" src="${pose}" alt="" loading="lazy"
+                 onerror="logoDeSerieAbsent(this)">`;
+  }
   const fondatrice = extensionFondatrice(setsDeLaSerie);
   if(!fondatrice) return '';
   return `<img class="logo-serie" src="${fondatrice.logo}" alt="" loading="lazy"
@@ -357,7 +368,7 @@ function renderSets(sets){
                ${ouverte ? 'open' : ''}>
         <summary class="series-title">
           <span class="chevron" aria-hidden="true"></span>
-          ${logoDeSerie(setsInSeries)}
+          ${logoDeSerie(seriesName, setsInSeries)}
           <h2>${seriesName}</h2>
           <span class="count">${setsInSeries.length} extension${setsInSeries.length > 1 ? 's' : ''}</span>
         </summary>

@@ -659,6 +659,35 @@ async function absorberCorrections(lots){
     const lot = lots[c.univers];
     if(!lot){ ignorees++; continue; }
 
+    // Un logo d'extension remplacé à la main : il rejoint le dépôt, comme
+    // les visuels de carte, et l'instantané pointe dessus. Sans cela, le
+    // site continuerait de le lire depuis Supabase indéfiniment.
+    if(c.genre === 'logo-extension'){
+      if(!c.image_chemin){ ignorees++; continue; }
+      const ext = lot.extensions.find(e => e.id === c.cible);
+      if(!ext){ ignorees++; continue; }
+      const suffixe = path.extname(c.image_chemin).toLowerCase();
+      const nom = `${c.cible}${EXTENSIONS_IMAGE.includes(suffixe) ? suffixe : '.png'}`;
+      const fichier = `${DOSSIER_LOGOS}/${nom}`;
+      if(!existsSync(fichier)){
+        try{
+          const r = await fetch(`${paquet.base}/storage/v1/object/public/corrections/${c.image_chemin}`);
+          if(r.ok){
+            await mkdir(DOSSIER_LOGOS, { recursive: true });
+            await writeFile(fichier, Buffer.from(await r.arrayBuffer()));
+            visuels++;
+          }
+        }catch(err){ /* on réessaiera demain */ }
+      }
+      if(existsSync(fichier)) ext.logo = fichier;
+      continue;
+    }
+
+    // Le logo d'une série reste servi depuis Supabase : une série n'a pas
+    // de fiche dans l'instantané où inscrire son visuel. Sa correction ne
+    // sera donc jamais « absorbée », et c'est normal.
+    if(c.genre === 'logo-serie'){ ignorees++; continue; }
+
     // Le visuel d'abord : il vaut pour les trois genres de correction, une
     // carte ajoutée pouvant arriver avec le sien.
     if(c.image_chemin && c.genre !== 'extension'){

@@ -206,19 +206,19 @@
   <footer data-note="Une correction saisie ici prend effet tout de suite, puis la construction nocturne l'inscrit dans les fichiers du site."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-gc2w"></script>
-<script src="supabase-config.js?v=2026-09-27-gc2w"></script>
-<script src="pied.js?v=2026-09-27-gc2w"></script>
-<script src="catalogue.js?v=2026-09-27-gc2w"></script>
-<script src="confirmation.js?v=2026-09-27-gc2w"></script>
-<script src="compte.js?v=2026-09-27-gc2w"></script>
-<script src="admin.js?v=2026-09-27-gc2w"></script>
+<script src="univers.js?v=2026-09-27-oz3k"></script>
+<script src="supabase-config.js?v=2026-09-27-oz3k"></script>
+<script src="pied.js?v=2026-09-27-oz3k"></script>
+<script src="catalogue.js?v=2026-09-27-oz3k"></script>
+<script src="confirmation.js?v=2026-09-27-oz3k"></script>
+<script src="compte.js?v=2026-09-27-oz3k"></script>
+<script src="admin.js?v=2026-09-27-oz3k"></script>
 <script>
 const panel = document.getElementById('panel');
 let ongletActif = 'visuel';
 
 const ONGLETS = [
-  { cle: 'visuel',    titre: 'Visuel d\'une carte' },
+  { cle: 'visuel',    titre: 'Remplacer un visuel' },
   { cle: 'carte',     titre: 'Corriger une carte' },
   { cle: 'ajout',     titre: 'Ajouter une carte' },
   { cle: 'extension', titre: 'Ajouter une extension' },
@@ -239,6 +239,11 @@ function champ(nom, etiquette, { type = 'text', aide = '', obligatoire = false, 
 
 const AIDE_CARTE = 'L\'identifiant se lit dans l\'adresse d\'une page d\'extension, par exemple <strong>B3-001</strong> pour la première carte d\'Aura Palpitante.';
 
+// Le formulaire des visuels sert trois cibles ; le choix survit à son
+// redessin, sans quoi il reviendrait sur « carte » à chaque changement.
+let quoiVisuelActif = 'carte';
+const quoiVisuel = () => quoiVisuelActif;
+
 function universChoisi(){
   return document.getElementById('univers')?.value ?? 'pocket';
 }
@@ -251,14 +256,30 @@ function choixUnivers(){
 }
 
 const FORMULAIRES = {
-  visuel: () => `
-    <h2>Remplacer le visuel d'une carte</h2>
-    <p class="intro">La nouvelle image s'affiche immédiatement. La nuit suivante, elle est copiée dans le dépôt du site et n'aura plus besoin de cette page.</p>
+  visuel: () => {
+    const q = quoiVisuel();
+    const dit = {
+      carte:     { quoi: 'une carte',     etiquette: "Identifiant de la carte",
+                   aide: AIDE_CARTE },
+      extension: { quoi: 'une extension', etiquette: "Identifiant de l'extension",
+                   aide: "Il se lit dans l'adresse de la page de l'extension, après « set= » — par exemple <strong>sv01</strong>." },
+      serie:     { quoi: 'une série',     etiquette: 'Nom de la série',
+                   aide: "Le nom tel qu'il s'affiche dans « Par extension », accents compris — par exemple <strong>Écarlate et Violet</strong>. Une série n'a pas d'identifiant : c'est son nom qui la désigne." },
+    }[q];
+    return `
+    <h2>Remplacer le visuel ${dit.quoi.replace(/^une /, "d'une ")}</h2>
+    <p class="intro">La nouvelle image s'affiche immédiatement sur le site.</p>
+    <label class="champ"><span>Quoi ?</span><select id="quoi-visuel">
+      <option value="carte" ${q === 'carte' ? 'selected' : ''}>Une carte</option>
+      <option value="extension" ${q === 'extension' ? 'selected' : ''}>Le logo d'une extension</option>
+      <option value="serie" ${q === 'serie' ? 'selected' : ''}>Le logo d'une série</option>
+    </select></label>
     ${choixUnivers()}
-    ${champ('cible', 'Identifiant de la carte', { obligatoire: true, aide: AIDE_CARTE })}
+    ${champ('cible', dit.etiquette, { obligatoire: true, aide: dit.aide })}
     ${champ('fichier', 'Image', { type: 'file', obligatoire: true, aide: 'WebP, PNG ou JPEG, 5 Mo maximum.' })}
     <button class="bouton-fort" id="valider">Remplacer le visuel</button>
-    <p class="msg" id="message" hidden></p>`,
+    <p class="msg" id="message" hidden></p>`;
+  },
 
   carte: () => `
     <h2>Corriger une carte</h2>
@@ -331,7 +352,8 @@ async function enregistrer(){
       throw new Error('Le nom et la série sont obligatoires.');
     }
 
-    const genre = ongletActif === 'visuel' ? 'visuel'
+    const genre = ongletActif === 'visuel'
+        ? ({ carte: 'visuel', extension: 'logo-extension', serie: 'logo-serie' })[quoiVisuel()]
       : ongletActif === 'extension' ? 'extension' : 'carte';
 
     await enregistrerCorrection({ univers: universChoisi(), genre, cible, donnees, image_chemin: chemin });
@@ -340,7 +362,10 @@ async function enregistrer(){
     // nettoyage, on ne verrait son propre changement qu'au prochain onglet.
     try{ sessionStorage.removeItem('pokeclasseur-corrections'); }catch(err){}
 
-    message(`Enregistré. <a href="extension.html?set=${cible.replace(/-\d+$/, '')}" style="text-decoration:underline">Voir le résultat</a>`, 'ok');
+    const ou = (ongletActif === 'visuel' && quoiVisuel() === 'serie')
+      ? 'series.html'
+      : `extension.html?set=${encodeURIComponent(cible.replace(/-\d+$/, ''))}`;
+    message(`Enregistré. <a href="${ou}" style="text-decoration:underline">Voir le résultat</a>`, 'ok');
   }catch(err){
     message(`Échec : ${err.message}`, 'ko');
   }finally{
@@ -362,7 +387,9 @@ async function afficherListe(){
         ${c.image_chemin ? `<img class="apercu" src="${SUPABASE_URL}/storage/v1/object/public/corrections/${c.image_chemin}" alt="">` : ''}
         <span class="quoi">
           <span class="cible">${c.cible}</span>
-          <span class="detail"> — ${({ visuel: 'visuel', carte: 'carte', extension: 'extension' })[c.genre]}
+          <span class="detail"> — ${({ visuel: 'visuel de carte', carte: 'carte',
+              extension: 'extension', 'logo-extension': "logo d'extension",
+              'logo-serie': 'logo de série' })[c.genre] ?? c.genre}
             · ${c.univers} · ${new Date(c.cree_le).toLocaleDateString('fr-FR')}</span>
         </span>
         <span class="etiquette ${etats[i] ? 'absorbee' : 'attente'}">${etats[i] ? 'absorbée par le site' : 'en attente'}</span>
@@ -667,7 +694,11 @@ function dessiner(){
 
   if(ongletActif === 'liste') afficherListe();
   else if(ongletActif === 'comptes') afficherComptes();
-  else document.getElementById('valider').onclick = enregistrer;
+  else{
+    document.getElementById('valider').onclick = enregistrer;
+    const quoi = document.getElementById('quoi-visuel');
+    if(quoi) quoi.onchange = () => { quoiVisuelActif = quoi.value; dessiner(); };
+  }
 }
 
 (async function(){

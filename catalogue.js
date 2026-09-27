@@ -524,12 +524,26 @@ async function corrigerExtensions(extensions){
   const connues = new Set(liste.map(e => e.id));
 
   for(const c of corrections){
-    if(c.univers !== univers || c.genre !== 'extension') continue;
+    if(c.univers !== univers) continue;
+
+    // Un logo remplacé à la main : il vaut pour une extension déjà connue
+    // comme pour une extension ajoutée ici.
+    if(c.genre === 'logo-extension'){
+      if(!c.image_chemin) continue;
+      const cible = liste.find(e => e.id === c.cible);
+      if(cible) cible.logo = adresseVisuelCorrige(c.image_chemin);
+      continue;
+    }
+
+    if(c.genre !== 'extension') continue;
     const existante = liste.find(e => e.id === c.cible);
     if(existante){
       for(const champ of ['name', 'serieNom', 'dateSortie']){
         if(c.donnees?.[champ]) existante[champ] = c.donnees[champ];
       }
+      // Une image jointe à la correction d'une extension existante était
+      // jusqu'ici enregistrée sans jamais s'afficher.
+      if(c.image_chemin) existante.logo = adresseVisuelCorrige(c.image_chemin);
     }else if(c.donnees?.name && !connues.has(c.cible)){
       liste.push({
         id: c.cible,
@@ -551,6 +565,20 @@ async function corrigerExtensions(extensions){
     || (estPromo(b) - estPromo(a))
     || String(a.dateSortie ?? '').localeCompare(String(b.dateSortie ?? '')));
   return liste;
+}
+
+// Les logos de série remplacés à la main, par nom de série. Une série n'a
+// pas d'identifiant dans ce que le site sert : son nom la désigne partout,
+// c'est donc lui qui sert de cible.
+async function logosDeSeriesCorriges(){
+  const corrections = await lireCorrections();
+  const univers = universActuel().cle;
+  const par = new Map();
+  for(const c of corrections){
+    if(c.univers !== univers || c.genre !== 'logo-serie' || !c.image_chemin) continue;
+    par.set(c.cible, adresseVisuelCorrige(c.image_chemin));
+  }
+  return par;
 }
 
 // ----------------------------------------------------------------------
