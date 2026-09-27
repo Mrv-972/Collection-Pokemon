@@ -225,19 +225,19 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="sets.js?v=2026-09-27-l4uq"></script>
-<script src="univers.js?v=2026-09-27-l4uq"></script>
-<script src="catalogue.js?v=2026-09-27-l4uq"></script>
-<script src="supabase-config.js?v=2026-09-27-l4uq"></script>
-<script src="pied.js?v=2026-09-27-l4uq"></script>
-<script src="admin.js?v=2026-09-27-l4uq"></script>
-<script src="progression.js?v=2026-09-27-l4uq"></script>
-<script src="confirmation.js?v=2026-09-27-l4uq"></script>
-<script src="tags.js?v=2026-09-27-l4uq"></script>
-<script src="raretes.js?v=2026-09-27-l4uq"></script>
-<script src="cards.js?v=2026-09-27-l4uq"></script>
-<script src="prix.js?v=2026-09-27-l4uq"></script>
-<script src="compte.js?v=2026-09-27-l4uq"></script>
+<script src="sets.js?v=2026-09-27-gc2w"></script>
+<script src="univers.js?v=2026-09-27-gc2w"></script>
+<script src="catalogue.js?v=2026-09-27-gc2w"></script>
+<script src="supabase-config.js?v=2026-09-27-gc2w"></script>
+<script src="pied.js?v=2026-09-27-gc2w"></script>
+<script src="admin.js?v=2026-09-27-gc2w"></script>
+<script src="progression.js?v=2026-09-27-gc2w"></script>
+<script src="confirmation.js?v=2026-09-27-gc2w"></script>
+<script src="tags.js?v=2026-09-27-gc2w"></script>
+<script src="raretes.js?v=2026-09-27-gc2w"></script>
+<script src="cards.js?v=2026-09-27-gc2w"></script>
+<script src="prix.js?v=2026-09-27-gc2w"></script>
+<script src="compte.js?v=2026-09-27-gc2w"></script>
 <script>
 // Récupère les cartes d'une extension depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
@@ -353,8 +353,10 @@ function renderHead(set){
   if(set.visuelsAnglais) reserves.push('visuels des cartes en anglais');
   document.getElementById('page-head').innerHTML = `
     ${set.logo
-      ? `<img src="${set.logo}.png" alt="${set.name}" data-fallback="images/sets/${setId}.png" onerror="setLogoFallback(this)">`
-      : `<img src="images/sets/${setId}.png" alt="${set.name}" onerror="setLogoFallback(this)">`}
+      ? `<img class="logo-extension" src="${set.logo}" alt="Logo de ${set.name}"
+             data-fallback="images/sets/${setId}.png" onerror="setLogoFallback(this)">`
+      : `<img class="logo-extension" src="images/sets/${setId}.png" alt="Logo de ${set.name}"
+             onerror="setLogoFallback(this)">`}
     <div>
       <h1>${set.name}</h1>
       <div class="meta">${[serie, year, total + ' cartes'].filter(Boolean).join(' · ')}</div>
