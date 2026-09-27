@@ -72,6 +72,12 @@ function reglagesDuClasseur(c){
           <button data-couleur="${col.cle}" aria-pressed="${col.cle === c.couleur}"
                   style="background:${col.teinte}" title="${col.nom}"
                   aria-label="Couleur ${col.nom}"></button>`).join('')}
+        <button class="libre" data-couleur-libre aria-pressed="${estCouleurLibre(c.couleur)}"
+                style="${estCouleurLibre(c.couleur) ? `background:${c.couleur}` : ''}"
+                title="Choisir une couleur précise"
+                aria-label="Choisir une couleur précise">+</button>
+        <input type="color" id="couleur-libre" value="${estCouleurLibre(c.couleur) ? c.couleur : teinteDe(c.couleur)}"
+               aria-label="Couleur précise du classeur">
       </span>
 
       <span>Pochettes</span>
@@ -293,6 +299,18 @@ function brancherLesGestes(){
     modifier(c => ({ ...c, couleur: b.dataset.couleur }));
     dessiner();
   }));
+
+  // Le « + » n'est qu'une façade : c'est le sélecteur natif du navigateur
+  // qui s'ouvre, celui que le membre connaît déjà de son système.
+  const libre = zone.querySelector('#couleur-libre');
+  zone.querySelector('[data-couleur-libre]')?.addEventListener('click', () => libre?.click());
+  libre?.addEventListener('input', () => {
+    modifier(c => ({ ...c, couleur: libre.value }));
+    // Redessiner fermerait le sélecteur : on ne repeint que les pages tant
+    // que le membre fait glisser sa souris dedans.
+    appliquerLaCouleur(actif());
+  });
+  libre?.addEventListener('change', () => dessiner());
 
   zone.querySelectorAll('[data-transparent]').forEach(b => b.addEventListener('click', () => {
     modifier(c => ({ ...c, transparent: b.dataset.transparent === 'oui' }));
@@ -886,12 +904,18 @@ function grilleDePage(c, page, numero, { dos = false } = {}){
   // compris, est déjà calculé par versoDeLaPage. Il ne reste qu'à l'afficher.
   const cases = page.map(valeur => caseDeLecture(c, valeur)).join('');
 
+  // Un feuillet opaque n'a de pochettes que d'un côté : son dos est une
+  // feuille lisse, de la couleur du classeur. On ne dessine donc la grille
+  // que si le membre y a lui-même rangé quelque chose.
+  const feuilleLisse = dos && !estTransparent(c) && page.every(v => !v);
+
   return `
-    <div class="page-livre${dos ? ' verso' : ''}"
+    <div class="page-livre${dos ? ' verso' : ''}${feuilleLisse ? ' lisse' : ''}"
          style="--rapport:${rapport.toFixed(4)};--lignes:${f.lignes}">
+      ${feuilleLisse ? '' : `
       <div class="page-classeur" style="grid-template-columns:repeat(${f.colonnes},minmax(0,1fr))">
         ${cases}
-      </div>
+      </div>`}
       <div class="numero-page">${dos ? `dos de la page ${numero}` : numero}</div>
     </div>`;
 }

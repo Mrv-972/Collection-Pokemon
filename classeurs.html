@@ -127,6 +127,16 @@
   .couleurs button{width:24px;height:24px;border-radius:50%;cursor:pointer;
                    border:2px solid transparent;padding:0;transition:.12s}
   .couleurs button[aria-pressed="true"]{border-color:var(--text-on-ink)}
+  /* Le « + » de la couleur libre : la même pastille, mais creuse tant
+     qu'aucune couleur précise n'est choisie. */
+  .couleurs .libre{background:transparent;border-style:dashed;color:var(--text-soft);
+    border-color:var(--trait);
+    font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center}
+  .couleurs .libre:hover{border-color:var(--text-soft);color:var(--text-on-ink)}
+  .couleurs .libre[aria-pressed="true"]{border-style:solid;color:transparent}
+  /* Le sélecteur natif reste invisible : c'est le « + » qui l'ouvre. */
+  #couleur-libre{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+  .couleurs{position:relative}
   .pochettes{display:flex;gap:4px}
   .pochettes button{font-family:inherit;font-size:12.5px;padding:0 12px;height:30px;
     white-space:nowrap;border-radius:5px;cursor:pointer;color:var(--text-soft);
@@ -393,19 +403,19 @@
   <footer data-note="Tes classeurs sont enregistrés dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-eu47"></script>
-<script src="catalogue.js?v=2026-09-27-eu47"></script>
-<script src="supabase-config.js?v=2026-09-27-eu47"></script>
-<script src="pied.js?v=2026-09-27-eu47"></script>
-<script src="admin.js?v=2026-09-27-eu47"></script>
-<script src="compte.js?v=2026-09-27-eu47"></script>
-<script src="confirmation.js?v=2026-09-27-eu47"></script>
-<script src="progression.js?v=2026-09-27-eu47"></script>
-<script src="raretes.js?v=2026-09-27-eu47"></script>
-<script src="pokedex-fr.js?v=2026-09-27-eu47"></script>
-<script src="sets.js?v=2026-09-27-eu47"></script>
-<script src="classeurs.js?v=2026-09-27-eu47"></script>
-<script src="classeurs-page.js?v=2026-09-27-eu47"></script>
+<script src="univers.js?v=2026-09-27-snbq"></script>
+<script src="catalogue.js?v=2026-09-27-snbq"></script>
+<script src="supabase-config.js?v=2026-09-27-snbq"></script>
+<script src="pied.js?v=2026-09-27-snbq"></script>
+<script src="admin.js?v=2026-09-27-snbq"></script>
+<script src="compte.js?v=2026-09-27-snbq"></script>
+<script src="confirmation.js?v=2026-09-27-snbq"></script>
+<script src="progression.js?v=2026-09-27-snbq"></script>
+<script src="raretes.js?v=2026-09-27-snbq"></script>
+<script src="pokedex-fr.js?v=2026-09-27-snbq"></script>
+<script src="sets.js?v=2026-09-27-snbq"></script>
+<script src="classeurs.js?v=2026-09-27-snbq"></script>
+<script src="classeurs-page.js?v=2026-09-27-snbq"></script>
 
 </body>
 </html>

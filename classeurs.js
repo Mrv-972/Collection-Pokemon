@@ -38,7 +38,29 @@ const COULEURS = [
   { cle: 'noir',   nom: 'Noir',   teinte: '#3A3D42', page: '#DCDDE0', pliure: '#C0C2C6' },
 ];
 
-const couleurDe = cle => COULEURS.find(c => c.cle === cle) ?? COULEURS[0];
+// Une couleur libre est enregistrée telle quelle, sous la forme « #a1b2c3 ».
+const estCouleurLibre = cle => /^#[0-9a-f]{6}$/i.test(String(cle ?? ''));
+
+const versRVB = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+const versHex = rvb =>
+  '#' + rvb.map(n => Math.max(0, Math.min(255, Math.round(n))).toString(16).padStart(2, '0')).join('');
+
+// Mélanger une couleur à du blanc en garde la teinte et lui ôte sa force :
+// c'est ce qui donne un papier coloré plutôt qu'un aplat criard.
+const eclaircir = (hex, part) =>
+  versHex(versRVB(hex).map(n => n * (1 - part) + 255 * part));
+const assombrir = (hex, part) => versHex(versRVB(hex).map(n => n * (1 - part)));
+
+// Les trois tons d'une couleur libre se déduisent de la couleur choisie,
+// avec les mêmes écarts que pour les sept teintes prêtes à l'emploi.
+function couleurLibre(hex){
+  const page = eclaircir(hex, 0.82);
+  return { cle: hex, nom: 'Couleur choisie', teinte: hex, page, pliure: assombrir(page, 0.11) };
+}
+
+const couleurDe = cle => estCouleurLibre(cle)
+  ? couleurLibre(cle)
+  : (COULEURS.find(c => c.cle === cle) ?? COULEURS[0]);
 
 const teinteDe = cle => couleurDe(cle).teinte;
 
