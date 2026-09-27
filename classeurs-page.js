@@ -55,27 +55,43 @@ function couvertureDuClasseur(c, { titre = true } = {}){
     </span>`;
 }
 
-function etagere(){
-  const tuiles = classeurs.map(c => {
-    const cartes = compterLesCartes(c);
-    return `
-      <button class="tuile-classeur" data-ouvrir="${c.id}">
-        ${couvertureDuClasseur(c)}
-        <span class="nom-tuile">${echapper(c.nom)}</span>
-        <span class="detail-tuile">${cartes} carte${cartes > 1 ? 's' : ''}
-          · ${c.pages.length} page${c.pages.length > 1 ? 's' : ''}</span>
-      </button>`;
-  }).join('');
-
+function tuileDuClasseur(c){
+  const cartes = compterLesCartes(c);
   return `
-    <div class="etagere">
-      ${tuiles}
-      <button class="tuile-classeur neuve" id="nouveau-classeur">
-        <span class="couverture vide"><span class="tranche"></span><span class="plus">+</span></span>
-        <span class="nom-tuile">Nouveau classeur</span>
-        <span class="detail-tuile">Partir d'une page vide</span>
-      </button>
-    </div>`;
+    <button class="tuile-classeur" data-ouvrir="${c.id}">
+      ${couvertureDuClasseur(c)}
+      <span class="nom-tuile">${echapper(c.nom)}</span>
+      <span class="detail-tuile">${cartes} carte${cartes > 1 ? 's' : ''}
+        · ${c.pages.length} page${c.pages.length > 1 ? 's' : ''}</span>
+    </button>`;
+}
+
+const tuileNeuve = () => `
+  <button class="tuile-classeur neuve" id="nouveau-classeur">
+    <span class="couverture vide"><span class="tranche"></span><span class="plus">+</span></span>
+    <span class="nom-tuile">Nouveau classeur</span>
+    <span class="detail-tuile">Partir d'une page vide</span>
+  </button>`;
+
+function etagere(){
+  const groupes = classeursParRubrique(classeurs);
+
+  // Tant que personne n'a nommé de rubrique, une seule grille suffit : un
+  // titre « Sans rubrique » tout seul ne dirait rien à personne.
+  if(groupes.every(g => g.sansRubrique)){
+    return `<div class="etagere">${
+      (groupes[0]?.classeurs ?? []).map(tuileDuClasseur).join('')}${tuileNeuve()}</div>`;
+  }
+
+  return groupes.map((g, i) => `
+    <div class="rubrique-bloc">
+      <div class="rubrique-titre">
+        <h2>${echapper(g.nom)}</h2>
+        <span class="compte">${g.classeurs.length} classeur${g.classeurs.length > 1 ? 's' : ''}</span>
+      </div>
+      <div class="etagere">${g.classeurs.map(tuileDuClasseur).join('')}${
+        i === groupes.length - 1 ? tuileNeuve() : ''}</div>
+    </div>`).join('');
 }
 
 // Le bandeau du classeur ouvert : de quoi revenir à l'étagère.
@@ -96,27 +112,20 @@ function reglagesDuClasseur(c){
 
     <div class="reglages">
       <div class="reglage">
+      <label for="rubrique-classeur">Rubrique</label>
+      <input type="text" id="rubrique-classeur" list="rubriques-connues" maxlength="40"
+             placeholder="Sans rubrique" value="${echapper(c.rubrique ?? '')}">
+      <datalist id="rubriques-connues">
+        ${rubriquesDesClasseurs(classeurs).map(n => `<option value="${echapper(n)}">`).join('')}
+      </datalist>
+      </div>
+
+      <div class="reglage">
       <label for="format-classeur">Format des pages</label>
       <select id="format-classeur">
         ${Object.entries(FORMATS).map(([cle, f]) =>
           `<option value="${cle}" ${cle === c.format ? 'selected' : ''}>${f.nom}</option>`).join('')}
       </select>
-      </div>
-
-      <div class="reglage">
-      <span>Couleur des pages</span>
-      <span class="couleurs">
-        ${COULEURS.map(col => `
-          <button data-couleur="${col.cle}" aria-pressed="${col.cle === c.couleur}"
-                  style="background:${col.teinte}" title="${col.nom}"
-                  aria-label="Couleur ${col.nom}"></button>`).join('')}
-        <button class="libre" data-couleur-libre aria-pressed="${estCouleurLibre(c.couleur)}"
-                style="${estCouleurLibre(c.couleur) ? `background:${c.couleur}` : ''}"
-                title="Choisir une couleur précise"
-                aria-label="Choisir une couleur précise">+</button>
-        <input type="color" id="couleur-libre" value="${estCouleurLibre(c.couleur) ? c.couleur : teinteDe(c.couleur)}"
-               aria-label="Couleur précise du classeur">
-      </span>
       </div>
 
       <div class="reglage">
@@ -150,6 +159,22 @@ function reglagesDuClasseur(c){
                 title="On voit le dos des cartes rangées de l'autre côté">Transparentes</button>
         <button data-transparent="non" aria-pressed="${!estTransparent(c)}"
                 title="Le dos d'une page ne montre que la feuille">Opaques</button>
+      </span>
+      </div>
+
+      <div class="reglage">
+      <span>Couleur des pages</span>
+      <span class="couleurs">
+        ${COULEURS.map(col => `
+          <button data-couleur="${col.cle}" aria-pressed="${col.cle === c.couleur}"
+                  style="background:${col.teinte}" title="${col.nom}"
+                  aria-label="Couleur ${col.nom}"></button>`).join('')}
+        <button class="libre" data-couleur-libre aria-pressed="${estCouleurLibre(c.couleur)}"
+                style="${estCouleurLibre(c.couleur) ? `background:${c.couleur}` : ''}"
+                title="Choisir une couleur précise"
+                aria-label="Choisir une couleur précise">+</button>
+        <input type="color" id="couleur-libre" value="${estCouleurLibre(c.couleur) ? c.couleur : teinteDe(c.couleur)}"
+               aria-label="Couleur précise du classeur">
       </span>
       </div>
     </div>`;
@@ -376,6 +401,13 @@ function brancherLesGestes(){
     c.nom = e.target.value;
     enregistrerLesClasseurs(classeurs);
 
+  });
+
+  zone.querySelector('#rubrique-classeur')?.addEventListener('input', e => {
+    const c = actif();
+    if(!c) return;
+    c.rubrique = e.target.value.trim() || null;
+    enregistrerLesClasseurs(classeurs);
   });
 
   zone.querySelector('#format-classeur')?.addEventListener('change', e => {
