@@ -49,12 +49,9 @@
   /* Le logo de la série, à la place du titre quand il existe. Une hauteur
      fixe : les logos vont du carré au bandeau très large, et sans elle la
      rangée des titres sautait d'une série à l'autre. */
-  .logo-serie{height:38px;max-width:230px;object-fit:contain;object-position:left center;
-              flex-shrink:0;}
-  /* Le titre reste dans le document — pour les lecteurs d'écran et pour
-     Ctrl+F — mais s'efface à l'œil dès que le logo est là. */
-  .series-title.illustree h2{position:absolute;width:1px;height:1px;overflow:hidden;
-                             clip-path:inset(50%);white-space:nowrap;}
+  .logo-serie{height:30px;max-width:170px;object-fit:contain;object-position:left center;
+              flex-shrink:0;opacity:.92;}
+
   .series-title .count{font-size:13px;color:var(--text-on-ink-dim);}
   /* Le chevron dit dans quel sens ça va s'ouvrir, sans texte à traduire. */
   .series-title .chevron{flex-shrink:0;width:10px;height:10px;margin-left:2px;
@@ -151,14 +148,14 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-yvns"></script>
-<script src="catalogue.js?v=2026-09-27-yvns"></script>
-<script src="supabase-config.js?v=2026-09-27-yvns"></script>
-<script src="pied.js?v=2026-09-27-yvns"></script>
-<script src="admin.js?v=2026-09-27-yvns"></script>
-<script src="compte.js?v=2026-09-27-yvns"></script>
-<script src="progression.js?v=2026-09-27-yvns"></script>
-<script src="sets.js?v=2026-09-27-yvns"></script>
+<script src="univers.js?v=2026-09-27-l4uq"></script>
+<script src="catalogue.js?v=2026-09-27-l4uq"></script>
+<script src="supabase-config.js?v=2026-09-27-l4uq"></script>
+<script src="pied.js?v=2026-09-27-l4uq"></script>
+<script src="admin.js?v=2026-09-27-l4uq"></script>
+<script src="compte.js?v=2026-09-27-l4uq"></script>
+<script src="progression.js?v=2026-09-27-l4uq"></script>
+<script src="sets.js?v=2026-09-27-l4uq"></script>
 <script>
 // Récupère la liste complète des extensions depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), puis les regroupe par série (Écarlate et
@@ -286,7 +283,12 @@ function extensionFondatrice(setsDeLaSerie){
 // fondatrice, qui porte le nom de l'ère — « Écarlate et Violet », « Épée et
 // Bouclier », « Soleil et Lune ». Là où il manque, le titre reste seul,
 // sans image cassée : c'est le rôle de « onerror ».
+const cotePocket = () =>
+  (typeof estPocket === 'function' && estPocket())
+  || document.documentElement.dataset.univers === 'pocket';
+
 function logoDeSerie(setsDeLaSerie){
+  if(cotePocket()) return '';
   const fondatrice = extensionFondatrice(setsDeLaSerie);
   if(!fondatrice) return '';
   return `<img class="logo-serie" src="${fondatrice.logo}" alt="" loading="lazy"
@@ -303,19 +305,7 @@ function logoDeSerieAbsent(img){
     img.src = secours;
     return;
   }
-  img.closest('.series-title')?.classList.remove('illustree');
   img.remove();
-}
-
-// Le logo dit déjà le nom de la série ; l'écrire à côté ferait doublon pour
-// qui voit, et l'alt vide le tait pour qui écoute. On garde donc le titre,
-// mais on l'efface visuellement quand le logo est arrivé.
-function marquerLesSeriesIllustrees(){
-  document.querySelectorAll('.logo-serie').forEach(img => {
-    const poser = () => img.closest('.series-title')?.classList.add('illustree');
-    if(img.complete && img.naturalWidth) poser();
-    else img.addEventListener('load', poser, { once: true });
-  });
 }
 
 // Une recherche est-elle en cours ? Le rendu s'en sert pour tout ouvrir.
@@ -363,7 +353,7 @@ function renderSets(sets){
     const ouverte = filtreEnCours || !repliees.has(seriesName);
     return `
       <details class="series-block" data-serie="${seriesName.replace(/"/g, '&quot;')}"
-               data-fondatrice="${extensionFondatrice(setsInSeries)?.id ?? ''}"
+               data-fondatrice="${cotePocket() ? '' : (extensionFondatrice(setsInSeries)?.id ?? '')}"
                ${ouverte ? 'open' : ''}>
         <summary class="series-title">
           <span class="chevron" aria-hidden="true"></span>
@@ -375,7 +365,6 @@ function renderSets(sets){
       </details>
     `;
   }).join('');
-  marquerLesSeriesIllustrees();
 }
 
 // Ce qu'on avait replié le reste au retour. On garde les séries FERMÉES, pas
