@@ -91,8 +91,14 @@ function ecrireLeRangement(rangement){
 
 function lireLesClasseurs(){
   // Les classeurs d'avant les dossiers portaient le champ « rubrique ».
-  return lireLeRangement().classeurs.map(c =>
-    ('rubrique' in c) ? { ...c, dossier: c.dossier ?? c.rubrique, rubrique: undefined } : c);
+  return lireLeRangement().classeurs.map(c => {
+    const repris = ('rubrique' in c)
+      ? { ...c, dossier: c.dossier ?? c.rubrique, rubrique: undefined } : { ...c };
+    // Avant, une couverture sans choix reprenait la couleur des pages ; c'est
+    // l'inverse aujourd'hui. On fige la couleur qu'elle montrait alors.
+    if(!repris.couverture) repris.couverture = repris.couleur || COULEURS[0].cle;
+    return repris;
+  });
 }
 
 // Les deux listes vivent dans le même enregistrement : on relit l'autre pour
@@ -120,7 +126,8 @@ function classeurNeuf(nom){
     id: nouvelIdentifiant(),
     nom: nom || 'Nouveau classeur',
     format: FORMAT_PAR_DEFAUT,
-    couleur: 'creme',
+    // Rien : les pages suivent la couverture.
+    couleur: null,
     // Les pochettes des vrais classeurs sont le plus souvent transparentes :
     // on voit alors le dos de la carte rangée de l'autre côté de la feuille.
     // Certains classeurs ont au contraire des feuilles opaques, et le dos
@@ -128,7 +135,7 @@ function classeurNeuf(nom){
     transparent: true,
     // La couverture : rien, et elle suit alors la couleur du classeur. Sinon
     // une couleur à elle, ou la clé d'une image importée.
-    couverture: null,
+    couverture: COULEURS[0].cle,
     // Le dossier où le classeur est rangé sur l'étagère. Rien : il va dans
     // la section « Sans dossier », en dernier.
     dossier: null,
@@ -248,7 +255,18 @@ function couvertureDe(classeur){
     const donnees = imageDuClasseur(classeur, choix);
     if(donnees) return { genre: 'image', valeur: donnees };
   }
-  return { genre: 'couleur', valeur: teinteDe(choix || classeur?.couleur) };
+  return { genre: 'couleur', valeur: teinteDe(choix) };
+}
+
+// La couleur des pages. Sans choix, elles suivent la couverture : c'est le
+// cas le plus courant, un classeur d'une seule couleur. Une couverture en
+// photo n'a pas de couleur à suivre — les pages restent alors crème.
+const pagesSuiventLaCouverture = classeur => !classeur?.couleur;
+
+function couleurDesPages(classeur){
+  if(classeur?.couleur) return couleurDe(classeur.couleur);
+  const couv = classeur?.couverture;
+  return (couv && !estImage(couv)) ? couleurDe(couv) : COULEURS[0];
 }
 
 // Une image dont plus aucune case ne se sert n'a pas à rester : la mémoire

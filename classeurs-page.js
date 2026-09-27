@@ -152,8 +152,6 @@ function reglagesDuClasseur(c){
       <div class="reglage">
       <span>Couverture</span>
       <span class="couleurs couv">
-        <button class="photo-couv comme-pages" data-couv="" aria-pressed="${!c.couverture}"
-                title="La couverture suit la couleur des pages">Comme les pages</button>
         ${COULEURS.map(col => `
           <button data-couv="${col.cle}" aria-pressed="${c.couverture === col.cle}"
                   style="background:${col.teinte}" title="${col.nom}"
@@ -164,7 +162,7 @@ function reglagesDuClasseur(c){
                 title="Choisir une couleur précise"
                 aria-label="Couverture : choisir une couleur précise">+</button>
         <input type="color" id="couleur-couverture"
-               value="${estCouleurLibre(c.couverture) ? c.couverture : teinteDe(c.couleur)}"
+               value="${estCouleurLibre(c.couverture) ? c.couverture : teinteDe(c.couverture)}"
                aria-label="Couleur précise de la couverture">
         <label class="photo-couv" for="fichier-couverture"
                aria-pressed="${Boolean(c.couverture && estImage(c.couverture))}">Une photo…</label>
@@ -186,6 +184,12 @@ function reglagesDuClasseur(c){
       <div class="reglage">
       <span>Couleur des pages</span>
       <span class="couleurs">
+        <button class="photo-couv suit-la-couverture" data-couleur=""
+                aria-pressed="${pagesSuiventLaCouverture(c)}"
+                title="${estImage(c.couverture ?? '')
+                  ? 'Une couverture en photo n’a pas de couleur à suivre : les pages restent crème'
+                  : 'Les pages suivent la couleur de la couverture'}"
+                >Comme la couverture</button>
         ${COULEURS.map(col => `
           <button data-couleur="${col.cle}" aria-pressed="${col.cle === c.couleur}"
                   style="background:${col.teinte}" title="${col.nom}"
@@ -194,7 +198,8 @@ function reglagesDuClasseur(c){
                 style="${estCouleurLibre(c.couleur) ? `background:${c.couleur}` : ''}"
                 title="Choisir une couleur précise"
                 aria-label="Choisir une couleur précise">+</button>
-        <input type="color" id="couleur-libre" value="${estCouleurLibre(c.couleur) ? c.couleur : teinteDe(c.couleur)}"
+        <input type="color" id="couleur-libre"
+               value="${estCouleurLibre(c.couleur) ? c.couleur : couleurDesPages(c).teinte}"
                aria-label="Couleur précise du classeur">
       </span>
       </div>
@@ -337,17 +342,54 @@ function classeurOuvertRetenu(){
   try{ return localStorage.getItem(CLE_OUVERT); }catch{ return null; }
 }
 
-function ouvrirLeClasseur(id){
+// Ouvrir un classeur est une étape dans l'historique du navigateur : le
+// bouton « page précédente » ramène alors à l'étagère, comme partout
+// ailleurs sur le site. On compte ce qu'on a empilé pour savoir, au retour,
+// s'il y a une étape à défaire ou s'il faut simplement changer d'écran.
+let etapesEmpilees = 0;
+
+function ouvrirLeClasseur(id, { empiler = true } = {}){
   idActif = id;
   pageActive = 0;
   faceActive = 'recto';
   vue = 'classeur';
   retenirLeClasseurOuvert(id);
+  if(empiler){
+    history.pushState({ vue: 'classeur', id }, '', '#classeur=' + encodeURIComponent(id));
+    etapesEmpilees++;
+  }
   dessiner();
 }
 
+function revenirALEtagere(){
+  // Une étape empilée ici : on la défait, pour que l'historique reste juste.
+  if(etapesEmpilees > 0){ history.back(); return; }
+  vue = 'etagere';
+  retenirLeClasseurOuvert(null);
+  history.replaceState({ vue: 'etagere' }, '', location.pathname + location.search);
+  dessiner();
+}
+
+const classeurDeLAdresse = () =>
+  decodeURIComponent((location.hash.match(/^#classeur=(.+)$/) ?? [])[1] ?? '');
+
+// Le bouton « page précédente » du navigateur, et « page suivante » aussi.
+// L'état empilé dit d'ordinaire où aller ; à défaut — une adresse saisie à
+// la main, un saut d'ancre — c'est l'adresse qui tranche.
+window.addEventListener('popstate', e => {
+  etapesEmpilees = Math.max(0, etapesEmpilees - 1);
+  const id = e.state?.vue === 'classeur' ? e.state.id : classeurDeLAdresse();
+  if(id && classeurs.some(c => c.id === id)){
+    ouvrirLeClasseur(id, { empiler: false });
+    return;
+  }
+  vue = 'etagere';
+  retenirLeClasseurOuvert(null);
+  dessiner();
+});
+
 function appliquerLaCouleur(classeur){
-  const col = couleurDe(classeur?.couleur);
+  const col = couleurDesPages(classeur);
   document.body.style.setProperty('--page-classeur', col.page);
 }
 
@@ -452,11 +494,7 @@ function brancherLesGestes(){
       dessiner();
     }));
 
-  zone.querySelector('#retour-etagere')?.addEventListener('click', () => {
-    vue = 'etagere';
-    retenirLeClasseurOuvert(null);
-    dessiner();
-  });
+  zone.querySelector('#retour-etagere')?.addEventListener('click', revenirALEtagere);
 
   // Le nom se retient à chaque frappe, sans bouton « Enregistrer » : c'est un
   // champ de texte, pas un formulaire. Redessiner à chaque lettre ferait
@@ -480,7 +518,7 @@ function brancherLesGestes(){
   });
 
   zone.querySelectorAll('[data-couleur]').forEach(b => b.addEventListener('click', () => {
-    modifier(c => ({ ...c, couleur: b.dataset.couleur }));
+    modifier(c => ({ ...c, couleur: b.dataset.couleur || null }));
     dessiner();
   }));
 
@@ -498,7 +536,7 @@ function brancherLesGestes(){
 
   // La couverture : une des teintes, une couleur précise, ou une photo.
   zone.querySelectorAll('[data-couv]').forEach(b => b.addEventListener('click', () => {
-    modifier(c => oublierLesImagesInutiles({ ...c, couverture: b.dataset.couv || null }));
+    modifier(c => oublierLesImagesInutiles({ ...c, couverture: b.dataset.couv }));
     dessiner();
   }));
 
@@ -671,6 +709,8 @@ async function supprimerLeClasseur(){
   pageActive = 0;
   vue = 'etagere';
   retenirLeClasseurOuvert(null);
+  // Le classeur n'existe plus : son étape d'historique ne doit plus y mener.
+  history.replaceState({ vue: 'etagere' }, '', location.pathname + location.search);
   dessiner();
 }
 
@@ -1030,11 +1070,17 @@ async function demarrer(){
 
   classeurs = lireLesClasseurs();
   dossiers = lireLesDossiers();
-  // On revient là où on s'était arrêté, si ce classeur existe toujours.
-  const retenu = classeurOuvertRetenu();
+  // L'adresse fait foi — un lien partagé ou une page rouverte —, à défaut le
+  // classeur qu'on avait sous les yeux la dernière fois.
+  const retenu = classeurDeLAdresse() || classeurOuvertRetenu();
   if(retenu && classeurs.some(c => c.id === retenu)){
     idActif = retenu;
     vue = 'classeur';
+    retenirLeClasseurOuvert(retenu);
+    history.replaceState({ vue: 'classeur', id: retenu }, '',
+      '#classeur=' + encodeURIComponent(retenu));
+  }else{
+    history.replaceState({ vue: 'etagere' }, '', location.pathname + location.search);
   }
 
   try{
