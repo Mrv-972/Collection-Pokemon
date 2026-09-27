@@ -26,16 +26,16 @@ const casesParPage = format => FORMATS[format].colonnes * FORMATS[format].lignes
 
 // La couleur du classeur. « teinte » est la couleur franche, celle de la
 // pastille et de la puce ; « page » est la teinte des feuillets, beaucoup
-// plus claire pour qu'une carte posée dessus reste lisible ; « pliure » est
-// la même en un ton plus sombre, pour l'intérieur de la couverture.
+// plus claire pour qu'une carte posée dessus reste lisible. L'intérieur de
+// la couverture prend la même teinte que les feuillets.
 const COULEURS = [
-  { cle: 'creme',  nom: 'Crème',  teinte: '#C6B894', page: '#E9E2D2', pliure: '#CFC7B5' },
-  { cle: 'rouge',  nom: 'Rouge',  teinte: '#A8431C', page: '#EEDBD0', pliure: '#D8BFB1' },
-  { cle: 'bleu',   nom: 'Bleu',   teinte: '#2D5F8A', page: '#D8E3EE', pliure: '#BCCBDB' },
-  { cle: 'vert',   nom: 'Vert',   teinte: '#1F6F63', page: '#D5E6E1', pliure: '#B7CFC9' },
-  { cle: 'or',     nom: 'Or',     teinte: '#C9A227', page: '#EFE5C6', pliure: '#D7CAA5' },
-  { cle: 'violet', nom: 'Violet', teinte: '#6B4A8A', page: '#E2D9ED', pliure: '#C7BBD7' },
-  { cle: 'noir',   nom: 'Noir',   teinte: '#3A3D42', page: '#DCDDE0', pliure: '#C0C2C6' },
+  { cle: 'creme',  nom: 'Crème',  teinte: '#C6B894', page: '#E9E2D2' },
+  { cle: 'rouge',  nom: 'Rouge',  teinte: '#A8431C', page: '#EEDBD0' },
+  { cle: 'bleu',   nom: 'Bleu',   teinte: '#2D5F8A', page: '#D8E3EE' },
+  { cle: 'vert',   nom: 'Vert',   teinte: '#1F6F63', page: '#D5E6E1' },
+  { cle: 'or',     nom: 'Or',     teinte: '#C9A227', page: '#EFE5C6' },
+  { cle: 'violet', nom: 'Violet', teinte: '#6B4A8A', page: '#E2D9ED' },
+  { cle: 'noir',   nom: 'Noir',   teinte: '#3A3D42', page: '#DCDDE0' },
 ];
 
 // Une couleur libre est enregistrée telle quelle, sous la forme « #a1b2c3 ».
@@ -49,13 +49,10 @@ const versHex = rvb =>
 // c'est ce qui donne un papier coloré plutôt qu'un aplat criard.
 const eclaircir = (hex, part) =>
   versHex(versRVB(hex).map(n => n * (1 - part) + 255 * part));
-const assombrir = (hex, part) => versHex(versRVB(hex).map(n => n * (1 - part)));
-
 // Les trois tons d'une couleur libre se déduisent de la couleur choisie,
 // avec les mêmes écarts que pour les sept teintes prêtes à l'emploi.
 function couleurLibre(hex){
-  const page = eclaircir(hex, 0.82);
-  return { cle: hex, nom: 'Couleur choisie', teinte: hex, page, pliure: assombrir(page, 0.11) };
+  return { cle: hex, nom: 'Couleur choisie', teinte: hex, page: eclaircir(hex, 0.82) };
 }
 
 const couleurDe = cle => estCouleurLibre(cle)

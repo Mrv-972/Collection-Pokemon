@@ -214,7 +214,6 @@ function tiroirDesCartes(){
 function appliquerLaCouleur(classeur){
   const col = couleurDe(classeur?.couleur);
   document.body.style.setProperty('--page-classeur', col.page);
-  document.body.style.setProperty('--page-pliure', col.pliure);
 }
 
 function dessiner(){
