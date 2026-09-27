@@ -151,14 +151,14 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-4gzs"></script>
-<script src="catalogue.js?v=2026-09-27-4gzs"></script>
-<script src="supabase-config.js?v=2026-09-27-4gzs"></script>
-<script src="pied.js?v=2026-09-27-4gzs"></script>
-<script src="admin.js?v=2026-09-27-4gzs"></script>
-<script src="compte.js?v=2026-09-27-4gzs"></script>
-<script src="progression.js?v=2026-09-27-4gzs"></script>
-<script src="sets.js?v=2026-09-27-4gzs"></script>
+<script src="univers.js?v=2026-09-27-yvns"></script>
+<script src="catalogue.js?v=2026-09-27-yvns"></script>
+<script src="supabase-config.js?v=2026-09-27-yvns"></script>
+<script src="pied.js?v=2026-09-27-yvns"></script>
+<script src="admin.js?v=2026-09-27-yvns"></script>
+<script src="compte.js?v=2026-09-27-yvns"></script>
+<script src="progression.js?v=2026-09-27-yvns"></script>
+<script src="sets.js?v=2026-09-27-yvns"></script>
 <script>
 // Récupère la liste complète des extensions depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), puis les regroupe par série (Écarlate et
@@ -252,26 +252,59 @@ function setLogoFallback(img){
 function groupBySeries(sets){
   const groups = {};
   const order = [];
-  const ids = {};
   sets.forEach(s => {
     // Le catalogue livre déjà chaque extension avec sa série.
     const seriesName = s.serieNom;
     if(!groups[seriesName]){ groups[seriesName] = []; order.push(seriesName); }
     groups[seriesName].push(s);
-    if(s.serieId && !ids[seriesName]) ids[seriesName] = s.serieId;
   });
-  return { groups, order, ids };
+  return { groups, order };
 }
 
-// Le logo d'une série se range chez TCGdex au même endroit que celui d'une
-// extension, mais d'un cran plus haut. Toutes n'en ont pas, et les séries de
-// l'application n'en ont aucune : le titre reste alors seul, sans image
-// cassée — c'est le rôle de « onerror ».
-function logoDeSerie(serieId, nom){
-  if(!serieId) return '';
-  return `<img class="logo-serie" src="https://assets.tcgdex.net/fr/${serieId}/logo.png"
-               alt="" loading="lazy" onerror="this.remove()"
-               data-serie-logo="${serieId}">`;
+// L'extension qui ouvre la série, celle dont le logo porte le nom de l'ère.
+//
+// La plus ancienne ne convient pas : les extensions de promotion sortent
+// d'ordinaire les premières et portent un logo de promotion — on aurait eu
+// « swshp » pour Épée et Bouclier. Le jeu nomme en revanche l'extension
+// fondatrice avec une régularité dont on peut se servir : des lettres puis
+// 1, éventuellement 01 — base1, xy1, swsh1, sv01, me01. À défaut, la plus
+// ancienne qui ne soit pas une promotion ; à défaut encore, la plus
+// ancienne, une extension sans date passant en dernier.
+function extensionFondatrice(setsDeLaSerie){
+  const avecLogo = setsDeLaSerie.filter(s => s.logo);
+  if(!avecLogo.length) return null;
+  const parDate = avecLogo.slice().sort((a, b) =>
+    String(a.dateSortie ?? '9999').localeCompare(String(b.dateSortie ?? '9999')));
+  return parDate.find(s => /^[a-z]+0?1$/i.test(s.id))
+      ?? parDate.find(s => !/p$/i.test(s.id))
+      ?? parDate[0];
+}
+
+// TCGdex n'héberge aucun logo de série : ses fiches de série n'en déclarent
+// pas, et une sonde lancée depuis un exécuteur GitHub, témoins à l'appui,
+// n'en a trouvé pour aucune des vingt. On montre donc le logo de l'extension
+// fondatrice, qui porte le nom de l'ère — « Écarlate et Violet », « Épée et
+// Bouclier », « Soleil et Lune ». Là où il manque, le titre reste seul,
+// sans image cassée : c'est le rôle de « onerror ».
+function logoDeSerie(setsDeLaSerie){
+  const fondatrice = extensionFondatrice(setsDeLaSerie);
+  if(!fondatrice) return '';
+  return `<img class="logo-serie" src="${fondatrice.logo}" alt="" loading="lazy"
+               onerror="logoDeSerieAbsent(this)"
+               data-secours="images/sets/${fondatrice.id}.png">`;
+}
+
+// Un logo qui ne vient pas : on tente le miroir local, puis on renonce. Le
+// titre, resté dans le document, reprend alors sa place.
+function logoDeSerieAbsent(img){
+  const secours = img.dataset.secours;
+  if(secours){
+    img.removeAttribute('data-secours');
+    img.src = secours;
+    return;
+  }
+  img.closest('.series-title')?.classList.remove('illustree');
+  img.remove();
 }
 
 // Le logo dit déjà le nom de la série ; l'écrire à côté ferait doublon pour
@@ -294,7 +327,7 @@ function renderSets(sets){
     content.innerHTML = '<p class="status-msg">Aucune extension ne correspond à ta recherche.</p>';
     return;
   }
-  const { groups, order, ids } = groupBySeries(sets);
+  const { groups, order } = groupBySeries(sets);
   // Une seule lecture des marquages pour toute la page : les recompter à
   // chaque vignette relirait le stockage cent fois pour le même résultat.
   const obtenues = compterObtenuesParExtension(sets.map(s => s.id));
@@ -330,10 +363,11 @@ function renderSets(sets){
     const ouverte = filtreEnCours || !repliees.has(seriesName);
     return `
       <details class="series-block" data-serie="${seriesName.replace(/"/g, '&quot;')}"
+               data-fondatrice="${extensionFondatrice(setsInSeries)?.id ?? ''}"
                ${ouverte ? 'open' : ''}>
         <summary class="series-title">
           <span class="chevron" aria-hidden="true"></span>
-          ${logoDeSerie(ids[seriesName], seriesName)}
+          ${logoDeSerie(setsInSeries)}
           <h2>${seriesName}</h2>
           <span class="count">${setsInSeries.length} extension${setsInSeries.length > 1 ? 's' : ''}</span>
         </summary>
