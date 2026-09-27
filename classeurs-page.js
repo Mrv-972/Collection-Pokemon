@@ -43,11 +43,15 @@ function modifier(transformation){
 
 // La couverture telle qu'on la voit sur l'étagère : la tranche à gauche,
 // comme un classeur posé de face sur une étagère.
-function couvertureDuClasseur(c){
+function couvertureDuClasseur(c, { titre = true } = {}){
+  const couv = couvertureDe(c);
+  const fond = couv.genre === 'image'
+    ? `background-image:url(${couv.valeur})`
+    : `--couv:${couv.valeur}`;
   return `
-    <span class="couverture" style="--couv:${teinteDe(c.couleur)}">
+    <span class="couverture ${couv.genre === 'image' ? 'photo' : ''}" style="${fond}">
       <span class="tranche"></span>
-      <span class="titre-couverture">${echapper(c.nom)}</span>
+      ${titre ? `<span class="titre-couverture">${echapper(c.nom)}</span>` : ''}
     </span>`;
 }
 
@@ -91,13 +95,16 @@ function reglagesDuClasseur(c){
     </div>
 
     <div class="reglages">
+      <div class="reglage">
       <label for="format-classeur">Format des pages</label>
       <select id="format-classeur">
         ${Object.entries(FORMATS).map(([cle, f]) =>
           `<option value="${cle}" ${cle === c.format ? 'selected' : ''}>${f.nom}</option>`).join('')}
       </select>
+      </div>
 
-      <span>Couleur</span>
+      <div class="reglage">
+      <span>Couleur des pages</span>
       <span class="couleurs">
         ${COULEURS.map(col => `
           <button data-couleur="${col.cle}" aria-pressed="${col.cle === c.couleur}"
@@ -110,7 +117,33 @@ function reglagesDuClasseur(c){
         <input type="color" id="couleur-libre" value="${estCouleurLibre(c.couleur) ? c.couleur : teinteDe(c.couleur)}"
                aria-label="Couleur précise du classeur">
       </span>
+      </div>
 
+      <div class="reglage">
+      <span>Couverture</span>
+      <span class="couleurs couv">
+        <button class="photo-couv comme-pages" data-couv="" aria-pressed="${!c.couverture}"
+                title="La couverture suit la couleur des pages">Comme les pages</button>
+        ${COULEURS.map(col => `
+          <button data-couv="${col.cle}" aria-pressed="${c.couverture === col.cle}"
+                  style="background:${col.teinte}" title="${col.nom}"
+                  aria-label="Couverture ${col.nom}"></button>`).join('')}
+        <button class="libre" data-couv-libre
+                aria-pressed="${estCouleurLibre(c.couverture)}"
+                style="${estCouleurLibre(c.couverture) ? `background:${c.couverture}` : ''}"
+                title="Choisir une couleur précise"
+                aria-label="Couverture : choisir une couleur précise">+</button>
+        <input type="color" id="couleur-couverture"
+               value="${estCouleurLibre(c.couverture) ? c.couverture : teinteDe(c.couleur)}"
+               aria-label="Couleur précise de la couverture">
+        <label class="photo-couv" for="fichier-couverture"
+               aria-pressed="${Boolean(c.couverture && estImage(c.couverture))}">Une photo…</label>
+        <input type="file" id="fichier-couverture" accept="image/*"
+               aria-label="Photo de couverture">
+      </span>
+      </div>
+
+      <div class="reglage">
       <span>Pochettes</span>
       <span class="pochettes">
         <button data-transparent="oui" aria-pressed="${estTransparent(c)}"
@@ -118,6 +151,7 @@ function reglagesDuClasseur(c){
         <button data-transparent="non" aria-pressed="${!estTransparent(c)}"
                 title="Le dos d'une page ne montre que la feuille">Opaques</button>
       </span>
+      </div>
     </div>`;
 }
 
@@ -367,6 +401,27 @@ function brancherLesGestes(){
   });
   libre?.addEventListener('change', () => dessiner());
 
+  // La couverture : une des teintes, une couleur précise, ou une photo.
+  zone.querySelectorAll('[data-couv]').forEach(b => b.addEventListener('click', () => {
+    modifier(c => oublierLesImagesInutiles({ ...c, couverture: b.dataset.couv || null }));
+    dessiner();
+  }));
+
+  const couvLibre = zone.querySelector('#couleur-couverture');
+  zone.querySelector('[data-couv-libre]')?.addEventListener('click', () => couvLibre?.click());
+  couvLibre?.addEventListener('input', () => {
+    modifier(c => ({ ...c, couverture: couvLibre.value }));
+  });
+  couvLibre?.addEventListener('change', () => {
+    modifier(c => oublierLesImagesInutiles(c));
+    dessiner();
+  });
+
+  zone.querySelector('#fichier-couverture')?.addEventListener('change', async e => {
+    await importerLaCouverture(e.target.files?.[0]);
+    e.target.value = '';
+  });
+
   zone.querySelectorAll('[data-transparent]').forEach(b => b.addEventListener('click', () => {
     modifier(c => ({ ...c, transparent: b.dataset.transparent === 'oui' }));
     dessiner();
@@ -593,8 +648,11 @@ function poserLaCarte(carteId){
 // avant de l'enregistrer : 500 px de large suffisent pour une case qui en
 // fait 220, et le WebP ramène le poids à quelques dizaines de kilo-octets.
 const LARGEUR_IMAGE_IMPORTEE = 500;
+// Une couverture s'affiche plus grande qu'une pochette : elle mérite un peu
+// plus de définition, sans pour autant remplir la mémoire.
+const LARGEUR_COUVERTURE = 700;
 
-function reduireLImage(fichier){
+function reduireLImage(fichier, largeurMax = LARGEUR_IMAGE_IMPORTEE){
   return new Promise((resoudre, rejeter) => {
     const lecteur = new FileReader();
     lecteur.onerror = () => rejeter(new Error('Lecture du fichier impossible.'));
@@ -602,7 +660,7 @@ function reduireLImage(fichier){
       const img = new Image();
       img.onerror = () => rejeter(new Error("Ce fichier n'est pas une image lisible."));
       img.onload = () => {
-        const largeur = Math.min(LARGEUR_IMAGE_IMPORTEE, img.width);
+        const largeur = Math.min(largeurMax, img.width);
         const hauteur = Math.round(img.height * (largeur / img.width));
         const toile = document.createElement('canvas');
         toile.width = largeur;
@@ -663,6 +721,38 @@ async function importerUneImage(fichier){
     return;
   }
   messageFugace(cible ? 'Image posée dans la case choisie.' : 'Image ajoutée au classeur.');
+}
+
+async function importerLaCouverture(fichier){
+  if(!fichier) return;
+  if(!fichier.type.startsWith('image/')){
+    messageFugace("Ce fichier n'est pas une image.");
+    return;
+  }
+  messageFugace("Lecture de l'image…");
+  let donnees;
+  try{
+    donnees = await reduireLImage(fichier, LARGEUR_COUVERTURE);
+  }catch(err){
+    messageFugace(err.message);
+    return;
+  }
+
+  const avant = actif();
+  modifier(c => {
+    const { cle, classeur } = ajouterUneImage(c, donnees);
+    // L'ancienne photo de couverture n'a plus d'emploi : on la laisse
+    // partir au ménage plutôt que d'empiler les images dans la mémoire.
+    return oublierLesImagesInutiles({ ...classeur, couverture: cle });
+  });
+  if(!enregistrerLesClasseurs(classeurs)){
+    classeurs = classeurs.map(x => (x.id === avant.id ? avant : x));
+    enregistrerLesClasseurs(classeurs);
+    dessiner();
+    messageFugace("Mémoire du navigateur pleine : l'image n'a pas pu être gardée.");
+    return;
+  }
+  messageFugace('Couverture changée.');
 }
 
 // ------------------------------------------------------------ le tiroir ---

@@ -118,12 +118,17 @@
                                       border:0;border-bottom:1px solid rgba(237,234,224,0.14);
                                       padding:4px 0;}
   .entete-classeur input[type="text"]:focus{outline:0;border-bottom-color:var(--gold)}
-  .reglages{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 22px;
-            font-size:13px;color:var(--text-on-ink-dim)}
+  /* Un réglage par ligne : deux rangées de pastilles côte à côte ne se
+     distinguaient plus l'une de l'autre. */
+  .reglages{display:flex;flex-direction:column;gap:11px;margin:0 0 22px}
+  .reglage{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .reglage > span:first-child, .reglage > label:first-child{
+    min-width:132px;color:var(--text-soft);font-size:13px}
+  .couleurs .comme-pages{border-radius:12px}
   .reglages select{font-family:inherit;font-size:13px;padding:7px 10px;border-radius:5px;
                    background:var(--ink-soft);color:var(--text-on-ink);
                    border:1px solid rgba(237,234,224,0.14);}
-  .couleurs{display:flex;gap:6px}
+  .couleurs{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
   .couleurs button{width:24px;height:24px;border-radius:50%;cursor:pointer;
                    border:2px solid transparent;padding:0;transition:.12s}
   .couleurs button[aria-pressed="true"]{border-color:var(--text-on-ink)}
@@ -168,6 +173,22 @@
   .tuile-classeur.neuve:hover .couverture{transform:translateY(-3px);box-shadow:none}
   .nom-tuile{font-size:14px;color:var(--text-on-ink);line-height:1.3}
   .detail-tuile{font-size:12px;color:var(--text-soft)}
+
+  /* Une couverture en photo : l'image remplit le carton, quitte à être
+     rognée, comme une jaquette collée dessus. */
+  .couverture.photo{background-size:cover;background-position:center}
+  .couverture.photo .titre-couverture{background:linear-gradient(transparent,rgba(0,0,0,0.65));
+    left:13px;right:0;bottom:0;padding:18px 12px 10px}
+  /* Le bouton « Une photo… » : un libellé, pas une pastille ronde. */
+  .couleurs .photo-couv{font-family:inherit;font-size:12px;height:24px;padding:0 10px;
+    width:auto;background:transparent;
+    display:inline-flex;align-items:center;border-radius:12px;cursor:pointer;
+    color:var(--text-soft);border:1px dashed rgba(255,255,255,0.22)}
+  .couleurs .photo-couv:hover{color:var(--text-on-ink);border-color:var(--text-soft)}
+  .couleurs .photo-couv[aria-pressed="true"]{border-style:solid;color:var(--text-on-ink);
+    border-color:rgba(var(--gold-rgb),0.55);background:rgba(var(--gold-rgb),0.11)}
+  #fichier-couverture{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+  #couleur-couverture{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 
   .fil-classeurs{margin:0 0 16px}
   .retour-etagere{font-family:inherit;font-size:13px;background:none;border:0;padding:4px 0;
@@ -441,19 +462,19 @@
   <footer data-note="Tes classeurs sont enregistrés dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-10hr"></script>
-<script src="catalogue.js?v=2026-09-27-10hr"></script>
-<script src="supabase-config.js?v=2026-09-27-10hr"></script>
-<script src="pied.js?v=2026-09-27-10hr"></script>
-<script src="admin.js?v=2026-09-27-10hr"></script>
-<script src="compte.js?v=2026-09-27-10hr"></script>
-<script src="confirmation.js?v=2026-09-27-10hr"></script>
-<script src="progression.js?v=2026-09-27-10hr"></script>
-<script src="raretes.js?v=2026-09-27-10hr"></script>
-<script src="pokedex-fr.js?v=2026-09-27-10hr"></script>
-<script src="sets.js?v=2026-09-27-10hr"></script>
-<script src="classeurs.js?v=2026-09-27-10hr"></script>
-<script src="classeurs-page.js?v=2026-09-27-10hr"></script>
+<script src="univers.js?v=2026-09-27-9f8z"></script>
+<script src="catalogue.js?v=2026-09-27-9f8z"></script>
+<script src="supabase-config.js?v=2026-09-27-9f8z"></script>
+<script src="pied.js?v=2026-09-27-9f8z"></script>
+<script src="admin.js?v=2026-09-27-9f8z"></script>
+<script src="compte.js?v=2026-09-27-9f8z"></script>
+<script src="confirmation.js?v=2026-09-27-9f8z"></script>
+<script src="progression.js?v=2026-09-27-9f8z"></script>
+<script src="raretes.js?v=2026-09-27-9f8z"></script>
+<script src="pokedex-fr.js?v=2026-09-27-9f8z"></script>
+<script src="sets.js?v=2026-09-27-9f8z"></script>
+<script src="classeurs.js?v=2026-09-27-9f8z"></script>
+<script src="classeurs-page.js?v=2026-09-27-9f8z"></script>
 
 </body>
 </html>

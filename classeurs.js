@@ -103,6 +103,9 @@ function classeurNeuf(nom){
     // Certains classeurs ont au contraire des feuilles opaques, et le dos
     // d'une page n'y montre que la feuille elle-même.
     transparent: true,
+    // La couverture : rien, et elle suit alors la couleur du classeur. Sinon
+    // une couleur à elle, ou la clé d'une image importée.
+    couverture: null,
     // Une page vide pour commencer : un classeur sans page ne se regarde pas.
     pages: [pageVide(FORMAT_PAR_DEFAUT)],
     // Les images importées par le membre, rangées par clé.
@@ -185,12 +188,28 @@ function ajouterUneImage(classeur, donnees){
 
 const imageDuClasseur = (classeur, cle) => classeur?.images?.[cle] ?? null;
 
+// Ce qu'il faut afficher sur la couverture d'un classeur. Sans choix, elle
+// reprend la couleur du classeur : un classeur a toujours une couverture.
+function couvertureDe(classeur){
+  const choix = classeur?.couverture;
+  if(choix && estImage(choix)){
+    const donnees = imageDuClasseur(classeur, choix);
+    if(donnees) return { genre: 'image', valeur: donnees };
+  }
+  return { genre: 'couleur', valeur: teinteDe(choix || classeur?.couleur) };
+}
+
 // Une image dont plus aucune case ne se sert n'a pas à rester : la mémoire
 // du navigateur est petite, et un classeur qu'on remanie longtemps finirait
 // par la remplir de ce qu'on a retiré.
 function oublierLesImagesInutiles(classeur){
   const images = classeur.images ?? {};
-  const utilisees = new Set(classeur.pages.flat().filter(v => v && estImage(v)));
+  const partout = [
+    ...classeur.pages.flat(),
+    ...(classeur.versos ?? []).flatMap(v => v ?? []),
+    classeur.couverture,
+  ];
+  const utilisees = new Set(partout.filter(v => v && estImage(v)));
   const gardees = {};
   for(const [cle, donnees] of Object.entries(images)){
     if(utilisees.has(cle)) gardees[cle] = donnees;
