@@ -24,19 +24,23 @@ const FORMATS = {
 const FORMAT_PAR_DEFAUT = '3x3';
 const casesParPage = format => FORMATS[format].colonnes * FORMATS[format].lignes;
 
-// La couleur de la couverture. Elle ne sert à rien d'autre qu'à distinguer
-// ses classeurs d'un coup d'œil, ce qui est déjà quelque chose quand on en
-// a six.
+// La couleur du classeur. « teinte » est la couleur franche, celle de la
+// pastille et de la puce ; « page » est la teinte des feuillets, beaucoup
+// plus claire pour qu'une carte posée dessus reste lisible ; « pliure » est
+// la même en un ton plus sombre, pour l'intérieur de la couverture.
 const COULEURS = [
-  { cle: 'rouge',  nom: 'Rouge',   teinte: '#A8431C' },
-  { cle: 'bleu',   nom: 'Bleu',    teinte: '#2D5F8A' },
-  { cle: 'vert',   nom: 'Vert',    teinte: '#1F6F63' },
-  { cle: 'or',     nom: 'Or',      teinte: '#C9A227' },
-  { cle: 'violet', nom: 'Violet',  teinte: '#6B4A8A' },
-  { cle: 'noir',   nom: 'Noir',    teinte: '#3A3D42' },
+  { cle: 'creme',  nom: 'Crème',  teinte: '#C6B894', page: '#E9E2D2', pliure: '#CFC7B5' },
+  { cle: 'rouge',  nom: 'Rouge',  teinte: '#A8431C', page: '#EEDBD0', pliure: '#D8BFB1' },
+  { cle: 'bleu',   nom: 'Bleu',   teinte: '#2D5F8A', page: '#D8E3EE', pliure: '#BCCBDB' },
+  { cle: 'vert',   nom: 'Vert',   teinte: '#1F6F63', page: '#D5E6E1', pliure: '#B7CFC9' },
+  { cle: 'or',     nom: 'Or',     teinte: '#C9A227', page: '#EFE5C6', pliure: '#D7CAA5' },
+  { cle: 'violet', nom: 'Violet', teinte: '#6B4A8A', page: '#E2D9ED', pliure: '#C7BBD7' },
+  { cle: 'noir',   nom: 'Noir',   teinte: '#3A3D42', page: '#DCDDE0', pliure: '#C0C2C6' },
 ];
 
-const teinteDe = cle => (COULEURS.find(c => c.cle === cle) ?? COULEURS[0]).teinte;
+const couleurDe = cle => COULEURS.find(c => c.cle === cle) ?? COULEURS[0];
+
+const teinteDe = cle => couleurDe(cle).teinte;
 
 // Les classeurs enregistrés avant l'option n'ont pas le champ ; ils étaient
 // transparents, ils le restent.
@@ -74,7 +78,7 @@ function classeurNeuf(nom){
     id: nouvelIdentifiant(),
     nom: nom || 'Nouveau classeur',
     format: FORMAT_PAR_DEFAUT,
-    couleur: COULEURS[0].cle,
+    couleur: 'creme',
     // Les pochettes des vrais classeurs sont le plus souvent transparentes :
     // on voit alors le dos de la carte rangée de l'autre côté de la feuille.
     // Certains classeurs ont au contraire des feuilles opaques, et le dos

@@ -66,12 +66,12 @@ function reglagesDuClasseur(c){
           `<option value="${cle}" ${cle === c.format ? 'selected' : ''}>${f.nom}</option>`).join('')}
       </select>
 
-      <span>Couverture</span>
+      <span>Couleur</span>
       <span class="couleurs">
         ${COULEURS.map(col => `
           <button data-couleur="${col.cle}" aria-pressed="${col.cle === c.couleur}"
                   style="background:${col.teinte}" title="${col.nom}"
-                  aria-label="Couverture ${col.nom}"></button>`).join('')}
+                  aria-label="Couleur ${col.nom}"></button>`).join('')}
       </span>
 
       <span>Pochettes</span>
@@ -205,8 +205,15 @@ function tiroirDesCartes(){
     </div>`;
 }
 
+function appliquerLaCouleur(classeur){
+  const col = couleurDe(classeur?.couleur);
+  document.body.style.setProperty('--page-classeur', col.page);
+  document.body.style.setProperty('--page-pliure', col.pliure);
+}
+
 function dessiner(){
   const c = actif();
+  appliquerLaCouleur(c);
   if(!classeurs.length){
     contenu().innerHTML = barreDesClasseurs() + `
       <p class="vide">Aucun classeur pour l'instant. Crée le premier : tu pourras
@@ -284,6 +291,7 @@ function brancherLesGestes(){
 
   zone.querySelectorAll('[data-couleur]').forEach(b => b.addEventListener('click', () => {
     modifier(c => ({ ...c, couleur: b.dataset.couleur }));
+    dessiner();
   }));
 
   zone.querySelectorAll('[data-transparent]').forEach(b => b.addEventListener('click', () => {
@@ -897,6 +905,7 @@ function dessinerLeLivre(){
   const c = actif();
   const livre = document.getElementById('livre');
   if(!c || !livre) return;
+  appliquerLaCouleur(c);
 
   const double = livreEnDouble();
   const gauche = double

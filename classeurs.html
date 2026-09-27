@@ -147,7 +147,7 @@
 
   /* La page du classeur : un fond clair, comme une vraie feuille de
      pochettes, pour qu'on juge le rendu et pas l'interface. */
-  .page-classeur{background:#E9E2D2;border-radius:8px;padding:16px;display:grid;gap:12px;
+  .page-classeur{background:var(--page-classeur,#E9E2D2);border-radius:8px;padding:16px;display:grid;gap:12px;
                  box-shadow:0 10px 34px rgba(0,0,0,0.35);margin:0 0 26px;}
   /* Les feuillets d'un classeur sont en plastique transparent : une pochette
      vide laisse voir la page, elle ne fait pas un trou sombre. D'où ce fond
@@ -265,7 +265,7 @@
      n'ont pas le même rapport que quatre sur trois — et sa taille de la
      place disponible. Sans cela, chaque page prenait la largeur que son
      contenu voulait, et les deux ne se ressemblaient plus. */
-  .page-livre{position:relative;background:#E9E2D2;padding:14px 14px 20px;
+  .page-livre{position:relative;background:var(--page-classeur,#E9E2D2);padding:14px 14px 20px;
               box-shadow:0 12px 40px rgba(0,0,0,0.5);box-sizing:border-box;
               height:min(74vh,760px);aspect-ratio:var(--rapport,0.71);
               max-width:min(45vw,560px);}
@@ -280,7 +280,7 @@
                          box-shadow:inset 9px 0 13px -11px rgba(0,0,0,0.34), 0 12px 40px rgba(0,0,0,0.5);}
   /* L'intérieur de la couverture, à gauche du tout premier feuillet : il
      n'y a jamais rien de ce côté-là. */
-  .page-livre.couverture{background:#CFC7B5;aspect-ratio:var(--rapport,0.71);
+  .page-livre.couverture{background:var(--page-pliure,#CFC7B5);aspect-ratio:var(--rapport,0.71);
                          height:min(74vh,760px);max-width:min(45vw,560px);}
   /* Le verso d'une feuille : on n'y voit que le dos des cartes. */
   .page-livre.verso .case{cursor:default}
@@ -393,19 +393,19 @@
   <footer data-note="Tes classeurs sont enregistrés dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-inat"></script>
-<script src="catalogue.js?v=2026-09-27-inat"></script>
-<script src="supabase-config.js?v=2026-09-27-inat"></script>
-<script src="pied.js?v=2026-09-27-inat"></script>
-<script src="admin.js?v=2026-09-27-inat"></script>
-<script src="compte.js?v=2026-09-27-inat"></script>
-<script src="confirmation.js?v=2026-09-27-inat"></script>
-<script src="progression.js?v=2026-09-27-inat"></script>
-<script src="raretes.js?v=2026-09-27-inat"></script>
-<script src="pokedex-fr.js?v=2026-09-27-inat"></script>
-<script src="sets.js?v=2026-09-27-inat"></script>
-<script src="classeurs.js?v=2026-09-27-inat"></script>
-<script src="classeurs-page.js?v=2026-09-27-inat"></script>
+<script src="univers.js?v=2026-09-27-eu47"></script>
+<script src="catalogue.js?v=2026-09-27-eu47"></script>
+<script src="supabase-config.js?v=2026-09-27-eu47"></script>
+<script src="pied.js?v=2026-09-27-eu47"></script>
+<script src="admin.js?v=2026-09-27-eu47"></script>
+<script src="compte.js?v=2026-09-27-eu47"></script>
+<script src="confirmation.js?v=2026-09-27-eu47"></script>
+<script src="progression.js?v=2026-09-27-eu47"></script>
+<script src="raretes.js?v=2026-09-27-eu47"></script>
+<script src="pokedex-fr.js?v=2026-09-27-eu47"></script>
+<script src="sets.js?v=2026-09-27-eu47"></script>
+<script src="classeurs.js?v=2026-09-27-eu47"></script>
+<script src="classeurs-page.js?v=2026-09-27-eu47"></script>
 
 </body>
 </html>
