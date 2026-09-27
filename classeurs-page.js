@@ -45,7 +45,7 @@ function modifier(transformation){
 
 // La couverture telle qu'on la voit sur l'étagère : la tranche à gauche,
 // comme un classeur posé de face sur une étagère.
-function couvertureDuClasseur(c, { titre = true } = {}){
+function couvertureDuClasseur(c){
   const couv = couvertureDe(c);
   const fond = couv.genre === 'image'
     ? `background-image:url(${couv.valeur})`
@@ -53,7 +53,6 @@ function couvertureDuClasseur(c, { titre = true } = {}){
   return `
     <span class="couverture ${couv.genre === 'image' ? 'photo' : ''}" style="${fond}">
       <span class="tranche"></span>
-      ${titre ? `<span class="titre-couverture">${echapper(c.nom)}</span>` : ''}
     </span>`;
 }
 
@@ -75,9 +74,25 @@ const tuileNeuve = () => `
     <span class="detail-tuile">Partir d'une page vide</span>
   </button>`;
 
-function barreDesDossiers(){
+// Ce qu'on avait replié le reste au retour. On garde les dossiers FERMÉS,
+// pas les ouverts : un dossier tout neuf doit s'ouvrir, pas se cacher.
+const CLE_REPLIES = 'pokeclasseur-dossiers-replies';
+
+function dossiersReplies(){
+  try{ return new Set(JSON.parse(localStorage.getItem(CLE_REPLIES)) ?? []); }
+  catch{ return new Set(); }
+}
+
+function enregistrerLesReplies(noms){
+  try{ localStorage.setItem(CLE_REPLIES, JSON.stringify([...noms])); }
+  catch{ /* mémoire refusée : on s'en passe */ }
+}
+
+function barreDesDossiers({ avecClasseur = false } = {}){
   return `
     <div class="barre-dossiers">
+      ${avecClasseur
+        ? '<button class="bouton-dossier" id="nouveau-classeur">+ Nouveau classeur</button>' : ''}
       ${creationDeDossier ? `
         <input type="text" id="nom-dossier" maxlength="40" placeholder="Nom du dossier"
                aria-label="Nom du nouveau dossier">
@@ -92,26 +107,35 @@ function etagere(){
 
   // Tant qu'aucun dossier n'existe, une seule grille suffit : un titre
   // « Sans dossier » tout seul ne dirait rien à personne.
-  const plat = groupes.every(g => g.sansDossier);
-  const corps = plat
-    ? `<div class="etagere">${
-        (groupes[0]?.classeurs ?? []).map(tuileDuClasseur).join('')}${tuileNeuve()}</div>`
-    : groupes.map((g, i) => `
-        <div class="rubrique-bloc">
-          <div class="rubrique-titre">
-            <h2>${echapper(g.nom)}</h2>
-            <span class="compte">${g.classeurs.length} classeur${g.classeurs.length > 1 ? 's' : ''}</span>
-            ${!g.sansDossier && !g.classeurs.length
-              ? `<button class="retirer-dossier" data-retirer-dossier="${echapper(g.nom)}"
-                         title="Supprimer ce dossier vide">Supprimer</button>` : ''}
-          </div>
-          <div class="etagere">${g.classeurs.map(tuileDuClasseur).join('')}${
-            i === groupes.length - 1 ? tuileNeuve() : ''}
-            ${g.classeurs.length ? ''
-              : '<p class="vide-dossier">Ce dossier est vide. Range un classeur ici depuis ses réglages.</p>'}</div>
-        </div>`).join('');
+  if(groupes.every(g => g.sansDossier)){
+    return barreDesDossiers() + `<div class="etagere">${
+      (groupes[0]?.classeurs ?? []).map(tuileDuClasseur).join('')}${tuileNeuve()}</div>`;
+  }
 
-  return barreDesDossiers() + corps;
+  // <details> plutôt qu'un dépliage écrit à la main : le clavier l'ouvre
+  // déjà, les lecteurs d'écran l'annoncent, et Ctrl+F y trouve le texte
+  // replié. C'est aussi ce qui sert aux missions secrètes.
+  const replies = dossiersReplies();
+  const corps = groupes.map(g => `
+    <details class="dossier-bloc" data-dossier="${echapper(g.nom)}"
+             ${replies.has(g.nom) ? '' : 'open'}>
+      <summary class="dossier-tete">
+        <span class="chevron" aria-hidden="true"></span>
+        <h2>${echapper(g.nom)}</h2>
+        <span class="compte">${g.classeurs.length} classeur${g.classeurs.length > 1 ? 's' : ''}</span>
+        ${!g.sansDossier && !g.classeurs.length
+          ? `<span class="retirer-dossier" role="button" tabindex="0"
+                   data-retirer-dossier="${echapper(g.nom)}"
+                   title="Supprimer ce dossier vide">Supprimer</span>` : ''}
+      </summary>
+      <div class="dossier-corps">
+        ${g.classeurs.length
+          ? `<div class="etagere">${g.classeurs.map(tuileDuClasseur).join('')}</div>`
+          : '<p class="vide-dossier">Ce dossier est vide. Range un classeur ici depuis ses réglages.</p>'}
+      </div>
+    </details>`).join('');
+
+  return barreDesDossiers({ avecClasseur: true }) + corps;
 }
 
 // Le bandeau du classeur ouvert : de quoi revenir à l'étagère.
@@ -469,14 +493,33 @@ function brancherLesGestes(){
     if(e.key === 'Escape'){ creationDeDossier = false; dessiner(); }
   });
 
-  zone.querySelectorAll('[data-retirer-dossier]').forEach(b =>
-    b.addEventListener('click', () => {
+  zone.querySelectorAll('[data-retirer-dossier]').forEach(b => {
+    b.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); b.click(); }
+    });
+    b.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
       // Le bouton n'apparaît que sur un dossier vide : il n'y a rien à
       // perdre, donc rien à confirmer.
       dossiers = dossiers.filter(d => d !== b.dataset.retirerDossier);
       enregistrerLesDossiers(dossiers);
+      const replies = dossiersReplies();
+      replies.delete(b.dataset.retirerDossier);
+      enregistrerLesReplies(replies);
       dessiner();
-    }));
+    });
+  });
+
+  // <details> n'émet pas d'événement qui remonte : on l'attrape à la descente.
+  zone.addEventListener('toggle', e => {
+    const bloc = e.target.closest?.('.dossier-bloc');
+    if(!bloc) return;
+    const replies = dossiersReplies();
+    if(bloc.open) replies.delete(bloc.dataset.dossier);
+    else replies.add(bloc.dataset.dossier);
+    enregistrerLesReplies(replies);
+  }, true);
 
   zone.querySelector('#retour-etagere')?.addEventListener('click', revenirALEtagere);
 

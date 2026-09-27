@@ -14,8 +14,11 @@
 <style>
   :root{
     --ink:#15171B; --ink-soft:#20232A; --paper:#F1EBDC; --paper-line:#D9CFB6;
-    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair);
+    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:#E3C766;
     --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+    /* Ces trois-là manquaient : faute de valeur, « var() » retombait sur la
+       couleur héritée, et un texte voulu discret sortait en pleine clarté. */
+    --text-soft:#9B9E9C; --trait:rgba(237,234,224,0.16); --rouge-doux:#D98A7A;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
@@ -163,13 +166,22 @@
   .retirer-dossier:hover{color:var(--rouge-doux,#D98A7A)}
   .vide-dossier{grid-column:1/-1;margin:0;font-size:13px;color:var(--text-soft)}
 
-  /* Les dossiers s'enchaînent comme les séries de « Par extension » :
-     un filet, un titre, puis les classeurs de la rubrique. */
-  .rubrique-bloc{padding:26px 0;border-top:1px solid rgba(237,234,224,0.08)}
-  .rubrique-bloc:first-child{border-top:0;padding-top:4px}
-  .rubrique-titre{display:flex;align-items:baseline;gap:12px;margin-bottom:18px}
-  .rubrique-titre h2{font-size:20px}
-  .rubrique-titre .compte{font-size:13px;color:var(--text-soft)}
+  /* Un dossier se replie, comme une extension dans les missions secrètes :
+     avec dix dossiers, tout dérouler d'un coup ne se lit plus. */
+  .dossier-bloc{border-top:1px solid rgba(237,234,224,0.08)}
+  .dossier-bloc:first-of-type{border-top:0}
+  .dossier-tete{display:flex;align-items:center;gap:13px;flex-wrap:wrap;
+    padding:18px 4px;cursor:pointer;list-style:none;transition:background .12s}
+  .dossier-tete::-webkit-details-marker{display:none}
+  .dossier-tete:hover{background:rgba(237,234,224,0.03)}
+  .dossier-tete h2{font-size:20px;font-family:'Newsreader',serif;font-weight:500}
+  .dossier-tete .compte{font-size:13px;color:var(--text-soft)}
+  /* Le chevron dit dans quel sens ça va s'ouvrir, sans texte à traduire. */
+  .dossier-tete .chevron{flex-shrink:0;width:10px;height:10px;margin-left:2px;
+    border-right:2px solid var(--text-soft);border-bottom:2px solid var(--text-soft);
+    transform:rotate(45deg);transition:transform .18s}
+  .dossier-bloc[open] > .dossier-tete .chevron{transform:rotate(-135deg)}
+  .dossier-corps{padding:2px 0 8px}
   .etagere{display:grid;gap:22px;margin:0 0 30px;
     grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
   .tuile-classeur{font-family:inherit;text-align:left;background:none;border:0;padding:0;
@@ -492,19 +504,19 @@
   <footer data-note="Tes classeurs sont enregistrés dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-htqb"></script>
-<script src="catalogue.js?v=2026-09-27-htqb"></script>
-<script src="supabase-config.js?v=2026-09-27-htqb"></script>
-<script src="pied.js?v=2026-09-27-htqb"></script>
-<script src="admin.js?v=2026-09-27-htqb"></script>
-<script src="compte.js?v=2026-09-27-htqb"></script>
-<script src="confirmation.js?v=2026-09-27-htqb"></script>
-<script src="progression.js?v=2026-09-27-htqb"></script>
-<script src="raretes.js?v=2026-09-27-htqb"></script>
-<script src="pokedex-fr.js?v=2026-09-27-htqb"></script>
-<script src="sets.js?v=2026-09-27-htqb"></script>
-<script src="classeurs.js?v=2026-09-27-htqb"></script>
-<script src="classeurs-page.js?v=2026-09-27-htqb"></script>
+<script src="univers.js?v=2026-09-27-gg7o"></script>
+<script src="catalogue.js?v=2026-09-27-gg7o"></script>
+<script src="supabase-config.js?v=2026-09-27-gg7o"></script>
+<script src="pied.js?v=2026-09-27-gg7o"></script>
+<script src="admin.js?v=2026-09-27-gg7o"></script>
+<script src="compte.js?v=2026-09-27-gg7o"></script>
+<script src="confirmation.js?v=2026-09-27-gg7o"></script>
+<script src="progression.js?v=2026-09-27-gg7o"></script>
+<script src="raretes.js?v=2026-09-27-gg7o"></script>
+<script src="pokedex-fr.js?v=2026-09-27-gg7o"></script>
+<script src="sets.js?v=2026-09-27-gg7o"></script>
+<script src="classeurs.js?v=2026-09-27-gg7o"></script>
+<script src="classeurs-page.js?v=2026-09-27-gg7o"></script>
 
 </body>
 </html>

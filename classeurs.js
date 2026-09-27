@@ -242,10 +242,12 @@ function tousLesDossiers(classeurs, dossiers){
 
 // Les classeurs rangés par dossier, dans l'ordre où l'étagère les montre.
 function classeursParDossier(classeurs, dossiers){
+  const parNom = liste =>
+    liste.slice().sort((a, b) => parOrdreAlphabetique(a.nom ?? '', b.nom ?? ''));
   const groupes = tousLesDossiers(classeurs, dossiers)
-    .map(nom => ({ nom, classeurs: classeurs.filter(c => (c.dossier || '').trim() === nom) }));
+    .map(nom => ({ nom, classeurs: parNom(classeurs.filter(c => (c.dossier || '').trim() === nom)) }));
   const sans = classeurs.filter(c => !(c.dossier || '').trim());
-  if(sans.length) groupes.push({ nom: SANS_DOSSIER, classeurs: sans, sansDossier: true });
+  if(sans.length) groupes.push({ nom: SANS_DOSSIER, classeurs: parNom(sans), sansDossier: true });
   return groupes;
 }
 
