@@ -118,7 +118,9 @@ function etagere(){
 function retourEtagere(){
   return `
     <div class="fil-classeurs">
-      <button class="retour-etagere" id="retour-etagere">‹ Mes classeurs</button>
+      <button class="retour-etagere" id="retour-etagere">
+        <span aria-hidden="true">←</span> Tous mes classeurs
+      </button>
     </div>`;
 }
 
@@ -327,21 +329,6 @@ function tiroirDesCartes(){
     </div>`;
 }
 
-const CLE_OUVERT = 'pokeclasseur-classeur-ouvert';
-
-// Recharger la page ne doit pas renvoyer sur l'étagère quelqu'un qui était
-// en train de ranger ses cartes.
-function retenirLeClasseurOuvert(id){
-  try{
-    if(id) localStorage.setItem(CLE_OUVERT, id);
-    else localStorage.removeItem(CLE_OUVERT);
-  }catch{ /* mémoire refusée : on s'en passe */ }
-}
-
-function classeurOuvertRetenu(){
-  try{ return localStorage.getItem(CLE_OUVERT); }catch{ return null; }
-}
-
 // Ouvrir un classeur est une étape dans l'historique du navigateur : le
 // bouton « page précédente » ramène alors à l'étagère, comme partout
 // ailleurs sur le site. On compte ce qu'on a empilé pour savoir, au retour,
@@ -353,7 +340,6 @@ function ouvrirLeClasseur(id, { empiler = true } = {}){
   pageActive = 0;
   faceActive = 'recto';
   vue = 'classeur';
-  retenirLeClasseurOuvert(id);
   if(empiler){
     history.pushState({ vue: 'classeur', id }, '', '#classeur=' + encodeURIComponent(id));
     etapesEmpilees++;
@@ -365,7 +351,6 @@ function revenirALEtagere(){
   // Une étape empilée ici : on la défait, pour que l'historique reste juste.
   if(etapesEmpilees > 0){ history.back(); return; }
   vue = 'etagere';
-  retenirLeClasseurOuvert(null);
   history.replaceState({ vue: 'etagere' }, '', location.pathname + location.search);
   dessiner();
 }
@@ -384,7 +369,6 @@ window.addEventListener('popstate', e => {
     return;
   }
   vue = 'etagere';
-  retenirLeClasseurOuvert(null);
   dessiner();
 });
 
@@ -708,7 +692,6 @@ async function supprimerLeClasseur(){
   idActif = null;
   pageActive = 0;
   vue = 'etagere';
-  retenirLeClasseurOuvert(null);
   // Le classeur n'existe plus : son étape d'historique ne doit plus y mener.
   history.replaceState({ vue: 'etagere' }, '', location.pathname + location.search);
   dessiner();
@@ -1070,13 +1053,12 @@ async function demarrer(){
 
   classeurs = lireLesClasseurs();
   dossiers = lireLesDossiers();
-  // L'adresse fait foi — un lien partagé ou une page rouverte —, à défaut le
-  // classeur qu'on avait sous les yeux la dernière fois.
-  const retenu = classeurDeLAdresse() || classeurOuvertRetenu();
+  // Seule l'adresse ouvre un classeur : arriver sur « Mes classeurs » montre
+  // l'étagère, et c'est elle que retrouve le bouton « page précédente ».
+  const retenu = classeurDeLAdresse();
   if(retenu && classeurs.some(c => c.id === retenu)){
     idActif = retenu;
     vue = 'classeur';
-    retenirLeClasseurOuvert(retenu);
     history.replaceState({ vue: 'classeur', id: retenu }, '',
       '#classeur=' + encodeURIComponent(retenu));
   }else{
