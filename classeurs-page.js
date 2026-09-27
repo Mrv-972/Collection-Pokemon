@@ -5,6 +5,9 @@
 // enregistrer ce qui change.
 
 let classeurs = [];
+// Deux écrans : l'étagère, où l'on voit la couverture de chaque classeur, et
+// le classeur ouvert, où l'on range les cartes.
+let vue = 'etagere';             // 'etagere' ou 'classeur'
 let idActif = null;
 let pageActive = 0;
 let faceActive = 'recto';        // 'recto' ou 'verso'
@@ -38,16 +41,44 @@ function modifier(transformation){
 
 // ------------------------------------------------------------ le rendu ---
 
-function barreDesClasseurs(){
+// La couverture telle qu'on la voit sur l'étagère : la tranche à gauche,
+// comme un classeur posé de face sur une étagère.
+function couvertureDuClasseur(c){
   return `
-    <div class="barre-classeurs">
-      ${classeurs.map(c => `
-        <button class="puce-classeur" data-ouvrir="${c.id}" aria-selected="${c.id === idActif}">
-          <span class="dos" style="background:${teinteDe(c.couleur)}"></span>
-          <span>${echapper(c.nom)}</span>
-          <span class="compte">${compterLesCartes(c)}</span>
-        </button>`).join('')}
-      <button class="bouton-neuf" id="nouveau-classeur">+ Nouveau classeur</button>
+    <span class="couverture" style="--couv:${teinteDe(c.couleur)}">
+      <span class="tranche"></span>
+      <span class="titre-couverture">${echapper(c.nom)}</span>
+    </span>`;
+}
+
+function etagere(){
+  const tuiles = classeurs.map(c => {
+    const cartes = compterLesCartes(c);
+    return `
+      <button class="tuile-classeur" data-ouvrir="${c.id}">
+        ${couvertureDuClasseur(c)}
+        <span class="nom-tuile">${echapper(c.nom)}</span>
+        <span class="detail-tuile">${cartes} carte${cartes > 1 ? 's' : ''}
+          · ${c.pages.length} page${c.pages.length > 1 ? 's' : ''}</span>
+      </button>`;
+  }).join('');
+
+  return `
+    <div class="etagere">
+      ${tuiles}
+      <button class="tuile-classeur neuve" id="nouveau-classeur">
+        <span class="couverture vide"><span class="tranche"></span><span class="plus">+</span></span>
+        <span class="nom-tuile">Nouveau classeur</span>
+        <span class="detail-tuile">Partir d'une page vide</span>
+      </button>
+    </div>`;
+}
+
+// Le bandeau du classeur ouvert : de quoi revenir à l'étagère.
+function retourEtagere(){
+  return `
+    <div class="fil-classeurs">
+      <button class="retour-etagere" id="retour-etagere">‹ Mes classeurs</button>
     </div>`;
 }
 
@@ -211,6 +242,30 @@ function tiroirDesCartes(){
     </div>`;
 }
 
+const CLE_OUVERT = 'pokeclasseur-classeur-ouvert';
+
+// Recharger la page ne doit pas renvoyer sur l'étagère quelqu'un qui était
+// en train de ranger ses cartes.
+function retenirLeClasseurOuvert(id){
+  try{
+    if(id) localStorage.setItem(CLE_OUVERT, id);
+    else localStorage.removeItem(CLE_OUVERT);
+  }catch{ /* mémoire refusée : on s'en passe */ }
+}
+
+function classeurOuvertRetenu(){
+  try{ return localStorage.getItem(CLE_OUVERT); }catch{ return null; }
+}
+
+function ouvrirLeClasseur(id){
+  idActif = id;
+  pageActive = 0;
+  faceActive = 'recto';
+  vue = 'classeur';
+  retenirLeClasseurOuvert(id);
+  dessiner();
+}
+
 function appliquerLaCouleur(classeur){
   const col = couleurDe(classeur?.couleur);
   document.body.style.setProperty('--page-classeur', col.page);
@@ -219,20 +274,21 @@ function appliquerLaCouleur(classeur){
 function dessiner(){
   const c = actif();
   appliquerLaCouleur(c);
-  if(!classeurs.length){
-    contenu().innerHTML = barreDesClasseurs() + `
+  // Un classeur supprimé ailleurs, ou un identifiant retenu qui ne
+  // correspond plus à rien : on retombe sur l'étagère plutôt que sur rien.
+  if(vue === 'classeur' && !c) vue = 'etagere';
+
+  if(vue === 'etagere'){
+    contenu().innerHTML = (classeurs.length ? '' : `
       <p class="vide">Aucun classeur pour l'instant. Crée le premier : tu pourras
          y disposer tes cartes, changer le format des pages, et déplacer chaque
-         carte à la main jusqu'à ce que l'ensemble te plaise.</p>`;
-  }else if(!c){
-    contenu().innerHTML = barreDesClasseurs() +
-      '<p class="vide">Choisis un classeur ci-dessus.</p>';
+         carte à la main jusqu'à ce que l'ensemble te plaise.</p>`) + etagere();
   }else{
-    contenu().innerHTML = barreDesClasseurs() + reglagesDuClasseur(c)
+    contenu().innerHTML = retourEtagere() + reglagesDuClasseur(c)
       + pageDuClasseur(c) + tiroirDesCartes();
   }
   brancherLesGestes();
-  if(actif()) dessinerLeTiroir();
+  if(vue === 'classeur' && actif()) dessinerLeTiroir();
 }
 
 // Un visuel qui ne vient pas laisserait une case d'apparence vide, alors
@@ -264,17 +320,18 @@ function brancherLesGestes(){
     const neuf = classeurNeuf(`Classeur ${classeurs.length + 1}`);
     classeurs = [...classeurs, neuf];
     enregistrerLesClasseurs(classeurs);
-    idActif = neuf.id;
-    pageActive = 0;
-    dessiner();
+    ouvrirLeClasseur(neuf.id);
     document.getElementById('nom-classeur')?.select();
   });
 
-  zone.querySelectorAll('[data-ouvrir]').forEach(b => b.addEventListener('click', () => {
-    idActif = b.dataset.ouvrir;
-    pageActive = 0;
+  zone.querySelectorAll('[data-ouvrir]').forEach(b =>
+    b.addEventListener('click', () => ouvrirLeClasseur(b.dataset.ouvrir)));
+
+  zone.querySelector('#retour-etagere')?.addEventListener('click', () => {
+    vue = 'etagere';
+    retenirLeClasseurOuvert(null);
     dessiner();
-  }));
+  });
 
   // Le nom se retient à chaque frappe, sans bouton « Enregistrer » : c'est un
   // champ de texte, pas un formulaire. Redessiner à chaque lettre ferait
@@ -284,8 +341,7 @@ function brancherLesGestes(){
     if(!c) return;
     c.nom = e.target.value;
     enregistrerLesClasseurs(classeurs);
-    const puce = zone.querySelector(`[data-ouvrir="${c.id}"] span:nth-child(2)`);
-    if(puce) puce.textContent = c.nom;
+
   });
 
   zone.querySelector('#format-classeur')?.addEventListener('change', e => {
@@ -461,8 +517,10 @@ async function supprimerLeClasseur(){
   if(!accord) return;
   classeurs = classeurs.filter(x => x.id !== c.id);
   enregistrerLesClasseurs(classeurs);
-  idActif = classeurs[0]?.id ?? null;
+  idActif = null;
   pageActive = 0;
+  vue = 'etagere';
+  retenirLeClasseurOuvert(null);
   dessiner();
 }
 
@@ -786,7 +844,12 @@ async function demarrer(){
   }
 
   classeurs = lireLesClasseurs();
-  idActif = classeurs[0]?.id ?? null;
+  // On revient là où on s'était arrêté, si ce classeur existe toujours.
+  const retenu = classeurOuvertRetenu();
+  if(retenu && classeurs.some(c => c.id === retenu)){
+    idActif = retenu;
+    vue = 'classeur';
+  }
 
   try{
     const toutes = await listerExtensions();
