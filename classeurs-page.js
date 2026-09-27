@@ -138,11 +138,11 @@ function pageDuClasseur(c){
       <button id="page-apres" ${pageActive >= c.pages.length - 1 ? 'disabled' : ''} aria-label="Page suivante">›</button>
       <button class="ajouter" id="ajouter-page">+ une page</button>
       ${c.pages.length > 1 ? '<button class="ajouter" id="retirer-page">Retirer cette page</button>' : ''}
-      <button class="ajouter voir" id="voir-le-livre">Visualiser mon classeur</button>
       <div class="faces">
         <button data-face="recto" aria-selected="${!auVerso}">Recto</button>
         <button data-face="verso" aria-selected="${auVerso}">Verso</button>
       </div>
+      <button class="ajouter voir" id="voir-le-livre">Visualiser mon classeur</button>
     </div>
     ${auVerso ? `<p class="mot-du-verso">Le dos de la page ${pageActive + 1}, vu en
        retournant la feuille — les cases sont donc inversées de gauche à droite.

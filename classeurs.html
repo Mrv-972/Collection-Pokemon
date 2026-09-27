@@ -200,11 +200,13 @@
 
   /* La bascule recto / verso, à droite de la navigation : on tourne la
      feuille, on ne change pas de page. */
-  .faces{display:flex;gap:4px;margin-left:auto}
-  /* Sur écran étroit, la bascule passe à la ligne plutôt que de pousser la
-     barre hors de l'écran. */
-  @media(max-width:640px){ .faces{margin-left:0} }
-  .faces button{font-family:inherit;font-size:12.5px;padding:6px 13px;border-radius:5px;
+  .faces{display:flex;gap:4px;flex:0 0 auto}
+  /* « Visualiser mon classeur » occupe le bout de la barre ; sur écran étroit
+     il passe à la ligne plutôt que de pousser la barre hors de l'écran. */
+  .navigation-pages .voir{margin-left:auto}
+  @media(max-width:640px){ .navigation-pages .voir{margin-left:0} }
+  .faces button{font-family:inherit;font-size:12.5px;width:auto;height:34px;
+    padding:0 14px;white-space:nowrap;border-radius:5px;
                 cursor:pointer;background:transparent;color:var(--text-on-ink-dim);
                 border:1px solid rgba(237,234,224,0.16);transition:.12s;}
   .faces button[aria-selected="true"]{color:var(--text-on-ink);
@@ -385,19 +387,19 @@
   <footer data-note="Tes classeurs sont enregistrés dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-24-nu86"></script>
-<script src="catalogue.js?v=2026-09-24-nu86"></script>
-<script src="supabase-config.js?v=2026-09-24-nu86"></script>
-<script src="pied.js?v=2026-09-24-nu86"></script>
-<script src="admin.js?v=2026-09-24-nu86"></script>
-<script src="compte.js?v=2026-09-24-nu86"></script>
-<script src="confirmation.js?v=2026-09-24-nu86"></script>
-<script src="progression.js?v=2026-09-24-nu86"></script>
-<script src="raretes.js?v=2026-09-24-nu86"></script>
-<script src="pokedex-fr.js?v=2026-09-24-nu86"></script>
-<script src="sets.js?v=2026-09-24-nu86"></script>
-<script src="classeurs.js?v=2026-09-24-nu86"></script>
-<script src="classeurs-page.js?v=2026-09-24-nu86"></script>
+<script src="univers.js?v=2026-09-27-hzre"></script>
+<script src="catalogue.js?v=2026-09-27-hzre"></script>
+<script src="supabase-config.js?v=2026-09-27-hzre"></script>
+<script src="pied.js?v=2026-09-27-hzre"></script>
+<script src="admin.js?v=2026-09-27-hzre"></script>
+<script src="compte.js?v=2026-09-27-hzre"></script>
+<script src="confirmation.js?v=2026-09-27-hzre"></script>
+<script src="progression.js?v=2026-09-27-hzre"></script>
+<script src="raretes.js?v=2026-09-27-hzre"></script>
+<script src="pokedex-fr.js?v=2026-09-27-hzre"></script>
+<script src="sets.js?v=2026-09-27-hzre"></script>
+<script src="classeurs.js?v=2026-09-27-hzre"></script>
+<script src="classeurs-page.js?v=2026-09-27-hzre"></script>
 
 </body>
 </html>
