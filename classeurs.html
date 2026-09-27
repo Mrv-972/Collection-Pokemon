@@ -148,7 +148,22 @@
   .couleurs{position:relative}
   /* ------------------------------------------------------- l'étagère --- */
   /* Les classeurs vus de face, comme posés sur une étagère. */
-  /* Les rubriques s'enchaînent comme les séries de « Par extension » :
+  .barre-dossiers{display:flex;gap:8px;align-items:center;margin:0 0 6px;flex-wrap:wrap}
+  .bouton-dossier{font-family:inherit;font-size:13px;padding:8px 14px;border-radius:5px;
+    cursor:pointer;color:var(--text-on-ink);background:transparent;
+    border:1px dashed rgba(255,255,255,0.22)}
+  .bouton-dossier:hover{border-color:var(--text-soft)}
+  .bouton-dossier.discret{border:0;color:var(--text-soft)}
+  #nom-dossier{font-family:inherit;font-size:13px;padding:8px 10px;border-radius:5px;
+    min-width:200px;background:var(--ink-soft);color:var(--text-on-ink);
+    border:1px solid rgba(237,234,224,0.14)}
+  #nom-dossier:focus{outline:0;border-color:rgba(var(--gold-rgb),0.5)}
+  .retirer-dossier{font-family:inherit;font-size:12px;background:none;border:0;padding:0;
+    color:var(--text-soft);cursor:pointer;text-decoration:underline}
+  .retirer-dossier:hover{color:var(--rouge-doux,#D98A7A)}
+  .vide-dossier{grid-column:1/-1;margin:0;font-size:13px;color:var(--text-soft)}
+
+  /* Les dossiers s'enchaînent comme les séries de « Par extension » :
      un filet, un titre, puis les classeurs de la rubrique. */
   .rubrique-bloc{padding:26px 0;border-top:1px solid rgba(237,234,224,0.08)}
   .rubrique-bloc:first-child{border-top:0;padding-top:4px}
@@ -473,19 +488,19 @@
   <footer data-note="Tes classeurs sont enregistrés dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-hsh8"></script>
-<script src="catalogue.js?v=2026-09-27-hsh8"></script>
-<script src="supabase-config.js?v=2026-09-27-hsh8"></script>
-<script src="pied.js?v=2026-09-27-hsh8"></script>
-<script src="admin.js?v=2026-09-27-hsh8"></script>
-<script src="compte.js?v=2026-09-27-hsh8"></script>
-<script src="confirmation.js?v=2026-09-27-hsh8"></script>
-<script src="progression.js?v=2026-09-27-hsh8"></script>
-<script src="raretes.js?v=2026-09-27-hsh8"></script>
-<script src="pokedex-fr.js?v=2026-09-27-hsh8"></script>
-<script src="sets.js?v=2026-09-27-hsh8"></script>
-<script src="classeurs.js?v=2026-09-27-hsh8"></script>
-<script src="classeurs-page.js?v=2026-09-27-hsh8"></script>
+<script src="univers.js?v=2026-09-27-3pq6"></script>
+<script src="catalogue.js?v=2026-09-27-3pq6"></script>
+<script src="supabase-config.js?v=2026-09-27-3pq6"></script>
+<script src="pied.js?v=2026-09-27-3pq6"></script>
+<script src="admin.js?v=2026-09-27-3pq6"></script>
+<script src="compte.js?v=2026-09-27-3pq6"></script>
+<script src="confirmation.js?v=2026-09-27-3pq6"></script>
+<script src="progression.js?v=2026-09-27-3pq6"></script>
+<script src="raretes.js?v=2026-09-27-3pq6"></script>
+<script src="pokedex-fr.js?v=2026-09-27-3pq6"></script>
+<script src="sets.js?v=2026-09-27-3pq6"></script>
+<script src="classeurs.js?v=2026-09-27-3pq6"></script>
+<script src="classeurs-page.js?v=2026-09-27-3pq6"></script>
 
 </body>
 </html>

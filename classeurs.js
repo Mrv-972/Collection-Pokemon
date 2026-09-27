@@ -67,23 +67,46 @@ const estTransparent = classeur => classeur.transparent !== false;
 
 // ------------------------------------------------------ enregistrement ---
 
-function lireLesClasseurs(){
+function lireLeRangement(){
   try{
     const brut = JSON.parse(localStorage.getItem(CLE_CLASSEURS));
-    return Array.isArray(brut?.classeurs) ? brut.classeurs : [];
+    return {
+      classeurs: Array.isArray(brut?.classeurs) ? brut.classeurs : [],
+      dossiers: Array.isArray(brut?.dossiers) ? brut.dossiers : [],
+    };
   }catch{
-    return [];
+    return { classeurs: [], dossiers: [] };
   }
 }
 
-function enregistrerLesClasseurs(classeurs){
+function ecrireLeRangement(rangement){
   try{
-    localStorage.setItem(CLE_CLASSEURS, JSON.stringify({ version: 1, classeurs }));
+    localStorage.setItem(CLE_CLASSEURS, JSON.stringify({ version: 1, ...rangement }));
     return true;
   }catch(err){
     console.warn('Enregistrement des classeurs impossible', err);
     return false;
   }
+}
+
+function lireLesClasseurs(){
+  // Les classeurs d'avant les dossiers portaient le champ « rubrique ».
+  return lireLeRangement().classeurs.map(c =>
+    ('rubrique' in c) ? { ...c, dossier: c.dossier ?? c.rubrique, rubrique: undefined } : c);
+}
+
+// Les deux listes vivent dans le même enregistrement : on relit l'autre pour
+// ne pas l'effacer en écrivant celle-ci.
+function enregistrerLesClasseurs(classeurs){
+  return ecrireLeRangement({ classeurs, dossiers: lireLeRangement().dossiers });
+}
+
+function lireLesDossiers(){
+  return lireLeRangement().dossiers;
+}
+
+function enregistrerLesDossiers(dossiers){
+  return ecrireLeRangement({ classeurs: lireLeRangement().classeurs, dossiers });
 }
 
 // Un identifiant qui ne dépend de rien : deux classeurs créés dans la même
@@ -106,9 +129,9 @@ function classeurNeuf(nom){
     // La couverture : rien, et elle suit alors la couleur du classeur. Sinon
     // une couleur à elle, ou la clé d'une image importée.
     couverture: null,
-    // La rubrique où le classeur est rangé sur l'étagère. Rien : il va dans
-    // la section « Sans rubrique », en dernier.
-    rubrique: null,
+    // Le dossier où le classeur est rangé sur l'étagère. Rien : il va dans
+    // la section « Sans dossier », en dernier.
+    dossier: null,
     // Une page vide pour commencer : un classeur sans page ne se regarde pas.
     pages: [pageVide(FORMAT_PAR_DEFAUT)],
     // Les images importées par le membre, rangées par clé.
@@ -193,22 +216,29 @@ const imageDuClasseur = (classeur, cle) => classeur?.images?.[cle] ?? null;
 
 // Ce qu'il faut afficher sur la couverture d'un classeur. Sans choix, elle
 // reprend la couleur du classeur : un classeur a toujours une couverture.
-// Les rubriques ne sont pas une liste à part : elles existent tant qu'un
-// classeur s'y range, et disparaissent quand le dernier en sort. Il n'y a
-// donc jamais de dossier vide à ranger, ni à supprimer.
-const SANS_RUBRIQUE = 'Sans rubrique';
+// Les dossiers sont une liste à part : on peut en créer un vide et le
+// remplir ensuite. Un dossier nommé dans un classeur mais absent de la liste
+// compte quand même — un enregistrement abîmé ne doit pas cacher un classeur.
+const SANS_DOSSIER = 'Sans dossier';
 
-function rubriquesDesClasseurs(classeurs){
-  const noms = [...new Set(classeurs.map(c => (c.rubrique || '').trim()).filter(Boolean))];
-  return noms.sort((a, b) => a.localeCompare(b, 'fr', { numeric: true, sensitivity: 'base' }));
+const parOrdreAlphabetique = (a, b) =>
+  a.localeCompare(b, 'fr', { numeric: true, sensitivity: 'base' });
+
+function tousLesDossiers(classeurs, dossiers){
+  const noms = new Set((dossiers ?? []).map(d => String(d).trim()).filter(Boolean));
+  for(const c of classeurs){
+    const d = (c.dossier || '').trim();
+    if(d) noms.add(d);
+  }
+  return [...noms].sort(parOrdreAlphabetique);
 }
 
-// Les classeurs rangés par rubrique, dans l'ordre où l'étagère les montre.
-function classeursParRubrique(classeurs){
-  const groupes = rubriquesDesClasseurs(classeurs)
-    .map(nom => ({ nom, classeurs: classeurs.filter(c => (c.rubrique || '').trim() === nom) }));
-  const sans = classeurs.filter(c => !(c.rubrique || '').trim());
-  if(sans.length) groupes.push({ nom: SANS_RUBRIQUE, classeurs: sans, sansRubrique: true });
+// Les classeurs rangés par dossier, dans l'ordre où l'étagère les montre.
+function classeursParDossier(classeurs, dossiers){
+  const groupes = tousLesDossiers(classeurs, dossiers)
+    .map(nom => ({ nom, classeurs: classeurs.filter(c => (c.dossier || '').trim() === nom) }));
+  const sans = classeurs.filter(c => !(c.dossier || '').trim());
+  if(sans.length) groupes.push({ nom: SANS_DOSSIER, classeurs: sans, sansDossier: true });
   return groupes;
 }
 

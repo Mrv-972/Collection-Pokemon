@@ -5,6 +5,8 @@
 // enregistrer ce qui change.
 
 let classeurs = [];
+let dossiers = [];               // les dossiers, y compris les vides
+let creationDeDossier = false;   // le champ « nouveau dossier » est-il ouvert ?
 // Deux écrans : l'étagère, où l'on voit la couverture de chaque classeur, et
 // le classeur ouvert, où l'on range les cartes.
 let vue = 'etagere';             // 'etagere' ou 'classeur'
@@ -73,25 +75,43 @@ const tuileNeuve = () => `
     <span class="detail-tuile">Partir d'une page vide</span>
   </button>`;
 
+function barreDesDossiers(){
+  return `
+    <div class="barre-dossiers">
+      ${creationDeDossier ? `
+        <input type="text" id="nom-dossier" maxlength="40" placeholder="Nom du dossier"
+               aria-label="Nom du nouveau dossier">
+        <button class="bouton-dossier" id="creer-dossier">Créer</button>
+        <button class="bouton-dossier discret" id="annuler-dossier">Annuler</button>`
+        : '<button class="bouton-dossier" id="ouvrir-dossier">+ Nouveau dossier</button>'}
+    </div>`;
+}
+
 function etagere(){
-  const groupes = classeursParRubrique(classeurs);
+  const groupes = classeursParDossier(classeurs, dossiers);
 
-  // Tant que personne n'a nommé de rubrique, une seule grille suffit : un
-  // titre « Sans rubrique » tout seul ne dirait rien à personne.
-  if(groupes.every(g => g.sansRubrique)){
-    return `<div class="etagere">${
-      (groupes[0]?.classeurs ?? []).map(tuileDuClasseur).join('')}${tuileNeuve()}</div>`;
-  }
+  // Tant qu'aucun dossier n'existe, une seule grille suffit : un titre
+  // « Sans dossier » tout seul ne dirait rien à personne.
+  const plat = groupes.every(g => g.sansDossier);
+  const corps = plat
+    ? `<div class="etagere">${
+        (groupes[0]?.classeurs ?? []).map(tuileDuClasseur).join('')}${tuileNeuve()}</div>`
+    : groupes.map((g, i) => `
+        <div class="rubrique-bloc">
+          <div class="rubrique-titre">
+            <h2>${echapper(g.nom)}</h2>
+            <span class="compte">${g.classeurs.length} classeur${g.classeurs.length > 1 ? 's' : ''}</span>
+            ${!g.sansDossier && !g.classeurs.length
+              ? `<button class="retirer-dossier" data-retirer-dossier="${echapper(g.nom)}"
+                         title="Supprimer ce dossier vide">Supprimer</button>` : ''}
+          </div>
+          <div class="etagere">${g.classeurs.map(tuileDuClasseur).join('')}${
+            i === groupes.length - 1 ? tuileNeuve() : ''}
+            ${g.classeurs.length ? ''
+              : '<p class="vide-dossier">Ce dossier est vide. Range un classeur ici depuis ses réglages.</p>'}</div>
+        </div>`).join('');
 
-  return groupes.map((g, i) => `
-    <div class="rubrique-bloc">
-      <div class="rubrique-titre">
-        <h2>${echapper(g.nom)}</h2>
-        <span class="compte">${g.classeurs.length} classeur${g.classeurs.length > 1 ? 's' : ''}</span>
-      </div>
-      <div class="etagere">${g.classeurs.map(tuileDuClasseur).join('')}${
-        i === groupes.length - 1 ? tuileNeuve() : ''}</div>
-    </div>`).join('');
+  return barreDesDossiers() + corps;
 }
 
 // Le bandeau du classeur ouvert : de quoi revenir à l'étagère.
@@ -112,12 +132,13 @@ function reglagesDuClasseur(c){
 
     <div class="reglages">
       <div class="reglage">
-      <label for="rubrique-classeur">Rubrique</label>
-      <input type="text" id="rubrique-classeur" list="rubriques-connues" maxlength="40"
-             placeholder="Sans rubrique" value="${echapper(c.rubrique ?? '')}">
-      <datalist id="rubriques-connues">
-        ${rubriquesDesClasseurs(classeurs).map(n => `<option value="${echapper(n)}">`).join('')}
-      </datalist>
+      <label for="dossier-classeur">Dossier</label>
+      <select id="dossier-classeur">
+        <option value="">${SANS_DOSSIER}</option>
+        ${tousLesDossiers(classeurs, dossiers).map(n =>
+          `<option value="${echapper(n)}" ${n === (c.dossier || '').trim() ? 'selected' : ''}
+           >${echapper(n)}</option>`).join('')}
+      </select>
       </div>
 
       <div class="reglage">
@@ -386,6 +407,51 @@ function brancherLesGestes(){
   zone.querySelectorAll('[data-ouvrir]').forEach(b =>
     b.addEventListener('click', () => ouvrirLeClasseur(b.dataset.ouvrir)));
 
+  zone.querySelector('#ouvrir-dossier')?.addEventListener('click', () => {
+    creationDeDossier = true;
+    dessiner();
+    document.getElementById('nom-dossier')?.focus();
+  });
+
+  zone.querySelector('#annuler-dossier')?.addEventListener('click', () => {
+    creationDeDossier = false;
+    dessiner();
+  });
+
+  const champDossier = zone.querySelector('#nom-dossier');
+  const creer = () => {
+    const nom = champDossier.value.trim();
+    if(!nom){ messageFugace('Donne un nom à ce dossier.'); return; }
+    // Deux dossiers du même nom seraient impossibles à distinguer sur
+    // l'étagère : on renvoie sur celui qui existe déjà.
+    if(tousLesDossiers(classeurs, dossiers).some(d =>
+        d.localeCompare(nom, 'fr', { sensitivity: 'base' }) === 0)){
+      messageFugace('Ce dossier existe déjà.');
+      return;
+    }
+    dossiers = [...dossiers, nom];
+    if(!enregistrerLesDossiers(dossiers)){
+      messageFugace("Enregistrement impossible : la mémoire du navigateur est pleine ou refusée.");
+      dossiers = lireLesDossiers();
+    }
+    creationDeDossier = false;
+    dessiner();
+  };
+  zone.querySelector('#creer-dossier')?.addEventListener('click', creer);
+  champDossier?.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){ e.preventDefault(); creer(); }
+    if(e.key === 'Escape'){ creationDeDossier = false; dessiner(); }
+  });
+
+  zone.querySelectorAll('[data-retirer-dossier]').forEach(b =>
+    b.addEventListener('click', () => {
+      // Le bouton n'apparaît que sur un dossier vide : il n'y a rien à
+      // perdre, donc rien à confirmer.
+      dossiers = dossiers.filter(d => d !== b.dataset.retirerDossier);
+      enregistrerLesDossiers(dossiers);
+      dessiner();
+    }));
+
   zone.querySelector('#retour-etagere')?.addEventListener('click', () => {
     vue = 'etagere';
     retenirLeClasseurOuvert(null);
@@ -403,11 +469,8 @@ function brancherLesGestes(){
 
   });
 
-  zone.querySelector('#rubrique-classeur')?.addEventListener('input', e => {
-    const c = actif();
-    if(!c) return;
-    c.rubrique = e.target.value.trim() || null;
-    enregistrerLesClasseurs(classeurs);
+  zone.querySelector('#dossier-classeur')?.addEventListener('change', e => {
+    modifier(c => ({ ...c, dossier: e.target.value || null }));
   });
 
   zone.querySelector('#format-classeur')?.addEventListener('change', e => {
@@ -966,6 +1029,7 @@ async function demarrer(){
   }
 
   classeurs = lireLesClasseurs();
+  dossiers = lireLesDossiers();
   // On revient là où on s'était arrêté, si ce classeur existe toujours.
   const retenu = classeurOuvertRetenu();
   if(retenu && classeurs.some(c => c.id === retenu)){
