@@ -14,7 +14,7 @@
 <style>
   :root{
     --ink:#15171B; --ink-soft:#20232A; --paper:#F1EBDC; --paper-line:#D9CFB6;
-    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:var(--accent-clair);
+    --teal:#1F6F63; --teal-deep:#123F38; --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:#E3C766;
     --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
   }
   *{box-sizing:border-box}
@@ -40,10 +40,20 @@
   .search-row input{flex:1;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   .search-row input::placeholder{color:var(--text-on-ink-dim)}
 
-  .series-block{padding:34px 0;border-top:1px solid rgba(237,234,224,0.08);}
-  .series-title{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;}
+  .series-block{border-top:1px solid rgba(237,234,224,0.08);}
+  .series-title{display:flex;align-items:center;gap:12px;padding:28px 4px 20px;
+                cursor:pointer;list-style:none;transition:background .12s;}
+  .series-title::-webkit-details-marker{display:none}
+  .series-title:hover{background:rgba(237,234,224,0.03)}
   .series-title h2{font-size:22px;}
   .series-title .count{font-size:13px;color:var(--text-on-ink-dim);}
+  /* Le chevron dit dans quel sens ça va s'ouvrir, sans texte à traduire. */
+  .series-title .chevron{flex-shrink:0;width:10px;height:10px;margin-left:2px;
+                         border-right:2px solid var(--text-on-ink-dim);
+                         border-bottom:2px solid var(--text-on-ink-dim);
+                         transform:rotate(45deg);transition:transform .18s;}
+  .series-block[open] > .series-title .chevron{transform:rotate(-135deg)}
+  .series-block .set-grid{padding-bottom:34px}
 
   .set-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
   @media(max-width:900px){.set-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -132,14 +142,14 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-09-27-gg7o"></script>
-<script src="catalogue.js?v=2026-09-27-gg7o"></script>
-<script src="supabase-config.js?v=2026-09-27-gg7o"></script>
-<script src="pied.js?v=2026-09-27-gg7o"></script>
-<script src="admin.js?v=2026-09-27-gg7o"></script>
-<script src="compte.js?v=2026-09-27-gg7o"></script>
-<script src="progression.js?v=2026-09-27-gg7o"></script>
-<script src="sets.js?v=2026-09-27-gg7o"></script>
+<script src="univers.js?v=2026-09-27-so9n"></script>
+<script src="catalogue.js?v=2026-09-27-so9n"></script>
+<script src="supabase-config.js?v=2026-09-27-so9n"></script>
+<script src="pied.js?v=2026-09-27-so9n"></script>
+<script src="admin.js?v=2026-09-27-so9n"></script>
+<script src="compte.js?v=2026-09-27-so9n"></script>
+<script src="progression.js?v=2026-09-27-so9n"></script>
+<script src="sets.js?v=2026-09-27-so9n"></script>
 <script>
 // Récupère la liste complète des extensions depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), puis les regroupe par série (Écarlate et
@@ -242,6 +252,9 @@ function groupBySeries(sets){
   return { groups, order };
 }
 
+// Une recherche est-elle en cours ? Le rendu s'en sert pour tout ouvrir.
+let filtreEnCours = false;
+
 function renderSets(sets){
   const content = document.getElementById('content');
   if(sets.length === 0){
@@ -252,6 +265,7 @@ function renderSets(sets){
   // Une seule lecture des marquages pour toute la page : les recompter à
   // chaque vignette relirait le stockage cent fois pour le même résultat.
   const obtenues = compterObtenuesParExtension(sets.map(s => s.id));
+  const repliees = seriesRepliees();
   content.innerHTML = order.map(seriesName => {
     const setsInSeries = groups[seriesName];
     const cards = setsInSeries.map(s => {
@@ -278,20 +292,51 @@ function renderSets(sets){
       </a>
     `;
     }).join('');
+    // Une recherche en cours ouvre tout : on ne cache pas un résultat
+    // derrière un bloc replié.
+    const ouverte = filtreEnCours || !repliees.has(seriesName);
     return `
-      <div class="series-block">
-        <div class="series-title">
+      <details class="series-block" data-serie="${seriesName.replace(/"/g, '&quot;')}"
+               ${ouverte ? 'open' : ''}>
+        <summary class="series-title">
+          <span class="chevron" aria-hidden="true"></span>
           <h2>${seriesName}</h2>
           <span class="count">${setsInSeries.length} extension${setsInSeries.length > 1 ? 's' : ''}</span>
-        </div>
+        </summary>
         <div class="set-grid">${cards}</div>
-      </div>
+      </details>
     `;
   }).join('');
 }
 
+// Ce qu'on avait replié le reste au retour. On garde les séries FERMÉES, pas
+// les ouvertes : une série qui paraît doit s'afficher, pas se cacher. La clé
+// dépend de l'univers, les deux côtés n'ayant pas les mêmes séries.
+const CLE_SERIES_REPLIEES = () => 'pokeclasseur-series-repliees-' +
+  (document.documentElement.dataset.univers || 'physique');
+
+function seriesRepliees(){
+  try{ return new Set(JSON.parse(localStorage.getItem(CLE_SERIES_REPLIEES())) ?? []); }
+  catch{ return new Set(); }
+}
+
+function enregistrerLesSeriesRepliees(noms){
+  try{ localStorage.setItem(CLE_SERIES_REPLIEES(), JSON.stringify([...noms])); }
+  catch{ /* mémoire refusée : on s'en passe */ }
+}
+
+// <details> n'émet pas d'événement qui remonte : on l'attrape à la descente.
+document.getElementById('content').addEventListener('toggle', e => {
+  const bloc = e.target.closest?.('.series-block');
+  if(!bloc || filtreEnCours) return;
+  const noms = seriesRepliees();
+  if(bloc.open) noms.delete(bloc.dataset.serie); else noms.add(bloc.dataset.serie);
+  enregistrerLesSeriesRepliees(noms);
+}, true);
+
 document.getElementById('filter-input').addEventListener('input', (e) => {
   const q = e.target.value.trim().toLowerCase();
+  filtreEnCours = Boolean(q);
   if(!q){ renderSets(allSets); return; }
   renderSets(allSets.filter(s => s.name.toLowerCase().includes(q)));
 });
