@@ -38,6 +38,10 @@ const COULEURS = [
 
 const teinteDe = cle => (COULEURS.find(c => c.cle === cle) ?? COULEURS[0]).teinte;
 
+// Les classeurs enregistrés avant l'option n'ont pas le champ ; ils étaient
+// transparents, ils le restent.
+const estTransparent = classeur => classeur.transparent !== false;
+
 // ------------------------------------------------------ enregistrement ---
 
 function lireLesClasseurs(){
@@ -71,6 +75,11 @@ function classeurNeuf(nom){
     nom: nom || 'Nouveau classeur',
     format: FORMAT_PAR_DEFAUT,
     couleur: COULEURS[0].cle,
+    // Les pochettes des vrais classeurs sont le plus souvent transparentes :
+    // on voit alors le dos de la carte rangée de l'autre côté de la feuille.
+    // Certains classeurs ont au contraire des feuilles opaques, et le dos
+    // d'une page n'y montre que la feuille elle-même.
+    transparent: true,
     // Une page vide pour commencer : un classeur sans page ne se regarde pas.
     pages: [pageVide(FORMAT_PAR_DEFAUT)],
     // Les images importées par le membre, rangées par clé.
@@ -209,10 +218,15 @@ function enMiroirDeLaPage(page, colonnes){
 function versoDeLaPage(classeur, index){
   const recto = classeur.pages[index] ?? [];
   const colonnes = FORMATS[classeur.format].colonnes;
-  const automatique = enMiroirDeLaPage(recto, colonnes).map(valeur => {
-    if(!valeur) return null;
-    return estImage(valeur) ? VERSO_PAPIER : DOS_DE_CARTE;
-  });
+  // Sur des feuilles opaques, rien ne transparaît : le dos d'une page ne
+  // montre que la feuille. Ce que le membre a lui-même posé au verso reste
+  // visible, puisque c'est rangé dans la pochette de ce côté-ci.
+  const automatique = estTransparent(classeur)
+    ? enMiroirDeLaPage(recto, colonnes).map(valeur => {
+        if(!valeur) return null;
+        return estImage(valeur) ? VERSO_PAPIER : DOS_DE_CARTE;
+      })
+    : new Array(casesParPage(classeur.format)).fill(null);
   const choisis = classeur.versos?.[index] ?? [];
   return automatique.map((defaut, i) => {
     const choix = choisis[i];

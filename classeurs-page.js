@@ -73,6 +73,14 @@ function reglagesDuClasseur(c){
                   style="background:${col.teinte}" title="${col.nom}"
                   aria-label="Couverture ${col.nom}"></button>`).join('')}
       </span>
+
+      <span>Pochettes</span>
+      <span class="pochettes">
+        <button data-transparent="oui" aria-pressed="${estTransparent(c)}"
+                title="On voit le dos des cartes rangées de l'autre côté">Transparentes</button>
+        <button data-transparent="non" aria-pressed="${!estTransparent(c)}"
+                title="Le dos d'une page ne montre que la feuille">Opaques</button>
+      </span>
     </div>`;
 }
 
@@ -146,8 +154,10 @@ function pageDuClasseur(c){
     </div>
     ${auVerso ? `<p class="mot-du-verso">Le dos de la page ${pageActive + 1}, vu en
        retournant la feuille — les cases sont donc inversées de gauche à droite.
-       Chaque pochette montre le dos de la carte d'en face ; clique-la pour y mettre
-       autre chose.</p>` : ''}
+       ${estTransparent(c)
+         ? "Les pochettes étant transparentes, chaque case montre le dos de la carte d'en face"
+         : 'Les pochettes étant opaques, on ne voit rien au travers'} ;
+       clique une case pour y mettre autre chose.</p>` : ''}
     <div class="page-classeur" style="grid-template-columns:repeat(${f.colonnes},minmax(0,1fr))">
       ${cases}
     </div>`;
@@ -274,6 +284,11 @@ function brancherLesGestes(){
 
   zone.querySelectorAll('[data-couleur]').forEach(b => b.addEventListener('click', () => {
     modifier(c => ({ ...c, couleur: b.dataset.couleur }));
+  }));
+
+  zone.querySelectorAll('[data-transparent]').forEach(b => b.addEventListener('click', () => {
+    modifier(c => ({ ...c, transparent: b.dataset.transparent === 'oui' }));
+    dessiner();
   }));
 
   zone.querySelector('#supprimer-classeur')?.addEventListener('click', supprimerLeClasseur);
