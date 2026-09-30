@@ -21,9 +21,9 @@ const IDENTITE = {
 };
 
 const A_SONDER = [
-  ['carte physique', 'https://assets.tcgdex.net/fr/sv/sv01/1/high.png'],
-  ['logo physique  ', 'https://assets.tcgdex.net/fr/sv/sv01/logo.png'],
-  ['carte Pocket   ', 'https://assets.tcgdex.net/fr/tcgp/A1/1/high.png'],
+  ['carte physique, basse déf. ', 'https://assets.tcgdex.net/fr/sv/sv01/001/low.webp'],
+  ['carte physique, haute déf.  ', 'https://assets.tcgdex.net/fr/sv/sv01/001/high.webp'],
+  ['logo d\'extension physique  ', 'https://assets.tcgdex.net/fr/sv/sv01/logo.png'],
 ];
 
 let tousAutorises = true;
@@ -42,6 +42,9 @@ for(const [nom, adresse] of A_SONDER){
   }
 }
 
+console.log('');
+console.log('Les visuels des cartes de l\'application sont dans le dépôt du site,');
+console.log('donc de la même origine que la page : rien à autoriser de ce côté.');
 console.log('');
 console.log(tousAutorises
   ? 'Tout est autorisé : l\'image d\'un classeur peut contenir les vraies cartes.'
