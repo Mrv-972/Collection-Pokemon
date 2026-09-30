@@ -298,8 +298,10 @@ function pageDuClasseur(c){
         <button data-face="recto" aria-selected="${!auVerso}">Recto</button>
         <button data-face="verso" aria-selected="${auVerso}">Verso</button>
       </div>
-      <button class="ajouter" id="partager-page">Partager</button>
       <button class="ajouter voir" id="voir-le-livre">Visualiser mon classeur</button>
+      <button class="ajouter icone" id="partager-page"
+              title="Partager sur les réseaux sociaux"
+              aria-label="Partager sur les réseaux sociaux">${ICONE_PARTAGE}</button>
     </div>
     ${auVerso ? `<p class="mot-du-verso">Le dos de la page ${pageActive + 1}, vu en
        retournant la feuille — les cases sont donc inversées de gauche à droite.
@@ -1282,26 +1284,52 @@ function tournerLeFeuillet(sens){
   dessinerLeLivre();
 }
 
+// Le symbole du partage : un nœud relié à deux autres. Dessiné ici plutôt
+// qu'emprunté à une police d'icônes, qui ne se chargerait pas toujours.
+const ICONE_PARTAGE = `
+  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+       stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="18" cy="5" r="2.6"></circle>
+    <circle cx="6" cy="12" r="2.6"></circle>
+    <circle cx="18" cy="19" r="2.6"></circle>
+    <line x1="8.3" y1="10.8" x2="15.7" y2="6.2"></line>
+    <line x1="8.3" y1="13.2" x2="15.7" y2="17.8"></line>
+  </svg>`;
+
 // Fabriquer l'image prend un instant — chaque carte est chargée puis
 // peinte. Le bouton le dit, plutôt que de laisser croire à un clic perdu.
-async function partagerLaPageCourante(){
+// La page en cours d'abord : c'est immédiat. La fenêtre propose ensuite
+// d'ajouter les autres, ce qui évite de faire attendre qui ne veut qu'une
+// page — vingt pages, c'est cent quatre-vingts visuels à charger.
+async function partagerDepuisLeClasseur(pages, bouton){
   const c = actif();
   if(!c) return;
-  const bouton = document.getElementById('partager-page');
-  const libelle = bouton?.textContent;
-  if(bouton){ bouton.disabled = true; bouton.textContent = 'Préparation…'; }
+  const avant = bouton?.innerHTML;
+  const direAvancement = (fait, total) => {
+    if(bouton) bouton.innerHTML = total > 1 ? `${fait}/${total}…` : '…';
+  };
+  if(bouton) bouton.disabled = true;
+  direAvancement(0, pages.length);
   try{
-    const r = await partagerLaPage(c, pageActive, faceActive);
+    const images = await imagesDuClasseur(c, {
+      pages, face: faceActive, avancement: direAvancement,
+    });
+    const r = await partagerDesImages(c, images);
     if(r.chemin === 'fenetre'){
       ouvrirLaFenetreDePartage({
-        blob: r.blob, texte: r.texte, nom: nomDuFichier(c, pageActive),
+        classeur: c, images, texte: r.texte, face: faceActive,
+        surTout: bouton2 => partagerDepuisLeClasseur(toutesLesPages(c), bouton2),
       });
     }
   }catch(err){
     messageFugace(`Partage impossible : ${err.message}`);
   }finally{
-    if(bouton){ bouton.disabled = false; bouton.textContent = libelle; }
+    if(bouton){ bouton.disabled = false; bouton.innerHTML = avant; }
   }
+}
+
+function partagerLaPageCourante(e){
+  return partagerDepuisLeClasseur([pageActive], e.currentTarget);
 }
 
 function ouvrirLeLivre(){

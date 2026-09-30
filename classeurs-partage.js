@@ -177,9 +177,10 @@ const ADRESSE_DU_SITE = 'mrv-972.github.io/Collection-Pokemon';
 
 // ------------------------------------------------------- le partage lui-même
 
-const texteDePartage = classeur => {
+const texteDePartage = (classeur, nbPages = 1) => {
   const cartes = compterLesCartes(classeur);
-  return `Mon classeur « ${classeur.nom} » — ${cartes} carte${cartes > 1 ? 's' : ''} `
+  const pages = nbPages > 1 ? ` — ${nbPages} pages` : '';
+  return `Mon classeur « ${classeur.nom} »${pages} — ${cartes} carte${cartes > 1 ? 's' : ''} `
        + `rangée${cartes > 1 ? 's' : ''} sur PokéClasseur.`;
 };
 
@@ -217,26 +218,44 @@ function telecharger(blob, nom){
 // Sur téléphone, le navigateur sait ouvrir le sélecteur d'applications du
 // système : Instagram, WhatsApp, Messages… avec l'image déjà jointe. C'est
 // de loin le chemin le plus court, quand il existe.
-function peutPartagerUnFichier(fichier){
-  return Boolean(navigator.canShare?.({ files: [fichier] }) && navigator.share);
+function peutPartagerUnFichier(fichiers){
+  const liste = Array.isArray(fichiers) ? fichiers : [fichiers];
+  return Boolean(navigator.canShare?.({ files: liste }) && navigator.share);
 }
 
-async function partagerLaPage(classeur, indexPage, face){
-  const blob = await imageDeLaPage(classeur, indexPage, { face });
-  if(!blob) throw new Error("L'image n'a pas pu être fabriquée.");
-  const fichier = new File([blob], nomDuFichier(classeur, indexPage), { type: 'image/png' });
-  const texte = texteDePartage(classeur);
+// Une page, ou toutes : le reste du chemin est le même. « avancement » est
+// appelé à chaque page finie — fabriquer vingt pages prend plusieurs
+// secondes, et un bouton muet pendant ce temps-là passe pour cassé.
+async function imagesDuClasseur(classeur, { pages, face = 'recto', avancement } = {}){
+  const liste = [];
+  for(let rang = 0; rang < pages.length; rang++){
+    const index = pages[rang];
+    const blob = await imageDeLaPage(classeur, index, { face });
+    if(!blob) throw new Error("L'image n'a pas pu être fabriquée.");
+    liste.push({ blob, index, nom: nomDuFichier(classeur, index) });
+    avancement?.(rang + 1, pages.length);
+  }
+  return liste;
+}
 
-  if(peutPartagerUnFichier(fichier)){
+const toutesLesPages = classeur => classeur.pages.map((_, i) => i);
+
+// Le sélecteur du système accepte plusieurs fichiers d'un coup, mais pas
+// partout : on lui demande avant de compter dessus.
+async function partagerDesImages(classeur, images){
+  const fichiers = images.map(i => new File([i.blob], i.nom, { type: 'image/png' }));
+  const texte = texteDePartage(classeur, images.length);
+
+  if(fichiers.length && peutPartagerUnFichier(fichiers)){
     try{
-      await navigator.share({ files: [fichier], text: texte, title: classeur.nom });
+      await navigator.share({ files: fichiers, text: texte, title: classeur.nom });
       return { chemin: 'systeme' };
     }catch(err){
       // Fermer le sélecteur n'est pas une erreur : on n'insiste pas.
       if(err?.name === 'AbortError') return { chemin: 'annule' };
     }
   }
-  return { chemin: 'fenetre', blob, fichier, texte };
+  return { chemin: 'fenetre', images, texte };
 }
 
 // ------------------------------------------------------------- la fenêtre
@@ -249,8 +268,16 @@ const STYLE_PARTAGE = `
     color:var(--text-on-ink,#EDEAE0);font-family:inherit}
   .boite-partage h2{font-family:'Newsreader',serif;font-weight:500;font-size:21px;margin:0 0 6px}
   .boite-partage .mot{font-size:13.5px;color:var(--text-on-ink-dim,#9B9E9C);margin:0 0 16px;line-height:1.6}
-  .boite-partage .apercu{display:block;width:100%;max-width:300px;margin:0 auto 18px;
+  .boite-partage .pellicule{margin:0 0 18px}
+  .boite-partage .pellicule figure{margin:0}
+  .boite-partage .apercu{display:block;width:100%;max-width:300px;margin:0 auto;
     border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.45)}
+  .boite-partage .pellicule.multiple{display:flex;gap:12px;overflow-x:auto;
+    padding-bottom:8px;scroll-snap-type:x mandatory}
+  .boite-partage .pellicule.multiple figure{flex:0 0 150px;scroll-snap-align:start}
+  .boite-partage .pellicule.multiple .apercu{max-width:150px}
+  .boite-partage figcaption{font-size:12px;color:var(--text-on-ink-dim,#9B9E9C);
+    text-align:center;margin-top:6px}
   .boite-partage .reseaux{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
   .boite-partage .reseaux a{font-size:13px;padding:9px 14px;border-radius:5px;
     border:1px solid rgba(237,234,224,0.16);color:var(--text-on-ink,#EDEAE0);text-decoration:none}
@@ -273,26 +300,36 @@ function poserStylePartage(){
   document.head.appendChild(style);
 }
 
-function ouvrirLaFenetreDePartage({ blob, texte, nom }){
+function ouvrirLaFenetreDePartage({ classeur, images, texte, face, surTout }){
   poserStylePartage();
-  const url = URL.createObjectURL(blob);
   const adresse = typeof SITE === 'object' ? SITE.adresseWeb : `https://${ADRESSE_DU_SITE}/`;
+  const urls = images.map(i => URL.createObjectURL(i.blob));
+  const plusieurs = images.length > 1;
+  const reste = classeur.pages.length - images.length;
 
   const voile = document.createElement('div');
   voile.className = 'voile-partage';
   voile.setAttribute('role', 'dialog');
   voile.setAttribute('aria-modal', 'true');
-  voile.setAttribute('aria-label', 'Partager cette page de classeur');
+  voile.setAttribute('aria-label', 'Partager ce classeur');
   voile.innerHTML = `
     <div class="boite-partage">
-      <h2>Partager cette page</h2>
-      <p class="mot">Enregistre l'image, puis dépose-la dans ta publication.
-         Les réseaux ne permettent pas à un site de joindre une image à ta
-         place : le bouton ouvre la fenêtre de publication avec le texte
-         déjà écrit, l'image reste à glisser.</p>
-      <img class="apercu" src="${url}" alt="Aperçu de l'image à partager">
+      <h2>Partager ${plusieurs ? 'ce classeur' : 'cette page'}</h2>
+      <p class="mot">Enregistre ${plusieurs ? 'les images' : "l'image"}, puis
+         dépose-${plusieurs ? 'les' : 'la'} dans ta publication. Les réseaux ne
+         permettent pas à un site de joindre une image à ta place : le bouton ouvre la
+         fenêtre de publication avec le texte déjà écrit, l'image reste à glisser.</p>
+      <div class="pellicule ${plusieurs ? 'multiple' : ''}">
+        ${urls.map((u, i) => `<figure>
+             <img class="apercu" src="${u}" alt="Aperçu de la page ${images[i].index + 1}">
+             ${plusieurs ? `<figcaption>Page ${images[i].index + 1}</figcaption>` : ''}
+           </figure>`).join('')}
+      </div>
+      ${reste > 0 ? `<div class="boutons" style="margin-bottom:14px">
+          <button data-tout>Ajouter les ${reste} autre${reste > 1 ? 's' : ''} page${reste > 1 ? 's' : ''}</button>
+        </div>` : ''}
       <div class="boutons">
-        <button class="principal" data-enregistrer>Enregistrer l'image</button>
+        <button class="principal" data-enregistrer>Enregistrer ${plusieurs ? `les ${images.length} images` : "l'image"}</button>
         <button data-copier>Copier le texte</button>
       </div>
       <p class="mot" style="margin:16px 0 8px">Ouvrir une publication :</p>
@@ -307,13 +344,31 @@ function ouvrirLaFenetreDePartage({ blob, texte, nom }){
 
   const fermer = () => {
     document.removeEventListener('keydown', auClavier);
-    URL.revokeObjectURL(url);
+    urls.forEach(URL.revokeObjectURL);
     voile.remove();
   };
   function auClavier(e){ if(e.key === 'Escape') fermer(); }
 
-  voile.querySelector('[data-enregistrer]').addEventListener('click',
-    () => telecharger(blob, nom));
+  // Plusieurs enregistrements d'affilée : les navigateurs en bloquent une
+  // partie s'ils arrivent tous dans la même fraction de seconde.
+  voile.querySelector('[data-enregistrer]').addEventListener('click', async () => {
+    for(const image of images){
+      telecharger(image.blob, image.nom);
+      if(images.length > 1) await new Promise(r => setTimeout(r, 350));
+    }
+  });
+
+  voile.querySelector('[data-tout]')?.addEventListener('click', async e => {
+    e.target.disabled = true;
+    try{
+      await surTout(e.target);
+      fermer();
+    }catch(err){
+      e.target.disabled = false;
+      e.target.textContent = `Échec : ${err.message}`;
+    }
+  });
+
   voile.querySelector('[data-copier]').addEventListener('click', async e => {
     try{
       await navigator.clipboard.writeText(`${texte} ${adresse}`);
