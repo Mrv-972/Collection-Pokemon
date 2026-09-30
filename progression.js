@@ -107,19 +107,87 @@ function estObtenue(idCarte){
 
 const CLASSE_NON_OBTENUE = 'non-obtenue';
 
+// Griser ou non, c'est au lecteur de choisir : certains veulent voir d'un
+// coup d'œil ce qui leur manque, d'autres veulent regarder les cartes.
+// Le choix est retenu sur l'appareil et vaut pour tout le site.
+const CLE_GRISAILLE = 'pokeclasseur-griser-manquantes';
+
+function grisailleActive(){
+  try{ return localStorage.getItem(CLE_GRISAILLE) !== 'non'; }
+  catch{ return true; }   // mémoire refusée : on garde le comportement d'origine
+}
+
+// La règle est portée par un attribut du document plutôt que par chaque
+// image : basculer ne demande alors aucun redessin, la page change de
+// couleur d'un coup.
+//
 // La transition évite le clignotement quand on coche : la couleur revient en
 // fondu plutôt que d'un coup.
 const STYLE_NON_OBTENUE = `
-  img.${CLASSE_NON_OBTENUE}{filter:grayscale(1);opacity:.78;transition:filter .2s,opacity .2s}
+  img.${CLASSE_NON_OBTENUE}{transition:filter .2s,opacity .2s}
+  html[data-griser="oui"] img.${CLASSE_NON_OBTENUE}{filter:grayscale(1);opacity:.78}
   @media(prefers-reduced-motion:reduce){
     img.${CLASSE_NON_OBTENUE}{transition:none}
   }
 `;
 
+function appliquerLaGrisaille(){
+  document.documentElement.dataset.griser = grisailleActive() ? 'oui' : 'non';
+}
+
 function poserStyleNonObtenue(){
+  appliquerLaGrisaille();
   if(document.getElementById('style-non-obtenue')) return;
   const style = document.createElement('style');
   style.id = 'style-non-obtenue';
   style.textContent = STYLE_NON_OBTENUE;
   document.head.appendChild(style);
+}
+
+// L'interrupteur, posé dans la barre d'outils des pages qui montrent des
+// cartes. Une seule écriture pour les trois pages concernées : sans cela,
+// le libellé et la mémoire auraient divergé au premier remaniement.
+const STYLE_INTERRUPTEUR = `
+  .bouton-grisaille{font-family:inherit;font-size:13px;padding:7px 13px;border-radius:5px;
+    cursor:pointer;color:var(--text-on-ink-dim);background:transparent;
+    border:1px solid rgba(237,234,224,0.14);white-space:nowrap}
+  .bouton-grisaille:hover{color:var(--text-on-ink)}
+  .bouton-grisaille[aria-pressed="true"]{color:var(--text-on-ink);
+    border-color:rgba(var(--gold-rgb),0.45);background:rgba(var(--gold-rgb),0.10)}
+`;
+
+function poserInterrupteurGrisaille(conteneur){
+  if(!conteneur || conteneur.querySelector('.bouton-grisaille')) return;
+  poserStyleNonObtenue();
+
+  if(!document.getElementById('style-interrupteur-grisaille')){
+    const style = document.createElement('style');
+    style.id = 'style-interrupteur-grisaille';
+    style.textContent = STYLE_INTERRUPTEUR;
+    document.head.appendChild(style);
+  }
+
+  const bouton = document.createElement('button');
+  bouton.type = 'button';
+  bouton.className = 'bouton-grisaille';
+  bouton.id = 'bouton-grisaille';
+
+  const rafraichir = () => {
+    const actif = grisailleActive();
+    bouton.setAttribute('aria-pressed', String(actif));
+    bouton.textContent = actif ? '◐ Manquantes en gris' : '◐ Manquantes en couleur';
+    bouton.title = actif
+      ? 'Les cartes que tu n\'as pas encore sont en noir et blanc. Clique pour les voir en couleur.'
+      : 'Toutes les cartes sont en couleur. Clique pour griser celles qui te manquent.';
+  };
+
+  bouton.addEventListener('click', () => {
+    try{ localStorage.setItem(CLE_GRISAILLE, grisailleActive() ? 'non' : 'oui'); }
+    catch{ /* mémoire refusée : le choix ne durera pas, mais la page suit */ }
+    appliquerLaGrisaille();
+    rafraichir();
+  });
+
+  rafraichir();
+  conteneur.appendChild(bouton);
 }

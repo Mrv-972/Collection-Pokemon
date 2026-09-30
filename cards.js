@@ -289,8 +289,14 @@ function setIdOfCard(cardId){
 // Le composant est autonome (styles compris) pour que les deux grilles en
 // bénéficient sans dupliquer de CSS dans chaque page.
 
-// La règle du noir et blanc vient de progression.js, quand la page le charge.
+// La règle du noir et blanc vient de progression.js, quand la page le charge,
+// et l'interrupteur qui l'allume ou l'éteint se pose dans la barre d'outils.
 if(typeof poserStyleNonObtenue === 'function') poserStyleNonObtenue();
+if(typeof poserInterrupteurGrisaille === 'function'){
+  const poser = () => poserInterrupteurGrisaille(document.querySelector('.toolbar'));
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', poser);
+  else poser();
+}
 
 document.head.appendChild(Object.assign(document.createElement('style'), { textContent: `
   .card-img-wrap img{cursor:zoom-in}
