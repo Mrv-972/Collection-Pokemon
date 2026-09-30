@@ -35,3 +35,6 @@ jobs:
 
       - name: Sonder les logos
         run: node outils/sonde-logos-series.mjs --instantane /tmp/instantane
+
+      - name: Sonder l'autorisation de peindre les visuels
+        run: node outils/sonde-cors-visuels.mjs
