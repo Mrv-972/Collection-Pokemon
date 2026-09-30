@@ -300,12 +300,57 @@ function poserStylePartage(){
   document.head.appendChild(style);
 }
 
-function ouvrirLaFenetreDePartage({ classeur, images, texte, face, surTout }){
+// Une page ou tout le classeur ? La question se pose avant de fabriquer la
+// moindre image, et non dans la fenêtre de repli : un navigateur qui sait
+// partager un fichier ne l'ouvre jamais, et le classeur entier y serait
+// resté hors d'atteinte — ce qui était le cas.
+function demanderLEtendue(classeur){
+  return new Promise(resoudre => {
+    poserStylePartage();
+    const pages = classeur.pages.length;
+
+    const voile = document.createElement('div');
+    voile.className = 'voile-partage';
+    voile.setAttribute('role', 'dialog');
+    voile.setAttribute('aria-modal', 'true');
+    voile.setAttribute('aria-label', 'Que partager ?');
+    voile.innerHTML = `
+      <div class="boite-partage">
+        <h2>Que partager ?</h2>
+        <p class="mot">Une image est fabriquée pour chaque page. Tout le classeur
+           demande donc un peu de patience.</p>
+        <div class="boutons">
+          <button class="principal" data-etendue="page">Cette page seulement</button>
+          <button data-etendue="tout">Tout le classeur — ${pages} pages</button>
+        </div>
+        <div class="boutons" style="justify-content:flex-end;margin-top:16px">
+          <button data-fermer>Annuler</button>
+        </div>
+      </div>`;
+
+    const fermer = reponse => {
+      document.removeEventListener('keydown', auClavier);
+      voile.remove();
+      resoudre(reponse);
+    };
+    function auClavier(e){ if(e.key === 'Escape') fermer(null); }
+
+    voile.querySelectorAll('[data-etendue]').forEach(b =>
+      b.addEventListener('click', () => fermer(b.dataset.etendue)));
+    voile.querySelector('[data-fermer]').addEventListener('click', () => fermer(null));
+    voile.addEventListener('click', e => { if(e.target === voile) fermer(null); });
+    document.addEventListener('keydown', auClavier);
+
+    document.body.appendChild(voile);
+    voile.querySelector('[data-etendue="page"]').focus();
+  });
+}
+
+function ouvrirLaFenetreDePartage({ classeur, images, texte }){
   poserStylePartage();
   const adresse = typeof SITE === 'object' ? SITE.adresseWeb : `https://${ADRESSE_DU_SITE}/`;
   const urls = images.map(i => URL.createObjectURL(i.blob));
   const plusieurs = images.length > 1;
-  const reste = classeur.pages.length - images.length;
 
   const voile = document.createElement('div');
   voile.className = 'voile-partage';
@@ -325,9 +370,6 @@ function ouvrirLaFenetreDePartage({ classeur, images, texte, face, surTout }){
              ${plusieurs ? `<figcaption>Page ${images[i].index + 1}</figcaption>` : ''}
            </figure>`).join('')}
       </div>
-      ${reste > 0 ? `<div class="boutons" style="margin-bottom:14px">
-          <button data-tout>Ajouter les ${reste} autre${reste > 1 ? 's' : ''} page${reste > 1 ? 's' : ''}</button>
-        </div>` : ''}
       <div class="boutons">
         <button class="principal" data-enregistrer>Enregistrer ${plusieurs ? `les ${images.length} images` : "l'image"}</button>
         <button data-copier>Copier le texte</button>
@@ -355,17 +397,6 @@ function ouvrirLaFenetreDePartage({ classeur, images, texte, face, surTout }){
     for(const image of images){
       telecharger(image.blob, image.nom);
       if(images.length > 1) await new Promise(r => setTimeout(r, 350));
-    }
-  });
-
-  voile.querySelector('[data-tout]')?.addEventListener('click', async e => {
-    e.target.disabled = true;
-    try{
-      await surTout(e.target);
-      fermer();
-    }catch(err){
-      e.target.disabled = false;
-      e.target.textContent = `Échec : ${err.message}`;
     }
   });
 

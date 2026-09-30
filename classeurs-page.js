@@ -1316,10 +1316,7 @@ async function partagerDepuisLeClasseur(pages, bouton){
     });
     const r = await partagerDesImages(c, images);
     if(r.chemin === 'fenetre'){
-      ouvrirLaFenetreDePartage({
-        classeur: c, images, texte: r.texte, face: faceActive,
-        surTout: bouton2 => partagerDepuisLeClasseur(toutesLesPages(c), bouton2),
-      });
+      ouvrirLaFenetreDePartage({ classeur: c, images, texte: r.texte });
     }
   }catch(err){
     messageFugace(`Partage impossible : ${err.message}`);
@@ -1328,8 +1325,17 @@ async function partagerDepuisLeClasseur(pages, bouton){
   }
 }
 
-function partagerLaPageCourante(e){
-  return partagerDepuisLeClasseur([pageActive], e.currentTarget);
+async function partagerLaPageCourante(e){
+  const c = actif();
+  if(!c) return;
+  const bouton = e.currentTarget;
+  // Un classeur d'une seule page ne laisse pas le choix : on ne pose pas
+  // une question dont la réponse est déjà écrite.
+  if(c.pages.length <= 1) return partagerDepuisLeClasseur([0], bouton);
+  const etendue = await demanderLEtendue(c);
+  if(!etendue) return;
+  return partagerDepuisLeClasseur(
+    etendue === 'tout' ? toutesLesPages(c) : [pageActive], bouton);
 }
 
 function ouvrirLeLivre(){
