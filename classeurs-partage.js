@@ -174,3 +174,158 @@ function peindreLePied(ctx, classeur, indexPage, face){
 }
 
 const ADRESSE_DU_SITE = 'mrv-972.github.io/Collection-Pokemon';
+
+// ------------------------------------------------------- le partage lui-même
+
+const texteDePartage = classeur => {
+  const cartes = compterLesCartes(classeur);
+  return `Mon classeur « ${classeur.nom} » — ${cartes} carte${cartes > 1 ? 's' : ''} `
+       + `rangée${cartes > 1 ? 's' : ''} sur PokéClasseur.`;
+};
+
+const nomDuFichier = (classeur, index) =>
+  `pokeclasseur-${classeur.nom.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'classeur'}-page-${index + 1}.png`;
+
+// Les réseaux qui savent ouvrir une fenêtre de publication avec un texte
+// prérempli. Aucun n'accepte qu'on y joigne une image depuis un site : c'est
+// au membre de la déposer, d'où le mot qui le dit dans la fenêtre.
+const RESEAUX = [
+  { cle: 'x', nom: 'X', adresse: (t, u) =>
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(t)}&url=${encodeURIComponent(u)}` },
+  { cle: 'facebook', nom: 'Facebook', adresse: (t, u) =>
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(u)}` },
+  { cle: 'bluesky', nom: 'Bluesky', adresse: (t, u) =>
+      `https://bsky.app/intent/compose?text=${encodeURIComponent(t + ' ' + u)}` },
+  { cle: 'whatsapp', nom: 'WhatsApp', adresse: (t, u) =>
+      `https://api.whatsapp.com/send?text=${encodeURIComponent(t + ' ' + u)}` },
+];
+
+function telecharger(blob, nom){
+  const url = URL.createObjectURL(blob);
+  const lien = document.createElement('a');
+  lien.href = url;
+  lien.download = nom;
+  document.body.appendChild(lien);
+  lien.click();
+  lien.remove();
+  // Laisser le temps au navigateur d'enregistrer avant de rendre la mémoire.
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+
+// Sur téléphone, le navigateur sait ouvrir le sélecteur d'applications du
+// système : Instagram, WhatsApp, Messages… avec l'image déjà jointe. C'est
+// de loin le chemin le plus court, quand il existe.
+function peutPartagerUnFichier(fichier){
+  return Boolean(navigator.canShare?.({ files: [fichier] }) && navigator.share);
+}
+
+async function partagerLaPage(classeur, indexPage, face){
+  const blob = await imageDeLaPage(classeur, indexPage, { face });
+  if(!blob) throw new Error("L'image n'a pas pu être fabriquée.");
+  const fichier = new File([blob], nomDuFichier(classeur, indexPage), { type: 'image/png' });
+  const texte = texteDePartage(classeur);
+
+  if(peutPartagerUnFichier(fichier)){
+    try{
+      await navigator.share({ files: [fichier], text: texte, title: classeur.nom });
+      return { chemin: 'systeme' };
+    }catch(err){
+      // Fermer le sélecteur n'est pas une erreur : on n'insiste pas.
+      if(err?.name === 'AbortError') return { chemin: 'annule' };
+    }
+  }
+  return { chemin: 'fenetre', blob, fichier, texte };
+}
+
+// ------------------------------------------------------------- la fenêtre
+
+const STYLE_PARTAGE = `
+  .voile-partage{position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:120;
+    display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
+  .boite-partage{background:var(--ink-soft,#20232A);border:1px solid rgba(237,234,224,0.14);
+    border-radius:10px;max-width:520px;width:100%;padding:24px;
+    color:var(--text-on-ink,#EDEAE0);font-family:inherit}
+  .boite-partage h2{font-family:'Newsreader',serif;font-weight:500;font-size:21px;margin:0 0 6px}
+  .boite-partage .mot{font-size:13.5px;color:var(--text-on-ink-dim,#9B9E9C);margin:0 0 16px;line-height:1.6}
+  .boite-partage .apercu{display:block;width:100%;max-width:300px;margin:0 auto 18px;
+    border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,0.45)}
+  .boite-partage .reseaux{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+  .boite-partage .reseaux a{font-size:13px;padding:9px 14px;border-radius:5px;
+    border:1px solid rgba(237,234,224,0.16);color:var(--text-on-ink,#EDEAE0);text-decoration:none}
+  .boite-partage .reseaux a:hover{border-color:rgba(var(--gold-rgb,201,162,39),0.5)}
+  .boite-partage .boutons{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .boite-partage button{font-family:inherit;font-size:13.5px;padding:10px 16px;border-radius:5px;
+    cursor:pointer;border:1px solid rgba(237,234,224,0.16);background:transparent;
+    color:var(--text-on-ink,#EDEAE0)}
+  .boite-partage button.principal{border-color:rgba(var(--gold-rgb,201,162,39),0.55);
+    background:rgba(var(--gold-rgb,201,162,39),0.14)}
+  .boite-partage button:hover{border-color:rgba(var(--gold-rgb,201,162,39),0.6)}
+  @media(max-width:520px){ .boite-partage .apercu{max-width:220px} }
+`;
+
+function poserStylePartage(){
+  if(document.getElementById('style-partage')) return;
+  const style = document.createElement('style');
+  style.id = 'style-partage';
+  style.textContent = STYLE_PARTAGE;
+  document.head.appendChild(style);
+}
+
+function ouvrirLaFenetreDePartage({ blob, texte, nom }){
+  poserStylePartage();
+  const url = URL.createObjectURL(blob);
+  const adresse = typeof SITE === 'object' ? SITE.adresseWeb : `https://${ADRESSE_DU_SITE}/`;
+
+  const voile = document.createElement('div');
+  voile.className = 'voile-partage';
+  voile.setAttribute('role', 'dialog');
+  voile.setAttribute('aria-modal', 'true');
+  voile.setAttribute('aria-label', 'Partager cette page de classeur');
+  voile.innerHTML = `
+    <div class="boite-partage">
+      <h2>Partager cette page</h2>
+      <p class="mot">Enregistre l'image, puis dépose-la dans ta publication.
+         Les réseaux ne permettent pas à un site de joindre une image à ta
+         place : le bouton ouvre la fenêtre de publication avec le texte
+         déjà écrit, l'image reste à glisser.</p>
+      <img class="apercu" src="${url}" alt="Aperçu de l'image à partager">
+      <div class="boutons">
+        <button class="principal" data-enregistrer>Enregistrer l'image</button>
+        <button data-copier>Copier le texte</button>
+      </div>
+      <p class="mot" style="margin:16px 0 8px">Ouvrir une publication :</p>
+      <div class="reseaux">
+        ${RESEAUX.map(r => `<a href="${r.adresse(texte, adresse)}" target="_blank"
+             rel="noopener noreferrer">${r.nom}</a>`).join('')}
+      </div>
+      <div class="boutons" style="justify-content:flex-end">
+        <button data-fermer>Fermer</button>
+      </div>
+    </div>`;
+
+  const fermer = () => {
+    document.removeEventListener('keydown', auClavier);
+    URL.revokeObjectURL(url);
+    voile.remove();
+  };
+  function auClavier(e){ if(e.key === 'Escape') fermer(); }
+
+  voile.querySelector('[data-enregistrer]').addEventListener('click',
+    () => telecharger(blob, nom));
+  voile.querySelector('[data-copier]').addEventListener('click', async e => {
+    try{
+      await navigator.clipboard.writeText(`${texte} ${adresse}`);
+      e.target.textContent = 'Texte copié ✓';
+    }catch{
+      e.target.textContent = 'Copie refusée par le navigateur';
+    }
+  });
+  voile.querySelector('[data-fermer]').addEventListener('click', fermer);
+  voile.addEventListener('click', e => { if(e.target === voile) fermer(); });
+  document.addEventListener('keydown', auClavier);
+
+  document.body.appendChild(voile);
+  voile.querySelector('[data-enregistrer]').focus();
+}

@@ -298,6 +298,7 @@ function pageDuClasseur(c){
         <button data-face="recto" aria-selected="${!auVerso}">Recto</button>
         <button data-face="verso" aria-selected="${auVerso}">Verso</button>
       </div>
+      <button class="ajouter" id="partager-page">Partager</button>
       <button class="ajouter voir" id="voir-le-livre">Visualiser mon classeur</button>
     </div>
     ${auVerso ? `<p class="mot-du-verso">Le dos de la page ${pageActive + 1}, vu en
@@ -594,6 +595,7 @@ function brancherLesGestes(){
   zone.querySelector('#page-avant')?.addEventListener('click', () => allerALaPage(pageActive - 1, -1));
   zone.querySelector('#page-apres')?.addEventListener('click', () => allerALaPage(pageActive + 1, 1));
   zone.querySelector('#voir-le-livre')?.addEventListener('click', ouvrirLeLivre);
+  zone.querySelector('#partager-page')?.addEventListener('click', partagerLaPageCourante);
   zone.querySelectorAll('[data-face]').forEach(b => b.addEventListener('click', () => {
     if(faceActive === b.dataset.face) return;
     faceActive = b.dataset.face;
@@ -1278,6 +1280,28 @@ function tournerLeFeuillet(sens){
   if(voulu === pageLivre) return;
   pageLivre = voulu;
   dessinerLeLivre();
+}
+
+// Fabriquer l'image prend un instant — chaque carte est chargée puis
+// peinte. Le bouton le dit, plutôt que de laisser croire à un clic perdu.
+async function partagerLaPageCourante(){
+  const c = actif();
+  if(!c) return;
+  const bouton = document.getElementById('partager-page');
+  const libelle = bouton?.textContent;
+  if(bouton){ bouton.disabled = true; bouton.textContent = 'Préparation…'; }
+  try{
+    const r = await partagerLaPage(c, pageActive, faceActive);
+    if(r.chemin === 'fenetre'){
+      ouvrirLaFenetreDePartage({
+        blob: r.blob, texte: r.texte, nom: nomDuFichier(c, pageActive),
+      });
+    }
+  }catch(err){
+    messageFugace(`Partage impossible : ${err.message}`);
+  }finally{
+    if(bouton){ bouton.disabled = false; bouton.textContent = libelle; }
+  }
 }
 
 function ouvrirLeLivre(){
