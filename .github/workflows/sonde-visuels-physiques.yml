@@ -25,3 +25,6 @@ jobs:
 
       - name: Sonder
         run: node outils/sonde-visuels-physiques.mjs --instantane donnees --par-extension "${{ inputs.par-extension }}"
+
+      - name: Éclaircir les extensions muettes
+        run: node outils/sonde-adresses-tcgdex.mjs --instantane donnees
