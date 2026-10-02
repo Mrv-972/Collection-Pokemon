@@ -28,3 +28,15 @@ jobs:
 
       - name: Éclaircir les extensions muettes
         run: node outils/sonde-adresses-tcgdex.mjs --instantane donnees
+
+      - name: Récupérer la deuxième source
+        run: |
+          git clone --depth 1 --filter=blob:none --no-checkout \
+            https://github.com/PokemonTCG/pokemon-tcg-data /tmp/ptcgdata
+          cd /tmp/ptcgdata
+          git sparse-checkout init --cone
+          git sparse-checkout set sets cards/en
+          git checkout
+
+      - name: Éprouver la deuxième source
+        run: node outils/sonde-source-pokemontcg.mjs --instantane donnees --source /tmp/ptcgdata
