@@ -1,4 +1,4 @@
-# Relève les visuels français chez PkmCards, au navigateur.
+# Relève les visuels français chez PkmCards.
 #
 # À la demande seulement : rien n'est branché sur la construction nocturne
 # tant que la question de l'autorisation n'est pas réglée.
@@ -7,9 +7,9 @@ name: Moisson PkmCards
 on:
   workflow_dispatch:
     inputs:
-      series:
-        description: "Nombre de séries à parcourir (vide = toutes)"
-        default: "3"
+      pages:
+        description: "Pages de liste à lire (0 = toutes)"
+        default: "0"
       essai:
         description: "Essai : ne rien écrire dans le dépôt"
         type: boolean
@@ -27,23 +27,16 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Installer le navigateur
-        run: |
-          npm init -y >/dev/null 2>&1 || true
-          npm install playwright@latest
-          npx playwright install --with-deps chromium
-
       - name: Relever les visuels
         run: |
           node outils/moissonner-pkmcards.mjs \
             --sortie donnees \
-            ${{ inputs.series && format('--series {0}', inputs.series) || '' }} \
+            --pages "${{ inputs.pages }}" \
             ${{ inputs.essai && '--essai' || '' }}
 
       - name: Publier le relevé s'il a changé
         if: ${{ !inputs.essai }}
         run: |
-          rm -rf node_modules package.json package-lock.json
           git config user.name  "Moisson PkmCards"
           git config user.email "actions@users.noreply.github.com"
           git add donnees/visuels-pkmcards.json
