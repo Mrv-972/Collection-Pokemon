@@ -21,7 +21,7 @@
 //
 //   node outils/sonde-visuels-physiques.mjs --instantane donnees [--par-extension 5]
 
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
   a.startsWith('--') ? [a.slice(2), (t[i + 1] && !t[i + 1].startsWith('--')) ? t[i + 1] : true] : []
@@ -29,6 +29,10 @@ const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
 
 const dossier = args.instantane ?? 'donnees';
 const parExtension = Number(args['par-extension'] ?? 5);
+// Sans --rapport, la mesure ne vit que dans le journal de l'exécuteur, qui
+// finit par disparaître. Or c'est elle qui dit quelles extensions viser :
+// on la dépose donc dans le dépôt, pour pouvoir la citer plus tard.
+const rapport = typeof args.rapport === 'string' ? args.rapport : null;
 const IDENTITE = { 'User-Agent': 'PokeClasseur (sonde des visuels physiques)' };
 
 // Le serveur n'aime pas qu'on lui parle trop vite : on limite le nombre
@@ -131,4 +135,26 @@ const sansRien = bilan.filter(b => b.sondees && b.frOk === 0 && b.enOk === 0);
 if(sansRien.length){
   console.log(`\n${sansRien.length} extensions n'ont RIEN, dans aucune langue :`);
   for(const b of sansRien) console.log(`  ${b.id.padEnd(12)} ${b.serie} — ${b.nom}`);
+}
+
+// ------------------------------------------------- rapport durable --------
+if(rapport){
+  const chemin = rapport.endsWith('.json') ? rapport : `${rapport}/couverture-visuels.json`;
+  const dossierDuRapport = chemin.replace(/\/[^/]+$/, '');
+  if(dossierDuRapport) await mkdir(dossierDuRapport, { recursive: true });
+  await writeFile(chemin, JSON.stringify({
+    mesureLe: new Date().toISOString(),
+    // On note l'échantillon : conclure « cette extension n'a rien » sur
+    // cinq cartes tirées au hasard n'a pas le poids d'un relevé complet.
+    cartesSondeesParExtension: parExtension,
+    total: { sondees, frOk, sauvees, perdues },
+    logos: { fr: logosFr, enSeul: logosEn, aucun: logosRien },
+    // Les deux listes dont la suite a besoin : où il manque du français,
+    // et où il n'y a rien du tout (donc où une source française compterait).
+    extensionsATrous: aTrous.map(b => ({ id: b.id, serie: b.serie, nom: b.nom,
+      frOk: b.frOk, enOk: b.enOk, sondees: b.sondees })),
+    extensionsMuettes: sansRien.map(b => ({ id: b.id, serie: b.serie, nom: b.nom,
+      sondees: b.sondees })),
+  }, null, 1) + '\n');
+  console.log(`\nrapport écrit dans ${chemin}`);
 }
