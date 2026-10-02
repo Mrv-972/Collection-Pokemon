@@ -10,6 +10,10 @@ on:
       par-extension:
         description: "Cartes sondées par extension"
         default: "5"
+      seulement-francaises:
+        description: "Ne faire que la reconnaissance des sources françaises"
+        type: boolean
+        default: false
 
 jobs:
   sonder:
@@ -23,13 +27,19 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Reconnaître les sources françaises
+        run: node outils/sonde-sources-francaises.mjs
+
       - name: Sonder
+        if: ${{ !inputs.seulement-francaises }}
         run: node outils/sonde-visuels-physiques.mjs --instantane donnees --par-extension "${{ inputs.par-extension }}"
 
       - name: Éclaircir les extensions muettes
+        if: ${{ !inputs.seulement-francaises }}
         run: node outils/sonde-adresses-tcgdex.mjs --instantane donnees
 
       - name: Récupérer la deuxième source
+        if: ${{ !inputs.seulement-francaises }}
         run: |
           git clone --depth 1 --filter=blob:none --no-checkout \
             https://github.com/PokemonTCG/pokemon-tcg-data /tmp/ptcgdata
@@ -39,4 +49,5 @@ jobs:
           git checkout
 
       - name: Éprouver la deuxième source
+        if: ${{ !inputs.seulement-francaises }}
         run: node outils/sonde-source-pokemontcg.mjs --instantane donnees --source /tmp/ptcgdata
