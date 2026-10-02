@@ -1,136 +1,125 @@
-// Relever les visuels français chez PkmCards, au navigateur.
-// ==========================================================
+// Relever les visuels français chez PkmCards.
+// ===========================================
 //
-// Leurs pages construisent la liste des cartes par JavaScript : une simple
-// lecture du code livré ne rend rien. Il faut donc un vrai navigateur, qui
-// laisse la page s'exécuter avant qu'on regarde ce qu'elle contient.
+// L'outil ne télécharge AUCUNE image : il relève des adresses et les range
+// dans un fichier. Ce qu'on en fera ensuite est une autre décision.
 //
-// Cet outil NE TÉLÉCHARGE AUCUNE IMAGE. Il relève des adresses et les range
-// dans un fichier, rien de plus. Ce qu'on en fera ensuite est une autre
-// décision, qui n'est pas prise ici.
+// Deux chemins possibles, et le premier essai a montré lequel vaut mieux :
 //
-// Il est volontairement lent et bavard sur son identité : une pause entre
-// chaque page, un seul onglet, et un « User-Agent » qui dit qui frappe à la
-// porte. Un site de communauté n'a pas à subir notre impatience.
+//   « liste »  — leur page « liste des cartes françaises » est rendue par
+//                le serveur : ses adresses d'image sont dans le code livré,
+//                sans navigateur. C'est le chemin par défaut : plus simple
+//                pour nous, et bien plus léger pour eux.
 //
-//   node outils/moissonner-pkmcards.mjs --sortie donnees [--series 3] [--essai]
+//   « series » — les pages de série, elles, construisent leur contenu par
+//                JavaScript : il y faut un navigateur. Gardé en recours.
+//
+// Leçons du premier essai, inscrites ici pour ne pas les repayer :
+//   — leur page /series n'annonce que 30 séries sur 240 : s'y fier conduit
+//     à croire le catalogue bien plus petit qu'il n'est ;
+//   — une page de série ne livrait que 24 visuels pour 34 liens, le reste
+//     se chargeant au défilement ;
+//   — « --series 3 » restait passé alors qu'on demandait tout : une valeur
+//     vide est remplacée par le défaut du formulaire. D'où « 0 = toutes ».
+//
+//   node outils/moissonner-pkmcards.mjs --sortie donnees [--pages 0] [--essai]
 
 import { writeFile, mkdir } from 'node:fs/promises';
-import { chromium } from 'playwright';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
   a.startsWith('--') ? [a.slice(2), (t[i+1] && !t[i+1].startsWith('--')) ? t[i+1] : true] : []
 ).filter(x => x.length));
 
 const sortie = args.sortie ?? 'donnees';
-const combienDeSeries = args.series ? Number(args.series) : Infinity;
+// 0 veut dire « toutes » : une valeur vide serait remplacée par le défaut
+// du formulaire, et l'on croirait avoir tout pris alors que non.
+const maxPages = Number(args.pages ?? 0) || Infinity;
 const essai = Boolean(args.essai);
-const PAUSE = Number(args.pause ?? 2500);   // entre deux pages, en millisecondes
+const PAUSE = Number(args.pause ?? 1500);
 
 const RACINE = 'https://www.pkmcards.fr';
-const IDENTITE = 'PokeClasseur/1.0 (collecte de visuels francais ; ' +
-                 'github.com/Mrv-972/Collection-Pokemon ; mrv972.contact@gmail.com)';
+const IDENTITE = {
+  'User-Agent': 'PokeClasseur/1.0 (collecte de visuels francais ; ' +
+                'github.com/Mrv-972/Collection-Pokemon ; mrv972.contact@gmail.com)',
+  'Accept-Language': 'fr-FR,fr;q=0.9',
+};
 
 const dormir = ms => new Promise(r => setTimeout(r, ms));
 
-const navigateur = await chromium.launch();
-const contexte = await navigateur.newContext({
-  userAgent: IDENTITE,
-  locale: 'fr-FR',
-  // Les visuels eux-mêmes ne nous intéressent pas : on veut leurs adresses.
-  // Les bloquer allège la page et épargne leur serveur.
-  viewport: { width: 1280, height: 2000 },
-});
-await contexte.route('**/*', route => {
-  const type = route.request().resourceType();
-  if(type === 'image' || type === 'media' || type === 'font') return route.abort();
-  route.continue();
-});
-const page = await contexte.newPage();
+// Une adresse de visuel chez eux porte le code d'extension et le numéro :
+//   static.pkmcards.fr/cards/fr/<code>/…-<code>-fr-<numéro>-<nom>.webp
+const DECOUPE = /static\.pkmcards\.fr\/cards\/fr\/([^/]+)\/[^"'\s]*?-fr-(\d+[a-z]?)-/i;
 
-// ------------------------------------------------- la liste des séries ---
-console.log('Lecture de la liste des séries…');
-await page.goto(`${RACINE}/series`, { waitUntil: 'domcontentloaded', timeout: 60000 });
-const series = await page.evaluate(() =>
-  [...new Set([...document.querySelectorAll('a[href^="/series/"]')]
-    .map(a => a.getAttribute('href')))]);
-console.log(`${series.length} séries listées.\n`);
-
-const retenues = series.slice(0, combienDeSeries);
-if(retenues.length < series.length){
-  console.log(`(on n'en traite que ${retenues.length} : passe de reconnaissance)\n`);
-}
-
-// ------------------------------------------------- chaque série -----------
-// Une adresse de carte chez eux : /cards/<code>-fr-<numéro>-<nom en clair>
-const DECOUPE = /^\/cards\/([a-z0-9.]+)-fr-(\d+[a-z]?)-/i;
-
-const releve = {};      // "<code>-<numéro>" → adresse du visuel
-const parSerie = [];
-let sansRien = 0;
-
-for(const chemin of retenues){
-  await dormir(PAUSE);
-  let cartes = [];
+async function lire(adresse){
   try{
-    await page.goto(`${RACINE}${chemin}`, { waitUntil: 'networkidle', timeout: 60000 });
-    // La liste arrive après coup : on attend qu'une carte paraisse, sans
-    // faire échouer la série si elle n'en a aucune.
-    await page.waitForSelector('a[href^="/cards/"]', { timeout: 15000 }).catch(() => {});
-    cartes = await page.evaluate(() =>
-      [...document.querySelectorAll('a[href^="/cards/"]')].map(a => {
-        const img = a.querySelector('img');
-        return {
-          lien: a.getAttribute('href'),
-          // Une image paresseuse garde son adresse dans « data-src » tant
-          // qu'elle n'est pas affichée : on regarde les deux.
-          src: img?.getAttribute('src') || img?.getAttribute('data-src') || null,
-        };
-      }));
-  }catch(err){
-    console.log(`  ÉCHEC ${chemin} — ${err.message.split('\n')[0]}`);
-    continue;
-  }
-
-  let gardees = 0;
-  for(const c of cartes){
-    const m = DECOUPE.exec(c.lien ?? '');
-    if(!m || !c.src) continue;
-    const adresse = c.src.startsWith('http') ? c.src : `https:${c.src}`;
-    if(!adresse.includes('/cards/fr/')) continue;
-    releve[`${m[1].toLowerCase()}-${m[2]}`] = adresse;
-    gardees++;
-  }
-  if(!gardees) sansRien++;
-  parSerie.push({ chemin, vues: cartes.length, gardees });
-  console.log(`  ${String(gardees).padStart(4)} visuels  (${cartes.length} liens)  ${chemin}`);
+    const r = await fetch(adresse, { headers: IDENTITE, redirect: 'follow' });
+    return { code: r.status, corps: await r.text(), finale: r.url };
+  }catch(err){ return { code: 'réseau', corps: '', finale: adresse, err: err.message }; }
 }
 
-await navigateur.close();
+const releve = {};
+let pagesLues = 0, pagesVides = 0;
+
+console.log('Parcours de la liste des cartes françaises…\n');
+for(let page = 1; page <= maxPages; page++){
+  const adresse = page === 1
+    ? `${RACINE}/cards/liste-cartes-francaises`
+    : `${RACINE}/cards/liste-cartes-francaises?page=${page}`;
+  const r = await lire(adresse);
+
+  if(r.code !== 200){
+    console.log(`page ${page} : ${r.code} — on s'arrête là.`);
+    break;
+  }
+  // Une page au-delà de la dernière renvoie souvent la première : sans ce
+  // garde-fou, on tournerait en rond jusqu'à la limite.
+  if(page > 1 && !r.finale.includes(`page=${page}`)){
+    console.log(`page ${page} : renvoyée vers ${r.finale} — fin de la pagination.`);
+    break;
+  }
+
+  const adresses = [...new Set((r.corps.match(
+    /https?:\/\/static\.pkmcards\.fr\/cards\/fr\/[^"'\s)\\]+/gi) ?? [])];
+  let neuves = 0;
+  for(const a of adresses){
+    const m = DECOUPE.exec(a);
+    if(!m) continue;
+    const cle = `${m[1].toLowerCase()}-${m[2]}`;
+    if(!(cle in releve)){ releve[cle] = a; neuves++; }
+  }
+
+  pagesLues++;
+  console.log(`page ${String(page).padStart(3)} : ${String(adresses.length).padStart(3)} visuels, ${String(neuves).padStart(3)} nouveaux  (total ${Object.keys(releve).length})`);
+
+  // Deux pages d'affilée sans rien de neuf : on a fait le tour.
+  if(!neuves){
+    pagesVides++;
+    if(pagesVides >= 2){ console.log('deux pages sans nouveauté : fin.'); break; }
+  }else pagesVides = 0;
+
+  await dormir(PAUSE);
+}
 
 // ------------------------------------------------------------- bilan ------
+const codes = [...new Set(Object.keys(releve).map(c => c.replace(/-[^-]+$/, '')))].sort();
 console.log(`\n================ bilan ================`);
-console.log(`séries parcourues   : ${parSerie.length}`);
-console.log(`séries sans visuel  : ${sansRien}`);
-console.log(`visuels relevés     : ${Object.keys(releve).length}`);
-const codes = [...new Set(Object.keys(releve).map(c => c.replace(/-[^-]+$/, '')))];
-console.log(`codes d'extension   : ${codes.length}`);
-console.log(`   ${codes.slice(0, 40).join(', ')}`);
+console.log(`pages lues        : ${pagesLues}`);
+console.log(`visuels relevés   : ${Object.keys(releve).length}`);
+console.log(`codes d'extension : ${codes.length}`);
+console.log(`   ${codes.join(', ')}`);
 
 if(essai){
-  console.log('\n--essai : rien n\'est écrit.');
-  const apercu = Object.entries(releve).slice(0, 5);
-  for(const [cle, a] of apercu) console.log(`   ${cle}  ${a}`);
+  console.log("\n--essai : rien n'est écrit.");
 }else{
   await mkdir(sortie, { recursive: true });
   const fichier = `${sortie}/visuels-pkmcards.json`;
   await writeFile(fichier, JSON.stringify({
-    source: 'https://www.pkmcards.fr',
+    source: RACINE,
     releveLe: new Date().toISOString(),
-    // On garde la trace de ce qu'on a parcouru : un relevé partiel qu'on
-    // prendrait pour complet ferait conclure à tort à une absence.
-    seriesParcourues: parSerie.length,
-    seriesEnTout: series.length,
+    // On note ce qu'on a parcouru : un relevé partiel qu'on prendrait pour
+    // complet ferait conclure à tort à l'absence d'une carte.
+    pagesLues,
+    complet: maxPages === Infinity,
     visuels: releve,
   }, null, 1) + '\n');
   console.log(`\nécrit dans ${fichier}`);
