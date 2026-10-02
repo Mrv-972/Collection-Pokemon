@@ -1,0 +1,27 @@
+# Mesure le manque de visuels du TCG physique.
+#
+# Le bac à sable de développement n'atteint pas le serveur d'images ; un
+# exécuteur GitHub, si. Rien n'est écrit dans le dépôt : on lit le journal.
+name: Sonde des visuels physiques
+
+on:
+  workflow_dispatch:
+    inputs:
+      par-extension:
+        description: "Cartes sondées par extension"
+        default: "5"
+
+jobs:
+  sonder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Récupérer le site
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Sonder
+        run: node outils/sonde-visuels-physiques.mjs --instantane donnees --par-extension "${{ inputs.par-extension }}"
