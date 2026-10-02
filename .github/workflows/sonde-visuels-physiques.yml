@@ -30,6 +30,9 @@ jobs:
       - name: Reconnaître les sources françaises
         run: node outils/sonde-sources-francaises.mjs
 
+      - name: Examiner de près les deux pistes françaises
+        run: node outils/sonde-francaises-detail.mjs
+
       - name: Sonder
         if: ${{ !inputs.seulement-francaises }}
         run: node outils/sonde-visuels-physiques.mjs --instantane donnees --par-extension "${{ inputs.par-extension }}"
