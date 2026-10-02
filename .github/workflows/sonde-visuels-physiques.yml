@@ -33,6 +33,9 @@ jobs:
       - name: Examiner de près les deux pistes françaises
         run: node outils/sonde-francaises-detail.mjs
 
+      - name: Partir de la page des séries de PkmCards
+        run: node outils/sonde-pkmcards-series.mjs --instantane donnees
+
       - name: Sonder
         if: ${{ !inputs.seulement-francaises }}
         run: node outils/sonde-visuels-physiques.mjs --instantane donnees --par-extension "${{ inputs.par-extension }}"
