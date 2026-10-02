@@ -1,4 +1,4 @@
-# Relève les visuels français chez PkmCards.
+# Relève les visuels français chez PkmCards, par son paginateur /cards/<numéro>.
 #
 # À la demande seulement : rien n'est branché sur la construction nocturne
 # tant que la question de l'autorisation n'est pas réglée.
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       pages:
-        description: "Pages de liste à lire (0 = toutes)"
+        description: "Pages à lire (0 = toutes, environ 576)"
         default: "0"
       essai:
         description: "Essai : ne rien écrire dans le dépôt"
@@ -18,7 +18,7 @@ on:
 jobs:
   moissonner:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - name: Récupérer le site
         uses: actions/checkout@v4
