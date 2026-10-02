@@ -78,8 +78,8 @@ for(let page = 1; page <= maxPages; page++){
     break;
   }
 
-  const adresses = [...new Set((r.corps.match(
-    /https?:\/\/static\.pkmcards\.fr\/cards\/fr\/[^"'\s)\\]+/gi) ?? [])];
+  const motif = /https?:\/\/static\.pkmcards\.fr\/cards\/fr\/[^"'\s)\\]+/gi;
+  const adresses = [...new Set(r.corps.match(motif) ?? [])];
   let neuves = 0;
   for(const a of adresses){
     const m = DECOUPE.exec(a);
