@@ -1,0 +1,16 @@
+# Mesure jusqu'où descend le catalogue de PkmCards. Lecture seule, à la demande.
+name: Sonde portée PkmCards
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sonder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node outils/sonde-pkmcards-portee.mjs
