@@ -112,9 +112,69 @@ for(const ext of nos){
     `→ ${leurId.padEnd(10)} ${ext.name}`);
 }
 
+// --- 4 : et les trous À L'INTÉRIEUR des extensions couvertes ? ----------
+//
+// Les 53 extensions muettes ne sont pas tout le problème : une extension
+// peut avoir la plupart de ses visuels et en manquer quelques-uns. Ces
+// trous-là sont invisibles dans le décompte ci-dessus, et c'est peut-être
+// là que la deuxième source rend le plus de services.
+console.log("\nLes trous à l'intérieur des extensions par ailleurs servies :\n");
+let sondees = 0, trous = 0, combles = 0;
+const aideesParExtension = [];
+
+for(const ext of nos){
+  if(MUETTES.has(ext.id)) continue;
+  let nous = [];
+  try{
+    nous = JSON.parse(await readFile(
+      `${dossier}/physique/sets/${encodeURIComponent(ext.id)}.json`, 'utf8'));
+  }catch{}
+  if(!nous.length) continue;
+
+  // Un échantillon réparti : les numéros élevés sont les cartes spéciales,
+  // celles qui manquent le plus souvent.
+  const pas = Math.max(1, Math.floor(nous.length / 5));
+  const echantillon = [];
+  for(let i = 0; i < nous.length && echantillon.length < 5; i += pas) echantillon.push(nous[i]);
+
+  const leurId = parId.has(ext.id) ? ext.id
+    : (parId.has(sansZero(ext.id)) ? sansZero(ext.id) : null);
+  let leursNum = new Map();
+  if(leurId){
+    try{
+      const leurs = JSON.parse(await readFile(`${source}/cards/en/${leurId}.json`, 'utf8'));
+      leursNum = new Map(leurs.map(c => [String(c.number).toUpperCase(), c]));
+    }catch{}
+  }
+
+  let trousIci = 0, comblesIci = 0;
+  for(const c of echantillon){
+    sondees++;
+    const fr = await interroger(c.image);
+    if(fr.ok) continue;
+    const en = await interroger(c.image.replace('/fr/', '/en/'));
+    if(en.ok) continue;          // l'anglais suffit : ce n'est pas un trou
+    trous++; trousIci++;
+    const sien = leursNum.get(String(c.localId).toUpperCase())
+             ?? leursNum.get(String(Number(c.localId)));
+    if(sien?.images?.small && (await interroger(sien.images.small)).ok){
+      combles++; comblesIci++;
+    }
+  }
+  if(trousIci){
+    aideesParExtension.push(`${ext.id} : ${comblesIci}/${trousIci} comblés`);
+    console.log(`${ext.id.padEnd(12)} ${comblesIci}/${trousIci} comblés   ${ext.name}`);
+  }
+}
+
 console.log('\n================ bilan ================');
 console.log(`cartes dans les extensions muettes : ${cartesMuettes}`);
 console.log(`que la deuxième source comblerait  : ${cartesCouvertes} ` +
   `(${cartesMuettes ? (100*cartesCouvertes/cartesMuettes).toFixed(1) : 0} %)`);
+console.log(`\nailleurs : ${sondees} cartes sondées hors extensions muettes,`);
+console.log(`  dont ${trous} introuvables chez TCGdex dans les deux langues,`);
+console.log(`  dont ${combles} que la deuxième source comblerait ` +
+  `(${trous ? (100*combles/trous).toFixed(0) : 0} %)`);
+
 console.log(`\n${hors.length} extensions restent hors de portée des deux sources :`);
 for(const h of hors) console.log(`  ${h}`);
