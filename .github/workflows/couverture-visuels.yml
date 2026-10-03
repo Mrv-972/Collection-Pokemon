@@ -1,0 +1,54 @@
+# Mesure, et DÉPOSE, la couverture des visuels du TCG physique.
+#
+# Le bac à sable de développement n'atteint pas le serveur d'images ; un
+# exécuteur GitHub, si. Contrairement à l'ancienne sonde, le résultat est
+# écrit dans le dépôt : c'est lui qui dit quelles extensions viser, et une
+# mesure qui ne vit que dans un journal finit par disparaître.
+name: Couverture des visuels
+
+on:
+  workflow_dispatch:
+    inputs:
+      par-extension:
+        description: "Cartes sondées par extension (plus = plus sûr, plus lent)"
+        default: "8"
+
+permissions:
+  contents: write
+
+jobs:
+  mesurer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Mesurer
+        run: |
+          node outils/sonde-visuels-physiques.mjs \
+            --instantane donnees \
+            --par-extension "${{ inputs.par-extension }}" \
+            --rapport donnees
+
+      # Un filet : si le dépôt refuse, la mesure reste téléchargeable.
+      - name: Garder la mesure en pièce jointe
+        uses: actions/upload-artifact@v4
+        with:
+          name: couverture-visuels
+          path: donnees/couverture-visuels.json
+          retention-days: 7
+
+      - name: Publier la mesure si elle a changé
+        run: |
+          git config user.name  "Couverture des visuels"
+          git config user.email "actions@users.noreply.github.com"
+          git add donnees/couverture-visuels.json
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau."
+            exit 0
+          fi
+          git commit -m "Mesure la couverture des visuels physiques"
+          git push
