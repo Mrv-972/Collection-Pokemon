@@ -1,0 +1,20 @@
+# Éprouve Poképédia comme source de visuels français. Lecture seule, à la demande.
+name: Sonde Poképédia
+
+on:
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: "Pages de 500 fichiers à lire"
+        default: "4"
+
+jobs:
+  sonder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node outils/sonde-pokepedia.mjs --pages "${{ inputs.pages }}"
