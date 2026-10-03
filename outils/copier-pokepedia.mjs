@@ -99,6 +99,12 @@ async function visuelFrancaisManque(carte){
 const aFaire = [];
 const parExtension = new Map();
 let sansSerie = [], horsCible = 0, dejaBon = 0;
+// Quelles extensions sont écartées parce que leur visuel français répond ?
+// La question n'est pas de curiosité : la mesure de couverture dit que
+// certaines n'ont RIEN dans aucune langue. Si l'adresse répond quand même,
+// l'une des deux mesures se trompe, et il faut savoir laquelle avant de
+// copier quoi que ce soit.
+const bonnesParExtension = new Map();
 for(const ext of extensions){
   if(!aViser.has(ext.id)){ horsCible++; continue; }
   const leurNom = leurs.get(aplatir(ext.name));
@@ -113,7 +119,11 @@ for(const ext of extensions){
     if(aDeja(carte.id)) continue;
     const adresse = chezEux[sansZeros(carte.localId)];
     if(!adresse) continue;
-    if(!(await visuelFrancaisManque(carte))){ dejaBon++; continue; }
+    if(!(await visuelFrancaisManque(carte))){
+      dejaBon++;
+      bonnesParExtension.set(ext.id, (bonnesParExtension.get(ext.id) ?? 0) + 1);
+      continue;
+    }
     aFaire.push({ id: carte.id, nom: carte.name, adresse, serie: leurNom, extension: ext.id });
     parExtension.set(ext.id, (parExtension.get(ext.id) ?? 0) + 1);
   }
@@ -123,6 +133,15 @@ console.log(`${extensions.length} extensions chez nous, ${leurs.size} séries ch
 console.log(`${horsCible} extensions écartées : leurs visuels français vont bien.`);
 console.log(`${sansSerie.length} des extensions visées n'ont pas d'équivalent de nom chez eux.`);
 console.log(`${dejaBon} cartes écartées : leur visuel français répond déjà.`);
+if(bonnesParExtension.size){
+  console.log('  réparties ainsi — à comparer avec la mesure de couverture,');
+  console.log('  qui annonce certaines de ces extensions comme totalement muettes :');
+  for(const [id, n] of [...bonnesParExtension].sort((a,b) => b[1]-a[1]).slice(0, 20)){
+    const muette = bilan.muettes.restantes.some(m => m.id === id);
+    console.log(`    ${String(n).padStart(4)}  ${id.padEnd(12)}` +
+      `${muette ? '  <<< annoncée MUETTE, et pourtant elle répond' : ''}`);
+  }
+}
 console.log(`\n${aFaire.length} visuels à prendre, sur ${parExtension.size} extensions :`);
 for(const [id, n] of [...parExtension].sort((a,b) => b[1]-a[1]).slice(0, 20))
   console.log(`  ${String(n).padStart(4)}  ${id}`);
