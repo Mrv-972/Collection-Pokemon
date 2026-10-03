@@ -1,0 +1,1033 @@
+{
+ "mesureLe": "2026-10-03T00:51:23.270Z",
+ "cartesSondeesParExtension": 8,
+ "total": {
+  "sondees": 1617,
+  "frOk": 998,
+  "sauvees": 157,
+  "perdues": 462
+ },
+ "logos": {
+  "fr": 118,
+  "enSeul": 28,
+  "aucun": 58
+ },
+ "extensionsATrous": [
+  {
+   "id": "miscp",
+   "serie": "Autre",
+   "nom": "Miscellaneous Promos",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 1
+  },
+  {
+   "id": "base1",
+   "serie": "Base",
+   "nom": "Set de Base",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "base2",
+   "serie": "Base",
+   "nom": "Jungle",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "basep",
+   "serie": "Base",
+   "nom": "Wizards Black Star Promos",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "base3",
+   "serie": "Base",
+   "nom": "Fossile",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "base4",
+   "serie": "Base",
+   "nom": "Base Set 2",
+   "frOk": 0,
+   "enOk": 2,
+   "sondees": 8
+  },
+  {
+   "id": "gym1",
+   "serie": "Gym",
+   "nom": "Gym Heroes",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "gym2",
+   "serie": "Gym",
+   "nom": "Gym Challenge",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "si1",
+   "serie": "Neo",
+   "nom": "Southern Islands",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "lc",
+   "serie": "L'Appel des Légendes",
+   "nom": "Legendary Collection",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "bog",
+   "serie": "e-cards",
+   "nom": "Best of game",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "np",
+   "serie": "POP",
+   "nom": "Promo Nintendo",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "ex5.5",
+   "serie": "EX",
+   "nom": "Poké Card Creator Pack",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 5
+  },
+  {
+   "id": "tk-ex-latia",
+   "serie": "Kits du dresseur",
+   "nom": "EX Kit dresseur (Latias)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-ex-latio",
+   "serie": "Kits du dresseur",
+   "nom": "EX Kit dresseur (Latios)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "exu",
+   "serie": "EX",
+   "nom": "EX Forces Cachées Collection Zarbi",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-ex-m",
+   "serie": "Kits du dresseur",
+   "nom": "EX Kit dresseur (Négapi)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-ex-p",
+   "serie": "Kits du dresseur",
+   "nom": "EX Kit dresseur (Positi)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "dpp",
+   "serie": "Diamant & Perle",
+   "nom": "Promo DP",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "dp1",
+   "serie": "Diamant & Perle",
+   "nom": "Diamant & Perle",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "dp2",
+   "serie": "Diamant & Perle",
+   "nom": "Trésors Mystérieux",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "tk-dp-l",
+   "serie": "Kits du dresseur",
+   "nom": "DP Kit dresseur (Lucario)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-dp-m",
+   "serie": "Kits du dresseur",
+   "nom": "DP Kit dresseur (Manaphy)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "dp4",
+   "serie": "Diamant & Perle",
+   "nom": "Duels au Sommets",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "dp5",
+   "serie": "Diamant & Perle",
+   "nom": "Aube Majestueuse",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "dp6",
+   "serie": "Diamant & Perle",
+   "nom": "Éveil des Légendes",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "dp7",
+   "serie": "Diamant & Perle",
+   "nom": "Tempête",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "ru1",
+   "serie": "Platine",
+   "nom": "Pokémon Rumble",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "hgssp",
+   "serie": "HeartGold SoulSilver",
+   "nom": "Promo HGSS",
+   "frOk": 0,
+   "enOk": 6,
+   "sondees": 8
+  },
+  {
+   "id": "tk-hs-g",
+   "serie": "Kits du dresseur",
+   "nom": "HS Kit du dresseur (Léviator)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-hs-r",
+   "serie": "Kits du dresseur",
+   "nom": "HS Kit du dresseur (Raichu)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "col1",
+   "serie": "L'appel des Légendes",
+   "nom": "L'appel des Légendes",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "2011bw",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2011",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-bw-e",
+   "serie": "Kits du dresseur",
+   "nom": "BW Kit du dresseur (Minitaupe)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-bw-z",
+   "serie": "Kits du dresseur",
+   "nom": "BW Kit du dresseur (Zoroark)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2012bw",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2012",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2013bw",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2013",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "xya",
+   "serie": "XY",
+   "nom": "carte alternative A Jaune",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 6
+  },
+  {
+   "id": "tk-xy-n",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Bruyverne)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-sy",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Nymphali)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2014xy",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2014",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-b",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Scalproie)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-w",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Grodoudou)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-latia",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Latias)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-latio",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Latios)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2015xy",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2015",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-p",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Pikachu Libre)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-su",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Suicune)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2016xy",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2016",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "smp",
+   "serie": "Soleil et Lune",
+   "nom": "Promo SM",
+   "frOk": 0,
+   "enOk": 5,
+   "sondees": 8
+  },
+  {
+   "id": "tk-sm-r",
+   "serie": "Kits du dresseur",
+   "nom": "SM Kit du dresseur (Raichu d'Alola)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "tk-sm-l",
+   "serie": "Kits du dresseur",
+   "nom": "SM Kit du dresseur (Lougarox)",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2017sm",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2017",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "sm3.5",
+   "serie": "Soleil et Lune",
+   "nom": "Légendes Brillantes",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2018sm-fr",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2018",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "sm7.5",
+   "serie": "Soleil et Lune",
+   "nom": "Majesté Des Dragons",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2018sm",
+   "serie": "Collection McDonald's",
+   "nom": "McDonald's Collection 2018",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "det1",
+   "serie": "Soleil et Lune",
+   "nom": "Détective Pikachu",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "sm115",
+   "serie": "Soleil et Lune",
+   "nom": "Destinées Occultes",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "sma",
+   "serie": "Soleil et Lune",
+   "nom": "Destinées Occultes Coffre Étincelant",
+   "frOk": 0,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "2019sm",
+   "serie": "Collection McDonald's",
+   "nom": "McDonald's Collection 2019",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2019sm-fr",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2019",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "fut2020",
+   "serie": "Épée et Bouclier",
+   "nom": "Pokémon Futsal 2020",
+   "frOk": 0,
+   "enOk": 5,
+   "sondees": 5
+  },
+  {
+   "id": "2021swsh",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2021",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "swsh4.5sv",
+   "serie": "Épée et Bouclier",
+   "nom": "Destinées Radieuses Coffre Étincelant",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "cel25cc",
+   "serie": "Épée et Bouclier",
+   "nom": "Célébrations Collection Classique",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "swsh9tg",
+   "serie": "Épée et Bouclier",
+   "nom": "Stars Étincelantes Galerie de Dresseurs",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "swsh10tg",
+   "serie": "Épée et Bouclier",
+   "nom": "Astres Radieux Galerie de Dresseurs",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2022swsh",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2022",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "swsh11tg",
+   "serie": "Épée et Bouclier",
+   "nom": "Origine Perdue Galerie de Dresseurs",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "swsh12tg",
+   "serie": "Épée et Bouclier",
+   "nom": "Tempête Argentée Galerie de Dresseurs",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "swsh12.5gg",
+   "serie": "Épée et Bouclier",
+   "nom": "Zénith Suprême Galerie Galaroise",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "sve",
+   "serie": "Écarlate et Violet",
+   "nom": "Écarlate et Violet Énergie",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2023sv",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2023",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "mfb",
+   "serie": "Écarlate et Violet",
+   "nom": "My First Battle",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "2024sv",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2024",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "mee",
+   "serie": "Méga-Évolution",
+   "nom": "Méga-Évolution Énergie",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "30th-c",
+   "serie": "Méga-Évolution",
+   "nom": "30th Classic Collection",
+   "frOk": 0,
+   "enOk": 0,
+   "sondees": 8
+  },
+  {
+   "id": "mep",
+   "serie": "Méga-Évolution",
+   "nom": "MEP Black Star Promos",
+   "frOk": 4,
+   "enOk": 4,
+   "sondees": 8
+  },
+  {
+   "id": "sm11",
+   "serie": "Soleil et Lune",
+   "nom": "Harmonie des Esprits",
+   "frOk": 6,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "ecard2",
+   "serie": "e-cards",
+   "nom": "Aquapolis",
+   "frOk": 7,
+   "enOk": 7,
+   "sondees": 8
+  },
+  {
+   "id": "ecard3",
+   "serie": "e-cards",
+   "nom": "Skyridge",
+   "frOk": 7,
+   "enOk": 7,
+   "sondees": 8
+  },
+  {
+   "id": "sm10",
+   "serie": "Soleil et Lune",
+   "nom": "Alliance Infaillible",
+   "frOk": 7,
+   "enOk": 8,
+   "sondees": 8
+  },
+  {
+   "id": "svp",
+   "serie": "Écarlate et Violet",
+   "nom": "SVP Black Star Promos",
+   "frOk": 7,
+   "enOk": 7,
+   "sondees": 8
+  }
+ ],
+ "extensionsMuettes": [
+  {
+   "id": "miscp",
+   "serie": "Autre",
+   "nom": "Miscellaneous Promos",
+   "sondees": 1
+  },
+  {
+   "id": "base1",
+   "serie": "Base",
+   "nom": "Set de Base",
+   "sondees": 8
+  },
+  {
+   "id": "base2",
+   "serie": "Base",
+   "nom": "Jungle",
+   "sondees": 8
+  },
+  {
+   "id": "basep",
+   "serie": "Base",
+   "nom": "Wizards Black Star Promos",
+   "sondees": 8
+  },
+  {
+   "id": "base3",
+   "serie": "Base",
+   "nom": "Fossile",
+   "sondees": 8
+  },
+  {
+   "id": "bog",
+   "serie": "e-cards",
+   "nom": "Best of game",
+   "sondees": 8
+  },
+  {
+   "id": "ex5.5",
+   "serie": "EX",
+   "nom": "Poké Card Creator Pack",
+   "sondees": 5
+  },
+  {
+   "id": "tk-ex-latia",
+   "serie": "Kits du dresseur",
+   "nom": "EX Kit dresseur (Latias)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-ex-latio",
+   "serie": "Kits du dresseur",
+   "nom": "EX Kit dresseur (Latios)",
+   "sondees": 8
+  },
+  {
+   "id": "exu",
+   "serie": "EX",
+   "nom": "EX Forces Cachées Collection Zarbi",
+   "sondees": 8
+  },
+  {
+   "id": "tk-ex-m",
+   "serie": "Kits du dresseur",
+   "nom": "EX Kit dresseur (Négapi)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-ex-p",
+   "serie": "Kits du dresseur",
+   "nom": "EX Kit dresseur (Positi)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-dp-l",
+   "serie": "Kits du dresseur",
+   "nom": "DP Kit dresseur (Lucario)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-dp-m",
+   "serie": "Kits du dresseur",
+   "nom": "DP Kit dresseur (Manaphy)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-hs-g",
+   "serie": "Kits du dresseur",
+   "nom": "HS Kit du dresseur (Léviator)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-hs-r",
+   "serie": "Kits du dresseur",
+   "nom": "HS Kit du dresseur (Raichu)",
+   "sondees": 8
+  },
+  {
+   "id": "2011bw",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2011",
+   "sondees": 8
+  },
+  {
+   "id": "tk-bw-e",
+   "serie": "Kits du dresseur",
+   "nom": "BW Kit du dresseur (Minitaupe)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-bw-z",
+   "serie": "Kits du dresseur",
+   "nom": "BW Kit du dresseur (Zoroark)",
+   "sondees": 8
+  },
+  {
+   "id": "2012bw",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2012",
+   "sondees": 8
+  },
+  {
+   "id": "2013bw",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2013",
+   "sondees": 8
+  },
+  {
+   "id": "xya",
+   "serie": "XY",
+   "nom": "carte alternative A Jaune",
+   "sondees": 6
+  },
+  {
+   "id": "tk-xy-n",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Bruyverne)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-sy",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Nymphali)",
+   "sondees": 8
+  },
+  {
+   "id": "2014xy",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2014",
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-b",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Scalproie)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-w",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Grodoudou)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-latia",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Latias)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-latio",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Latios)",
+   "sondees": 8
+  },
+  {
+   "id": "2015xy",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2015",
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-p",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Pikachu Libre)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-xy-su",
+   "serie": "Kits du dresseur",
+   "nom": "XY Kit du dresseur (Suicune)",
+   "sondees": 8
+  },
+  {
+   "id": "2016xy",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2016",
+   "sondees": 8
+  },
+  {
+   "id": "tk-sm-r",
+   "serie": "Kits du dresseur",
+   "nom": "SM Kit du dresseur (Raichu d'Alola)",
+   "sondees": 8
+  },
+  {
+   "id": "tk-sm-l",
+   "serie": "Kits du dresseur",
+   "nom": "SM Kit du dresseur (Lougarox)",
+   "sondees": 8
+  },
+  {
+   "id": "2017sm",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2017",
+   "sondees": 8
+  },
+  {
+   "id": "sm3.5",
+   "serie": "Soleil et Lune",
+   "nom": "Légendes Brillantes",
+   "sondees": 8
+  },
+  {
+   "id": "2018sm-fr",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2018",
+   "sondees": 8
+  },
+  {
+   "id": "sm7.5",
+   "serie": "Soleil et Lune",
+   "nom": "Majesté Des Dragons",
+   "sondees": 8
+  },
+  {
+   "id": "2018sm",
+   "serie": "Collection McDonald's",
+   "nom": "McDonald's Collection 2018",
+   "sondees": 8
+  },
+  {
+   "id": "2019sm",
+   "serie": "Collection McDonald's",
+   "nom": "McDonald's Collection 2019",
+   "sondees": 8
+  },
+  {
+   "id": "2019sm-fr",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2019",
+   "sondees": 8
+  },
+  {
+   "id": "2021swsh",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2021",
+   "sondees": 8
+  },
+  {
+   "id": "swsh4.5sv",
+   "serie": "Épée et Bouclier",
+   "nom": "Destinées Radieuses Coffre Étincelant",
+   "sondees": 8
+  },
+  {
+   "id": "cel25cc",
+   "serie": "Épée et Bouclier",
+   "nom": "Célébrations Collection Classique",
+   "sondees": 8
+  },
+  {
+   "id": "swsh9tg",
+   "serie": "Épée et Bouclier",
+   "nom": "Stars Étincelantes Galerie de Dresseurs",
+   "sondees": 8
+  },
+  {
+   "id": "swsh10tg",
+   "serie": "Épée et Bouclier",
+   "nom": "Astres Radieux Galerie de Dresseurs",
+   "sondees": 8
+  },
+  {
+   "id": "2022swsh",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2022",
+   "sondees": 8
+  },
+  {
+   "id": "swsh11tg",
+   "serie": "Épée et Bouclier",
+   "nom": "Origine Perdue Galerie de Dresseurs",
+   "sondees": 8
+  },
+  {
+   "id": "swsh12tg",
+   "serie": "Épée et Bouclier",
+   "nom": "Tempête Argentée Galerie de Dresseurs",
+   "sondees": 8
+  },
+  {
+   "id": "swsh12.5gg",
+   "serie": "Épée et Bouclier",
+   "nom": "Zénith Suprême Galerie Galaroise",
+   "sondees": 8
+  },
+  {
+   "id": "sve",
+   "serie": "Écarlate et Violet",
+   "nom": "Écarlate et Violet Énergie",
+   "sondees": 8
+  },
+  {
+   "id": "2023sv",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2023",
+   "sondees": 8
+  },
+  {
+   "id": "mfb",
+   "serie": "Écarlate et Violet",
+   "nom": "My First Battle",
+   "sondees": 8
+  },
+  {
+   "id": "2024sv",
+   "serie": "Collection McDonald's",
+   "nom": "Collection McDonald's 2024",
+   "sondees": 8
+  },
+  {
+   "id": "mee",
+   "serie": "Méga-Évolution",
+   "nom": "Méga-Évolution Énergie",
+   "sondees": 8
+  },
+  {
+   "id": "30th-c",
+   "serie": "Méga-Évolution",
+   "nom": "30th Classic Collection",
+   "sondees": 8
+  }
+ ]
+}
