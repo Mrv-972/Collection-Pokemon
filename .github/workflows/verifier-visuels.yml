@@ -1,0 +1,51 @@
+# Vérifie carte par carte si le visuel s'affiche, et dépose le verdict.
+#
+# Remplace la sonde de couverture, qui recalculait les adresses et
+# n'échantillonnait que huit cartes par extension — elle a déclaré muettes
+# des séries qui s'affichaient très bien. Ici : une requête d'en-tête par
+# carte, sur l'adresse que le site sert réellement. Aucune image téléchargée.
+name: Vérifier les visuels
+
+on:
+  workflow_dispatch:
+    inputs:
+      largeur:
+        description: "Requêtes simultanées"
+        default: "16"
+
+permissions:
+  contents: write
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Vérifier
+        run: |
+          node outils/verifier-visuels.mjs \
+            --sortie donnees \
+            --largeur "${{ inputs.largeur }}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verification-visuels
+          path: donnees/verification-visuels.json
+          retention-days: 7
+
+      - name: Publier
+        run: |
+          git config user.name  "Vérification des visuels"
+          git config user.email "actions@users.noreply.github.com"
+          git add donnees/verification-visuels.json
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau."
+            exit 0
+          fi
+          git commit -m "Vérifie carte par carte l'affichage des visuels"
+          git push
