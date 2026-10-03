@@ -29,7 +29,10 @@ import { readFile } from 'node:fs/promises';
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
   a.startsWith('--') ? [a.slice(2), (t[i+1] && !t[i+1].startsWith('--')) ? t[i+1] : true] : []
 ).filter(x => x.length));
-const combien = Number(args.pages ?? 4);
+// 0 veut dire « toutes ». Avec PkmCards, une valeur vide avait été
+// remplacée par le défaut du formulaire, et la passe « complète » s'était
+// arrêtée à trois pages.
+const combien = Number(args.pages ?? 0) || Infinity;
 
 const API = 'https://www.pokepedia.fr/api.php';
 const IDENTITE = {
@@ -45,6 +48,20 @@ async function interroger(parametres){
   if(!r.ok) return { erreur: r.status };
   return r.json();
 }
+
+// --- 0. sous quelle licence ? -------------------------------------------
+// À régler avant d'utiliser une seule image : un wiki publie sous une
+// licence qui demande presque toujours d'en citer la source. Mieux vaut le
+// savoir maintenant que devoir tout retirer plus tard.
+console.log('=============== licence ===============');
+{
+  const d = await interroger({ action: 'query', meta: 'siteinfo', siprop: 'rightsinfo|general' });
+  const droits = d.query?.rightsinfo ?? {};
+  console.log(`  ${droits.text ?? '(non déclarée)'}`);
+  console.log(`  ${droits.url ?? ''}`);
+  console.log(`  site : ${d.query?.general?.sitename ?? '?'}`);
+}
+await dormir(1000);
 
 // --- 1 et 2. énumérer, et voir les noms de série -------------------------
 console.log('=============== énumération des visuels ===============');
@@ -122,8 +139,16 @@ try{
   const aplatir = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '');
   const leurs = new Map([...parSerie].map(([s, x]) => [aplatir(s), { nom: s, n: x.n }]));
-  const manquants = [...bilan.aTrousSansSource, ...bilan.muettes.restantes
-    .map(m => ({ ...m, manqueEstime: m.cartes }))];
+  // Les deux listes se recoupent — une extension muette est aussi une
+  // extension à trous — et les additionner comptait certaines deux fois.
+  // On déduplique par identifiant, en gardant le plus grand manque.
+  const parId = new Map();
+  for(const m of [...bilan.aTrousSansSource,
+                  ...bilan.muettes.restantes.map(m => ({ ...m, manqueEstime: m.cartes }))]){
+    const vu = parId.get(m.id);
+    if(!vu || m.manqueEstime > vu.manqueEstime) parId.set(m.id, m);
+  }
+  const manquants = [...parId.values()].sort((a, b) => b.manqueEstime - a.manqueEstime);
   let trouves = 0, cartesTrouvees = 0;
   const absents = [];
   for(const m of manquants){
@@ -139,6 +164,21 @@ try{
     ` car un nom\n  peut différer sans que la série manque (nous : « Fossile »).`);
 }catch(err){
   console.log(`  (bilan illisible : ${err.message})`);
+}
+
+if(typeof args.sortie === 'string'){
+  const { writeFile } = await import('node:fs/promises');
+  const fichier = `${args.sortie}/pokepedia-series.json`;
+  await writeFile(fichier, JSON.stringify({
+    releveLe: new Date().toISOString(),
+    pagesLues: lu,
+    // Si l'énumération n'est pas allée au bout, le dire : un relevé
+    // partiel pris pour complet ferait conclure à tort qu'une série manque.
+    complet: !suite,
+    fichiersVus: total,
+    series: Object.fromEntries([...parSerie].map(([nom, x]) => [nom, x.n])),
+  }, null, 1) + '\n');
+  console.log(`\nécrit dans ${fichier}`);
 }
 
 console.log('\nRien n’a été téléchargé : seules des adresses ont été lues.');

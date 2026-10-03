@@ -5,8 +5,8 @@ on:
   workflow_dispatch:
     inputs:
       pages:
-        description: "Pages de 500 fichiers à lire"
-        default: "4"
+        description: "Pages de 500 fichiers à lire (0 = toutes)"
+        default: "0"
 
 jobs:
   sonder:
@@ -17,4 +17,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node outils/sonde-pokepedia.mjs --pages "${{ inputs.pages }}"
+      - run: node outils/sonde-pokepedia.mjs --pages "${{ inputs.pages }}" --sortie /tmp
+
+      - name: Garder le relevé
+        uses: actions/upload-artifact@v4
+        with:
+          name: pokepedia-series
+          path: /tmp/pokepedia-series.json
+          retention-days: 7
