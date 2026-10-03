@@ -1,0 +1,16 @@
+# Éprouve les deux pistes pour les cartes restantes. Lecture seule, à la demande.
+name: Sonde pistes restantes
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sonder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node outils/sonde-pistes-restantes.mjs
