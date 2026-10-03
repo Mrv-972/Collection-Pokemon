@@ -15,6 +15,9 @@ on:
         type: boolean
         default: true
 
+permissions:
+  contents: write
+
 jobs:
   moissonner:
     runs-on: ubuntu-latest
@@ -33,6 +36,16 @@ jobs:
             --sortie donnees \
             --pages "${{ inputs.pages }}" \
             ${{ inputs.essai && '--essai' || '' }}
+
+      # Un filet : si le dépôt refuse encore, le relevé reste
+      # téléchargeable depuis l'exécution plutôt que perdu avec l'exécuteur.
+      - name: Garder le relevé en pièce jointe
+        if: ${{ !inputs.essai }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: visuels-pkmcards
+          path: donnees/visuels-pkmcards.json
+          retention-days: 7
 
       - name: Publier le relevé s'il a changé
         if: ${{ !inputs.essai }}
