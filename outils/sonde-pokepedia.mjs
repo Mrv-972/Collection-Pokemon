@@ -74,12 +74,14 @@ for(let i = 0; i < combien; i++){
     // « Carte Set de Base 4.png » -> série « Set de Base », numéro « 4 ».
     // On exige un numéro final : sans lui, ce n'est pas une carte mais une
     // image d'habillage, et la compter gonflerait le bilan pour rien.
-    // Un numéro de carte n'est pas forcément un nombre : « H1 »
-    // (Aquapolis), « TG01 » (galeries), « SV01 ». Exiger des chiffres
-    // seuls écartait des séries entières.
-    const m = /^Carte (.+?) ([A-Za-z]{0,3}[0-9]+[a-z]?)\.(png|jpe?g|webp|gif)$/i.exec(img.name);
+    // Deux pièges, tous deux vus dans les noms bruts plutôt que supposés :
+    // le séparateur est un tiret BAS, pas une espace — la page affiche
+    // « Carte Set de Base 4 » mais le fichier s'appelle
+    // « Carte_Set_de_Base_4.png » — et un numéro de carte n'est pas
+    // forcément un nombre : « H1 » (Aquapolis), « TG01 » (galeries).
+    const m = /^Carte_(.+)_([A-Za-z]{0,3}[0-9]+[a-z]?)\.(png|jpe?g|webp|gif)$/i.exec(img.name);
     if(!m) continue;
-    const serie = m[1];
+    const serie = m[1].replace(/_/g, ' ');
     if(!parSerie.has(serie)) parSerie.set(serie, { n: 0, url: img.url });
     parSerie.get(serie).n++;
     if(exemples.length < 3) exemples.push(img);
