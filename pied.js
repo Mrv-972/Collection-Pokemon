@@ -136,8 +136,18 @@ function poserPied(){
          marques de Nintendo, Creatures Inc. et GAME FREAK inc.</p>
       <p>Catalogue constitué à partir de
          <a href="https://tcgdex.dev" rel="noopener">TCGdex</a>,
-         de <a href="https://github.com/flibustier/pokemon-tcg-pocket-database" rel="noopener">flibustier</a>
-         et du <a href="https://pokemon-tcg-pocket.wiki" rel="noopener">wiki francophone TCG Pocket</a>.</p>
+         de <a href="https://github.com/flibustier/pokemon-tcg-pocket-database" rel="noopener">flibustier</a>,
+         du <a href="https://pokemon-tcg-pocket.wiki" rel="noopener">wiki francophone TCG Pocket</a>
+         et de <a href="https://www.pkmcards.fr" rel="noopener">PkmCards</a>.</p>
+      <!-- Ce crédit n'est pas une politesse : la licence de Poképédia
+           (CC BY-NC-SA 3.0) l'exige, et elle impose aussi que le site
+           reste non commercial. Le détail de ce qui en vient est dans
+           donnees/visuels-pokepedia-copies.json. -->
+      <p>Certains visuels de cartes anciennes proviennent de
+         <a href="https://www.pokepedia.fr" rel="noopener">Poképédia</a>,
+         sous licence
+         <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/deed.fr" rel="noopener"
+            >CC BY-NC-SA 3.0</a>.</p>
       <p>Site indépendant, sans lien avec The Pokémon Company.</p>
     </div>
   `;
