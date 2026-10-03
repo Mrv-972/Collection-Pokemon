@@ -1,0 +1,67 @@
+# Relève l'index de Poképédia, puis copie les visuels manquants dans le dépôt.
+#
+# Le relevé ne touche que du texte. La copie télécharge des images, les
+# réduit, et les dépose dans images/cards — où l'instantané les ramasse
+# tout seul au passage suivant.
+#
+# Licence CC BY-NC-SA 3.0 : le crédit est affiché dans le pied de page du
+# site, et l'usage doit rester non commercial. L'outil écrit la liste de ce
+# qu'il a pris, pour que ce crédit soit justifiable.
+name: Visuels Poképédia
+
+on:
+  workflow_dispatch:
+    inputs:
+      limite:
+        description: "Nombre de visuels à prendre (0 = tous)"
+        default: "0"
+      essai:
+        description: "Essai : relever et compter, sans rien télécharger"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  copier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Relever l'index
+        run: node outils/moissonner-pokepedia.mjs --sortie donnees
+
+      # sharp réduit les 2 Mo de PNG en vignette WebP. Sans lui, 1 600
+      # fichiers pèseraient 3 Go dans le dépôt.
+      - name: Installer sharp
+        if: ${{ !inputs.essai }}
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install sharp
+
+      - name: Copier les visuels
+        run: |
+          node outils/copier-pokepedia.mjs \
+            --limite "${{ inputs.limite }}" \
+            ${{ inputs.essai && '--essai' || '' }}
+
+      - name: Publier
+        if: ${{ !inputs.essai }}
+        run: |
+          rm -rf node_modules package.json package-lock.json
+          git config user.name  "Visuels Poképédia"
+          git config user.email "actions@users.noreply.github.com"
+          git add donnees/visuels-pokepedia.json \
+                  donnees/visuels-pokepedia-copies.json \
+                  images/cards
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau."
+            exit 0
+          fi
+          git commit -m "Copie les visuels français de Poképédia"
+          git push
