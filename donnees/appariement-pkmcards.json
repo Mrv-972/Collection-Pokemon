@@ -1,0 +1,923 @@
+{
+ "apparieLe": "2026-10-03T00:48:59.976Z",
+ "releveDu": "2026-10-03T00:47:59.069Z",
+ "releveComplet": true,
+ "apparies": {
+  "asc": {
+   "notre": "me02.5",
+   "nom": "Héros Transcendants",
+   "serie": "Méga-Évolution",
+   "communs": 225,
+   "compares": 295,
+   "cartesRelevees": 295
+  },
+  "fst": {
+   "notre": "swsh8",
+   "nom": "Poing de Fusion",
+   "serie": "Épée et Bouclier",
+   "communs": 282,
+   "compares": 284,
+   "cartesRelevees": 284
+  },
+  "pal": {
+   "notre": "sv02",
+   "nom": "Évolutions à Paldea",
+   "serie": "Écarlate et Violet",
+   "communs": 273,
+   "compares": 279,
+   "cartesRelevees": 279
+  },
+  "cec": {
+   "notre": "sm12",
+   "nom": "Éclipse Cosmique",
+   "serie": "Soleil et Lune",
+   "communs": 241,
+   "compares": 271,
+   "cartesRelevees": 271
+  },
+  "par": {
+   "notre": "sv04",
+   "nom": "Faille Paradoxe",
+   "serie": "Écarlate et Violet",
+   "communs": 252,
+   "compares": 266,
+   "cartesRelevees": 266
+  },
+  "unm": {
+   "notre": "sm11",
+   "nom": "Harmonie des Esprits",
+   "serie": "Soleil et Lune",
+   "communs": 234,
+   "compares": 258,
+   "cartesRelevees": 261
+  },
+  "sv01": {
+   "notre": "sv01",
+   "nom": "Écarlate et Violet",
+   "serie": "Écarlate et Violet",
+   "communs": 256,
+   "compares": 258,
+   "cartesRelevees": 258
+  },
+  "ssp": {
+   "notre": "sv08",
+   "nom": "Étincelles Déferlantes",
+   "serie": "Écarlate et Violet",
+   "communs": 231,
+   "compares": 252,
+   "cartesRelevees": 252
+  },
+  "paf": {
+   "notre": "sv04.5",
+   "nom": "Destinées de Paldea",
+   "serie": "Écarlate et Violet",
+   "communs": 238,
+   "compares": 245,
+   "cartesRelevees": 245
+  },
+  "dri": {
+   "notre": "sv10",
+   "nom": "Rivalités Destinées",
+   "serie": "Écarlate et Violet",
+   "communs": 201,
+   "compares": 244,
+   "cartesRelevees": 244
+  },
+  "lot": {
+   "notre": "sm8",
+   "nom": "Tonnerre Perdu",
+   "serie": "Soleil et Lune",
+   "communs": 232,
+   "compares": 236,
+   "cartesRelevees": 240
+  },
+  "unb": {
+   "notre": "sm10",
+   "nom": "Alliance Infaillible",
+   "serie": "Soleil et Lune",
+   "communs": 207,
+   "compares": 234,
+   "cartesRelevees": 238
+  },
+  "evs": {
+   "notre": "swsh7",
+   "nom": "Évolution Céleste",
+   "serie": "Épée et Bouclier",
+   "communs": 234,
+   "compares": 237,
+   "cartesRelevees": 237
+  },
+  "cre": {
+   "notre": "swsh6",
+   "nom": "Règne de Glace",
+   "serie": "Épée et Bouclier",
+   "communs": 230,
+   "compares": 233,
+   "cartesRelevees": 233
+  },
+  "obf": {
+   "notre": "sv03",
+   "nom": "Flammes Obsidiennes",
+   "serie": "Écarlate et Violet",
+   "communs": 215,
+   "compares": 227,
+   "cartesRelevees": 227
+  },
+  "twm": {
+   "notre": "sv06",
+   "nom": "Mascarade Crépusculaire",
+   "serie": "Écarlate et Violet",
+   "communs": 206,
+   "compares": 226,
+   "cartesRelevees": 226
+  },
+  "tef": {
+   "notre": "sv05",
+   "nom": "Forces Temporelles",
+   "serie": "Écarlate et Violet",
+   "communs": 214,
+   "compares": 218,
+   "cartesRelevees": 218
+  },
+  "lor": {
+   "notre": "swsh11",
+   "nom": "Origine Perdue",
+   "serie": "Épée et Bouclier",
+   "communs": 187,
+   "compares": 217,
+   "cartesRelevees": 217
+  },
+  "asr": {
+   "notre": "swsh10",
+   "nom": "Astres Radieux",
+   "serie": "Épée et Bouclier",
+   "communs": 186,
+   "compares": 216,
+   "cartesRelevees": 216
+  },
+  "ssh": {
+   "notre": "swsh1",
+   "nom": "Épée et Bouclier",
+   "serie": "Épée et Bouclier",
+   "communs": 213,
+   "compares": 216,
+   "cartesRelevees": 216
+  },
+  "sit": {
+   "notre": "swsh12",
+   "nom": "Tempête Argentée",
+   "serie": "Épée et Bouclier",
+   "communs": 185,
+   "compares": 215,
+   "cartesRelevees": 215
+  },
+  "rcl": {
+   "notre": "swsh2",
+   "nom": "Clash des Rebelles",
+   "serie": "Épée et Bouclier",
+   "communs": 204,
+   "compares": 209,
+   "cartesRelevees": 209
+  },
+  "mew": {
+   "notre": "sv03.5",
+   "nom": "151",
+   "serie": "Écarlate et Violet",
+   "communs": 206,
+   "compares": 207,
+   "cartesRelevees": 207
+  },
+  "viv": {
+   "notre": "swsh4",
+   "nom": "Voltage Éclatant",
+   "serie": "Épée et Bouclier",
+   "communs": 199,
+   "compares": 203,
+   "cartesRelevees": 203
+  },
+  "daa": {
+   "notre": "swsh3",
+   "nom": "Ténèbres Embrasées",
+   "serie": "Épée et Bouclier",
+   "communs": 198,
+   "compares": 201,
+   "cartesRelevees": 201
+  },
+  "teu": {
+   "notre": "sm9",
+   "nom": "Duo de Choc",
+   "serie": "Soleil et Lune",
+   "communs": 176,
+   "compares": 196,
+   "cartesRelevees": 198
+  },
+  "jtg": {
+   "notre": "sv09",
+   "nom": "Aventures Ensemble",
+   "serie": "Écarlate et Violet",
+   "communs": 157,
+   "compares": 190,
+   "cartesRelevees": 190
+  },
+  "meg": {
+   "notre": "me01",
+   "nom": "Méga-Évolution",
+   "serie": "Méga-Évolution",
+   "communs": 160,
+   "compares": 188,
+   "cartesRelevees": 188
+  },
+  "ces": {
+   "notre": "sm7",
+   "nom": "Tempête Céleste",
+   "serie": "Soleil et Lune",
+   "communs": 183,
+   "compares": 183,
+   "cartesRelevees": 187
+  },
+  "brs": {
+   "notre": "swsh9",
+   "nom": "Stars Étincelantes",
+   "serie": "Épée et Bouclier",
+   "communs": 156,
+   "compares": 186,
+   "cartesRelevees": 186
+  },
+  "bst": {
+   "notre": "swsh5",
+   "nom": "Styles de combat",
+   "serie": "Épée et Bouclier",
+   "communs": 183,
+   "compares": 183,
+   "cartesRelevees": 183
+  },
+  "pre": {
+   "notre": "sv08.5",
+   "nom": "Évolutions Prismatiques",
+   "serie": "Écarlate et Violet",
+   "communs": 146,
+   "compares": 180,
+   "cartesRelevees": 180
+  },
+  "upr": {
+   "notre": "sm5",
+   "nom": "Ultra-Prisme",
+   "serie": "Soleil et Lune",
+   "communs": 169,
+   "compares": 173,
+   "cartesRelevees": 177
+  },
+  "scr": {
+   "notre": "sv07",
+   "nom": "Couronne Stellaire",
+   "serie": "Écarlate et Violet",
+   "communs": 149,
+   "compares": 175,
+   "cartesRelevees": 175
+  },
+  "gri": {
+   "notre": "sm2",
+   "nom": "Gardiens Ascendants",
+   "serie": "Soleil et Lune",
+   "communs": 166,
+   "compares": 169,
+   "cartesRelevees": 175
+  },
+  "wht": {
+   "notre": "sv10.5w",
+   "nom": "Flamme Blanche",
+   "serie": "Écarlate et Violet",
+   "communs": 154,
+   "compares": 173,
+   "cartesRelevees": 173
+  },
+  "bus": {
+   "notre": "sm3",
+   "nom": "Ombres Ardentes",
+   "serie": "Soleil et Lune",
+   "communs": 166,
+   "compares": 169,
+   "cartesRelevees": 173
+  },
+  "blk": {
+   "notre": "sv10.5b",
+   "nom": "Foudre Noire",
+   "serie": "Écarlate et Violet",
+   "communs": 153,
+   "compares": 172,
+   "cartesRelevees": 172
+  },
+  "bkt": {
+   "notre": "xy8",
+   "nom": "Impulsion Turbo",
+   "serie": "XY",
+   "communs": 156,
+   "compares": 164,
+   "cartesRelevees": 165
+  },
+  "sum": {
+   "notre": "sm1",
+   "nom": "Soleil et Lune",
+   "serie": "Soleil et Lune",
+   "communs": 161,
+   "compares": 163,
+   "cartesRelevees": 164
+  },
+  "prc": {
+   "notre": "xy5",
+   "nom": "Primo-Choc",
+   "serie": "XY",
+   "communs": 160,
+   "compares": 164,
+   "cartesRelevees": 164
+  },
+  "30c": {
+   "notre": "30th",
+   "nom": "30th Celebration",
+   "serie": "Méga-Évolution",
+   "communs": 137,
+   "compares": 161,
+   "cartesRelevees": 161
+  },
+  "bcr": {
+   "notre": "bw7",
+   "nom": "Frontières Franchies",
+   "serie": "Noir & Blanc",
+   "communs": 153,
+   "compares": 153,
+   "cartesRelevees": 153
+  },
+  "sv": {
+   "notre": "pl3",
+   "nom": "Vainqueurs Suprêmes",
+   "serie": "Platine",
+   "communs": 115,
+   "compares": 150,
+   "cartesRelevees": 150
+  },
+  "fli": {
+   "notre": "sm6",
+   "nom": "Lumière Interdite",
+   "serie": "Soleil et Lune",
+   "communs": 143,
+   "compares": 146,
+   "cartesRelevees": 148
+  },
+  "xy": {
+   "notre": "xy1",
+   "nom": "XY",
+   "serie": "XY",
+   "communs": 143,
+   "compares": 146,
+   "cartesRelevees": 146
+  },
+  "la": {
+   "notre": "dp6",
+   "nom": "Éveil des Légendes",
+   "serie": "Diamant & Perle",
+   "communs": 138,
+   "compares": 146,
+   "cartesRelevees": 146
+  },
+  "pls": {
+   "notre": "bw8",
+   "nom": "Tempète Plasma",
+   "serie": "Noir & Blanc",
+   "communs": 138,
+   "compares": 138,
+   "cartesRelevees": 138
+  },
+  "sw": {
+   "notre": "dp3",
+   "nom": "Merveilles Secrètes",
+   "serie": "Diamant & Perle",
+   "communs": 130,
+   "compares": 132,
+   "cartesRelevees": 132
+  },
+  "pfl": {
+   "notre": "me02",
+   "nom": "Flammes Fantasmagoriques",
+   "serie": "Méga-Évolution",
+   "communs": 107,
+   "compares": 130,
+   "cartesRelevees": 130
+  },
+  "pl": {
+   "notre": "pl1",
+   "nom": "Platine",
+   "serie": "Platine",
+   "communs": 112,
+   "compares": 130,
+   "cartesRelevees": 130
+  },
+  "dp": {
+   "notre": "dp1",
+   "nom": "Diamant & Perle",
+   "serie": "Diamant & Perle",
+   "communs": 127,
+   "compares": 130,
+   "cartesRelevees": 130
+  },
+  "fco": {
+   "notre": "xy10",
+   "nom": "Impact des Destins",
+   "serie": "XY",
+   "communs": 120,
+   "compares": 125,
+   "cartesRelevees": 128
+  },
+  "drx": {
+   "notre": "bw6",
+   "nom": "Dragons Éxaltés",
+   "serie": "Noir & Blanc",
+   "communs": 126,
+   "compares": 128,
+   "cartesRelevees": 128
+  },
+  "bkp": {
+   "notre": "xy9",
+   "nom": "Rupture Turbo",
+   "serie": "XY",
+   "communs": 119,
+   "compares": 123,
+   "cartesRelevees": 126
+  },
+  "por": {
+   "notre": "me03",
+   "nom": "Équilibre Parfait",
+   "serie": "Méga-Évolution",
+   "communs": 99,
+   "compares": 124,
+   "cartesRelevees": 124
+  },
+  "cin": {
+   "notre": "sm4",
+   "nom": "Invasion Carmin",
+   "serie": "Soleil et Lune",
+   "communs": 123,
+   "compares": 124,
+   "cartesRelevees": 124
+  },
+  "phf": {
+   "notre": "xy4",
+   "nom": "Vigueur Spectrale",
+   "serie": "XY",
+   "communs": 118,
+   "compares": 122,
+   "cartesRelevees": 123
+  },
+  "hs": {
+   "notre": "hgss1",
+   "nom": "HeartGold SoulSilver",
+   "serie": "HeartGold SoulSilver",
+   "communs": 117,
+   "compares": 123,
+   "cartesRelevees": 123
+  },
+  "mt": {
+   "notre": "dp2",
+   "nom": "Trésors Mystérieux",
+   "serie": "Diamant & Perle",
+   "communs": 117,
+   "compares": 123,
+   "cartesRelevees": 123
+  },
+  "cri": {
+   "notre": "me04",
+   "nom": "Chaos Ascendant",
+   "serie": "Méga-Évolution",
+   "communs": 96,
+   "compares": 122,
+   "cartesRelevees": 122
+  },
+  "plf": {
+   "notre": "bw9",
+   "nom": "Glaciation Plasma",
+   "serie": "Noir & Blanc",
+   "communs": 122,
+   "compares": 122,
+   "cartesRelevees": 122
+  },
+  "pbl": {
+   "notre": "me05",
+   "nom": "Nuit Noire",
+   "serie": "Méga-Évolution",
+   "communs": 95,
+   "compares": 120,
+   "cartesRelevees": 120
+  },
+  "uf": {
+   "notre": "ex10",
+   "nom": "EX Forces Cachées",
+   "serie": "EX",
+   "communs": 117,
+   "compares": 117,
+   "cartesRelevees": 117
+  },
+  "sts": {
+   "notre": "xy11",
+   "nom": "Offensive Vapeur",
+   "serie": "XY",
+   "communs": 112,
+   "compares": 116,
+   "cartesRelevees": 116
+  },
+  "rg": {
+   "notre": "ex6",
+   "nom": "EX Rouge Feu & Vert Feuille",
+   "serie": "EX",
+   "communs": 114,
+   "compares": 116,
+   "cartesRelevees": 116
+  },
+  "blw": {
+   "notre": "bw1",
+   "nom": "Noir & Blanc",
+   "serie": "Noir & Blanc",
+   "communs": 115,
+   "compares": 115,
+   "cartesRelevees": 115
+  },
+  "hif": {
+   "notre": "sm115",
+   "nom": "Destinées Occultes",
+   "serie": "Soleil et Lune",
+   "communs": 66,
+   "compares": 69,
+   "cartesRelevees": 114
+  },
+  "ffi": {
+   "notre": "xy3",
+   "nom": "Poings Furieux",
+   "serie": "XY",
+   "communs": 109,
+   "compares": 113,
+   "cartesRelevees": 114
+  },
+  "ds": {
+   "notre": "ex11",
+   "nom": "EX Espèces Delta",
+   "serie": "EX",
+   "communs": 114,
+   "compares": 114,
+   "cartesRelevees": 114
+  },
+  "evo": {
+   "notre": "xy12",
+   "nom": "Évolutions",
+   "serie": "XY",
+   "communs": 103,
+   "compares": 113,
+   "cartesRelevees": 113
+  },
+  "ros": {
+   "notre": "xy6",
+   "nom": "Ciel Rugissant",
+   "serie": "XY",
+   "communs": 103,
+   "compares": 110,
+   "cartesRelevees": 111
+  },
+  "dex": {
+   "notre": "bw5",
+   "nom": "Explorateurs Obscurs",
+   "serie": "Noir & Blanc",
+   "communs": 109,
+   "compares": 111,
+   "cartesRelevees": 111
+  },
+  "hp": {
+   "notre": "ex13",
+   "nom": "EX Fantômes Holon",
+   "serie": "EX",
+   "communs": 110,
+   "compares": 111,
+   "cartesRelevees": 111
+  },
+  "flf": {
+   "notre": "xy2",
+   "nom": "Étincelles",
+   "serie": "XY",
+   "communs": 103,
+   "compares": 109,
+   "cartesRelevees": 110
+  },
+  "pk": {
+   "notre": "ex16",
+   "nom": "EX Gardiens du Pouvoir",
+   "serie": "EX",
+   "communs": 108,
+   "compares": 108,
+   "cartesRelevees": 108
+  },
+  "dx": {
+   "notre": "ex8",
+   "nom": "EX Deoxys",
+   "serie": "EX",
+   "communs": 108,
+   "compares": 108,
+   "cartesRelevees": 108
+  },
+  "em": {
+   "notre": "ex9",
+   "nom": "EX Émeraude",
+   "serie": "EX",
+   "communs": 107,
+   "compares": 107,
+   "cartesRelevees": 107
+  },
+  "plb": {
+   "notre": "bw10",
+   "nom": "Explosion Plasma",
+   "serie": "Noir & Blanc",
+   "communs": 105,
+   "compares": 105,
+   "cartesRelevees": 105
+  },
+  "n4": {
+   "notre": "neo4",
+   "nom": "Neo Destiny",
+   "serie": "Neo",
+   "communs": 105,
+   "compares": 105,
+   "cartesRelevees": 105
+  },
+  "nxd": {
+   "notre": "bw4",
+   "nom": "Destinées Futures",
+   "serie": "Noir & Blanc",
+   "communs": 103,
+   "compares": 103,
+   "cartesRelevees": 103
+  },
+  "nvi": {
+   "notre": "bw3",
+   "nom": "Nobles Victoires",
+   "serie": "Noir & Blanc",
+   "communs": 102,
+   "compares": 102,
+   "cartesRelevees": 102
+  },
+  "tm": {
+   "notre": "hgss4",
+   "nom": "Triomphant",
+   "serie": "HeartGold SoulSilver",
+   "communs": 98,
+   "compares": 102,
+   "cartesRelevees": 102
+  },
+  "hl": {
+   "notre": "ex5",
+   "nom": "EX Légendes Oubliées",
+   "serie": "EX",
+   "communs": 102,
+   "compares": 102,
+   "cartesRelevees": 102
+  },
+  "aor": {
+   "notre": "xy7",
+   "nom": "Origines Antiques",
+   "serie": "XY",
+   "communs": 93,
+   "compares": 100,
+   "cartesRelevees": 101
+  },
+  "df": {
+   "notre": "ex15",
+   "nom": "EX Île des Dragons",
+   "serie": "EX",
+   "communs": 99,
+   "compares": 101,
+   "cartesRelevees": 101
+  },
+  "md": {
+   "notre": "dp5",
+   "nom": "Aube Majestueuse",
+   "serie": "Diamant & Perle",
+   "communs": 96,
+   "compares": 100,
+   "cartesRelevees": 100
+  },
+  "cg": {
+   "notre": "ex14",
+   "nom": "EX Gardiens de Cristal",
+   "serie": "EX",
+   "communs": 100,
+   "compares": 100,
+   "cartesRelevees": 100
+  },
+  "dr": {
+   "notre": "ex3",
+   "nom": "EX Dragon",
+   "serie": "EX",
+   "communs": 100,
+   "compares": 100,
+   "cartesRelevees": 100
+  },
+  "ss": {
+   "notre": "ex2",
+   "nom": "EX Tempête de sable",
+   "serie": "EX",
+   "communs": 100,
+   "compares": 100,
+   "cartesRelevees": 100
+  },
+  "sfa": {
+   "notre": "sv06.5",
+   "nom": "Fable Nébuleuse",
+   "serie": "Écarlate et Violet",
+   "communs": 95,
+   "compares": 99,
+   "cartesRelevees": 99
+  },
+  "epo": {
+   "notre": "bw2",
+   "nom": "Pouvoirs Émergents",
+   "serie": "Noir & Blanc",
+   "communs": 98,
+   "compares": 98,
+   "cartesRelevees": 98
+  },
+  "ma": {
+   "notre": "ex4",
+   "nom": "EX Team Magma vs Team Aqua",
+   "serie": "EX",
+   "communs": 96,
+   "compares": 97,
+   "cartesRelevees": 97
+  },
+  "cl": {
+   "notre": "col1",
+   "nom": "L'appel des Légendes",
+   "serie": "L'appel des Légendes",
+   "communs": 95,
+   "compares": 95,
+   "cartesRelevees": 95
+  },
+  "ul": {
+   "notre": "hgss2",
+   "nom": "Déchaînement",
+   "serie": "HeartGold SoulSilver",
+   "communs": 89,
+   "compares": 95,
+   "cartesRelevees": 95
+  },
+  "lm": {
+   "notre": "ex12",
+   "nom": "EX Créateurs de légendes",
+   "serie": "EX",
+   "communs": 93,
+   "compares": 93,
+   "cartesRelevees": 93
+  },
+  "rs": {
+   "notre": "ex1",
+   "nom": "EX Rubis & Saphir",
+   "serie": "EX",
+   "communs": 93,
+   "compares": 93,
+   "cartesRelevees": 93
+  },
+  "ud": {
+   "notre": "hgss3",
+   "nom": "Indomptable",
+   "serie": "HeartGold SoulSilver",
+   "communs": 85,
+   "compares": 90,
+   "cartesRelevees": 90
+  },
+  "pgo": {
+   "notre": "swsh10.5",
+   "nom": "Pokémon GO",
+   "serie": "Épée et Bouclier",
+   "communs": 88,
+   "compares": 88,
+   "cartesRelevees": 88
+  },
+  "cpa": {
+   "notre": "swsh3.5",
+   "nom": "Champion's Path",
+   "serie": "Épée et Bouclier",
+   "communs": 79,
+   "compares": 80,
+   "cartesRelevees": 80
+  },
+  "drm": {
+   "notre": "sm7.5",
+   "nom": "Majesté Des Dragons",
+   "serie": "Soleil et Lune",
+   "communs": 78,
+   "compares": 78,
+   "cartesRelevees": 79
+  },
+  "slg": {
+   "notre": "sm3.5",
+   "nom": "Légendes Brillantes",
+   "serie": "Soleil et Lune",
+   "communs": 78,
+   "compares": 78,
+   "cartesRelevees": 79
+  },
+  "shf": {
+   "notre": "swsh4.5",
+   "nom": "Destinées Radieuses",
+   "serie": "Épée et Bouclier",
+   "communs": 71,
+   "compares": 73,
+   "cartesRelevees": 73
+  },
+  "stf": {
+   "notre": "dp7",
+   "nom": "Tempête",
+   "serie": "Diamant & Perle",
+   "communs": 64,
+   "compares": 64,
+   "cartesRelevees": 64
+  },
+  "cel": {
+   "notre": "cel25",
+   "nom": "Célébrations",
+   "serie": "Épée et Bouclier",
+   "communs": 23,
+   "compares": 25,
+   "cartesRelevees": 36
+  },
+  "dcr": {
+   "notre": "dc1",
+   "nom": "Double Danger",
+   "serie": "XY",
+   "communs": 32,
+   "compares": 34,
+   "cartesRelevees": 34
+  },
+  "svp": {
+   "notre": "svp",
+   "nom": "SVP Black Star Promos",
+   "serie": "Écarlate et Violet",
+   "communs": 25,
+   "compares": 27,
+   "cartesRelevees": 27
+  },
+  "ge": {
+   "notre": "dp4",
+   "nom": "Duels au Sommets",
+   "serie": "Diamant & Perle",
+   "communs": 17,
+   "compares": 17,
+   "cartesRelevees": 17
+  },
+  "ex": {
+   "notre": "ecard1",
+   "nom": "Expedition",
+   "serie": "e-cards",
+   "communs": 12,
+   "compares": 12,
+   "cartesRelevees": 12
+  }
+ },
+ "douteux": [
+  {
+   "code": "swsh",
+   "cartesRelevees": 299,
+   "pistes": [
+    "30th (3/158) 30th Celebration",
+    "2019sm-fr (1/40) Collection McDonald's 2019",
+    "dp5 (1/100) Aube Majestueuse"
+   ]
+  },
+  {
+   "code": "crz",
+   "cartesRelevees": 160,
+   "pistes": [
+    "swsh12.5 (95/160) Zénith Suprême",
+    "bw7 (2/153) Frontières Franchies",
+    "ecard1 (2/160) Expedition"
+   ]
+  },
+  {
+   "code": "rr",
+   "cartesRelevees": 94,
+   "pistes": [
+    "pl2 (6/94) Rivaux Émergeants",
+    "dp5 (5/94) Aube Majestueuse",
+    "ex6 (2/94) EX Rouge Feu & Vert Feuille"
+   ]
+  },
+  {
+   "code": "gen",
+   "cartesRelevees": 84,
+   "pistes": [
+    "g1 (56/83) Générations",
+    "ex6 (2/83) EX Rouge Feu & Vert Feuille",
+    "xy3 (2/83) Poings Furieux"
+   ]
+  }
+ ],
+ "orphelins": [
+  {
+   "code": "aq",
+   "cartesRelevees": 5
+  }
+ ]
+}

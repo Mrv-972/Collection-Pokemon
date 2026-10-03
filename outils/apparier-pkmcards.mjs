@@ -41,17 +41,49 @@ const numero = n => String(n ?? '').replace(/^0+/, '').toLowerCase();
 
 // ------------------------------------------------- ce qu'ils ont ----------
 const releve = JSON.parse(await readFile(releveChemin, 'utf8'));
-// clé « code-numéro » -> nom aplati, groupé par code.
-const chezEux = new Map();
+
+// Ce qui suit « -fr-<numéro>- » n'est PAS seulement le nom de la carte :
+// c'est le nom de l'extension, puis celui de la carte. Ainsi
+//   …-30c-fr-001-me055-30e-anniversaire-noeunoeuf.webp
+// porte « me055-30e-anniversaire » avant « noeunoeuf ». Comparer le tout
+// à « Nœunœuf » ne pouvait rien donner — et ne donnait rien.
+//
+// Ce préfixe est constant à l'intérieur d'un même code. On le DÉTECTE donc,
+// en prenant le plus long début commun à toutes les cartes du code, plutôt
+// que de le deviner extension par extension.
+const brut = new Map();     // code -> [{num, bouts}]
 for(const [cle, adresse] of Object.entries(releve.visuels ?? {})){
   const m = /^(.+)-([0-9a-z]+)$/i.exec(cle);
   if(!m) continue;
   const [, code, num] = m;
-  // Le nom est la fin du nom de fichier, après « -fr-<numéro>- ».
-  const nom = (/-fr-[0-9a-z]+-(.+)\.(webp|png|jpe?g)$/i.exec(adresse) ?? [])[1];
-  if(!nom) continue;
-  if(!chezEux.has(code)) chezEux.set(code, new Map());
-  chezEux.get(code).set(numero(num), aplatir(nom));
+  const queue = (/-fr-[0-9a-z]+-(.+)\.(webp|png|jpe?g)$/i.exec(adresse) ?? [])[1];
+  if(!queue) continue;
+  if(!brut.has(code)) brut.set(code, []);
+  brut.get(code).push({ num: numero(num), bouts: queue.split('-') });
+}
+
+// Le début commun, compté en morceaux séparés par des tirets : couper au
+// milieu d'un mot donnerait des noms tronqués qui ne s'apparieraient pas.
+function débutCommun(entrées){
+  if(entrées.length < 2) return 0;
+  let n = 0;
+  for(;;){
+    const premier = entrées[0].bouts[n];
+    // On ne mange jamais le dernier morceau : ce serait le nom de la carte.
+    if(premier === undefined) return n;
+    if(entrées.some(e => e.bouts.length <= n + 1 || e.bouts[n] !== premier)) return n;
+    n++;
+  }
+}
+
+const chezEux = new Map();
+const préfixes = new Map();
+for(const [code, entrées] of brut){
+  const saut = débutCommun(entrées);
+  préfixes.set(code, entrées[0].bouts.slice(0, saut).join('-'));
+  const par = new Map();
+  for(const e of entrées) par.set(e.num, aplatir(e.bouts.slice(saut).join('-')));
+  chezEux.set(code, par);
 }
 
 // ------------------------------------------------- ce que nous avons -----
@@ -67,6 +99,10 @@ for(const ext of extensions){
 }
 
 console.log(`${chezEux.size} codes chez eux, ${chezNous.size} extensions chez nous.\n`);
+console.log('préfixes détectés (un échantillon) :');
+for(const [code, p] of [...préfixes].slice(0, 8))
+  console.log(`  ${code.padEnd(8)} « ${p} »`);
+console.log('');
 
 // ------------------------------------------------- l'appariement ---------
 // Pour un code, on compte chez chaque extension combien de numéros portent
