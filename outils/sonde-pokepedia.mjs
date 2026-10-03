@@ -62,11 +62,22 @@ for(let i = 0; i < combien; i++){
   const images = d.query?.allimages ?? [];
   total += images.length;
   lu++;
+  // Les noms bruts, d'abord : la première passe n'en reconnaissait aucun
+  // sur 3 000 fichiers, et c'était mon motif qui était trop strict, pas
+  // les données qui manquaient. On regarde avant de supposer.
+  if(i === 0){
+    console.log('\n  noms bruts, les 15 premiers :');
+    for(const img of images.slice(0, 15)) console.log(`    ${img.name}`);
+    console.log('');
+  }
   for(const img of images){
     // « Carte Set de Base 4.png » -> série « Set de Base », numéro « 4 ».
     // On exige un numéro final : sans lui, ce n'est pas une carte mais une
     // image d'habillage, et la compter gonflerait le bilan pour rien.
-    const m = /^Carte (.+?) ([0-9]+[a-z]?)\.(png|jpe?g|webp|gif)$/i.exec(img.name);
+    // Un numéro de carte n'est pas forcément un nombre : « H1 »
+    // (Aquapolis), « TG01 » (galeries), « SV01 ». Exiger des chiffres
+    // seuls écartait des séries entières.
+    const m = /^Carte (.+?) ([A-Za-z]{0,3}[0-9]+[a-z]?)\.(png|jpe?g|webp|gif)$/i.exec(img.name);
     if(!m) continue;
     const serie = m[1];
     if(!parSerie.has(serie)) parSerie.set(serie, { n: 0, url: img.url });
