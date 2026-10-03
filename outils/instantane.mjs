@@ -949,6 +949,64 @@ async function recolterLogosFrancais(pocket){
 // Comme ailleurs : rien n'est redemandé deux fois, et rien n'écrase un
 // fichier existant.
 
+// Brancher les visuels français relevés chez PkmCards.
+// ====================================================
+//
+// Beaucoup de cartes n'ont pas de visuel français chez TCGdex : l'adresse
+// existe, mais elle répond 404, et le site affiche un point
+// d'interrogation. PkmCards, lui, a ces visuels en français. On s'en sert
+// de secours à la place de l'anglais : Mrv972 ne veut que du français.
+//
+// Le rapprochement n'est pas devinable — leurs codes d'extension ne sont
+// pas les nôtres (« fst » pour Poing de Fusion) — il a été établi à part,
+// en vérifiant que les mêmes noms de cartes tombent aux mêmes numéros, et
+// vit dans donnees/appariement-pkmcards.json. Les appariements douteux en
+// sont écartés : servir une image venue d'une autre extension serait pire
+// que le point d'interrogation.
+async function brancherPkmcards(physique){
+  let releve, appariement;
+  try{
+    releve = JSON.parse(await readFile('donnees/visuels-pkmcards.json', 'utf8'));
+    appariement = JSON.parse(await readFile('donnees/appariement-pkmcards.json', 'utf8'));
+  }catch{
+    console.log('Pas de relevé PkmCards : on garde les secours en place.');
+    return;
+  }
+
+  // Leurs numéros portent des zéros devant (« 001 »), les nôtres non.
+  const sansZeros = n => String(n ?? '').replace(/^0+/, '').toLowerCase();
+
+  // notre identifiant d'extension -> leur code
+  const leurCode = new Map();
+  for(const [code, a] of Object.entries(appariement.apparies ?? {})) leurCode.set(a.notre, code);
+
+  // « leurcode-numéro » -> adresse, avec le numéro normalisé pour pouvoir
+  // le rapprocher du nôtre.
+  const parCle = new Map();
+  for(const [cle, adresse] of Object.entries(releve.visuels ?? {})){
+    const m = /^(.+)-([0-9a-z]+)$/i.exec(cle);
+    if(m) parCle.set(`${m[1].toLowerCase()}-${sansZeros(m[2])}`, adresse);
+  }
+
+  let poses = 0;
+  const parExtension = new Map();
+  for(const [setId, cartes] of physique.cartesParSet){
+    const code = leurCode.get(setId);
+    if(!code) continue;
+    for(const carte of cartes){
+      const adresse = parCle.get(`${code}-${sansZeros(carte.localId)}`);
+      if(!adresse) continue;
+      carte.imageSecours = adresse;
+      poses++;
+      parExtension.set(setId, (parExtension.get(setId) ?? 0) + 1);
+    }
+  }
+  console.log(`Secours français depuis PkmCards : ${poses} cartes` +
+    ` sur ${parExtension.size} extensions` +
+    ` (relevé du ${String(releve.releveLe ?? '?').slice(0, 10)}` +
+    `${releve.complet ? '' : ', PARTIEL'})`);
+}
+
 async function copierLeResteDuCatalogue(pocket){
   await mkdir(DOSSIER_VISUELS, { recursive: true });
   const aFaire = [];
@@ -1083,6 +1141,8 @@ async function principal(){
 
   await recolterLogosFrancais(pocket);
   await copierLeResteDuCatalogue(pocket);
+
+  await brancherPkmcards(physique);
 
   const { vignettes, hautes } = trierVisuels(await recenserVisuelsLocaux());
   if(vignettes.size){
