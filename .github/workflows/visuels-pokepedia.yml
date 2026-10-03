@@ -64,4 +64,14 @@ jobs:
             exit 0
           fi
           git commit -m "Copie les visuels français de Poképédia"
-          git push
+          for essai in 1 2 3 4 5; do
+            if git pull --rebase --autostash -q origin "$GITHUB_REF_NAME" \
+               && git push -q origin HEAD:"$GITHUB_REF_NAME"; then
+              echo "déposé."
+              exit 0
+            fi
+            echo "dépôt refusé (tentative $essai) — on reprend la branche et on réessaie."
+            sleep $((essai * 5))
+          done
+          echo "::error::dépôt impossible après cinq tentatives."
+          exit 1
