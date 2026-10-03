@@ -67,10 +67,40 @@ const leurs = new Map(Object.keys(releve.series).map(nom => [aplatir(nom), nom])
 const aDeja = id => ['.webp', '.png', '.jpg', '.jpeg']
   .some(ext => existsSync(path.join(DOSSIER, id + ext)));
 
+// On ne prend QUE les cartes qui en ont besoin. Sans cette restriction,
+// l'outil voulait 6 874 visuels au lieu des 1 603 demandés : il prenait
+// toute carte dont Poképédia a une image et dont nous n'avons pas de
+// fichier local — y compris celles dont le visuel français de TCGdex
+// fonctionne déjà. Remplacer une image qui marche n'apporte rien et
+// alourdit le dépôt pour rien.
+//
+// La liste des extensions à viser vient de la mesure, pas d'un jugement :
+// celles où il manque du français, et celles où il n'y a rien du tout.
+const bilan = JSON.parse(await readFile('donnees/bilan-visuels.json', 'utf8'));
+const aViser = new Set([
+  ...bilan.aTrousSansSource.map(x => x.id),
+  ...bilan.muettes.restantes.map(x => x.id),
+]);
+console.log(`${aViser.size} extensions à viser, d'après la mesure du ` +
+  `${String(bilan.mesureDu ?? '?').slice(0, 10)}.`);
+
+// Et dans ces extensions, carte par carte : l'adresse française de TCGdex
+// répond-elle ? Une extension « à trous » en a par définition qui vont
+// bien. Mesurer plutôt que supposer, même au prix de quelques milliers de
+// requêtes en tête — qui ne téléchargent aucune image.
+async function visuelFrancaisManque(carte){
+  if(!/^https?:/.test(carte.image ?? '')) return true;
+  try{
+    const r = await fetch(carte.image, { method: 'HEAD', redirect: 'follow', headers: IDENTITE });
+    return !r.ok;
+  }catch{ return true; }   // injoignable : on considère qu'il manque
+}
+
 const aFaire = [];
 const parExtension = new Map();
-let sansSerie = [];
+let sansSerie = [], horsCible = 0, dejaBon = 0;
 for(const ext of extensions){
+  if(!aViser.has(ext.id)){ horsCible++; continue; }
   const leurNom = leurs.get(aplatir(ext.name));
   if(!leurNom){ sansSerie.push(ext.name); continue; }
   let cartes;
@@ -83,13 +113,16 @@ for(const ext of extensions){
     if(aDeja(carte.id)) continue;
     const adresse = chezEux[sansZeros(carte.localId)];
     if(!adresse) continue;
+    if(!(await visuelFrancaisManque(carte))){ dejaBon++; continue; }
     aFaire.push({ id: carte.id, nom: carte.name, adresse, serie: leurNom, extension: ext.id });
     parExtension.set(ext.id, (parExtension.get(ext.id) ?? 0) + 1);
   }
 }
 
 console.log(`${extensions.length} extensions chez nous, ${leurs.size} séries chez eux.`);
-console.log(`${sansSerie.length} de nos extensions n'ont pas d'équivalent de nom.`);
+console.log(`${horsCible} extensions écartées : leurs visuels français vont bien.`);
+console.log(`${sansSerie.length} des extensions visées n'ont pas d'équivalent de nom chez eux.`);
+console.log(`${dejaBon} cartes écartées : leur visuel français répond déjà.`);
 console.log(`\n${aFaire.length} visuels à prendre, sur ${parExtension.size} extensions :`);
 for(const [id, n] of [...parExtension].sort((a,b) => b[1]-a[1]).slice(0, 20))
   console.log(`  ${String(n).padStart(4)}  ${id}`);
