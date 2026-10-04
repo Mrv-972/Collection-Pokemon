@@ -1,0 +1,20 @@
+# Écoute l'interface de données de Pokécardex. Lecture seule, à la demande.
+name: Sonde réseau Pokécardex
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sonder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install playwright@latest
+          npx playwright install --with-deps chromium
+      - run: node outils/sonde-pokecardex-reseau.mjs
