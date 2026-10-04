@@ -1,5 +1,5 @@
 # Écoute l'interface de données de Pokécardex. Lecture seule, à la demande.
-name: Sonde séries Pokécardex
+name: Sonde structure Pokécardex
 
 on:
   workflow_dispatch:
@@ -17,4 +17,4 @@ jobs:
           npm init -y >/dev/null 2>&1 || true
           npm install playwright@latest
           npx playwright install --with-deps chromium
-      - run: node outils/sonde-pokecardex-series.mjs
+      - run: node outils/sonde-pokecardex-structure.mjs
