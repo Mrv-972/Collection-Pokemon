@@ -1,14 +1,15 @@
 {
- "verifieLe": "2026-10-04T17:35:36.715Z",
+ "verifieLe": "2026-10-04T18:41:41.113Z",
  "methode": "une requête d'en-tête par carte, sur l'adresse que le site sert",
- "repriseDe": "2026-10-03T22:05:53.795Z",
+ "repriseDe": null,
  "total": 21393,
  "compte": {
   "depot": 1322,
-  "principal": 16691,
-  "secours": 2444,
-  "manquant": 936,
-  "indecis": 0
+  "principal": 16852,
+  "secoursFrancais": 1820,
+  "secoursAnglais": 397,
+  "manquant": 869,
+  "indecis": 133
  },
  "extensions": {
   "miscp": {
@@ -16,7 +17,8 @@
    "total": 1,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 1,
    "indecis": 0,
    "cartesManquantes": [
@@ -24,174 +26,453 @@
      "id": "miscp-001",
      "nom": "Ancient Mew"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "base1": {
    "nom": "Set de Base",
    "total": 102,
    "depot": 0,
    "principal": 102,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "base2": {
    "nom": "Jungle",
    "total": 64,
    "depot": 0,
    "principal": 64,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "basep": {
    "nom": "Wizards Black Star Promos",
    "total": 53,
    "depot": 0,
    "principal": 0,
-   "secours": 53,
+   "secoursFrancais": 0,
+   "secoursAnglais": 53,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "basep-1",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "basep-2",
+     "nom": "Élektek"
+    },
+    {
+     "id": "basep-3",
+     "nom": "Deuxmiaou"
+    },
+    {
+     "id": "basep-4",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "basep-5",
+     "nom": "Dracolosse"
+    },
+    {
+     "id": "basep-6",
+     "nom": "Arcanin"
+    },
+    {
+     "id": "basep-7",
+     "nom": "Jigglypuff"
+    },
+    {
+     "id": "basep-8",
+     "nom": "Mew"
+    },
+    {
+     "id": "basep-9",
+     "nom": "Mew"
+    },
+    {
+     "id": "basep-10",
+     "nom": "Meowth"
+    },
+    {
+     "id": "basep-11",
+     "nom": "Eevee"
+    },
+    {
+     "id": "basep-12",
+     "nom": "Mewtwo"
+    },
+    {
+     "id": "basep-13",
+     "nom": "Venusaur"
+    },
+    {
+     "id": "basep-14",
+     "nom": "Mewtwo"
+    },
+    {
+     "id": "basep-15",
+     "nom": "Cool Porygon"
+    },
+    {
+     "id": "basep-16",
+     "nom": "Computer Error"
+    },
+    {
+     "id": "basep-17",
+     "nom": "Dark Persian"
+    },
+    {
+     "id": "basep-18",
+     "nom": "Team Rocket's Meowth"
+    },
+    {
+     "id": "basep-19",
+     "nom": "Sabrina's Abra"
+    },
+    {
+     "id": "basep-20",
+     "nom": "Psykokwak"
+    },
+    {
+     "id": "basep-21",
+     "nom": "Sulfura"
+    },
+    {
+     "id": "basep-22",
+     "nom": "Artikodin"
+    },
+    {
+     "id": "basep-23",
+     "nom": "Électhor"
+    },
+    {
+     "id": "basep-24",
+     "nom": "Pikachu de ________"
+    },
+    {
+     "id": "basep-25",
+     "nom": "Pikachu volant"
+    },
+    {
+     "id": "basep-26",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "basep-27",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "basep-28",
+     "nom": "Pikachu surfeur"
+    },
+    {
+     "id": "basep-29",
+     "nom": "Marill"
+    },
+    {
+     "id": "basep-30",
+     "nom": "Togepi"
+    },
+    {
+     "id": "basep-31",
+     "nom": "Mélo"
+    },
+    {
+     "id": "basep-32",
+     "nom": "Queulorior"
+    },
+    {
+     "id": "basep-33",
+     "nom": "Cizayox"
+    },
+    {
+     "id": "basep-34",
+     "nom": "Entei"
+    },
+    {
+     "id": "basep-35",
+     "nom": "Pichu"
+    },
+    {
+     "id": "basep-36",
+     "nom": "Toudoudou"
+    },
+    {
+     "id": "basep-37",
+     "nom": "Kapoera"
+    },
+    {
+     "id": "basep-38",
+     "nom": "Zarbi J"
+    },
+    {
+     "id": "basep-39",
+     "nom": "Feuforêve"
+    },
+    {
+     "id": "basep-40",
+     "nom": "Pokémon Center"
+    },
+    {
+     "id": "basep-41",
+     "nom": "Lucky Stadium"
+    },
+    {
+     "id": "basep-42",
+     "nom": "Pokémon Tower"
+    },
+    {
+     "id": "basep-43",
+     "nom": "Machamp"
+    },
+    {
+     "id": "basep-44",
+     "nom": "Magmar"
+    },
+    {
+     "id": "basep-45",
+     "nom": "Scyther"
+    },
+    {
+     "id": "basep-46",
+     "nom": "Electabuzz"
+    },
+    {
+     "id": "basep-47",
+     "nom": "Mew"
+    },
+    {
+     "id": "basep-48",
+     "nom": "Articuno"
+    },
+    {
+     "id": "basep-49",
+     "nom": "Snorlax"
+    },
+    {
+     "id": "basep-50",
+     "nom": "Celebi"
+    },
+    {
+     "id": "basep-51",
+     "nom": "Rapidash"
+    },
+    {
+     "id": "basep-52",
+     "nom": "Ho-oh"
+    },
+    {
+     "id": "basep-53",
+     "nom": "Suicune"
+    }
+   ]
   },
   "base3": {
    "nom": "Fossile",
    "total": 62,
    "depot": 2,
    "principal": 60,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "base4": {
    "nom": "Base Set 2",
    "total": 130,
    "depot": 95,
    "principal": 35,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "base5": {
    "nom": "Team Rocket",
    "total": 83,
    "depot": 0,
    "principal": 82,
-   "secours": 1,
+   "secoursFrancais": 0,
+   "secoursAnglais": 1,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "base5-63",
+     "nom": "Mystherbe"
+    }
+   ]
   },
   "gym1": {
    "nom": "Gym Heroes",
    "total": 132,
    "depot": 132,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "gym2": {
    "nom": "Gym Challenge",
    "total": 132,
    "depot": 132,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "neo1": {
    "nom": "Neo Genesis",
    "total": 111,
    "depot": 0,
    "principal": 111,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "neo2": {
    "nom": "Neo Discovery",
    "total": 75,
    "depot": 0,
    "principal": 75,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "si1": {
    "nom": "Southern Islands",
    "total": 18,
    "depot": 18,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "neo3": {
    "nom": "Neo Revelation",
    "total": 66,
    "depot": 0,
    "principal": 66,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "neo4": {
    "nom": "Neo Destiny",
    "total": 113,
    "depot": 0,
    "principal": 113,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "lc": {
    "nom": "Legendary Collection",
    "total": 110,
    "depot": 109,
    "principal": 0,
-   "secours": 1,
+   "secoursFrancais": 0,
+   "secoursAnglais": 1,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "lc-46",
+     "nom": "Haunter"
+    }
+   ]
   },
   "ecard1": {
    "nom": "Expedition",
    "total": 165,
    "depot": 0,
    "principal": 164,
-   "secours": 1,
+   "secoursFrancais": 0,
+   "secoursAnglais": 1,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "ecard1-16",
+     "nom": "Mackogneur"
+    }
+   ]
   },
   "bog": {
    "nom": "Best of game",
    "total": 9,
    "depot": 9,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ecard2": {
    "nom": "Aquapolis",
    "total": 186,
    "depot": 5,
    "principal": 172,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 9,
    "indecis": 0,
    "cartesManquantes": [
@@ -231,14 +512,17 @@
      "id": "ecard2-H09",
      "nom": "Mentali"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ecard3": {
    "nom": "Skyridge",
    "total": 182,
    "depot": 26,
    "principal": 147,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 9,
    "indecis": 0,
    "cartesManquantes": [
@@ -278,174 +562,225 @@
      "id": "ecard3-H09",
      "nom": "Gengar"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex1": {
    "nom": "EX Rubis & Saphir",
    "total": 109,
    "depot": 0,
-   "principal": 109,
-   "secours": 0,
+   "principal": 95,
+   "secoursFrancais": 14,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex2": {
    "nom": "EX Tempête de sable",
    "total": 100,
    "depot": 0,
    "principal": 100,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "np": {
    "nom": "Promo Nintendo",
    "total": 40,
    "depot": 40,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex3": {
    "nom": "EX Dragon",
    "total": 100,
    "depot": 0,
    "principal": 100,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex4": {
    "nom": "EX Team Magma vs Team Aqua",
    "total": 97,
    "depot": 0,
    "principal": 97,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex5": {
    "nom": "EX Légendes Oubliées",
    "total": 102,
    "depot": 0,
    "principal": 102,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex5.5": {
    "nom": "Poké Card Creator Pack",
    "total": 5,
    "depot": 5,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-ex-latia": {
    "nom": "EX Kit dresseur (Latias)",
    "total": 10,
    "depot": 10,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-ex-latio": {
    "nom": "EX Kit dresseur (Latios)",
    "total": 10,
    "depot": 10,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex6": {
    "nom": "EX Rouge Feu & Vert Feuille",
    "total": 116,
    "depot": 0,
    "principal": 116,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "pop1": {
    "nom": "POP Série 1",
    "total": 17,
    "depot": 0,
    "principal": 17,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex7": {
    "nom": "Team Rocket Returns",
    "total": 111,
    "depot": 0,
    "principal": 111,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex8": {
    "nom": "EX Deoxys",
    "total": 108,
    "depot": 0,
    "principal": 108,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex9": {
    "nom": "EX Émeraude",
    "total": 107,
    "depot": 0,
    "principal": 107,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "pop2": {
    "nom": "POP Série 2",
    "total": 17,
    "depot": 0,
    "principal": 17,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex10": {
    "nom": "EX Forces Cachées",
    "total": 117,
    "depot": 0,
    "principal": 117,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "exu": {
    "nom": "EX Forces Cachées Collection Zarbi",
    "total": 28,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 28,
    "indecis": 0,
    "cartesManquantes": [
@@ -561,34 +896,43 @@
      "id": "exu-Z",
      "nom": "Zarbi"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex11": {
    "nom": "EX Espèces Delta",
    "total": 114,
    "depot": 0,
    "principal": 114,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex12": {
    "nom": "EX Créateurs de légendes",
    "total": 93,
    "depot": 0,
    "principal": 93,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-ex-m": {
    "nom": "EX Kit dresseur (Négapi)",
    "total": 12,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 12,
    "indecis": 0,
    "cartesManquantes": [
@@ -640,14 +984,17 @@
      "id": "tk-ex-m-12",
      "nom": "Énergie Électrique"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-ex-p": {
    "nom": "EX Kit dresseur (Positi)",
    "total": 12,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 12,
    "indecis": 0,
    "cartesManquantes": [
@@ -699,126 +1046,165 @@
      "id": "tk-ex-p-12",
      "nom": "Énergie Psy"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "pop3": {
    "nom": "POP Série 3",
    "total": 17,
    "depot": 0,
    "principal": 17,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex13": {
    "nom": "EX Fantômes Holon",
    "total": 111,
    "depot": 0,
    "principal": 111,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "pop4": {
    "nom": "POP Série 4",
    "total": 17,
    "depot": 0,
    "principal": 17,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex14": {
    "nom": "EX Gardiens de Cristal",
    "total": 100,
    "depot": 0,
-   "principal": 98,
-   "secours": 2,
+   "principal": 100,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex15": {
    "nom": "EX Île des Dragons",
    "total": 101,
    "depot": 0,
-   "principal": 85,
-   "secours": 16,
+   "principal": 101,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ex16": {
    "nom": "EX Gardiens du Pouvoir",
    "total": 108,
    "depot": 0,
-   "principal": 60,
-   "secours": 48,
+   "principal": 108,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "pop5": {
    "nom": "POP Series 5",
    "total": 17,
    "depot": 0,
    "principal": 17,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "dpp": {
    "nom": "Promo DP",
    "total": 56,
    "depot": 56,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "dp1": {
    "nom": "Diamant & Perle",
    "total": 130,
    "depot": 0,
    "principal": 0,
-   "secours": 130,
+   "secoursFrancais": 130,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "dp2": {
    "nom": "Trésors Mystérieux",
    "total": 124,
    "depot": 0,
    "principal": 0,
-   "secours": 124,
+   "secoursFrancais": 123,
+   "secoursAnglais": 1,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "dp2-124",
+     "nom": "Altération espace-temps"
+    }
+   ]
   },
   "pop6": {
    "nom": "POP Series 6",
    "total": 17,
    "depot": 0,
    "principal": 17,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-dp-l": {
    "nom": "DP Kit dresseur (Lucario)",
    "total": 11,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 11,
    "indecis": 0,
    "cartesManquantes": [
@@ -867,14 +1253,16 @@
      "nom": "Énergie Combat"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-dp-m": {
    "nom": "DP Kit dresseur (Manaphy)",
    "total": 12,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 12,
    "indecis": 0,
    "cartesManquantes": [
@@ -927,158 +1315,1145 @@
      "nom": "Énergie Eau"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "dp3": {
    "nom": "Merveilles Secrètes",
    "total": 132,
    "depot": 0,
-   "principal": 57,
-   "secours": 75,
+   "principal": 132,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "dp4": {
    "nom": "Duels au Sommets",
    "total": 106,
    "depot": 0,
    "principal": 0,
-   "secours": 106,
+   "secoursFrancais": 17,
+   "secoursAnglais": 89,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "dp4-18",
+     "nom": "Demolosse"
+    },
+    {
+     "id": "dp4-19",
+     "nom": "Hypnomade"
+    },
+    {
+     "id": "dp4-20",
+     "nom": "Krabboss"
+    },
+    {
+     "id": "dp4-21",
+     "nom": "Lokhlass"
+    },
+    {
+     "id": "dp4-22",
+     "nom": "Latias"
+    },
+    {
+     "id": "dp4-23",
+     "nom": "Latios"
+    },
+    {
+     "id": "dp4-24",
+     "nom": "Mysdibule"
+    },
+    {
+     "id": "dp4-25",
+     "nom": "Milobellus"
+    },
+    {
+     "id": "dp4-26",
+     "nom": "Palkia"
+    },
+    {
+     "id": "dp4-27",
+     "nom": "Colossinge"
+    },
+    {
+     "id": "dp4-28",
+     "nom": "Roigada"
+    },
+    {
+     "id": "dp4-29",
+     "nom": "Zarbi H"
+    },
+    {
+     "id": "dp4-30",
+     "nom": "Wailord"
+    },
+    {
+     "id": "dp4-31",
+     "nom": "Smogogo"
+    },
+    {
+     "id": "dp4-32",
+     "nom": "Grodoudou"
+    },
+    {
+     "id": "dp4-33",
+     "nom": "Arbok"
+    },
+    {
+     "id": "dp4-34",
+     "nom": "Cacturne"
+    },
+    {
+     "id": "dp4-35",
+     "nom": "Galifeu"
+    },
+    {
+     "id": "dp4-36",
+     "nom": "Cadoizo"
+    },
+    {
+     "id": "dp4-37",
+     "nom": "Mustéflott"
+    },
+    {
+     "id": "dp4-38",
+     "nom": "Rosabyss"
+    },
+    {
+     "id": "dp4-39",
+     "nom": "Granbull"
+    },
+    {
+     "id": "dp4-40",
+     "nom": "Massko"
+    },
+    {
+     "id": "dp4-41",
+     "nom": "Hariyama"
+    },
+    {
+     "id": "dp4-42",
+     "nom": "Serpang"
+    },
+    {
+     "id": "dp4-43",
+     "nom": "Linéon"
+    },
+    {
+     "id": "dp4-44",
+     "nom": "Ramboum"
+    },
+    {
+     "id": "dp4-45",
+     "nom": "Volcaropod"
+    },
+    {
+     "id": "dp4-46",
+     "nom": "Flobio"
+    },
+    {
+     "id": "dp4-47",
+     "nom": "Chrysacier"
+    },
+    {
+     "id": "dp4-48",
+     "nom": "Bekipan"
+    },
+    {
+     "id": "dp4-49",
+     "nom": "Porygon2"
+    },
+    {
+     "id": "dp4-50",
+     "nom": "Chaffreux"
+    },
+    {
+     "id": "dp4-51",
+     "nom": "Relicanth"
+    },
+    {
+     "id": "dp4-52",
+     "nom": "Séviper"
+    },
+    {
+     "id": "dp4-53",
+     "nom": "Airmure"
+    },
+    {
+     "id": "dp4-54",
+     "nom": "Flagadoss"
+    },
+    {
+     "id": "dp4-55",
+     "nom": "Togetic"
+    },
+    {
+     "id": "dp4-56",
+     "nom": "Zarbi F"
+    },
+    {
+     "id": "dp4-57",
+     "nom": "Zarbi G"
+    },
+    {
+     "id": "dp4-58",
+     "nom": "Wailmer"
+    },
+    {
+     "id": "dp4-59",
+     "nom": "Mangriff"
+    },
+    {
+     "id": "dp4-60",
+     "nom": "Balbuto"
+    },
+    {
+     "id": "dp4-61",
+     "nom": "Mustébouée"
+    },
+    {
+     "id": "dp4-62",
+     "nom": "Cacnea"
+    },
+    {
+     "id": "dp4-63",
+     "nom": "Chenipan"
+    },
+    {
+     "id": "dp4-64",
+     "nom": "Coquiperl"
+    },
+    {
+     "id": "dp4-65",
+     "nom": "Soporifik"
+    },
+    {
+     "id": "dp4-66",
+     "nom": "Abo"
+    },
+    {
+     "id": "dp4-67",
+     "nom": "Barpau"
+    },
+    {
+     "id": "dp4-68",
+     "nom": "Chaglam"
+    },
+    {
+     "id": "dp4-69",
+     "nom": "Malosse"
+    },
+    {
+     "id": "dp4-70",
+     "nom": "Toudoudou"
+    },
+    {
+     "id": "dp4-71",
+     "nom": "Lumivole"
+    },
+    {
+     "id": "dp4-72",
+     "nom": "Rondoudou"
+    },
+    {
+     "id": "dp4-73",
+     "nom": "Coconfort"
+    },
+    {
+     "id": "dp4-74",
+     "nom": "Smogo"
+    },
+    {
+     "id": "dp4-75",
+     "nom": "Krabby"
+    },
+    {
+     "id": "dp4-76",
+     "nom": "Séléroc"
+    },
+    {
+     "id": "dp4-77",
+     "nom": "Lovdisc"
+    },
+    {
+     "id": "dp4-78",
+     "nom": "Makuhita"
+    },
+    {
+     "id": "dp4-79",
+     "nom": "Férosinge"
+    },
+    {
+     "id": "dp4-80",
+     "nom": "Gobou"
+    },
+    {
+     "id": "dp4-81",
+     "nom": "Porygon"
+    },
+    {
+     "id": "dp4-82",
+     "nom": "Ramoloss"
+    },
+    {
+     "id": "dp4-83",
+     "nom": "Limagma"
+    },
+    {
+     "id": "dp4-84",
+     "nom": "Snubbull"
+    },
+    {
+     "id": "dp4-85",
+     "nom": "Solaroc"
+    },
+    {
+     "id": "dp4-86",
+     "nom": "Tylton"
+    },
+    {
+     "id": "dp4-87",
+     "nom": "Saquedeneu"
+    },
+    {
+     "id": "dp4-88",
+     "nom": "Togepi"
+    },
+    {
+     "id": "dp4-89",
+     "nom": "Poussifeu"
+    },
+    {
+     "id": "dp4-90",
+     "nom": "Arcko"
+    },
+    {
+     "id": "dp4-91",
+     "nom": "Zarbi L"
+    },
+    {
+     "id": "dp4-92",
+     "nom": "Muciole"
+    },
+    {
+     "id": "dp4-93",
+     "nom": "Aspicot"
+    },
+    {
+     "id": "dp4-94",
+     "nom": "Chuchmur"
+    },
+    {
+     "id": "dp4-95",
+     "nom": "Goélise"
+    },
+    {
+     "id": "dp4-96",
+     "nom": "Zigzaton"
+    },
+    {
+     "id": "dp4-97",
+     "nom": "Pièce rune"
+    },
+    {
+     "id": "dp4-98",
+     "nom": "Le dessin de Felicity"
+    },
+    {
+     "id": "dp4-99",
+     "nom": "Restes"
+    },
+    {
+     "id": "dp4-100",
+     "nom": "Stade clair de lune"
+    },
+    {
+     "id": "dp4-101",
+     "nom": "Honor ball"
+    },
+    {
+     "id": "dp4-102",
+     "nom": "Super bonbon"
+    },
+    {
+     "id": "dp4-103",
+     "nom": "Cresselia"
+    },
+    {
+     "id": "dp4-104",
+     "nom": "Darkrai"
+    },
+    {
+     "id": "dp4-105",
+     "nom": "Dialga"
+    },
+    {
+     "id": "dp4-106",
+     "nom": "Palkia"
+    }
+   ]
   },
   "pop7": {
    "nom": "POP Série 7",
    "total": 17,
    "depot": 0,
    "principal": 17,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "dp5": {
    "nom": "Aube Majestueuse",
    "total": 100,
    "depot": 0,
    "principal": 0,
-   "secours": 100,
+   "secoursFrancais": 100,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "dp6": {
    "nom": "Éveil des Légendes",
    "total": 146,
    "depot": 0,
    "principal": 0,
-   "secours": 146,
+   "secoursFrancais": 146,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "pop8": {
    "nom": "POP Series 8",
    "total": 17,
    "depot": 0,
    "principal": 17,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "dp7": {
    "nom": "Tempête",
    "total": 106,
    "depot": 0,
    "principal": 0,
-   "secours": 106,
+   "secoursFrancais": 64,
+   "secoursAnglais": 26,
    "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": []
+   "indecis": 16,
+   "cartesManquantes": [],
+   "cartesIndecises": [
+    {
+     "id": "dp7-70",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "dp7-72",
+     "nom": "Rosélia"
+    },
+    {
+     "id": "dp7-73",
+     "nom": "Rapion"
+    },
+    {
+     "id": "dp7-75",
+     "nom": "Etourmi"
+    },
+    {
+     "id": "dp7-77",
+     "nom": "Marcacrin"
+    },
+    {
+     "id": "dp7-78",
+     "nom": "Saquedeneu"
+    },
+    {
+     "id": "dp7-90",
+     "nom": "Poké Guérison +"
+    },
+    {
+     "id": "dp7-92",
+     "nom": "Potion"
+    },
+    {
+     "id": "dp7-93",
+     "nom": "Échange"
+    },
+    {
+     "id": "dp7-97",
+     "nom": "Heatran"
+    },
+    {
+     "id": "dp7-99",
+     "nom": "Raichu"
+    },
+    {
+     "id": "dp7-100",
+     "nom": "Regigigas"
+    },
+    {
+     "id": "dp7-101",
+     "nom": "Salamèche"
+    },
+    {
+     "id": "dp7-102",
+     "nom": "Reptincel"
+    },
+    {
+     "id": "dp7-SH1",
+     "nom": "Baudrive"
+    },
+    {
+     "id": "dp7-SH2",
+     "nom": "Skelénox"
+    }
+   ],
+   "cartesAnglaises": [
+    {
+     "id": "dp7-65",
+     "nom": "Magicarpe"
+    },
+    {
+     "id": "dp7-66",
+     "nom": "Magnéti"
+    },
+    {
+     "id": "dp7-67",
+     "nom": "Magnéti"
+    },
+    {
+     "id": "dp7-68",
+     "nom": "Feuforêve"
+    },
+    {
+     "id": "dp7-69",
+     "nom": "Onix"
+    },
+    {
+     "id": "dp7-71",
+     "nom": "Ponyta"
+    },
+    {
+     "id": "dp7-74",
+     "nom": "Blizzi"
+    },
+    {
+     "id": "dp7-76",
+     "nom": "Moufouette"
+    },
+    {
+     "id": "dp7-79",
+     "nom": "Arcko"
+    },
+    {
+     "id": "dp7-80",
+     "nom": "Voltorbe"
+    },
+    {
+     "id": "dp7-81",
+     "nom": "Voltorbe"
+    },
+    {
+     "id": "dp7-82",
+     "nom": "Carrière conductrice"
+    },
+    {
+     "id": "dp7-83",
+     "nom": "Chaîne d'énergie"
+    },
+    {
+     "id": "dp7-84",
+     "nom": "Échange d'Énergie"
+    },
+    {
+     "id": "dp7-85",
+     "nom": "Super Ball"
+    },
+    {
+     "id": "dp7-86",
+     "nom": "Luxe Ball"
+    },
+    {
+     "id": "dp7-87",
+     "nom": "La requête de Vivianne"
+    },
+    {
+     "id": "dp7-88",
+     "nom": "Poké Coup +"
+    },
+    {
+     "id": "dp7-89",
+     "nom": "Poké Pioche +"
+    },
+    {
+     "id": "dp7-91",
+     "nom": "Honor ball"
+    },
+    {
+     "id": "dp7-94",
+     "nom": "Énergie Cyclone"
+    },
+    {
+     "id": "dp7-95",
+     "nom": "Énergie de Distorsion"
+    },
+    {
+     "id": "dp7-96",
+     "nom": "Noctunoir"
+    },
+    {
+     "id": "dp7-98",
+     "nom": "Mackogneur"
+    },
+    {
+     "id": "dp7-103",
+     "nom": "Dracaufeu"
+    },
+    {
+     "id": "dp7-SH3",
+     "nom": "Voltorbe"
+    }
+   ]
   },
   "pl1": {
    "nom": "Platine",
    "total": 133,
    "depot": 0,
-   "principal": 133,
-   "secours": 0,
+   "principal": 72,
+   "secoursFrancais": 60,
+   "secoursAnglais": 0,
    "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": []
+   "indecis": 1,
+   "cartesManquantes": [],
+   "cartesIndecises": [
+    {
+     "id": "pl1-SH6",
+     "nom": "Goupix"
+    }
+   ],
+   "cartesAnglaises": []
   },
   "pop9": {
    "nom": "POP Série 9",
    "total": 17,
    "depot": 0,
-   "principal": 17,
-   "secours": 0,
+   "principal": 4,
+   "secoursFrancais": 0,
+   "secoursAnglais": 7,
    "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": []
+   "indecis": 6,
+   "cartesManquantes": [],
+   "cartesIndecises": [
+    {
+     "id": "pop9-2",
+     "nom": "Manaphy"
+    },
+    {
+     "id": "pop9-3",
+     "nom": "Raichu"
+    },
+    {
+     "id": "pop9-4",
+     "nom": "Regigigas"
+    },
+    {
+     "id": "pop9-5",
+     "nom": "Motisma"
+    },
+    {
+     "id": "pop9-7",
+     "nom": "Cradopaud"
+    },
+    {
+     "id": "pop9-12",
+     "nom": "Laporeille"
+    }
+   ],
+   "cartesAnglaises": [
+    {
+     "id": "pop9-8",
+     "nom": "Carmache"
+    },
+    {
+     "id": "pop9-9",
+     "nom": "Lockpin"
+    },
+    {
+     "id": "pop9-10",
+     "nom": "Pachirisu"
+    },
+    {
+     "id": "pop9-11",
+     "nom": "Pichu"
+    },
+    {
+     "id": "pop9-13",
+     "nom": "Ouisticram"
+    },
+    {
+     "id": "pop9-15",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "pop9-16",
+     "nom": "Tiplouf"
+    }
+   ]
   },
   "pl2": {
    "nom": "Rivaux Émergeants",
    "total": 120,
    "depot": 0,
-   "principal": 120,
-   "secours": 0,
+   "principal": 77,
+   "secoursFrancais": 0,
+   "secoursAnglais": 31,
    "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": []
+   "indecis": 12,
+   "cartesManquantes": [],
+   "cartesIndecises": [
+    {
+     "id": "pl2-5",
+     "nom": "Flygon Niv. 65"
+    },
+    {
+     "id": "pl2-34",
+     "nom": "Aquali Niv. 48"
+    },
+    {
+     "id": "pl2-54",
+     "nom": "Barbicha 4 Niv. 50"
+    },
+    {
+     "id": "pl2-57",
+     "nom": "Galekid Niv. 21"
+    },
+    {
+     "id": "pl2-67",
+     "nom": "Kecleon Niv. 34"
+    },
+    {
+     "id": "pl2-75",
+     "nom": "Pifeuil Niv. 25"
+    },
+    {
+     "id": "pl2-83",
+     "nom": "Stari Niv. 18"
+    },
+    {
+     "id": "pl2-91",
+     "nom": "La volonté d'Adrien"
+    },
+    {
+     "id": "pl2-105",
+     "nom": "Libegon Niv. X"
+    },
+    {
+     "id": "pl2-111",
+     "nom": "Ronflex Niv. X"
+    },
+    {
+     "id": "pl2-RT1",
+     "nom": "Motisma Hélice Niv. 46"
+    },
+    {
+     "id": "pl2-RT2",
+     "nom": "Motisma Froid Niv. 46"
+    }
+   ],
+   "cartesAnglaises": [
+    {
+     "id": "pl2-2",
+     "nom": "Bastiodon GL Niv. 41"
+    },
+    {
+     "id": "pl2-3",
+     "nom": "Darkrai G Niv. 58"
+    },
+    {
+     "id": "pl2-9",
+     "nom": "Luxray GL Niv. 48"
+    },
+    {
+     "id": "pl2-17",
+     "nom": "Drascore 4 Niv. 53"
+    },
+    {
+     "id": "pl2-18",
+     "nom": "Mentali 4 Niv. 55"
+    },
+    {
+     "id": "pl2-22",
+     "nom": "Tritosor Mer Occident Niv. 50"
+    },
+    {
+     "id": "pl2-23",
+     "nom": "Grolem 4 Niv. 52"
+    },
+    {
+     "id": "pl2-25",
+     "nom": "Hippodocus Niv. 48"
+    },
+    {
+     "id": "pl2-26",
+     "nom": "Voltali Niv. 43"
+    },
+    {
+     "id": "pl2-27",
+     "nom": "Mammochon GL Niv. 61"
+    },
+    {
+     "id": "pl2-43",
+     "nom": "Simiabraz 4 Niv. 55"
+    },
+    {
+     "id": "pl2-44",
+     "nom": "Galegon Niv. 37"
+    },
+    {
+     "id": "pl2-50",
+     "nom": "Staross Niv. 44"
+    },
+    {
+     "id": "pl2-53",
+     "nom": "Vibraninf Niv. 36"
+    },
+    {
+     "id": "pl2-55",
+     "nom": "Ptera GL Niv. 62"
+    },
+    {
+     "id": "pl2-59",
+     "nom": "Evoli Niv. 10"
+    },
+    {
+     "id": "pl2-60",
+     "nom": "Pyroli 4 Niv. 55"
+    },
+    {
+     "id": "pl2-66",
+     "nom": "Coconfort Niv. 8"
+    },
+    {
+     "id": "pl2-72",
+     "nom": "Nidoran♂ Niv. 9"
+    },
+    {
+     "id": "pl2-74",
+     "nom": "Nidorino Niv. 30"
+    },
+    {
+     "id": "pl2-77",
+     "nom": "Phogleur Niv. 31"
+    },
+    {
+     "id": "pl2-86",
+     "nom": "Aspicot Niv. 6"
+    },
+    {
+     "id": "pl2-102",
+     "nom": "Énergie Sup"
+    },
+    {
+     "id": "pl2-103",
+     "nom": "Alakazam 4 Niv. X"
+    },
+    {
+     "id": "pl2-104",
+     "nom": "Mustéflott GL Niv. X"
+    },
+    {
+     "id": "pl2-108",
+     "nom": "Simiabraz 4 Niv. X"
+    },
+    {
+     "id": "pl2-110",
+     "nom": "Magirêve GL Niv. X"
+    },
+    {
+     "id": "pl2-112",
+     "nom": "Pikachu Niv. 12"
+    },
+    {
+     "id": "pl2-113",
+     "nom": "Pikachu volant Niv. 12"
+    },
+    {
+     "id": "pl2-114",
+     "nom": "Pikachu surfeur Niv. 13"
+    },
+    {
+     "id": "pl2-RT3",
+     "nom": "Motisma Chaleur Niv. 46"
+    }
+   ]
   },
   "pl3": {
    "nom": "Vainqueurs Suprêmes",
    "total": 162,
    "depot": 0,
-   "principal": 161,
-   "secours": 1,
+   "principal": 63,
+   "secoursFrancais": 95,
+   "secoursAnglais": 1,
    "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": []
+   "indecis": 3,
+   "cartesManquantes": [],
+   "cartesIndecises": [
+    {
+     "id": "pl3-AR4",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl3-AR5",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl3-AR6",
+     "nom": "Arceus"
+    }
+   ],
+   "cartesAnglaises": [
+    {
+     "id": "pl3-SH8",
+     "nom": "Relicanth"
+    }
+   ]
   },
   "pl4": {
    "nom": "Arceus",
    "total": 111,
    "depot": 0,
-   "principal": 111,
-   "secours": 0,
+   "principal": 71,
+   "secoursFrancais": 0,
+   "secoursAnglais": 17,
    "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": []
+   "indecis": 23,
+   "cartesManquantes": [],
+   "cartesIndecises": [
+    {
+     "id": "pl4-39",
+     "nom": "Grovyle"
+    },
+    {
+     "id": "pl4-44",
+     "nom": "Manectric"
+    },
+    {
+     "id": "pl4-54",
+     "nom": "Bronzor"
+    },
+    {
+     "id": "pl4-58",
+     "nom": "Burmy Trash Cloak"
+    },
+    {
+     "id": "pl4-59",
+     "nom": "Charmander"
+    },
+    {
+     "id": "pl4-75",
+     "nom": "Snorunt"
+    },
+    {
+     "id": "pl4-76",
+     "nom": "Tangela"
+    },
+    {
+     "id": "pl4-77",
+     "nom": "Tangela"
+    },
+    {
+     "id": "pl4-80",
+     "nom": "Wingull"
+    },
+    {
+     "id": "pl4-82",
+     "nom": "Porte de départ"
+    },
+    {
+     "id": "pl4-87",
+     "nom": "Expert Belt"
+    },
+    {
+     "id": "pl4-89",
+     "nom": "Old Amber"
+    },
+    {
+     "id": "pl4-90",
+     "nom": "Professor Oak's Visit"
+    },
+    {
+     "id": "pl4-92",
+     "nom": "Dome Fossil"
+    },
+    {
+     "id": "pl4-93",
+     "nom": "Helix Fossil"
+    },
+    {
+     "id": "pl4-94",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-95",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-98",
+     "nom": "Salamence LV.X"
+    },
+    {
+     "id": "pl4-99",
+     "nom": "Tangrowth LV.X"
+    },
+    {
+     "id": "pl4-AR3",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-AR4",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-AR7",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-AR8",
+     "nom": "Arceus"
+    }
+   ],
+   "cartesAnglaises": [
+    {
+     "id": "pl4-4",
+     "nom": "Kabutops"
+    },
+    {
+     "id": "pl4-14",
+     "nom": "Bronzong"
+    },
+    {
+     "id": "pl4-15",
+     "nom": "Cherrim"
+    },
+    {
+     "id": "pl4-16",
+     "nom": "Gengar"
+    },
+    {
+     "id": "pl4-17",
+     "nom": "Gengar"
+    },
+    {
+     "id": "pl4-20",
+     "nom": "Hariyama"
+    },
+    {
+     "id": "pl4-27",
+     "nom": "Raichu"
+    },
+    {
+     "id": "pl4-29",
+     "nom": "Raticate"
+    },
+    {
+     "id": "pl4-30",
+     "nom": "Sceptile"
+    },
+    {
+     "id": "pl4-46",
+     "nom": "Ponyta"
+    },
+    {
+     "id": "pl4-51",
+     "nom": "Wormadam Trash Cloak"
+    },
+    {
+     "id": "pl4-56",
+     "nom": "Burmy Plant Cloak"
+    },
+    {
+     "id": "pl4-57",
+     "nom": "Burmy Sandy Cloak"
+    },
+    {
+     "id": "pl4-70",
+     "nom": "Omanyte"
+    },
+    {
+     "id": "pl4-83",
+     "nom": "Bench Shield"
+    },
+    {
+     "id": "pl4-AR5",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-AR6",
+     "nom": "Arceus"
+    }
+   ]
   },
   "ru1": {
    "nom": "Pokémon Rumble",
    "total": 16,
    "depot": 16,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "hgss1": {
    "nom": "HeartGold SoulSilver",
    "total": 124,
    "depot": 0,
-   "principal": 123,
-   "secours": 1,
+   "principal": 99,
+   "secoursFrancais": 24,
+   "secoursAnglais": 1,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "hgss1-ONE",
+     "nom": "Lithographie d’Alph"
+    }
+   ]
   },
   "hgssp": {
    "nom": "Promo HGSS",
    "total": 25,
    "depot": 0,
    "principal": 0,
-   "secours": 16,
-   "manquant": 9,
-   "indecis": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 16,
+   "manquant": 8,
+   "indecis": 1,
    "cartesManquantes": [
     {
      "id": "hgssp-HGSS17",
@@ -1101,10 +2476,6 @@
      "nom": "Suicune"
     },
     {
-     "id": "hgssp-HGSS22",
-     "nom": "Porygon"
-    },
-    {
      "id": "hgssp-HGSS23",
      "nom": "Porygon2"
     },
@@ -1116,6 +2487,78 @@
      "id": "hgssp-HGSS25",
      "nom": "Kicklee"
     }
+   ],
+   "cartesIndecises": [
+    {
+     "id": "hgssp-HGSS22",
+     "nom": "Porygon"
+    }
+   ],
+   "cartesAnglaises": [
+    {
+     "id": "hgssp-HGSS01",
+     "nom": "Ho-Oh"
+    },
+    {
+     "id": "hgssp-HGSS02",
+     "nom": "Lugia"
+    },
+    {
+     "id": "hgssp-HGSS03",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "hgssp-HGSS04",
+     "nom": "Qulbutoké"
+    },
+    {
+     "id": "hgssp-HGSS05",
+     "nom": "Hoothoot"
+    },
+    {
+     "id": "hgssp-HGSS06",
+     "nom": "Noarfang"
+    },
+    {
+     "id": "hgssp-HGSS07",
+     "nom": "Aligatueur"
+    },
+    {
+     "id": "hgssp-HGSS08",
+     "nom": "Méganium"
+    },
+    {
+     "id": "hgssp-HGSS09",
+     "nom": "Typhlosion"
+    },
+    {
+     "id": "hgssp-HGSS10",
+     "nom": "Latias"
+    },
+    {
+     "id": "hgssp-HGSS11",
+     "nom": "Latios"
+    },
+    {
+     "id": "hgssp-HGSS12",
+     "nom": "Mélo"
+    },
+    {
+     "id": "hgssp-HGSS13",
+     "nom": "Lippouti"
+    },
+    {
+     "id": "hgssp-HGSS14",
+     "nom": "Lokhlass"
+    },
+    {
+     "id": "hgssp-HGSS15",
+     "nom": "Caratroc"
+    },
+    {
+     "id": "hgssp-HGSS16",
+     "nom": "Posipi"
+    }
    ]
   },
   "tk-hs-g": {
@@ -1123,107 +2566,198 @@
    "total": 30,
    "depot": 30,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-hs-r": {
    "nom": "HS Kit du dresseur (Raichu)",
    "total": 30,
    "depot": 30,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "hgss2": {
    "nom": "Déchaînement",
    "total": 96,
    "depot": 0,
    "principal": 95,
-   "secours": 1,
+   "secoursFrancais": 0,
+   "secoursAnglais": 1,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "hgss2-TWO",
+     "nom": "Lithographie d'Alpha"
+    }
+   ]
   },
   "hgss3": {
    "nom": "Indomptable",
    "total": 91,
    "depot": 0,
    "principal": 90,
-   "secours": 1,
+   "secoursFrancais": 0,
+   "secoursAnglais": 1,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "hgss3-THREE",
+     "nom": "Lithographie d’Alph"
+    }
+   ]
   },
   "hgss4": {
    "nom": "Triomphant",
    "total": 103,
    "depot": 0,
    "principal": 102,
-   "secours": 1,
+   "secoursFrancais": 0,
+   "secoursAnglais": 1,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "hgss4-FOUR",
+     "nom": "Lithographie d’Alpha"
+    }
+   ]
   },
   "col1": {
    "nom": "L'appel des Légendes",
    "total": 106,
    "depot": 0,
    "principal": 0,
-   "secours": 106,
+   "secoursFrancais": 95,
+   "secoursAnglais": 11,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "col1-SL1",
+     "nom": "Deoxys"
+    },
+    {
+     "id": "col1-SL2",
+     "nom": "Dialga"
+    },
+    {
+     "id": "col1-SL3",
+     "nom": "Entei"
+    },
+    {
+     "id": "col1-SL4",
+     "nom": "Groudon"
+    },
+    {
+     "id": "col1-SL5",
+     "nom": "Ho-Oh"
+    },
+    {
+     "id": "col1-SL6",
+     "nom": "Kyogre"
+    },
+    {
+     "id": "col1-SL7",
+     "nom": "Lugia"
+    },
+    {
+     "id": "col1-SL8",
+     "nom": "Palkia"
+    },
+    {
+     "id": "col1-SL9",
+     "nom": "Raikou"
+    },
+    {
+     "id": "col1-SL10",
+     "nom": "Rayquaza"
+    },
+    {
+     "id": "col1-SL11",
+     "nom": "Suicune"
+    }
+   ]
   },
   "bw1": {
    "nom": "Noir & Blanc",
    "total": 115,
    "depot": 0,
    "principal": 115,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bwp": {
    "nom": "Promo BW",
    "total": 101,
    "depot": 0,
    "principal": 101,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2011bw": {
    "nom": "Collection McDonald's 2011",
    "total": 12,
    "depot": 12,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bw2": {
    "nom": "Pouvoirs Émergents",
    "total": 98,
    "depot": 0,
    "principal": 97,
-   "secours": 1,
+   "secoursFrancais": 1,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-bw-e": {
    "nom": "BW Kit du dresseur (Minitaupe)",
    "total": 30,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 30,
    "indecis": 0,
    "cartesManquantes": [
@@ -1347,14 +2881,17 @@
      "id": "tk-bw-e-30",
      "nom": "Minotaupe"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-bw-z": {
    "nom": "BW Kit du dresseur (Zoroark)",
    "total": 30,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 30,
    "indecis": 0,
    "cartesManquantes": [
@@ -1478,166 +3015,258 @@
      "id": "tk-bw-z-30",
      "nom": "Zoroark"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bw3": {
    "nom": "Nobles Victoires",
    "total": 102,
    "depot": 0,
    "principal": 102,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bw4": {
    "nom": "Destinées Futures",
    "total": 103,
    "depot": 0,
    "principal": 103,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bw5": {
    "nom": "Explorateurs Obscurs",
    "total": 111,
    "depot": 0,
-   "principal": 111,
-   "secours": 0,
+   "principal": 110,
+   "secoursFrancais": 1,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2012bw": {
    "nom": "Collection McDonald's 2012",
    "total": 12,
    "depot": 12,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bw6": {
    "nom": "Dragons Éxaltés",
    "total": 128,
    "depot": 0,
    "principal": 128,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "dv1": {
    "nom": "Coffre des Dragons",
    "total": 21,
    "depot": 0,
    "principal": 21,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bw7": {
    "nom": "Frontières Franchies",
    "total": 153,
    "depot": 0,
    "principal": 153,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bw8": {
    "nom": "Tempète Plasma",
    "total": 138,
    "depot": 0,
    "principal": 138,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bw9": {
    "nom": "Glaciation Plasma",
    "total": 122,
    "depot": 0,
    "principal": 122,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bw10": {
    "nom": "Explosion Plasma",
    "total": 105,
    "depot": 0,
-   "principal": 104,
-   "secours": 1,
+   "principal": 105,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xyp": {
    "nom": "Promo XY",
    "total": 216,
    "depot": 0,
-   "principal": 206,
-   "secours": 10,
+   "principal": 214,
+   "secoursFrancais": 0,
+   "secoursAnglais": 2,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "xyp-XY91",
+     "nom": "Festival des Champions"
+    },
+    {
+     "id": "xyp-XY94",
+     "nom": "Desséliande"
+    }
+   ]
   },
   "2013bw": {
    "nom": "Collection McDonald's 2013",
    "total": 12,
    "depot": 12,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bw11": {
    "nom": "Trésors Légendaires",
    "total": 140,
    "depot": 0,
    "principal": 131,
-   "secours": 9,
+   "secoursFrancais": 0,
+   "secoursAnglais": 9,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "bw11-RC3",
+     "nom": "Serperior"
+    },
+    {
+     "id": "bw11-RC4",
+     "nom": "Growlithe"
+    },
+    {
+     "id": "bw11-RC6",
+     "nom": "Piplup"
+    },
+    {
+     "id": "bw11-RC7",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "bw11-RC10",
+     "nom": "Gardevoir"
+    },
+    {
+     "id": "bw11-RC12",
+     "nom": "Stunfisk"
+    },
+    {
+     "id": "bw11-RC13",
+     "nom": "Purrloin"
+    },
+    {
+     "id": "bw11-RC14",
+     "nom": "Eevee"
+    },
+    {
+     "id": "bw11-RC19",
+     "nom": "Cinccino"
+    }
+   ]
   },
   "xy0": {
    "nom": "Bienvenue à Kalos",
    "total": 39,
    "depot": 0,
    "principal": 39,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy1": {
    "nom": "XY",
    "total": 146,
    "depot": 0,
-   "principal": 71,
-   "secours": 75,
+   "principal": 145,
+   "secoursFrancais": 1,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xya": {
    "nom": "carte alternative A Jaune",
    "total": 6,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 6,
    "indecis": 0,
    "cartesManquantes": [
@@ -1666,44 +3295,55 @@
      "nom": "Professeur Platane"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-xy-n": {
    "nom": "XY Kit du dresseur (Bruyverne)",
    "total": 30,
    "depot": 30,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-xy-sy": {
    "nom": "XY Kit du dresseur (Nymphali)",
    "total": 30,
    "depot": 30,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy2": {
    "nom": "Étincelles",
    "total": 110,
    "depot": 0,
-   "principal": 96,
-   "secours": 14,
+   "principal": 110,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2014xy": {
    "nom": "Collection McDonald's 2014",
    "total": 12,
    "depot": 11,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 1,
    "indecis": 0,
    "cartesManquantes": [
@@ -1711,84 +3351,108 @@
      "id": "2014xy-7",
      "nom": "Monorpale"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy3": {
    "nom": "Poings Furieux",
    "total": 114,
    "depot": 0,
-   "principal": 75,
-   "secours": 39,
+   "principal": 114,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-xy-b": {
    "nom": "XY Kit du dresseur (Scalproie)",
    "total": 30,
    "depot": 30,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-xy-w": {
    "nom": "XY Kit du dresseur (Grodoudou)",
    "total": 30,
    "depot": 30,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy4": {
    "nom": "Vigueur Spectrale",
    "total": 124,
    "depot": 0,
-   "principal": 108,
-   "secours": 16,
+   "principal": 124,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy5": {
    "nom": "Primo-Choc",
    "total": 164,
    "depot": 0,
-   "principal": 103,
-   "secours": 61,
+   "principal": 164,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "dc1": {
    "nom": "Double Danger",
    "total": 34,
    "depot": 0,
-   "principal": 28,
-   "secours": 6,
+   "principal": 34,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-xy-latia": {
    "nom": "XY Kit du dresseur (Latias)",
    "total": 30,
    "depot": 30,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "tk-xy-latio": {
    "nom": "XY Kit du dresseur (Latios)",
    "total": 30,
    "depot": 28,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 2,
    "indecis": 0,
    "cartesManquantes": [
@@ -1800,77 +3464,114 @@
      "id": "tk-xy-latio-16",
      "nom": "Énergie Psy"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy6": {
    "nom": "Ciel Rugissant",
    "total": 112,
    "depot": 0,
-   "principal": 73,
-   "secours": 39,
+   "principal": 112,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy7": {
    "nom": "Origines Antiques",
    "total": 101,
    "depot": 0,
-   "principal": 72,
-   "secours": 29,
+   "principal": 99,
+   "secoursFrancais": 2,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy8": {
    "nom": "Impulsion Turbo",
    "total": 165,
    "depot": 0,
    "principal": 165,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2015xy": {
    "nom": "Collection McDonald's 2015",
    "total": 12,
    "depot": 12,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy9": {
    "nom": "Rupture Turbo",
    "total": 126,
    "depot": 0,
-   "principal": 72,
-   "secours": 54,
+   "principal": 120,
+   "secoursFrancais": 6,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "g1": {
    "nom": "Générations",
    "total": 117,
    "depot": 0,
-   "principal": 106,
-   "secours": 11,
+   "principal": 113,
+   "secoursFrancais": 0,
+   "secoursAnglais": 4,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "g1-46",
+     "nom": "Grolem-EX"
+    },
+    {
+     "id": "g1-47",
+     "nom": "Kicklee"
+    },
+    {
+     "id": "g1-48",
+     "nom": "Tygnon"
+    },
+    {
+     "id": "g1-49",
+     "nom": "Rhinocorne"
+    }
+   ]
   },
   "tk-xy-p": {
    "nom": "XY Kit du dresseur (Pikachu Libre)",
    "total": 30,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
-   "manquant": 30,
-   "indecis": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
+   "manquant": 26,
+   "indecis": 4,
    "cartesManquantes": [
     {
      "id": "tk-xy-p-1",
@@ -1887,18 +3588,6 @@
     {
      "id": "tk-xy-p-4",
      "nom": "Élekable"
-    },
-    {
-     "id": "tk-xy-p-5",
-     "nom": "Énergie Électrique"
-    },
-    {
-     "id": "tk-xy-p-6",
-     "nom": "Énergie Électrique"
-    },
-    {
-     "id": "tk-xy-p-7",
-     "nom": "Nirondelle"
     },
     {
      "id": "tk-xy-p-8",
@@ -1949,10 +3638,6 @@
      "nom": "Chaffreux"
     },
     {
-     "id": "tk-xy-p-20",
-     "nom": "Tierno"
-    },
-    {
      "id": "tk-xy-p-21",
      "nom": "Potion"
     },
@@ -1992,103 +3677,166 @@
      "id": "tk-xy-p-30",
      "nom": "Pikachu Catcheur"
     }
-   ]
+   ],
+   "cartesIndecises": [
+    {
+     "id": "tk-xy-p-5",
+     "nom": "Énergie Électrique"
+    },
+    {
+     "id": "tk-xy-p-6",
+     "nom": "Énergie Électrique"
+    },
+    {
+     "id": "tk-xy-p-7",
+     "nom": "Nirondelle"
+    },
+    {
+     "id": "tk-xy-p-20",
+     "nom": "Tierno"
+    }
+   ],
+   "cartesAnglaises": []
   },
   "tk-xy-su": {
    "nom": "XY Kit du dresseur (Suicune)",
    "total": 30,
    "depot": 30,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy10": {
    "nom": "Impact des Destins",
    "total": 129,
    "depot": 0,
-   "principal": 129,
-   "secours": 0,
+   "principal": 125,
+   "secoursFrancais": 4,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy11": {
    "nom": "Offensive Vapeur",
    "total": 116,
    "depot": 0,
-   "principal": 116,
-   "secours": 0,
+   "principal": 111,
+   "secoursFrancais": 5,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2016xy": {
    "nom": "Collection McDonald's 2016",
    "total": 12,
    "depot": 12,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "xy12": {
    "nom": "Évolutions",
    "total": 113,
    "depot": 0,
-   "principal": 113,
-   "secours": 0,
+   "principal": 111,
+   "secoursFrancais": 2,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "smp": {
    "nom": "Promo SM",
    "total": 248,
    "depot": 248,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm1": {
    "nom": "Soleil et Lune",
    "total": 172,
    "depot": 0,
-   "principal": 163,
-   "secours": 9,
+   "principal": 139,
+   "secoursFrancais": 24,
+   "secoursAnglais": 4,
    "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": []
+   "indecis": 5,
+   "cartesManquantes": [],
+   "cartesIndecises": [
+    {
+     "id": "sm1-168",
+     "nom": "Psychic Energy"
+    },
+    {
+     "id": "sm1-169",
+     "nom": "Fighting Energy"
+    },
+    {
+     "id": "sm1-170",
+     "nom": "Darkness Energy"
+    },
+    {
+     "id": "sm1-171",
+     "nom": "Metal Energy"
+    },
+    {
+     "id": "sm1-172",
+     "nom": "Fairy Energy"
+    }
+   ],
+   "cartesAnglaises": [
+    {
+     "id": "sm1-164",
+     "nom": "Grass Energy"
+    },
+    {
+     "id": "sm1-165",
+     "nom": "Fire Energy"
+    },
+    {
+     "id": "sm1-166",
+     "nom": "Water Energy"
+    },
+    {
+     "id": "sm1-167",
+     "nom": "Lightning Energy"
+    }
+   ]
   },
   "tk-sm-r": {
    "nom": "SM Kit du dresseur (Raichu d'Alola)",
    "total": 30,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
-   "manquant": 30,
-   "indecis": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
+   "manquant": 11,
+   "indecis": 19,
    "cartesManquantes": [
-    {
-     "id": "tk-sm-r-1",
-     "nom": "Lightning Energy"
-    },
-    {
-     "id": "tk-sm-r-2",
-     "nom": "Énergie Électrique"
-    },
-    {
-     "id": "tk-sm-r-3",
-     "nom": "Lightning Energy"
-    },
-    {
-     "id": "tk-sm-r-4",
-     "nom": "Nounourson"
-    },
     {
      "id": "tk-sm-r-5",
      "nom": "Lightning Energy"
@@ -2098,44 +3846,12 @@
      "nom": "Nosferalto"
     },
     {
-     "id": "tk-sm-r-7",
-     "nom": "Lightning Energy"
-    },
-    {
-     "id": "tk-sm-r-8",
-     "nom": "Lightning Energy"
-    },
-    {
-     "id": "tk-sm-r-9",
-     "nom": "Lightning Energy"
-    },
-    {
-     "id": "tk-sm-r-10",
-     "nom": "Lightning Energy"
-    },
-    {
      "id": "tk-sm-r-11",
      "nom": "Nosferapti"
     },
     {
-     "id": "tk-sm-r-12",
-     "nom": "Lightning Energy"
-    },
-    {
-     "id": "tk-sm-r-13",
-     "nom": "Piafabec"
-    },
-    {
      "id": "tk-sm-r-14",
      "nom": "Pikachu"
-    },
-    {
-     "id": "tk-sm-r-15",
-     "nom": "Potion"
-    },
-    {
-     "id": "tk-sm-r-16",
-     "nom": "Larvibule"
     },
     {
      "id": "tk-sm-r-17",
@@ -2158,12 +3874,66 @@
      "nom": "Super Ball"
     },
     {
-     "id": "tk-sm-r-22",
-     "nom": "Soporifik"
-    },
-    {
      "id": "tk-sm-r-23",
      "nom": "Tili"
+    },
+    {
+     "id": "tk-sm-r-27",
+     "nom": "Psychic Energy"
+    }
+   ],
+   "cartesIndecises": [
+    {
+     "id": "tk-sm-r-1",
+     "nom": "Lightning Energy"
+    },
+    {
+     "id": "tk-sm-r-2",
+     "nom": "Énergie Électrique"
+    },
+    {
+     "id": "tk-sm-r-3",
+     "nom": "Lightning Energy"
+    },
+    {
+     "id": "tk-sm-r-4",
+     "nom": "Nounourson"
+    },
+    {
+     "id": "tk-sm-r-7",
+     "nom": "Lightning Energy"
+    },
+    {
+     "id": "tk-sm-r-8",
+     "nom": "Lightning Energy"
+    },
+    {
+     "id": "tk-sm-r-9",
+     "nom": "Lightning Energy"
+    },
+    {
+     "id": "tk-sm-r-10",
+     "nom": "Lightning Energy"
+    },
+    {
+     "id": "tk-sm-r-12",
+     "nom": "Lightning Energy"
+    },
+    {
+     "id": "tk-sm-r-13",
+     "nom": "Piafabec"
+    },
+    {
+     "id": "tk-sm-r-15",
+     "nom": "Potion"
+    },
+    {
+     "id": "tk-sm-r-16",
+     "nom": "Larvibule"
+    },
+    {
+     "id": "tk-sm-r-22",
+     "nom": "Soporifik"
     },
     {
      "id": "tk-sm-r-24",
@@ -2178,10 +3948,6 @@
      "nom": "Togedemaru"
     },
     {
-     "id": "tk-sm-r-27",
-     "nom": "Psychic Energy"
-    },
-    {
      "id": "tk-sm-r-28",
      "nom": "Psychic Energy"
     },
@@ -2193,36 +3959,56 @@
      "id": "tk-sm-r-30",
      "nom": "Raichu d’Alola"
     }
-   ]
+   ],
+   "cartesAnglaises": []
   },
   "tk-sm-l": {
    "nom": "SM Kit du dresseur (Lougarox)",
    "total": 18,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
-   "manquant": 18,
-   "indecis": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
+   "manquant": 7,
+   "indecis": 11,
    "cartesManquantes": [
     {
      "id": "tk-sm-l-1",
      "nom": "Chenipan"
     },
     {
-     "id": "tk-sm-l-4",
-     "nom": "Piclairon"
-    },
-    {
      "id": "tk-sm-l-5",
      "nom": "Énergie Combat"
     },
     {
-     "id": "tk-sm-l-11",
-     "nom": "Passerouge"
-    },
-    {
      "id": "tk-sm-l-12",
      "nom": "Manglouton"
+    },
+    {
+     "id": "tk-sm-l-23",
+     "nom": "Tili"
+    },
+    {
+     "id": "tk-sm-l-25",
+     "nom": "Super Ball"
+    },
+    {
+     "id": "tk-sm-l-27",
+     "nom": "Malasada Maxi"
+    },
+    {
+     "id": "tk-sm-l-30",
+     "nom": "Lougaroc"
+    }
+   ],
+   "cartesIndecises": [
+    {
+     "id": "tk-sm-l-4",
+     "nom": "Piclairon"
+    },
+    {
+     "id": "tk-sm-l-11",
+     "nom": "Passerouge"
     },
     {
      "id": "tk-sm-l-13",
@@ -2257,103 +4043,110 @@
      "nom": "Bazoucan"
     },
     {
-     "id": "tk-sm-l-23",
-     "nom": "Tili"
-    },
-    {
-     "id": "tk-sm-l-25",
-     "nom": "Super Ball"
-    },
-    {
-     "id": "tk-sm-l-27",
-     "nom": "Malasada Maxi"
-    },
-    {
      "id": "tk-sm-l-29",
      "nom": "Rocabot"
-    },
-    {
-     "id": "tk-sm-l-30",
-     "nom": "Lougaroc"
     }
-   ]
+   ],
+   "cartesAnglaises": []
   },
   "sm2": {
    "nom": "Gardiens Ascendants",
    "total": 169,
    "depot": 0,
-   "principal": 169,
-   "secours": 0,
+   "principal": 81,
+   "secoursFrancais": 88,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2017sm": {
    "nom": "Collection McDonald's 2017",
    "total": 12,
    "depot": 12,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm3": {
    "nom": "Ombres Ardentes",
    "total": 169,
    "depot": 0,
-   "principal": 169,
-   "secours": 0,
+   "principal": 102,
+   "secoursFrancais": 67,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm3.5": {
    "nom": "Légendes Brillantes",
    "total": 78,
    "depot": 0,
    "principal": 0,
-   "secours": 78,
+   "secoursFrancais": 78,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm4": {
    "nom": "Invasion Carmin",
    "total": 125,
    "depot": 0,
-   "principal": 125,
-   "secours": 0,
+   "principal": 108,
+   "secoursFrancais": 17,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm5": {
    "nom": "Ultra-Prisme",
    "total": 173,
    "depot": 0,
    "principal": 172,
-   "secours": 1,
+   "secoursFrancais": 1,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm6": {
    "nom": "Lumière Interdite",
    "total": 146,
    "depot": 0,
    "principal": 146,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2018sm-fr": {
    "nom": "Collection McDonald's 2018",
    "total": 40,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 40,
    "indecis": 0,
    "cartesManquantes": [
@@ -2517,34 +4310,43 @@
      "id": "2018sm-fr-40",
      "nom": "Nounourson"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm7": {
    "nom": "Tempête Céleste",
    "total": 183,
    "depot": 0,
    "principal": 183,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm7.5": {
    "nom": "Majesté Des Dragons",
    "total": 78,
    "depot": 0,
    "principal": 0,
-   "secours": 78,
+   "secoursFrancais": 78,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2018sm": {
    "nom": "McDonald's Collection 2018",
    "total": 12,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 12,
    "indecis": 0,
    "cartesManquantes": [
@@ -2596,34 +4398,43 @@
      "id": "2018sm-12",
      "nom": "Porygon"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm8": {
    "nom": "Tonnerre Perdu",
    "total": 236,
    "depot": 0,
-   "principal": 236,
-   "secours": 0,
+   "principal": 234,
+   "secoursFrancais": 2,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm9": {
    "nom": "Duo de Choc",
    "total": 196,
    "depot": 0,
-   "principal": 195,
-   "secours": 1,
+   "principal": 196,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "det1": {
    "nom": "Détective Pikachu",
    "total": 19,
    "depot": 18,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 1,
    "indecis": 0,
    "cartesManquantes": [
@@ -2631,55 +4442,446 @@
      "id": "det1-25",
      "nom": "Lt. Yoshida"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm10": {
    "nom": "Alliance Infaillible",
    "total": 234,
    "depot": 0,
-   "principal": 186,
-   "secours": 48,
+   "principal": 196,
+   "secoursFrancais": 38,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm11": {
    "nom": "Harmonie des Esprits",
    "total": 258,
    "depot": 0,
-   "principal": 182,
-   "secours": 76,
+   "principal": 189,
+   "secoursFrancais": 69,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm115": {
    "nom": "Destinées Occultes",
    "total": 69,
    "depot": 0,
    "principal": 0,
-   "secours": 69,
+   "secoursFrancais": 69,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sma": {
    "nom": "Destinées Occultes Coffre Étincelant",
    "total": 94,
    "depot": 0,
    "principal": 0,
-   "secours": 94,
+   "secoursFrancais": 0,
+   "secoursAnglais": 94,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "sma-SV1",
+     "nom": "Insécateur"
+    },
+    {
+     "id": "sma-SV2",
+     "nom": "Brindibou"
+    },
+    {
+     "id": "sma-SV3",
+     "nom": "Efflèche"
+    },
+    {
+     "id": "sma-SV4",
+     "nom": "Sovkipou"
+    },
+    {
+     "id": "sma-SV5",
+     "nom": "Cancrelove"
+    },
+    {
+     "id": "sma-SV6",
+     "nom": "Salamèche"
+    },
+    {
+     "id": "sma-SV7",
+     "nom": "Reptincel"
+    },
+    {
+     "id": "sma-SV8",
+     "nom": "Goupix d’Alola"
+    },
+    {
+     "id": "sma-SV9",
+     "nom": "Axoloto"
+    },
+    {
+     "id": "sma-SV10",
+     "nom": "Maraiste"
+    },
+    {
+     "id": "sma-SV11",
+     "nom": "Grenousse"
+    },
+    {
+     "id": "sma-SV12",
+     "nom": "Croâporal"
+    },
+    {
+     "id": "sma-SV13",
+     "nom": "Voltorbe"
+    },
+    {
+     "id": "sma-SV14",
+     "nom": "Câblifère"
+    },
+    {
+     "id": "sma-SV15",
+     "nom": "Séviper"
+    },
+    {
+     "id": "sma-SV16",
+     "nom": "Polichombr"
+    },
+    {
+     "id": "sma-SV17",
+     "nom": "Sepiatop"
+    },
+    {
+     "id": "sma-SV18",
+     "nom": "Sepiatroce"
+    },
+    {
+     "id": "sma-SV19",
+     "nom": "Vémini"
+    },
+    {
+     "id": "sma-SV20",
+     "nom": "Simularbre"
+    },
+    {
+     "id": "sma-SV21",
+     "nom": "Riolu"
+    },
+    {
+     "id": "sma-SV22",
+     "nom": "Lucario"
+    },
+    {
+     "id": "sma-SV23",
+     "nom": "Rocabot"
+    },
+    {
+     "id": "sma-SV24",
+     "nom": "Mouscoto"
+    },
+    {
+     "id": "sma-SV25",
+     "nom": "Zorua"
+    },
+    {
+     "id": "sma-SV26",
+     "nom": "Engloutyran"
+    },
+    {
+     "id": "sma-SV27",
+     "nom": "Magnéti"
+    },
+    {
+     "id": "sma-SV28",
+     "nom": "Magnéton"
+    },
+    {
+     "id": "sma-SV29",
+     "nom": "Magnézone"
+    },
+    {
+     "id": "sma-SV30",
+     "nom": "Terhal"
+    },
+    {
+     "id": "sma-SV31",
+     "nom": "Métang"
+    },
+    {
+     "id": "sma-SV32",
+     "nom": "Bamboiselle"
+    },
+    {
+     "id": "sma-SV33",
+     "nom": "Katagami"
+    },
+    {
+     "id": "sma-SV34",
+     "nom": "Tarsal"
+    },
+    {
+     "id": "sma-SV35",
+     "nom": "Kirlia"
+    },
+    {
+     "id": "sma-SV36",
+     "nom": "Diancie"
+    },
+    {
+     "id": "sma-SV37",
+     "nom": "Altaria"
+    },
+    {
+     "id": "sma-SV38",
+     "nom": "Griknot"
+    },
+    {
+     "id": "sma-SV39",
+     "nom": "Carmache"
+    },
+    {
+     "id": "sma-SV40",
+     "nom": "Carchacrok"
+    },
+    {
+     "id": "sma-SV41",
+     "nom": "Évoli"
+    },
+    {
+     "id": "sma-SV42",
+     "nom": "Tylton"
+    },
+    {
+     "id": "sma-SV43",
+     "nom": "Sonistrelle"
+    },
+    {
+     "id": "sma-SV44",
+     "nom": "Gouroutan"
+    },
+    {
+     "id": "sma-SV45",
+     "nom": "Type:0"
+    },
+    {
+     "id": "sma-SV46",
+     "nom": "Phyllali-GX"
+    },
+    {
+     "id": "sma-SV47",
+     "nom": "Archéduc-GX"
+    },
+    {
+     "id": "sma-SV48",
+     "nom": "Sarmuraï-GX"
+    },
+    {
+     "id": "sma-SV49",
+     "nom": "Dracaufeu-GX"
+    },
+    {
+     "id": "sma-SV50",
+     "nom": "Ho-Oh-GX"
+    },
+    {
+     "id": "sma-SV51",
+     "nom": "Reshiram-GX"
+    },
+    {
+     "id": "sma-SV52",
+     "nom": "Boumata-GX"
+    },
+    {
+     "id": "sma-SV53",
+     "nom": "Feunard d’Alola-GX"
+    },
+    {
+     "id": "sma-SV54",
+     "nom": "Artikodin-GX"
+    },
+    {
+     "id": "sma-SV55",
+     "nom": "Givrali-GX"
+    },
+    {
+     "id": "sma-SV56",
+     "nom": "Amphinobi-GX"
+    },
+    {
+     "id": "sma-SV57",
+     "nom": "Électrode-GX"
+    },
+    {
+     "id": "sma-SV58",
+     "nom": "Câblifère-GX"
+    },
+    {
+     "id": "sma-SV59",
+     "nom": "Mewtwo-GX"
+    },
+    {
+     "id": "sma-SV60",
+     "nom": "Mentali-GX"
+    },
+    {
+     "id": "sma-SV61",
+     "nom": "Branette-GX"
+    },
+    {
+     "id": "sma-SV62",
+     "nom": "Zéroïd-GX"
+    },
+    {
+     "id": "sma-SV63",
+     "nom": "Mandrillon-GX"
+    },
+    {
+     "id": "sma-SV64",
+     "nom": "Lucario-GX"
+    },
+    {
+     "id": "sma-SV65",
+     "nom": "Zygarde-GX"
+    },
+    {
+     "id": "sma-SV66",
+     "nom": "Lougaroc-GX"
+    },
+    {
+     "id": "sma-SV67",
+     "nom": "Lougaroc-GX"
+    },
+    {
+     "id": "sma-SV68",
+     "nom": "Mouscoto-GX"
+    },
+    {
+     "id": "sma-SV69",
+     "nom": "Noctali-GX"
+    },
+    {
+     "id": "sma-SV70",
+     "nom": "Darkrai-GX"
+    },
+    {
+     "id": "sma-SV71",
+     "nom": "Engloutyran-GX"
+    },
+    {
+     "id": "sma-SV72",
+     "nom": "Cizayox-GX"
+    },
+    {
+     "id": "sma-SV73",
+     "nom": "Katagami-GX"
+    },
+    {
+     "id": "sma-SV74",
+     "nom": "Ama-Ama-GX"
+    },
+    {
+     "id": "sma-SV75",
+     "nom": "Gardevoir-GX"
+    },
+    {
+     "id": "sma-SV76",
+     "nom": "Nymphali-GX"
+    },
+    {
+     "id": "sma-SV77",
+     "nom": "Altaria-GX"
+    },
+    {
+     "id": "sma-SV78",
+     "nom": "Bruyverne-GX"
+    },
+    {
+     "id": "sma-SV79",
+     "nom": "Silvallié-GX"
+    },
+    {
+     "id": "sma-SV80",
+     "nom": "Draïeul-GX"
+    },
+    {
+     "id": "sma-SV81",
+     "nom": "Employés de la Fondation Æther"
+    },
+    {
+     "id": "sma-SV82",
+     "nom": "Cynthia"
+    },
+    {
+     "id": "sma-SV83",
+     "nom": "Pêcheur"
+    },
+    {
+     "id": "sma-SV84",
+     "nom": "Guzma"
+    },
+    {
+     "id": "sma-SV85",
+     "nom": "Montagnard"
+    },
+    {
+     "id": "sma-SV86",
+     "nom": "Mademoiselle"
+    },
+    {
+     "id": "sma-SV87",
+     "nom": "Réserve Naturelle du Paradis Æther"
+    },
+    {
+     "id": "sma-SV88",
+     "nom": "Colline Clapotis"
+    },
+    {
+     "id": "sma-SV89",
+     "nom": "Mont Couronné"
+    },
+    {
+     "id": "sma-SV90",
+     "nom": "Chapelle des Châtiments"
+    },
+    {
+     "id": "sma-SV91",
+     "nom": "Tokotoro-GX"
+    },
+    {
+     "id": "sma-SV92",
+     "nom": "Tokopisco-GX"
+    },
+    {
+     "id": "sma-SV93",
+     "nom": "Tokorico-GX"
+    },
+    {
+     "id": "sma-SV94",
+     "nom": "Tokopiyon-GX"
+    }
+   ]
   },
   "2019sm": {
    "nom": "McDonald's Collection 2019",
    "total": 12,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 12,
    "indecis": 0,
    "cartesManquantes": [
@@ -2732,14 +4934,16 @@
      "nom": "Gnaw"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2019sm-fr": {
    "nom": "Collection McDonald's 2019",
    "total": 41,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 41,
    "indecis": 0,
    "cartesManquantes": [
@@ -2908,24 +5112,29 @@
      "nom": "Évoli"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sm12": {
    "nom": "Éclipse Cosmique",
    "total": 271,
    "depot": 0,
-   "principal": 236,
-   "secours": 35,
+   "principal": 270,
+   "secoursFrancais": 1,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swshp": {
    "nom": "Promo SWSH",
    "total": 307,
    "depot": 0,
    "principal": 285,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 22,
    "indecis": 0,
    "cartesManquantes": [
@@ -3018,97 +5227,143 @@
      "nom": "Arceus VSTAR"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh1": {
    "nom": "Épée et Bouclier",
    "total": 216,
    "depot": 0,
-   "principal": 169,
-   "secours": 47,
+   "principal": 216,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh2": {
    "nom": "Clash des Rebelles",
    "total": 209,
    "depot": 0,
-   "principal": 179,
-   "secours": 30,
+   "principal": 209,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh3": {
    "nom": "Ténèbres Embrasées",
    "total": 201,
    "depot": 0,
-   "principal": 171,
-   "secours": 30,
+   "principal": 199,
+   "secoursFrancais": 2,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "fut2020": {
    "nom": "Pokémon Futsal 2020",
    "total": 5,
    "depot": 0,
    "principal": 0,
-   "secours": 5,
+   "secoursFrancais": 0,
+   "secoursAnglais": 5,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "fut2020-1",
+     "nom": "Pikachu on the Ball"
+    },
+    {
+     "id": "fut2020-2",
+     "nom": "Eevee on the Ball"
+    },
+    {
+     "id": "fut2020-3",
+     "nom": "Grookey on the Ball"
+    },
+    {
+     "id": "fut2020-4",
+     "nom": "Scorbunny on the Ball"
+    },
+    {
+     "id": "fut2020-5",
+     "nom": "Sobble on the Ball"
+    }
+   ]
   },
   "swsh3.5": {
    "nom": "Champion's Path",
    "total": 80,
    "depot": 0,
-   "principal": 62,
-   "secours": 18,
+   "principal": 77,
+   "secoursFrancais": 3,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh4": {
    "nom": "Voltage Éclatant",
    "total": 203,
    "depot": 0,
-   "principal": 197,
-   "secours": 6,
+   "principal": 194,
+   "secoursFrancais": 9,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2021swsh": {
    "nom": "Collection McDonald's 2021",
    "total": 25,
    "depot": 25,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh4.5": {
    "nom": "Destinées Radieuses",
    "total": 73,
    "depot": 0,
-   "principal": 69,
-   "secours": 4,
+   "principal": 68,
+   "secoursFrancais": 5,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh4.5sv": {
    "nom": "Destinées Radieuses Coffre Étincelant",
    "total": 122,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
-   "manquant": 122,
-   "indecis": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
+   "manquant": 96,
+   "indecis": 26,
    "cartesManquantes": [
     {
      "id": "swsh4.5sv-SV001",
@@ -3211,28 +5466,12 @@
      "nom": "Larméléon"
     },
     {
-     "id": "swsh4.5sv-SV026",
-     "nom": "Arrozard"
-    },
-    {
-     "id": "swsh4.5sv-SV027",
-     "nom": "Lézargus"
-    },
-    {
-     "id": "swsh4.5sv-SV028",
-     "nom": "Khélocrok"
-    },
-    {
      "id": "swsh4.5sv-SV029",
      "nom": "Torgamord"
     },
     {
      "id": "swsh4.5sv-SV030",
      "nom": "Nigosier"
-    },
-    {
-     "id": "swsh4.5sv-SV031",
-     "nom": "Embrochet"
     },
     {
      "id": "swsh4.5sv-SV032",
@@ -3255,10 +5494,6 @@
      "nom": "Hydragon"
     },
     {
-     "id": "swsh4.5sv-SV037",
-     "nom": "Hydragla"
-    },
-    {
      "id": "swsh4.5sv-SV038",
      "nom": "Motisma"
     },
@@ -3273,10 +5508,6 @@
     {
      "id": "swsh4.5sv-SV041",
      "nom": "Toxizap"
-    },
-    {
-     "id": "swsh4.5sv-SV042",
-     "nom": "Salarsen"
     },
     {
      "id": "swsh4.5sv-SV043",
@@ -3319,14 +5550,6 @@
      "nom": "Théffroi"
     },
     {
-     "id": "swsh4.5sv-SV053",
-     "nom": "Polthégeist"
-    },
-    {
-     "id": "swsh4.5sv-SV054",
-     "nom": "Bibichut"
-    },
-    {
      "id": "swsh4.5sv-SV055",
      "nom": "Chapotus"
     },
@@ -3343,10 +5566,6 @@
      "nom": "Charmilly"
     },
     {
-     "id": "swsh4.5sv-SV059",
-     "nom": "Wimessir"
-    },
-    {
      "id": "swsh4.5sv-SV060",
      "nom": "Fantyrm"
     },
@@ -3355,24 +5574,8 @@
      "nom": "Dispareptil"
     },
     {
-     "id": "swsh4.5sv-SV062",
-     "nom": "Lanssorien"
-    },
-    {
-     "id": "swsh4.5sv-SV063",
-     "nom": "Canarticho de Galar"
-    },
-    {
      "id": "swsh4.5sv-SV064",
      "nom": "Palarticho de Galar"
-    },
-    {
-     "id": "swsh4.5sv-SV065",
-     "nom": "Tutafeh de Galar"
-    },
-    {
-     "id": "swsh4.5sv-SV066",
-     "nom": "Tutétékri de Galar"
     },
     {
      "id": "swsh4.5sv-SV067",
@@ -3407,10 +5610,6 @@
      "nom": "Hexadron"
     },
     {
-     "id": "swsh4.5sv-SV075",
-     "nom": "Dolman"
-    },
-    {
      "id": "swsh4.5sv-SV076",
      "nom": "Smogo"
     },
@@ -3425,14 +5624,6 @@
     {
      "id": "swsh4.5sv-SV079",
      "nom": "Linéon de Galar"
-    },
-    {
-     "id": "swsh4.5sv-SV080",
-     "nom": "Ixon de Galar"
-    },
-    {
-     "id": "swsh4.5sv-SV081",
-     "nom": "Goupilou"
     },
     {
      "id": "swsh4.5sv-SV082",
@@ -3487,24 +5678,12 @@
      "nom": "Pashmilla"
     },
     {
-     "id": "swsh4.5sv-SV095",
-     "nom": "Couaneton"
-    },
-    {
      "id": "swsh4.5sv-SV096",
      "nom": "Lakmécygne"
     },
     {
      "id": "swsh4.5sv-SV097",
      "nom": "Sapereau"
-    },
-    {
-     "id": "swsh4.5sv-SV098",
-     "nom": "Gouroutan"
-    },
-    {
-     "id": "swsh4.5sv-SV099",
-     "nom": "Rongourmand"
     },
     {
      "id": "swsh4.5sv-SV100",
@@ -3517,14 +5696,6 @@
     {
      "id": "swsh4.5sv-SV102",
      "nom": "Bleuseille"
-    },
-    {
-     "id": "swsh4.5sv-SV103",
-     "nom": "Moumouton"
-    },
-    {
-     "id": "swsh4.5sv-SV104",
-     "nom": "Moumouflon"
     },
     {
      "id": "swsh4.5sv-SV105",
@@ -3547,16 +5718,8 @@
      "nom": "Scolocendre VMAX"
     },
     {
-     "id": "swsh4.5sv-SV110",
-     "nom": "Lokhlass V"
-    },
-    {
      "id": "swsh4.5sv-SV111",
      "nom": "Lokhlass VMAX"
-    },
-    {
-     "id": "swsh4.5sv-SV112",
-     "nom": "Salarsen V"
     },
     {
      "id": "swsh4.5sv-SV113",
@@ -3571,14 +5734,6 @@
      "nom": "Hexadron V"
     },
     {
-     "id": "swsh4.5sv-SV116",
-     "nom": "Angoliath V"
-    },
-    {
-     "id": "swsh4.5sv-SV117",
-     "nom": "Angoliath VMAX"
-    },
-    {
      "id": "swsh4.5sv-SV118",
      "nom": "Métamorph V"
     },
@@ -3591,61 +5746,177 @@
      "nom": "Moumouflon V"
     },
     {
-     "id": "swsh4.5sv-SV121",
-     "nom": "Éthernatos V"
-    },
-    {
      "id": "swsh4.5sv-SV122",
      "nom": "Éthernatos VMAX"
     }
-   ]
+   ],
+   "cartesIndecises": [
+    {
+     "id": "swsh4.5sv-SV026",
+     "nom": "Arrozard"
+    },
+    {
+     "id": "swsh4.5sv-SV027",
+     "nom": "Lézargus"
+    },
+    {
+     "id": "swsh4.5sv-SV028",
+     "nom": "Khélocrok"
+    },
+    {
+     "id": "swsh4.5sv-SV031",
+     "nom": "Embrochet"
+    },
+    {
+     "id": "swsh4.5sv-SV037",
+     "nom": "Hydragla"
+    },
+    {
+     "id": "swsh4.5sv-SV042",
+     "nom": "Salarsen"
+    },
+    {
+     "id": "swsh4.5sv-SV053",
+     "nom": "Polthégeist"
+    },
+    {
+     "id": "swsh4.5sv-SV054",
+     "nom": "Bibichut"
+    },
+    {
+     "id": "swsh4.5sv-SV059",
+     "nom": "Wimessir"
+    },
+    {
+     "id": "swsh4.5sv-SV062",
+     "nom": "Lanssorien"
+    },
+    {
+     "id": "swsh4.5sv-SV063",
+     "nom": "Canarticho de Galar"
+    },
+    {
+     "id": "swsh4.5sv-SV065",
+     "nom": "Tutafeh de Galar"
+    },
+    {
+     "id": "swsh4.5sv-SV066",
+     "nom": "Tutétékri de Galar"
+    },
+    {
+     "id": "swsh4.5sv-SV075",
+     "nom": "Dolman"
+    },
+    {
+     "id": "swsh4.5sv-SV080",
+     "nom": "Ixon de Galar"
+    },
+    {
+     "id": "swsh4.5sv-SV081",
+     "nom": "Goupilou"
+    },
+    {
+     "id": "swsh4.5sv-SV095",
+     "nom": "Couaneton"
+    },
+    {
+     "id": "swsh4.5sv-SV098",
+     "nom": "Gouroutan"
+    },
+    {
+     "id": "swsh4.5sv-SV099",
+     "nom": "Rongourmand"
+    },
+    {
+     "id": "swsh4.5sv-SV103",
+     "nom": "Moumouton"
+    },
+    {
+     "id": "swsh4.5sv-SV104",
+     "nom": "Moumouflon"
+    },
+    {
+     "id": "swsh4.5sv-SV110",
+     "nom": "Lokhlass V"
+    },
+    {
+     "id": "swsh4.5sv-SV112",
+     "nom": "Salarsen V"
+    },
+    {
+     "id": "swsh4.5sv-SV116",
+     "nom": "Angoliath V"
+    },
+    {
+     "id": "swsh4.5sv-SV117",
+     "nom": "Angoliath VMAX"
+    },
+    {
+     "id": "swsh4.5sv-SV121",
+     "nom": "Éthernatos V"
+    }
+   ],
+   "cartesAnglaises": []
   },
   "swsh5": {
    "nom": "Styles de combat",
    "total": 183,
    "depot": 0,
-   "principal": 183,
-   "secours": 0,
+   "principal": 120,
+   "secoursFrancais": 63,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh6": {
    "nom": "Règne de Glace",
    "total": 233,
    "depot": 0,
-   "principal": 233,
-   "secours": 0,
+   "principal": 156,
+   "secoursFrancais": 77,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh7": {
    "nom": "Évolution Céleste",
    "total": 237,
    "depot": 0,
-   "principal": 237,
-   "secours": 0,
+   "principal": 184,
+   "secoursFrancais": 53,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "cel25": {
    "nom": "Célébrations",
    "total": 25,
    "depot": 0,
-   "principal": 24,
-   "secours": 1,
+   "principal": 19,
+   "secoursFrancais": 6,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "cel25cc": {
    "nom": "Célébrations Collection Classique",
    "total": 25,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 25,
    "indecis": 0,
    "cartesManquantes": [
@@ -3750,34 +6021,42 @@
      "nom": "Tokopiyon-GX"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh8": {
    "nom": "Poing de Fusion",
    "total": 284,
    "depot": 0,
-   "principal": 284,
-   "secours": 0,
+   "principal": 283,
+   "secoursFrancais": 1,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh9": {
    "nom": "Stars Étincelantes",
    "total": 186,
    "depot": 0,
-   "principal": 186,
-   "secours": 0,
+   "principal": 183,
+   "secoursFrancais": 3,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh9tg": {
    "nom": "Stars Étincelantes Galerie de Dresseurs",
    "total": 30,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 30,
    "indecis": 0,
    "cartesManquantes": [
@@ -3902,24 +6181,29 @@
      "nom": "Shifours Mille Poings VMAX"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh10": {
    "nom": "Astres Radieux",
    "total": 216,
    "depot": 0,
-   "principal": 216,
-   "secours": 0,
+   "principal": 214,
+   "secoursFrancais": 2,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh10tg": {
    "nom": "Astres Radieux Galerie de Dresseurs",
    "total": 30,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 30,
    "indecis": 0,
    "cartesManquantes": [
@@ -4043,24 +6327,30 @@
      "id": "swsh10tg-TG30",
      "nom": "Sylveroy Cavalier d'Effroi VMAX"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh10.5": {
    "nom": "Pokémon GO",
    "total": 88,
    "depot": 0,
-   "principal": 85,
-   "secours": 3,
+   "principal": 88,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2022swsh": {
    "nom": "Collection McDonald's 2022",
    "total": 15,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 15,
    "indecis": 0,
    "cartesManquantes": [
@@ -4124,24 +6414,30 @@
      "id": "2022swsh-15",
      "nom": "Queulorior"
     }
-   ]
+   ],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh11": {
    "nom": "Origine Perdue",
    "total": 217,
    "depot": 0,
-   "principal": 204,
-   "secours": 13,
+   "principal": 215,
+   "secoursFrancais": 2,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh11tg": {
    "nom": "Origine Perdue Galerie de Dresseurs",
    "total": 30,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 30,
    "indecis": 0,
    "cartesManquantes": [
@@ -4266,24 +6562,29 @@
      "nom": "Mew VMAX"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh12": {
    "nom": "Tempête Argentée",
    "total": 215,
    "depot": 0,
-   "principal": 183,
-   "secours": 32,
+   "principal": 215,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh12tg": {
    "nom": "Tempête Argentée Galerie de Dresseurs",
    "total": 30,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 30,
    "indecis": 0,
    "cartesManquantes": [
@@ -4408,25 +6709,29 @@
      "nom": "Duralugon VMAX"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh12.5": {
    "nom": "Zénith Suprême",
    "total": 160,
    "depot": 0,
    "principal": 160,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "swsh12.5gg": {
    "nom": "Zénith Suprême Galerie Galaroise",
    "total": 70,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 70,
    "indecis": 0,
    "cartesManquantes": [
@@ -4711,14 +7016,16 @@
      "nom": "Arceus VSTAR"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "svp": {
    "nom": "SVP Black Star Promos",
    "total": 226,
    "depot": 0,
    "principal": 192,
-   "secours": 19,
+   "secoursFrancais": 0,
+   "secoursAnglais": 19,
    "manquant": 15,
    "indecis": 0,
    "cartesManquantes": [
@@ -4783,24 +7090,106 @@
      "nom": "Recherches Professorales"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "svp-191",
+     "nom": "Poussacha"
+    },
+    {
+     "id": "svp-192",
+     "nom": "Chochodile"
+    },
+    {
+     "id": "svp-196",
+     "nom": "Dracaufeu-ex"
+    },
+    {
+     "id": "svp-199",
+     "nom": "Zarude"
+    },
+    {
+     "id": "svp-200",
+     "nom": "Eevee"
+    },
+    {
+     "id": "svp-201",
+     "nom": "Zéblitz"
+    },
+    {
+     "id": "svp-202",
+     "nom": "Kangourex"
+    },
+    {
+     "id": "svp-203",
+     "nom": "Qulbutoké de la Team Rocket"
+    },
+    {
+     "id": "svp-204",
+     "nom": "Carchacrock-ex de Cynthia"
+    },
+    {
+     "id": "svp-205",
+     "nom": "Mewtwo-ex de la Team Rocket"
+    },
+    {
+     "id": "svp-213",
+     "nom": "Feraligatr"
+    },
+    {
+     "id": "svp-214",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "svp-215",
+     "nom": "Toxtricity ex"
+    },
+    {
+     "id": "svp-216",
+     "nom": "Mewtwo-ex de la Team Rocket"
+    },
+    {
+     "id": "svp-217",
+     "nom": "Nidoking-ex de la Team Rocket"
+    },
+    {
+     "id": "svp-218",
+     "nom": "Persian-ex de la Team Rocket"
+    },
+    {
+     "id": "svp-224",
+     "nom": "Hôtel « Au paradis des Pokémon »"
+    },
+    {
+     "id": "svp-225",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "svp-500",
+     "nom": "Terapagos & Friends"
+    }
+   ]
   },
   "sv01": {
    "nom": "Écarlate et Violet",
    "total": 258,
    "depot": 0,
-   "principal": 223,
-   "secours": 35,
+   "principal": 258,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sve": {
    "nom": "Écarlate et Violet Énergie",
    "total": 24,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 24,
    "indecis": 0,
    "cartesManquantes": [
@@ -4901,24 +7290,29 @@
      "nom": "Énergie Métal"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv02": {
    "nom": "Évolutions à Paldea",
    "total": 279,
    "depot": 0,
-   "principal": 228,
-   "secours": 51,
+   "principal": 278,
+   "secoursFrancais": 1,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2023sv": {
    "nom": "Collection McDonald's 2023",
    "total": 15,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 15,
    "indecis": 0,
    "cartesManquantes": [
@@ -4983,34 +7377,42 @@
      "nom": "Kirlia"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv03": {
    "nom": "Flammes Obsidiennes",
    "total": 230,
    "depot": 0,
-   "principal": 200,
-   "secours": 30,
+   "principal": 227,
+   "secoursFrancais": 3,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv03.5": {
    "nom": "151",
    "total": 207,
    "depot": 0,
-   "principal": 184,
-   "secours": 23,
+   "principal": 207,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "mfb": {
    "nom": "My First Battle",
    "total": 34,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 34,
    "indecis": 0,
    "cartesManquantes": [
@@ -5151,144 +7553,185 @@
      "nom": "Échange"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv04": {
    "nom": "Faille Paradoxe",
    "total": 266,
    "depot": 0,
-   "principal": 263,
-   "secours": 3,
+   "principal": 265,
+   "secoursFrancais": 1,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv04.5": {
    "nom": "Destinées de Paldea",
    "total": 245,
    "depot": 0,
    "principal": 244,
-   "secours": 1,
+   "secoursFrancais": 1,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv05": {
    "nom": "Forces Temporelles",
    "total": 218,
    "depot": 0,
-   "principal": 218,
-   "secours": 0,
+   "principal": 209,
+   "secoursFrancais": 9,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv06": {
    "nom": "Mascarade Crépusculaire",
    "total": 226,
    "depot": 0,
-   "principal": 226,
-   "secours": 0,
+   "principal": 224,
+   "secoursFrancais": 2,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv06.5": {
    "nom": "Fable Nébuleuse",
    "total": 99,
    "depot": 0,
-   "principal": 98,
-   "secours": 1,
+   "principal": 95,
+   "secoursFrancais": 4,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv07": {
    "nom": "Couronne Stellaire",
    "total": 175,
    "depot": 0,
-   "principal": 175,
-   "secours": 0,
+   "principal": 158,
+   "secoursFrancais": 17,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv08": {
    "nom": "Étincelles Déferlantes",
    "total": 252,
    "depot": 0,
-   "principal": 249,
-   "secours": 3,
+   "principal": 221,
+   "secoursFrancais": 31,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2024sv": {
    "nom": "Collection McDonald's 2024",
    "total": 15,
    "depot": 15,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv08.5": {
    "nom": "Évolutions Prismatiques",
    "total": 180,
    "depot": 0,
-   "principal": 178,
-   "secours": 2,
+   "principal": 134,
+   "secoursFrancais": 46,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv09": {
    "nom": "Aventures Ensemble",
    "total": 190,
    "depot": 0,
-   "principal": 186,
-   "secours": 4,
+   "principal": 160,
+   "secoursFrancais": 30,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv10": {
    "nom": "Rivalités Destinées",
    "total": 244,
    "depot": 0,
-   "principal": 234,
-   "secours": 10,
+   "principal": 235,
+   "secoursFrancais": 9,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv10.5b": {
    "nom": "Foudre Noire",
    "total": 172,
    "depot": 0,
    "principal": 170,
-   "secours": 2,
+   "secoursFrancais": 2,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "sv10.5w": {
    "nom": "Flamme Blanche",
    "total": 173,
    "depot": 0,
-   "principal": 160,
-   "secours": 13,
+   "principal": 173,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "mee": {
    "nom": "Méga-Évolution Énergie",
    "total": 16,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 16,
    "indecis": 0,
    "cartesManquantes": [
@@ -5357,16 +7800,18 @@
      "nom": "Énergie Métal de base"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "mep": {
    "nom": "MEP Black Star Promos",
    "total": 112,
    "depot": 0,
-   "principal": 40,
-   "secours": 0,
-   "manquant": 72,
-   "indecis": 0,
+   "principal": 39,
+   "secoursFrancais": 0,
+   "secoursAnglais": 1,
+   "manquant": 66,
+   "indecis": 6,
    "cartesManquantes": [
     {
      "id": "mep-032",
@@ -5381,20 +7826,8 @@
      "nom": "Méga-Méganium-ex"
     },
     {
-     "id": "mep-035",
-     "nom": "Méga-Roitiflam-ex"
-    },
-    {
-     "id": "mep-036",
-     "nom": "Méga-Aligatueur-ex"
-    },
-    {
      "id": "mep-046",
      "nom": "Germignon"
-    },
-    {
-     "id": "mep-047",
-     "nom": "Héricendre"
     },
     {
      "id": "mep-048",
@@ -5503,18 +7936,6 @@
     {
      "id": "mep-074",
      "nom": "Goupelin"
-    },
-    {
-     "id": "mep-075",
-     "nom": "Pharamp"
-    },
-    {
-     "id": "mep-076",
-     "nom": "Nostenfer"
-    },
-    {
-     "id": "mep-077",
-     "nom": "Muplodocus"
     },
     {
      "id": "mep-078",
@@ -5657,84 +8078,137 @@
      "nom": "Pikachu at the Museum"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [
+    {
+     "id": "mep-035",
+     "nom": "Méga-Roitiflam-ex"
+    },
+    {
+     "id": "mep-036",
+     "nom": "Méga-Aligatueur-ex"
+    },
+    {
+     "id": "mep-047",
+     "nom": "Héricendre"
+    },
+    {
+     "id": "mep-075",
+     "nom": "Pharamp"
+    },
+    {
+     "id": "mep-076",
+     "nom": "Nostenfer"
+    },
+    {
+     "id": "mep-077",
+     "nom": "Muplodocus"
+    }
+   ],
+   "cartesAnglaises": [
+    {
+     "id": "mep-040",
+     "nom": "Tortipouss"
+    }
+   ]
   },
   "me01": {
    "nom": "Méga-Évolution",
    "total": 188,
    "depot": 0,
-   "principal": 153,
-   "secours": 35,
+   "principal": 180,
+   "secoursFrancais": 8,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "me02": {
    "nom": "Flammes Fantasmagoriques",
    "total": 130,
    "depot": 0,
-   "principal": 121,
-   "secours": 9,
+   "principal": 130,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "me02.5": {
    "nom": "Héros Transcendants",
    "total": 295,
    "depot": 0,
-   "principal": 239,
-   "secours": 56,
+   "principal": 295,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "me03": {
    "nom": "Équilibre Parfait",
    "total": 124,
    "depot": 0,
-   "principal": 101,
-   "secours": 23,
+   "principal": 124,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "me04": {
    "nom": "Chaos Ascendant",
    "total": 122,
    "depot": 0,
-   "principal": 104,
-   "secours": 18,
+   "principal": 122,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "me05": {
    "nom": "Nuit Noire",
    "total": 120,
    "depot": 0,
-   "principal": 113,
-   "secours": 7,
+   "principal": 115,
+   "secoursFrancais": 5,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "30th": {
    "nom": "30th Celebration",
    "total": 161,
    "depot": 0,
-   "principal": 141,
-   "secours": 20,
+   "principal": 158,
+   "secoursFrancais": 3,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": []
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "30th-c": {
    "nom": "30th Classic Collection",
    "total": 30,
    "depot": 0,
    "principal": 0,
-   "secours": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 30,
    "indecis": 0,
    "cartesManquantes": [
@@ -5859,7 +8333,8 @@
      "nom": "Magicarpe"
     }
    ],
-   "cartesIndecises": []
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   }
  }
 }
