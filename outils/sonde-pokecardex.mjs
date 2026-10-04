@@ -68,8 +68,9 @@ await dormir(1500);
 console.log('\n=============== les images ===============');
 // On prend la page d'accueil et on regarde les adresses d'image qu'elle sert.
 const accueil = await lire(RACINE);
-const images = [...new Set((accueil.corps.match(
-  /https?:\/\/[^"'\s)]*?(?:assets|static|img|images|cdn)[^"'\s)]*?\.(?:png|jpe?g|webp)/gi) ?? [])];
+const motifImage =
+  /https?:\/\/[^"'\s)]*?(?:assets|static|img|images|cdn)[^"'\s)]*?\.(?:png|jpe?g|webp)/gi;
+const images = [...new Set(accueil.corps.match(motifImage) ?? [])];
 console.log(`${images.length} adresses d'image distinctes sur l'accueil :`);
 for(const i of images.slice(0, 10)) console.log(`  ${i}`);
 
