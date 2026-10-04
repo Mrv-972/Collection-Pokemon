@@ -30,6 +30,10 @@ const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
 
 const sortie = typeof args.sortie === 'string' ? args.sortie : null;
 const largeur = Number(args.largeur ?? 16);
+// Reprendre une vérification : on ne refait que les extensions qui avaient
+// des cartes indécises. Un indécis n'est pas une absence — c'est un hoquet
+// de réseau — et le compter comme manquant gonflerait le chiffre.
+const reprendre = typeof args.reprendre === 'string' ? args.reprendre : null;
 const DOSSIER = 'images/cards';
 const IDENTITE = { 'User-Agent': 'PokeClasseur/1.0 (verification des visuels)' };
 
@@ -70,8 +74,24 @@ async function parPaquets(taches, n, faire){
 
 // ------------------------------------------------- ce qu'on vérifie -------
 const extensions = JSON.parse(await readFile('donnees/physique/extensions.json', 'utf8'));
+
+// En reprise, on relit le verdict précédent pour savoir où chercher. Les
+// identifiants des indécises n'y figuraient pas au premier passage : on
+// reprend donc toutes les cartes des extensions concernées, ce qui est
+// large mais sûr, et le fichier les notera pour la prochaine fois.
+let aReprendre = null, precedent = null;
+if(reprendre){
+  precedent = JSON.parse(await readFile(reprendre, 'utf8'));
+  aReprendre = new Set(Object.entries(precedent.extensions)
+    .filter(([, e]) => e.indecis > 0).map(([id]) => id));
+  const combien = Object.values(precedent.extensions).reduce((s2, e) => s2 + e.indecis, 0);
+  console.log(`Reprise : ${combien} cartes indécises, réparties sur ${aReprendre.size} extensions.`);
+  console.log('On revérifie toutes les cartes de ces extensions.\n');
+}
+
 const toutes = [];
 for(const ext of extensions){
+  if(aReprendre && !aReprendre.has(ext.id)) continue;
   let cartes;
   try{ cartes = JSON.parse(await readFile(`donnees/physique/sets/${ext.id}.json`, 'utf8')); }
   catch{ continue; }
@@ -105,10 +125,14 @@ for(const v of verdicts){
   compte[v.etat]++;
   if(!parExtension.has(v.extension))
     parExtension.set(v.extension, { nom: v.nomExtension, total: 0,
-      depot: 0, principal: 0, secours: 0, manquant: 0, indecis: 0, cartesManquantes: [] });
+      depot: 0, principal: 0, secours: 0, manquant: 0, indecis: 0,
+      cartesManquantes: [], cartesIndecises: [] });
   const e = parExtension.get(v.extension);
   e.total++; e[v.etat]++;
   if(v.etat === 'manquant') e.cartesManquantes.push({ id: v.id, nom: v.name });
+  // Les noter : au premier passage je ne gardais que leur nombre, et une
+  // reprise ciblée devenait impossible.
+  if(v.etat === 'indecis') e.cartesIndecises.push({ id: v.id, nom: v.name });
 }
 
 const pc = n => `${(100 * n / toutes.length).toFixed(1)} %`;
@@ -129,6 +153,25 @@ if(troues.length > 30)
   console.log(`  … et ${troues.length - 30} autres, ` +
     `${troues.slice(30).reduce((s, [, e]) => s + e.manquant, 0)} cartes`);
 
+// En reprise, le verdict ne porte que sur quelques extensions : l'écrire
+// tel quel effacerait tout le reste. On le fusionne.
+let extensionsFinales = Object.fromEntries(parExtension);
+let compteFinal = compte;
+let totalFinal = toutes.length;
+if(precedent){
+  extensionsFinales = { ...precedent.extensions, ...extensionsFinales };
+  compteFinal = { depot: 0, principal: 0, secours: 0, manquant: 0, indecis: 0 };
+  totalFinal = 0;
+  for(const e of Object.values(extensionsFinales)){
+    totalFinal += e.total;
+    for(const cle of Object.keys(compteFinal)) compteFinal[cle] += e[cle] ?? 0;
+  }
+  const g = compteFinal, a = precedent.compte;
+  console.log('\n================ après reprise, sur tout le catalogue ================');
+  console.log(`  aucun visuel : ${a.manquant} -> ${g.manquant}`);
+  console.log(`  indécis      : ${a.indecis} -> ${g.indecis}`);
+}
+
 if(sortie){
   await mkdir(sortie, { recursive: true });
   const fichier = `${sortie}/verification-visuels.json`;
@@ -137,9 +180,10 @@ if(sortie){
     // Pas d'échantillon : chaque carte a été demandée. C'est la différence
     // avec la mesure précédente, et c'est elle qui rend ce fichier fiable.
     methode: "une requête d'en-tête par carte, sur l'adresse que le site sert",
-    total: toutes.length,
-    compte,
-    extensions: Object.fromEntries([...parExtension].map(([id, e]) => [id, e])),
+    repriseDe: precedent ? precedent.verifieLe : null,
+    total: totalFinal,
+    compte: compteFinal,
+    extensions: extensionsFinales,
   }, null, 1) + '\n');
   console.log(`\nécrit dans ${fichier}`);
 }

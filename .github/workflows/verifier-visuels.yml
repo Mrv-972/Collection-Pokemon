@@ -12,6 +12,10 @@ on:
       largeur:
         description: "Requêtes simultanées"
         default: "16"
+      reprendre:
+        description: "Ne revérifier que les extensions ayant des indécises"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -30,7 +34,8 @@ jobs:
         run: |
           node outils/verifier-visuels.mjs \
             --sortie donnees \
-            --largeur "${{ inputs.largeur }}"
+            --largeur "${{ inputs.largeur }}" \
+            ${{ inputs.reprendre && '--reprendre donnees/verification-visuels.json' || '' }}
 
       - uses: actions/upload-artifact@v4
         with:
