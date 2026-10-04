@@ -16,8 +16,14 @@
 // visiteur :
 //   1. un fichier dans le dépôt ? alors rien à demander, c'est bon ;
 //   2. sinon l'adresse principale (`image`) répond-elle ?
-//   3. sinon le secours (`imageSecours`, PkmCards ou l'anglais) ?
+//   3. sinon le secours (`imageSecours`) ?
 //   4. sinon le visiteur voit un point d'interrogation.
+//
+// Le secours est compté PAR LANGUE. Les mélanger disait « cette extension
+// est complète » d'une série affichée en anglais, ce qui est précisément
+// ce que Mrv972 ne veut pas. Une carte servie en anglais n'est pas une
+// carte réglée : c'est une carte dont il reste à trouver le visuel
+// français.
 //
 //   node outils/verifier-visuels.mjs [--sortie donnees] [--largeur 16]
 
@@ -108,7 +114,10 @@ const verdicts = await parPaquets(toutes, largeur, async carte => {
     if(principal === true) etat = 'principal';
     else {
       const secours = await repond(carte.imageSecours);
-      if(secours === true) etat = 'secours';
+      // D'où vient ce secours ? PkmCards est français ; une adresse
+      // TCGdex portant « /en/ » est anglaise.
+      if(secours === true)
+        etat = /\/en\//.test(carte.imageSecours) ? 'secoursAnglais' : 'secoursFrancais';
       else if(principal === null || secours === null) etat = 'indecis';
       else etat = 'manquant';
     }
@@ -119,29 +128,53 @@ const verdicts = await parPaquets(toutes, largeur, async carte => {
 });
 
 // ------------------------------------------------- le bilan ---------------
-const compte = { depot: 0, principal: 0, secours: 0, manquant: 0, indecis: 0 };
+const compte = { depot: 0, principal: 0, secoursFrancais: 0, secoursAnglais: 0,
+                 manquant: 0, indecis: 0 };
 const parExtension = new Map();
 for(const v of verdicts){
   compte[v.etat]++;
   if(!parExtension.has(v.extension))
     parExtension.set(v.extension, { nom: v.nomExtension, total: 0,
-      depot: 0, principal: 0, secours: 0, manquant: 0, indecis: 0,
-      cartesManquantes: [], cartesIndecises: [] });
+      depot: 0, principal: 0, secoursFrancais: 0, secoursAnglais: 0,
+      manquant: 0, indecis: 0,
+      cartesManquantes: [], cartesIndecises: [], cartesAnglaises: [] });
   const e = parExtension.get(v.extension);
   e.total++; e[v.etat]++;
   if(v.etat === 'manquant') e.cartesManquantes.push({ id: v.id, nom: v.name });
   // Les noter : au premier passage je ne gardais que leur nombre, et une
   // reprise ciblée devenait impossible.
   if(v.etat === 'indecis') e.cartesIndecises.push({ id: v.id, nom: v.name });
+  // Les noter : ce sont les prochaines à chercher en français.
+  if(v.etat === 'secoursAnglais') e.cartesAnglaises.push({ id: v.id, nom: v.name });
 }
 
 const pc = n => `${(100 * n / toutes.length).toFixed(1)} %`;
 console.log('\n================ bilan ================');
 console.log(`servi depuis le dépôt   : ${compte.depot} (${pc(compte.depot)})`);
 console.log(`adresse principale      : ${compte.principal} (${pc(compte.principal)})`);
-console.log(`secours                 : ${compte.secours} (${pc(compte.secours)})`);
+console.log(`secours français        : ${compte.secoursFrancais} (${pc(compte.secoursFrancais)})`);
+console.log(`SERVI EN ANGLAIS        : ${compte.secoursAnglais} (${pc(compte.secoursAnglais)})`);
 console.log(`AUCUN VISUEL            : ${compte.manquant} (${pc(compte.manquant)})`);
 console.log(`indécis (réseau)        : ${compte.indecis} (${pc(compte.indecis)})`);
+
+// Ce qui n'est pas en français : les absentes ET les anglaises. C'est ce
+// total-là qui dit ce qu'il reste à faire.
+const pasEnFrancais = compteFinalProvisoire =>
+  (compteFinalProvisoire.manquant ?? 0) + (compteFinalProvisoire.secoursAnglais ?? 0);
+console.log(`\nPAS EN FRANÇAIS         : ${pasEnFrancais(compte)}` +
+  ` (${pc(pasEnFrancais(compte))}) — absentes et anglaises réunies`);
+
+const anglaises = [...parExtension.entries()]
+  .filter(([, e]) => e.secoursAnglais)
+  .sort((a, b) => b[1].secoursAnglais - a[1].secoursAnglais);
+if(anglaises.length){
+  console.log(`\n${anglaises.length} extensions ont des cartes servies en ANGLAIS :`);
+  for(const [id, e] of anglaises.slice(0, 20))
+    console.log(`  ${String(e.secoursAnglais).padStart(4)}/${String(e.total).padEnd(4)}  ${id.padEnd(12)} ${e.nom}`);
+  if(anglaises.length > 20)
+    console.log(`  … et ${anglaises.length - 20} autres, ` +
+      `${anglaises.slice(20).reduce((s2, [, e]) => s2 + e.secoursAnglais, 0)} cartes`);
+}
 
 const troues = [...parExtension.entries()]
   .filter(([, e]) => e.manquant)
@@ -160,7 +193,8 @@ let compteFinal = compte;
 let totalFinal = toutes.length;
 if(precedent){
   extensionsFinales = { ...precedent.extensions, ...extensionsFinales };
-  compteFinal = { depot: 0, principal: 0, secours: 0, manquant: 0, indecis: 0 };
+  compteFinal = { depot: 0, principal: 0, secoursFrancais: 0, secoursAnglais: 0,
+                  manquant: 0, indecis: 0 };
   totalFinal = 0;
   for(const e of Object.values(extensionsFinales)){
     totalFinal += e.total;
