@@ -169,19 +169,34 @@ const STYLE_RAIL = `
   body{padding-left:56px;}
 
   /* L'onglet du physique fermé : présent, pour qu'on sache qu'il existe,
-     mais visiblement en attente. */
+     mais visiblement en attente. Seuls l'icône et le nom sont atténués :
+     une opacité posée sur tout l'onglet éteindrait aussi l'étiquette, qui
+     doit au contraire sauter aux yeux. */
   button.rail-item{font:inherit;cursor:pointer;background:none;border-top:0;border-right:0;border-bottom:0}
-  .a-venir-onglet{opacity:.55}
+  .rail-item.a-venir-onglet,.rail:hover .rail-item.a-venir-onglet,
+  .rail:focus-within .rail-item.a-venir-onglet{opacity:1}
+  .a-venir-onglet svg,.a-venir-onglet .rail-nom{opacity:.5}
+  .a-venir-onglet .rail-logo{filter:grayscale(.6)}
   .rail-badge{font-size:8.5px;line-height:1;letter-spacing:.2px;padding:3px 5px;border-radius:999px;
               background:rgba(var(--teinte-rgb),.18);color:var(--teinte);white-space:nowrap}
   .rail-badge-prive{background:rgba(140,140,140,.18);color:#B9BCB9}
+  /* Hors de la forme compacte, pour rester visible quand la barre s'élargit
+     et que l'icône laisse la place au logo. */
+  .rail-badge-a-venir{position:relative;z-index:1;font-size:10px;font-weight:700;letter-spacing:.3px;
+    padding:5px 8px;background:#C9A227;color:#15171A;
+    box-shadow:0 0 0 0 rgba(201,162,39,.55);animation:a-venir-pouls 2.4s ease-out infinite}
+  .rail:hover .rail-badge-a-venir,.rail:focus-within .rail-badge-a-venir{margin-top:84px;font-size:12px;padding:6px 12px}
+  @keyframes a-venir-pouls{
+    0%{box-shadow:0 0 0 0 rgba(201,162,39,.55)}
+    70%,100%{box-shadow:0 0 0 7px rgba(201,162,39,0)}
+  }
 
   #a-venir-annonce{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:9500;
     width:min(460px,calc(100vw - 32px));box-sizing:border-box;padding:14px 44px 14px 16px;border-radius:12px;
     background:#1B1E24;color:#EDEAE0;border:1px solid rgba(201,162,39,.55);
     box-shadow:0 10px 30px rgba(0,0,0,.45);font-size:14px;line-height:1.5}
   #a-venir-annonce strong{display:block;color:#E3C766;margin-bottom:4px}
-  #a-venir-annonce p{margin:0;color:#B9BCB9}
+  #a-venir-annonce p{margin:0;color:#EDEAE0;font-size:15px}
   #a-venir-annonce button{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;
     border:1px solid rgba(255,255,255,.2);background:none;color:#EDEAE0;cursor:pointer;font-size:17px;line-height:1}
 
@@ -259,9 +274,11 @@ const STYLE_RAIL = `
     .rail:hover,.rail:focus-within{width:56px}
     .rail:hover .rail-compact,.rail:focus-within .rail-compact{opacity:1}
     .rail-logo{display:none}
+    .rail:hover .rail-badge-a-venir,.rail:focus-within .rail-badge-a-venir{margin-top:0;font-size:10px;padding:5px 8px}
   }
   @media(prefers-reduced-motion:reduce){
     .rail,.rail-compact,.rail-logo{transition:none}
+    .rail-badge-a-venir{animation:none}
   }
 
   /* Sur téléphone, une colonne de 56 px prendrait un septième de la largeur.
@@ -285,6 +302,7 @@ const STYLE_RAIL = `
     .rail:hover,.rail:focus-within{width:100%}
     .rail:hover .rail-compact,.rail:focus-within .rail-compact{opacity:1}
     .rail-logo{display:none}
+    .rail:hover .rail-badge-a-venir,.rail:focus-within .rail-badge-a-venir{margin-top:0;font-size:10px;padding:5px 8px}
   }
 `;
 
@@ -294,9 +312,9 @@ function ongletDUnivers(u){
     // Un bouton, pas un lien : il n'y a nulle part où aller pour l'instant.
     return `
     <button type="button" class="rail-item a-venir-onglet" data-cible="${u.cle}"
-            title="${u.nom} — à venir" aria-describedby="a-venir-aide">
-      <span class="rail-compact">${u.icone}<span class="rail-nom">${u.court}</span>
-        <span class="rail-badge">À venir</span></span>
+            title="${u.nom} — à venir">
+      <span class="rail-compact">${u.icone}<span class="rail-nom">${u.court}</span></span>
+      <span class="rail-badge rail-badge-a-venir">À venir</span>
       <img class="rail-logo" src="${u.logo}" alt="" aria-hidden="true" loading="lazy">
     </button>`;
   }
@@ -313,9 +331,7 @@ function ongletDUnivers(u){
     </a>`;
 }
 
-const TEXTE_A_VENIR = `Le TCG physique arrive bientôt sur PokéClasseur. Nous terminons de
-  rassembler les visuels français de toutes les cartes, pour qu'aucune ne
-  s'affiche vide ou en anglais. En attendant, tout le TCG Pocket est disponible.`;
+const TEXTE_A_VENIR = 'La partie TCG Physique sera très bientôt disponible, nous sommes en train de la finaliser.';
 
 function brancherOngletAVenir(rail){
   const bouton = rail.querySelector('.a-venir-onglet');
@@ -331,8 +347,7 @@ function annoncerAVenir(){
   a.id = 'a-venir-annonce';
   a.setAttribute('role', 'status');
   a.innerHTML = `
-    <strong>TCG physique — à venir</strong>
-    <p id="a-venir-aide">${TEXTE_A_VENIR}</p>
+    <p>${TEXTE_A_VENIR}</p>
     <button type="button" aria-label="Fermer">×</button>`;
   a.querySelector('button').onclick = () => a.remove();
   document.body.appendChild(a);
@@ -345,7 +360,7 @@ function blocAVenir(){
   return `
     <div class="a-venir">
       <span class="a-venir-icone" aria-hidden="true">${UNIVERS.physique.icone}</span>
-      <h2>TCG physique — à venir</h2>
+      <h2>TCG Physique — à venir</h2>
       <p>${TEXTE_A_VENIR}</p>
       <a class="a-venir-lien" href="${avecUnivers('series.html', 'pocket')}">Voir le TCG Pocket</a>
     </div>`;
