@@ -1007,6 +1007,69 @@ async function brancherPkmcards(physique){
     `${releve.complet ? '' : ', PARTIEL'})`);
 }
 
+// Brancher les visuels français de Pokécardex.
+// ============================================
+//
+// Troisième source, pour ce que ni TCGdex ni PkmCards n'ont : les
+// coffrets, galeries de dresseurs, kits du dresseur, promos et
+// collections McDonald's — mesuré à 1 297 cartes pas en français, dont
+// 936 sans aucun visuel et 361 affichées en anglais.
+//
+// On POINTE vers leurs images au lieu de les copier, parce que leur CDN
+// répond « access-control-allow-origin: * » : l'export d'un classeur
+// partagé fonctionnera. C'est ce qui la distingue de Poképédia, dont les
+// images ont dû être copiées dans le dépôt faute de cet en-tête.
+//
+// Le rapprochement vient de donnees/appariement-pokecardex.json, établi
+// en vérifiant que les mêmes noms de cartes tombent aux mêmes numéros.
+// Les appariements douteux en sont écartés : afficher la carte d'une
+// autre extension serait pire que le point d'interrogation pour
+// quelqu'un qui range une collection.
+async function brancherPokecardex(physique){
+  let releve, appariement;
+  try{
+    releve = JSON.parse(await readFile('donnees/visuels-pokecardex.json', 'utf8'));
+    appariement = JSON.parse(await readFile('donnees/appariement-pokecardex.json', 'utf8'));
+  }catch{
+    console.log('Pas de relevé Pokécardex : on garde les secours en place.');
+    return;
+  }
+
+  const sansZeros = n => String(n ?? '').replace(/^0+/, '').toLowerCase();
+
+  // notre identifiant d'extension -> leur code
+  const leurCode = new Map();
+  for(const [code, a] of Object.entries(appariement.apparies ?? {})) leurCode.set(a.notre, code);
+
+  let poses = 0, remplaceDeLAnglais = 0;
+  const parExtension = new Map();
+  for(const [setId, cartes] of physique.cartesParSet){
+    const code = leurCode.get(setId);
+    if(!code) continue;
+    const chezEux = releve.series?.[code]?.cartes ?? {};
+    // Leurs numéros peuvent porter des zéros devant, les nôtres non : on
+    // compare des formes normalisées des deux côtés.
+    const parNumero = new Map(Object.entries(chezEux).map(([n, c]) => [sansZeros(n), c]));
+    for(const carte of cartes){
+      const chez = parNumero.get(sansZeros(carte.localId));
+      if(!chez) continue;
+      // On ne remplace jamais un secours DÉJÀ français : PkmCards a été
+      // vérifié carte par carte, il n'y a rien à y gagner.
+      const dejaFrancais = carte.imageSecours && !/\/en\//.test(carte.imageSecours);
+      if(dejaFrancais) continue;
+      if(carte.imageSecours && /\/en\//.test(carte.imageSecours)) remplaceDeLAnglais++;
+      carte.imageSecours = chez.adresse;
+      poses++;
+      parExtension.set(setId, (parExtension.get(setId) ?? 0) + 1);
+    }
+  }
+  console.log(`Secours français depuis Pokécardex : ${poses} cartes` +
+    ` sur ${parExtension.size} extensions` +
+    ` (dont ${remplaceDeLAnglais} qui étaient en anglais)` +
+    ` — relevé du ${String(releve.releveLe ?? '?').slice(0, 10)}` +
+    `${releve.complet ? '' : ', PARTIEL'}`);
+}
+
 async function copierLeResteDuCatalogue(pocket){
   await mkdir(DOSSIER_VISUELS, { recursive: true });
   const aFaire = [];
@@ -1143,6 +1206,7 @@ async function principal(){
   await copierLeResteDuCatalogue(pocket);
 
   await brancherPkmcards(physique);
+  await brancherPokecardex(physique);
 
   const { vignettes, hautes } = trierVisuels(await recenserVisuelsLocaux());
   if(vignettes.size){

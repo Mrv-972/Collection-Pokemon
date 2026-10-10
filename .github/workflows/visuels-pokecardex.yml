@@ -1,0 +1,83 @@
+# Relève l'index de Pokécardex, l'apparie à nos extensions, et dépose les deux.
+#
+# On ne copie aucune image : leur CDN répond « access-control-allow-origin: * »,
+# donc le site peut pointer vers leurs visuels directement — l'export d'un
+# classeur partagé fonctionnera, et le dépôt n'enfle pas.
+#
+# Il faut un navigateur : une lecture simple ne rend que la page de
+# vérification de Cloudflare.
+name: Visuels Pokécardex
+
+on:
+  workflow_dispatch:
+    inputs:
+      series:
+        description: "Séries à parcourir (0 = toutes, environ 249)"
+        default: "0"
+      essai:
+        description: "Essai : relever et compter, sans rien écrire"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  moissonner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Installer le navigateur
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install playwright@latest
+          npx playwright install --with-deps chromium
+
+      - name: Relever l'index
+        run: |
+          node outils/moissonner-pokecardex.mjs \
+            --sortie donnees \
+            --series "${{ inputs.series }}" \
+            ${{ inputs.essai && '--essai' || '' }}
+
+      - name: Apparier à nos extensions
+        if: ${{ !inputs.essai }}
+        run: node outils/apparier-pokecardex.mjs --sortie donnees
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !inputs.essai }}
+        with:
+          name: visuels-pokecardex
+          path: |
+            donnees/visuels-pokecardex.json
+            donnees/appariement-pokecardex.json
+          retention-days: 7
+
+      - name: Publier
+        if: ${{ !inputs.essai }}
+        run: |
+          rm -rf node_modules package.json package-lock.json
+          git config user.name  "Visuels Pokécardex"
+          git config user.email "actions@users.noreply.github.com"
+          git add donnees/visuels-pokecardex.json donnees/appariement-pokecardex.json
+          if git diff --cached --quiet; then
+            echo "Rien de nouveau."
+            exit 0
+          fi
+          git commit -m "Relève et apparie les visuels français de Pokécardex"
+          for essai in 1 2 3 4 5; do
+            if git pull --rebase --autostash -q origin "$GITHUB_REF_NAME" \
+               && git push -q origin HEAD:"$GITHUB_REF_NAME"; then
+              echo "déposé."
+              exit 0
+            fi
+            echo "dépôt refusé (tentative $essai) — on reprend la branche et on réessaie."
+            sleep $((essai * 5))
+          done
+          echo "::error::dépôt impossible après cinq tentatives."
+          exit 1
