@@ -48,10 +48,20 @@ for(const ext of extensions){
 }
 
 // --- ce qu'ils ont -------------------------------------------------------
+// Leur texte de carte vaut « Noeunoeuf 001/128 » dans une extension, mais
+// « Méganium 001 » dans une série de promos — sans le « /total ». Le
+// moissonneur ne retirait que la première forme : pour toutes les promos,
+// le numéro restait collé au nom, et AUCUN nom ne concordait (MEP : 103
+// numéros communs, 0 nom identique). On retire donc un dernier mot qui
+// contient un chiffre, avec ou sans « /total ». Exiger un chiffre protège
+// les vrais noms qui finissent par une lettre : « Pikachu V » reste entier.
+const sansNumero = nom => String(nom ?? '')
+  .replace(/\s+[a-z]{0,3}[0-9]+[a-z]?(?:\/[0-9a-z]+)?\s*$/i, '').trim();
+
 const chezEux = new Map();
 for(const [code, s] of Object.entries(releve.series ?? {})){
   const par = new Map();
-  for(const [num, c] of Object.entries(s.cartes)) par.set(numero(num), aplatir(c.nom));
+  for(const [num, c] of Object.entries(s.cartes)) par.set(numero(num), aplatir(sansNumero(c.nom)));
   chezEux.set(code, { nom: s.nom, cartes: par });
 }
 
@@ -74,12 +84,24 @@ function candidats(leurs){
   return scores.sort((a, b) => (b.communs - a.communs) || (b.part - a.part));
 }
 
+// La règle d'origine comparait des NOMBRES BRUTS de cartes communes. Elle
+// a rejeté des appariements évidents :
+//   — PRWC -> basep, 35 sur 53, contre 2 pour le suivant : rejeté parce
+//     que j'exigeais 75 % ;
+//   — TK10-L -> tk-sm-l, 18 sur 18, parfait : rejeté parce qu'un autre
+//     kit en partageait 11. Les kits contiennent tous les mêmes énergies
+//     aux mêmes numéros, ce qui gonfle le concurrent sans le rendre
+//     crédible.
+// On compare donc des PROPORTIONS — qui ne favorisent ni les grandes
+// séries ni les cartes génériques — et l'on exige une avance nette sur le
+// second, pas seulement un seuil absolu.
+const SEUIL = 0.6, AVANCE = 1.5;
 const apparies = {}, douteux = [], orphelins = [];
 for(const [code, leurs] of [...chezEux.entries()].sort((a,b) => b[1].cartes.size - a[1].cartes.size)){
-  const liste = candidats(leurs.cartes);
+  const liste = candidats(leurs.cartes).sort((a, b) => (b.part - a.part) || (b.communs - a.communs));
   const premier = liste[0], second = liste[1];
-  const net = premier && premier.part >= 0.75 && premier.communs >= 3;
-  const seul = !second || second.communs <= premier.communs * 0.5;
+  const net = premier && premier.part >= SEUIL && premier.communs >= 3;
+  const seul = !second || premier.part >= AVANCE * second.part;
   if(net && seul){
     apparies[code] = { notre: premier.id, leurNom: leurs.nom, notreNom: premier.nom,
                        communs: premier.communs, compares: premier.compares,
@@ -89,6 +111,31 @@ for(const [code, leurs] of [...chezEux.entries()].sort((a,b) => b[1].cartes.size
                    pistes: liste.slice(0, 3).map(c => `${c.id} (${c.communs}/${c.compares})`) });
   }else{
     orphelins.push({ code, leurNom: leurs.nom, cartesRelevees: leurs.cartes.size });
+  }
+}
+
+// Deux de leurs codes peuvent viser la même extension de chez nous — un
+// « Promo McDonald's 2018 » et son édition américaine, par exemple. Sans
+// arbitrage, l'instantané garderait le dernier lu, au hasard de l'ordre.
+// On garde le meilleur et l'on range les autres parmi les douteux, avec
+// la raison.
+const parNotre = new Map();
+for(const [code, a] of Object.entries(apparies)){
+  const deja = parNotre.get(a.notre);
+  const mieux = !deja
+    || a.communs / a.compares > deja.a.communs / deja.a.compares
+    || (a.communs / a.compares === deja.a.communs / deja.a.compares && a.communs > deja.a.communs);
+  if(mieux){
+    if(deja){
+      douteux.push({ code: deja.code, leurNom: deja.a.leurNom, cartesRelevees: deja.a.cartesRelevees,
+                     pistes: [`${a.notre} déjà pris par ${code}, mieux accordé`] });
+      delete apparies[deja.code];
+    }
+    parNotre.set(a.notre, { code, a });
+  }else{
+    douteux.push({ code, leurNom: a.leurNom, cartesRelevees: a.cartesRelevees,
+                   pistes: [`${a.notre} déjà pris par ${deja.code}, mieux accordé`] });
+    delete apparies[code];
   }
 }
 

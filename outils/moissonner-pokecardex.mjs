@@ -115,8 +115,12 @@ for(const [i, code] of retenues.entries()){
       // On garde l'adresse sans son « ?class=md » : la taille se choisira
       // au moment de l'affichage, pas ici.
       const adresse = (c.src || c.dataSrc).split('?')[0];
-      // « Noeunoeuf 001/128 » -> nom « Noeunoeuf ».
-      const nom = c.alt.replace(/\s+[0-9a-z]+\/[0-9]+\s*$/i, '').trim();
+      // « Noeunoeuf 001/128 » -> « Noeunoeuf », mais aussi
+      // « Méganium 001 » -> « Méganium » : dans les séries de promos, le
+      // numéro n'a pas de « /total ». Ne retirer que la première forme
+      // laissait le numéro collé au nom de toutes les promos. On exige un
+      // chiffre dans le mot retiré, pour garder « Pikachu V » entier.
+      const nom = c.alt.replace(/\s+[a-z]{0,3}[0-9]+[a-z]?(?:\/[0-9a-z]+)?\s*$/i, '').trim();
       parNumero[String(m[2]).toLowerCase()] = { adresse, nom };
     }
 

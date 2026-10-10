@@ -1,5 +1,5 @@
 {
- "apparieLe": "2026-10-10T17:27:30.501Z",
+ "apparieLe": "2026-10-10T17:30:33.733Z",
  "releveDu": "2026-10-10T17:27:30.034Z",
  "releveComplet": true,
  "apparies": {
@@ -15,7 +15,7 @@
    "notre": "swsh8",
    "leurNom": "Poing de Fusion",
    "notreNom": "Poing de Fusion",
-   "communs": 268,
+   "communs": 267,
    "compares": 268,
    "cartesRelevees": 268
   },
@@ -162,6 +162,14 @@
    "communs": 210,
    "compares": 210,
    "cartesRelevees": 210
+  },
+  "SVP": {
+   "notre": "svp",
+   "leurNom": "Promos Écarlate et Violet",
+   "notreNom": "SVP Black Star Promos",
+   "communs": 202,
+   "compares": 209,
+   "cartesRelevees": 209
   },
   "TEF": {
    "notre": "sv05",
@@ -335,7 +343,7 @@
    "notre": "ecard1",
    "leurNom": "Expedition",
    "notreNom": "Expedition",
-   "communs": 147,
+   "communs": 145,
    "compares": 149,
    "cartesRelevees": 149
   },
@@ -352,14 +360,6 @@
    "leurNom": "Primo-Choc",
    "notreNom": "Primo-Choc",
    "communs": 148,
-   "compares": 148,
-   "cartesRelevees": 148
-  },
-  "TOPPS": {
-   "notre": "sv03.5",
-   "leurNom": "Topps",
-   "notreNom": "151",
-   "communs": 125,
    "compares": 148,
    "cartesRelevees": 148
   },
@@ -395,14 +395,6 @@
    "compares": 134,
    "cartesRelevees": 137
   },
-  "LMN5": {
-   "notre": "sv03.5",
-   "leurNom": "Lamincards 2005",
-   "notreNom": "151",
-   "communs": 125,
-   "compares": 134,
-   "cartesRelevees": 134
-  },
   "SM06": {
    "notre": "sm6",
    "leurNom": "Lumière Interdite",
@@ -431,7 +423,7 @@
    "notre": "ex10",
    "leurNom": "EX : Forces Cachées",
    "notreNom": "EX Forces Cachées",
-   "communs": 97,
+   "communs": 96,
    "compares": 101,
    "cartesRelevees": 129
   },
@@ -575,7 +567,7 @@
    "notre": "ex6",
    "leurNom": "EX : Rouge Feu & Vert Feuille",
    "notreNom": "EX Rouge Feu & Vert Feuille",
-   "communs": 105,
+   "communs": 104,
    "compares": 108,
    "cartesRelevees": 108
   },
@@ -594,6 +586,14 @@
    "communs": 107,
    "compares": 107,
    "cartesRelevees": 107
+  },
+  "DS": {
+   "notre": "ex11",
+   "leurNom": "EX : Espèces Delta",
+   "notreNom": "EX Espèces Delta",
+   "communs": 64,
+   "compares": 106,
+   "cartesRelevees": 106
   },
   "EVO": {
    "notre": "xy12",
@@ -618,6 +618,14 @@
    "communs": 104,
    "compares": 105,
    "cartesRelevees": 105
+  },
+  "MEP": {
+   "notre": "mep",
+   "leurNom": "Promos Méga-Évolution",
+   "notreNom": "MEP Black Star Promos",
+   "communs": 103,
+   "compares": 103,
+   "cartesRelevees": 103
   },
   "DEX": {
    "notre": "bw5",
@@ -647,7 +655,7 @@
    "notre": "ex1",
    "leurNom": "EX : Rubis & Saphir",
    "notreNom": "EX Rubis & Saphir",
-   "communs": 101,
+   "communs": 100,
    "compares": 101,
    "cartesRelevees": 101
   },
@@ -655,7 +663,7 @@
    "notre": "ex16",
    "leurNom": "EX : Gardiens du Pouvoir",
    "notreNom": "EX Gardiens du Pouvoir",
-   "communs": 94,
+   "communs": 93,
    "compares": 100,
    "cartesRelevees": 100
   },
@@ -915,6 +923,14 @@
    "compares": 58,
    "cartesRelevees": 58
   },
+  "PRWC": {
+   "notre": "basep",
+   "leurNom": "Promo Black Star Wizards Of The Coast",
+   "notreNom": "Wizards Black Star Promos",
+   "communs": 35,
+   "compares": 53,
+   "cartesRelevees": 53
+  },
   "CEL": {
    "notre": "cel25",
    "leurNom": "Célébrations",
@@ -946,6 +962,22 @@
    "communs": 39,
    "compares": 39,
    "cartesRelevees": 39
+  },
+  "TK10-R": {
+   "notre": "tk-sm-r",
+   "leurNom": "SL Kit du Dresseur (Raichu d'Alola)",
+   "notreNom": "SM Kit du dresseur (Raichu d'Alola)",
+   "communs": 19,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "TK10-L": {
+   "notre": "tk-sm-l",
+   "leurNom": "SL Kit du Dresseur (Lougaroc)",
+   "notreNom": "SM Kit du dresseur (Lougarox)",
+   "communs": 18,
+   "compares": 18,
+   "cartesRelevees": 30
   },
   "TK9-S": {
    "notre": "tk-xy-su",
@@ -1103,7 +1135,7 @@
    "notre": "pop2",
    "leurNom": "POP 2",
    "notreNom": "POP Série 2",
-   "communs": 17,
+   "communs": 16,
    "compares": 17,
    "cartesRelevees": 17
   },
@@ -1232,6 +1264,26 @@
    ]
   },
   {
+   "code": "PRSM",
+   "leurNom": "Promos Soleil et Lune",
+   "cartesRelevees": 232,
+   "pistes": [
+    "2017sm (1/12)",
+    "2018sm (1/12)",
+    "basep (1/45)"
+   ]
+  },
+  {
+   "code": "PRXY",
+   "leurNom": "Promos X&Y",
+   "cartesRelevees": 195,
+   "pistes": [
+    "det1 (1/19)",
+    "swsh12.5 (1/144)",
+    "sv07 (1/159)"
+   ]
+  },
+  {
    "code": "PRZP",
    "leurNom": "Pack Récompense",
    "cartesRelevees": 184,
@@ -1246,8 +1298,8 @@
    "cartesRelevees": 170,
    "pistes": [
     "ecard2 (42/130)",
-    "neo3 (2/58)",
-    "pop7 (1/17)"
+    "pop7 (1/17)",
+    "neo3 (2/58)"
    ]
   },
   {
@@ -1256,8 +1308,8 @@
    "cartesRelevees": 166,
    "pistes": [
     "ecard3 (27/134)",
-    "ex12 (2/85)",
-    "neo1 (2/96)"
+    "pop3 (1/17)",
+    "mfb (1/32)"
    ]
   },
   {
@@ -1276,8 +1328,8 @@
    "cartesRelevees": 124,
    "pistes": [
     "bw11 (29/99)",
-    "sm8 (3/124)",
-    "swsh6 (3/124)"
+    "30th-c (1/30)",
+    "sm8 (3/124)"
    ]
   },
   {
@@ -1312,18 +1364,8 @@
    "cartesRelevees": 112,
    "pistes": [
     "pl2 (22/106)",
-    "ex6 (2/108)",
-    "tk-ex-m (1/12)"
-   ]
-  },
-  {
-   "code": "DS",
-   "leurNom": "EX : Espèces Delta",
-   "cartesRelevees": 106,
-   "pistes": [
-    "ex11 (64/106)",
-    "ex6 (3/106)",
-    "hgss1 (3/106)"
+    "tk-ex-m (1/12)",
+    "dp5 (3/92)"
    ]
   },
   {
@@ -1332,8 +1374,8 @@
    "cartesRelevees": 103,
    "pistes": [
     "pl4 (17/91)",
-    "ex8 (2/100)",
-    "2024sv (1/15)"
+    "2024sv (1/15)",
+    "dv1 (1/21)"
    ]
   },
   {
@@ -1373,7 +1415,7 @@
    "pistes": [
     "lc (24/102)",
     "base4 (5/102)",
-    "g1 (2/75)"
+    "mfb (1/32)"
    ]
   },
   {
@@ -1401,8 +1443,8 @@
    "leurNom": "World Championships 2023",
    "cartesRelevees": 97,
    "pistes": [
-    "ex9 (3/97)",
-    "2018sm-fr (1/32)"
+    "2018sm-fr (1/32)",
+    "ex9 (3/97)"
    ]
   },
   {
@@ -1412,6 +1454,16 @@
    "pistes": [
     "tk-hs-r (1/30)",
     "bw5 (1/96)"
+   ]
+  },
+  {
+   "code": "PRBW",
+   "leurNom": "Promos Black Star Noir & Blanc",
+   "cartesRelevees": 93,
+   "pistes": [
+    "ex6 (1/93)",
+    "bw1 (1/93)",
+    "bw3 (1/93)"
    ]
   },
   {
@@ -1485,8 +1537,8 @@
    "leurNom": "World Championships 2006",
    "cartesRelevees": 87,
    "pistes": [
-    "xy2 (3/87)",
     "tk-ex-p (1/12)",
+    "xy2 (3/87)",
     "ex11 (1/87)"
    ]
   },
@@ -1569,6 +1621,14 @@
    ]
   },
   {
+   "code": "PRAL",
+   "leurNom": "Promos Alternative",
+   "cartesRelevees": 71,
+   "pistes": [
+    "bw4 (1/71)"
+   ]
+  },
+  {
    "code": "ADC3-P",
    "leurNom": "Académie de Combat 2024 (Deck Pikachu)",
    "cartesRelevees": 60,
@@ -1583,8 +1643,8 @@
    "leurNom": "Académie de Combat 2024 (Deck Carmadura)",
    "cartesRelevees": 60,
    "pistes": [
-    "neo2 (2/60)",
     "mee (1/16)",
+    "neo2 (2/60)",
     "tk-xy-b (1/30)"
    ]
   },
@@ -1603,8 +1663,8 @@
    "leurNom": "Académie de Combat 2022 (Deck Pyrobut)",
    "cartesRelevees": 60,
    "pistes": [
-    "sve (2/24)",
     "tk-ex-latia (1/10)",
+    "sve (2/24)",
     "tk-ex-m (1/12)"
    ]
   },
@@ -1623,19 +1683,19 @@
    "leurNom": "Académie de Combat (Deck Dracaufeu)",
    "cartesRelevees": 60,
    "pistes": [
+    "tk-ex-latia (1/10)",
     "sve (2/24)",
-    "sm7.5 (2/60)",
-    "tk-ex-latia (1/10)"
+    "tk-ex-m (1/12)"
    ]
   },
   {
-   "code": "PRWC",
-   "leurNom": "Promo Black Star Wizards Of The Coast",
-   "cartesRelevees": 53,
+   "code": "PRDP",
+   "leurNom": "Promos Black Star DP",
+   "cartesRelevees": 56,
    "pistes": [
-    "basep (35/53)",
-    "det1 (2/19)",
-    "swsh9 (2/53)"
+    "pop2 (1/17)",
+    "pop6 (1/17)",
+    "tk-hs-r (1/30)"
    ]
   },
   {
@@ -1643,9 +1703,9 @@
    "leurNom": "Mon Premier Combat",
    "cartesRelevees": 48,
    "pistes": [
+    "tk-dp-l (1/11)",
     "sv03 (4/48)",
-    "mfb (2/34)",
-    "sm3 (2/48)"
+    "tk-ex-p (1/12)"
    ]
   },
   {
@@ -1661,8 +1721,8 @@
    "leurNom": "TCG Classic Blastoise & Suicune",
    "cartesRelevees": 34,
    "pistes": [
-    "tk-hs-g (2/30)",
     "2015xy (1/12)",
+    "tk-hs-g (2/30)",
     "tk-xy-n (1/30)"
    ]
   },
@@ -1729,29 +1789,9 @@
    "leurNom": "SL Kit du Dresseur (Feunard d'Alola)",
    "cartesRelevees": 30,
    "pistes": [
+    "tk-sm-l (4/18)",
     "tk-xy-latia (5/30)",
-    "tk-sm-r (5/30)",
-    "tk-sm-l (4/18)"
-   ]
-  },
-  {
-   "code": "TK10-R",
-   "leurNom": "SL Kit du Dresseur (Raichu d'Alola)",
-   "cartesRelevees": 30,
-   "pistes": [
-    "tk-sm-r (19/30)",
-    "tk-xy-p (6/30)",
-    "tk-hs-r (5/30)"
-   ]
-  },
-  {
-   "code": "TK10-L",
-   "leurNom": "SL Kit du Dresseur (Lougaroc)",
-   "cartesRelevees": 30,
-   "pistes": [
-    "tk-sm-l (18/18)",
-    "tk-bw-e (11/30)",
-    "tk-xy-latio (9/30)"
+    "tk-sm-r (5/30)"
    ]
   },
   {
@@ -1780,7 +1820,8 @@
    "cartesRelevees": 24,
    "pistes": [
     "xy7 (1/24)",
-    "swsh6 (1/24)"
+    "swsh6 (1/24)",
+    "30th (1/24)"
    ]
   },
   {
@@ -1990,6 +2031,22 @@
     "ex5.5 (1/5)",
     "2013bw (1/5)"
    ]
+  },
+  {
+   "code": "TOPPS",
+   "leurNom": "Topps",
+   "cartesRelevees": 148,
+   "pistes": [
+    "sv03.5 déjà pris par MEW, mieux accordé"
+   ]
+  },
+  {
+   "code": "LMN5",
+   "leurNom": "Lamincards 2005",
+   "cartesRelevees": 134,
+   "pistes": [
+    "sv03.5 déjà pris par MEW, mieux accordé"
+   ]
   }
  ],
  "orphelins": [
@@ -1999,44 +2056,9 @@
    "cartesRelevees": 283
   },
   {
-   "code": "PRSM",
-   "leurNom": "Promos Soleil et Lune",
-   "cartesRelevees": 232
-  },
-  {
-   "code": "SVP",
-   "leurNom": "Promos Écarlate et Violet",
-   "cartesRelevees": 209
-  },
-  {
-   "code": "PRXY",
-   "leurNom": "Promos X&Y",
-   "cartesRelevees": 195
-  },
-  {
-   "code": "MEP",
-   "leurNom": "Promos Méga-Évolution",
-   "cartesRelevees": 103
-  },
-  {
-   "code": "PRBW",
-   "leurNom": "Promos Black Star Noir & Blanc",
-   "cartesRelevees": 93
-  },
-  {
    "code": "NRGY",
    "leurNom": "Énergies",
    "cartesRelevees": 88
-  },
-  {
-   "code": "PRAL",
-   "leurNom": "Promos Alternative",
-   "cartesRelevees": 71
-  },
-  {
-   "code": "PRDP",
-   "leurNom": "Promos Black Star DP",
-   "cartesRelevees": 56
   },
   {
    "code": "PRHS",
