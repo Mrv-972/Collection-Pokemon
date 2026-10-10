@@ -1164,6 +1164,17 @@ async function ecrire(dossier, nom, donnees){
 async function publier(univers, { extensions, cartesParSet }, sortie){
   const base = path.join(sortie, univers);
   await rm(base, { recursive: true, force: true });
+
+  // Une extension de promos s'agrandit à chaque nouvelle carte : sa source
+  // n'en annonce donc pas le total (Promo-B côté Pocket, par exemple). Sans
+  // total, le catalogue n'affiche pas de barre d'avancement. Le nombre de
+  // cartes qu'on publie pour elle n'est pas un chiffre inventé : c'est
+  // exactement ce que le visiteur peut cocher.
+  for(const ext of extensions){
+    const annonce = ext.cardCount?.official ?? ext.cardCount?.total ?? null;
+    const publiees = cartesParSet.get(ext.id)?.length ?? 0;
+    if(!(annonce > 0) && publiees > 0) ext.cardCount = { ...ext.cardCount, official: publiees };
+  }
   await ecrire(base, 'extensions.json', extensions);
 
   const parDex = new Map();
