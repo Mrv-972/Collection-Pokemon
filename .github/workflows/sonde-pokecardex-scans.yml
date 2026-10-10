@@ -1,0 +1,14 @@
+# Vérifie ce que sert le serveur des cartes de Pokécardex. Lecture seule.
+name: Sonde scans Pokécardex
+on:
+  workflow_dispatch:
+jobs:
+  sonder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node outils/sonde-pokecardex-scans.mjs
