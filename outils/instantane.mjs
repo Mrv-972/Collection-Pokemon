@@ -1071,6 +1071,24 @@ async function brancherPokecardex(physique){
       parExtension.set(setId, (parExtension.get(setId) ?? 0) + 1);
     }
   }
+  // Les séries à préfixe — promos, coffres, galeries — rattachées carte par
+  // carte par l'appariement, numéro ET nom vérifiés. On les prend telles
+  // quelles : rien à recalculer ici, donc rien à mal recalculer.
+  for(const [setId, sous] of Object.entries(appariement.sousSeries ?? {})){
+    const cartes = physique.cartesParSet.get(setId);
+    if(!cartes) continue;
+    for(const carte of cartes){
+      const adresse = sous.cartes?.[carte.localId];
+      if(!adresse) continue;
+      const dejaFrancais = carte.imageSecours && !/\/en\//.test(carte.imageSecours);
+      if(dejaFrancais) continue;
+      if(carte.imageSecours && /\/en\//.test(carte.imageSecours)) remplaceDeLAnglais++;
+      carte.imageSecours = adresseServie(adresse);
+      poses++;
+      parExtension.set(setId, (parExtension.get(setId) ?? 0) + 1);
+    }
+  }
+
   console.log(`Secours français depuis Pokécardex : ${poses} cartes` +
     ` sur ${parExtension.size} extensions` +
     ` (dont ${remplaceDeLAnglais} qui étaient en anglais)` +

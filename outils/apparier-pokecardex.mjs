@@ -156,6 +156,86 @@ if(orphelins.length){
     console.log(`  ${o.code.padEnd(8)} ${String(o.cartesRelevees).padStart(4)} « ${o.leurNom} »`);
 }
 
+// --- les séries à préfixe : promos, coffres et galeries --------------------
+//
+// Une partie de nos séries numérote ses cartes avec un préfixe : « XY01 »
+// pour les promos XY, « GG01 » pour la Galerie Galaroise, « SV001 » pour un
+// Coffre Étincelant, « TG01 » pour une Galerie de Dresseurs. Pokécardex,
+// lui, numérote tout en chiffres, et de deux façons :
+//
+//   — les promos à part, en commençant à 1 : notre « XY01 » est leur « 1 » ;
+//   — les coffres et galeries À LA SUITE de leur extension mère : notre
+//     « GG01 » est leur n° 161 de Zénith Suprême, parce que l'extension
+//     principale s'arrête à 160.
+//
+// L'appariement ordinaire comparait « xy01 » à « 1 » et ne trouvait jamais
+// rien. Cette passe retire le préfixe, puis cherche ELLE-MÊME, pour chaque
+// série, le couple (série chez eux, décalage) qui fait concorder le plus de
+// noms — sans liste écrite à la main. Vérifié sur sept sous-séries avant
+// d'être généralisé : 119/120 sur les Galeries de Dresseurs, 69/70 sur la
+// Galerie Galaroise, et chaque écart était la même carte écrite autrement.
+//
+// Une carte n'est retenue que si son nom concorde à CE numéro précis —
+// identique, ou leur nom prolongeant le nôtre (« Ordres du Boss » /
+// « Ordres du Boss Lysandre »). Une concordance d'ensemble ne suffit pas à
+// rattacher une carte isolée.
+
+const sansNumeroP = nom => String(nom ?? '')
+  .replace(/\s+[a-z]{0,3}[0-9]+[a-z]?(?:\/[0-9a-z]+)?\s*$/i, '').trim();
+const partieNumerique = l => { const m = /^[A-Za-z]+0*(\d+)$/.exec(String(l)); return m ? Number(m[1]) : null; };
+
+const parLeurNumero = new Map();       // code -> Map(numéro entier -> { nom aplati, adresse })
+for(const [code, s] of Object.entries(releve.series ?? {})){
+  const m = new Map();
+  for(const [num, c] of Object.entries(s.cartes)){
+    const n = Number(String(num).replace(/^0+/, '') || '0');
+    if(Number.isFinite(n)) m.set(n, { nom: aplatir(sansNumeroP(c.nom)), adresse: c.adresse });
+  }
+  parLeurNumero.set(code, { nom: s.nom, cartes: m, max: Math.max(0, ...m.keys()) });
+}
+
+const concorde = (notre, leur) => notre && leur && (notre === leur || leur.startsWith(notre));
+const sousSeries = {};
+for(const ext of extensions){
+  let cartes;
+  try{ cartes = JSON.parse(await readFile(`donnees/physique/sets/${ext.id}.json`, 'utf8')); }catch{ continue; }
+  const prefixees = cartes.filter(c => partieNumerique(c.localId) !== null);
+  if(prefixees.length < Math.max(4, cartes.length * 0.6)) continue;
+
+  let meilleur = null;
+  for(const [code, eux] of parLeurNumero){
+    // Promos : décalage nul. Coffres et galeries : en fin d'extension mère.
+    const fin = eux.max - prefixees.length;
+    const decalages = new Set([0]);
+    for(let d = fin - 15; d <= fin + 15; d++) if(d > 0) decalages.add(d);
+    for(const d of decalages){
+      let ok = 0;
+      for(const c of prefixees){
+        if(aplatir(c.name) === eux.cartes.get(d + partieNumerique(c.localId))?.nom) ok++;
+      }
+      if(!meilleur || ok > meilleur.ok) meilleur = { code, d, ok };
+    }
+  }
+  if(!meilleur || meilleur.ok < 4 || meilleur.ok / prefixees.length < 0.6) continue;
+
+  const eux = parLeurNumero.get(meilleur.code);
+  const retenues = {};
+  for(const c of prefixees){
+    const leur = eux.cartes.get(meilleur.d + partieNumerique(c.localId));
+    if(concorde(aplatir(c.name), leur?.nom)) retenues[c.localId] = leur.adresse;
+  }
+  sousSeries[ext.id] = {
+    code: meilleur.code, leurNom: eux.nom, decalage: meilleur.d,
+    concordance: `${meilleur.ok}/${prefixees.length}`,
+    retenues: Object.keys(retenues).length, cartes: retenues,
+  };
+}
+
+console.log('\n================ séries à préfixe ================');
+for(const [id, x] of Object.entries(sousSeries))
+  console.log(`  ${id.padEnd(12)} -> ${x.code.padEnd(8)} décalage ${String(x.decalage).padStart(3)}` +
+    `  noms ${x.concordance.padEnd(8)} cartes retenues ${String(x.retenues).padStart(4)}   « ${x.leurNom} »`);
+
 console.log('\n================ bilan ================');
 console.log(`appariés            : ${Object.keys(apparies).length}`);
 console.log(`douteux             : ${douteux.length}`);
@@ -201,6 +281,9 @@ if(sortie){
     // Les douteux restent inscrits : les taire donnerait à croire le
     // rapprochement terminé alors qu'il reste à trancher.
     apparies, douteux, orphelins,
+    // Rattachées carte par carte, numéro et nom vérifiés : l'instantané
+    // s'en sert telles quelles, sans rien recalculer.
+    sousSeries,
   }, null, 1) + '\n');
   console.log(`\nécrit dans ${fichier}`);
 }
