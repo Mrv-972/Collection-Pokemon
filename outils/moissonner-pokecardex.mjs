@@ -43,11 +43,18 @@ const dormir = ms => new Promise(r => setTimeout(r, ms));
 const nav = await chromium.launch();
 const contexte = await nav.newContext({ userAgent: IDENTITE, locale: 'fr-FR',
                                         viewport: { width: 1600, height: 1200 } });
-// On refuse les images : leur contenu ne nous sert pas, seule leur adresse
-// compte. C'est beaucoup plus léger pour leur serveur comme pour nous.
+// On laisse les images se charger, et c'est une leçon payée : refuser les
+// images pour « alléger leur serveur » a rendu ZÉRO carte sur douze
+// séries. Leur page pose deux images par carte — un fond provisoire et le
+// vrai visuel — et bloquer le second déclenche leur gestion d'erreur, qui
+// remet le fond provisoire à la place. L'adresse qu'on venait chercher
+// disparaissait donc à cause de l'optimisation elle-même.
+//
+// On n'allège que ce qui ne porte aucune adresse de carte : vidéos et
+// polices de caractères.
 await contexte.route('**/*', route => {
   const t = route.request().resourceType();
-  if(t === 'image' || t === 'media' || t === 'font') return route.abort();
+  if(t === 'media' || t === 'font') return route.abort();
   route.continue();
 });
 const page = await contexte.newPage();
@@ -116,7 +123,14 @@ for(const [i, code] of retenues.entries()){
     const combien = Object.keys(parNumero).length;
     totalCartes += combien;
     if(combien) series[code] = { nom: lu.nom, cartes: parNumero };
-    else sansCarte.push(code);
+    else{
+      sansCarte.push(code);
+      // Une série sans carte doit dire POURQUOI. « 0 carte sur 273 images »
+      // et « 0 carte sur 0 image » sont deux pannes différentes, et la
+      // première m'aurait fait gagner une passe.
+      console.log(`  ${code} : 0 carte retenue sur ${lu.cartes.length} images` +
+        ` — exemple : ${JSON.stringify(lu.cartes.find(c => c.src || c.dataSrc) ?? null)}`);
+    }
 
     if((i + 1) % 20 === 0 || i === retenues.length - 1)
       console.log(`  ${i + 1}/${retenues.length} séries — ${totalCartes} cartes relevées`);
