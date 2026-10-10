@@ -1,0 +1,2077 @@
+{
+ "apparieLe": "2026-10-10T17:27:30.501Z",
+ "releveDu": "2026-10-10T17:27:30.034Z",
+ "releveComplet": true,
+ "apparies": {
+  "ASC": {
+   "notre": "me02.5",
+   "leurNom": "Héros Transcendants",
+   "notreNom": "Héros Transcendants",
+   "communs": 276,
+   "compares": 279,
+   "cartesRelevees": 279
+  },
+  "FST": {
+   "notre": "swsh8",
+   "leurNom": "Poing de Fusion",
+   "notreNom": "Poing de Fusion",
+   "communs": 268,
+   "compares": 268,
+   "cartesRelevees": 268
+  },
+  "PAL": {
+   "notre": "sv02",
+   "leurNom": "Évolutions à Paldea",
+   "notreNom": "Évolutions à Paldea",
+   "communs": 258,
+   "compares": 263,
+   "cartesRelevees": 263
+  },
+  "SM12": {
+   "notre": "sm12",
+   "leurNom": "Éclipse Cosmique",
+   "notreNom": "Éclipse Cosmique",
+   "communs": 255,
+   "compares": 255,
+   "cartesRelevees": 255
+  },
+  "PAR": {
+   "notre": "sv04",
+   "leurNom": "Faille Paradoxe",
+   "notreNom": "Faille Paradoxe",
+   "communs": 250,
+   "compares": 250,
+   "cartesRelevees": 250
+  },
+  "SVI": {
+   "notre": "sv01",
+   "leurNom": "Écarlate et Violet",
+   "notreNom": "Écarlate et Violet",
+   "communs": 236,
+   "compares": 242,
+   "cartesRelevees": 242
+  },
+  "SM11": {
+   "notre": "sm11",
+   "leurNom": "Harmonie des Esprits",
+   "notreNom": "Harmonie des Esprits",
+   "communs": 242,
+   "compares": 242,
+   "cartesRelevees": 242
+  },
+  "SSP": {
+   "notre": "sv08",
+   "leurNom": "Étincelles Déferlantes",
+   "notreNom": "Étincelles Déferlantes",
+   "communs": 236,
+   "compares": 236,
+   "cartesRelevees": 236
+  },
+  "LOR": {
+   "notre": "swsh11",
+   "leurNom": "Origine Perdue",
+   "notreNom": "Origine Perdue",
+   "communs": 201,
+   "compares": 201,
+   "cartesRelevees": 231
+  },
+  "ASR": {
+   "notre": "swsh10",
+   "leurNom": "Astres Radieux",
+   "notreNom": "Astres Radieux",
+   "communs": 200,
+   "compares": 200,
+   "cartesRelevees": 230
+  },
+  "PAF": {
+   "notre": "sv04.5",
+   "leurNom": "Destinées de Paldea",
+   "notreNom": "Destinées de Paldea",
+   "communs": 226,
+   "compares": 229,
+   "cartesRelevees": 229
+  },
+  "SIT": {
+   "notre": "swsh12",
+   "leurNom": "Tempête Argentée",
+   "notreNom": "Tempête Argentée",
+   "communs": 199,
+   "compares": 199,
+   "cartesRelevees": 229
+  },
+  "DRI": {
+   "notre": "sv10",
+   "leurNom": "Rivalités Destinées",
+   "notreNom": "Rivalités Destinées",
+   "communs": 228,
+   "compares": 228,
+   "cartesRelevees": 228
+  },
+  "EVS": {
+   "notre": "swsh7",
+   "leurNom": "Évolution Céleste",
+   "notreNom": "Évolution Céleste",
+   "communs": 220,
+   "compares": 221,
+   "cartesRelevees": 221
+  },
+  "SM08": {
+   "notre": "sm8",
+   "leurNom": "Tonnerre Perdu",
+   "notreNom": "Tonnerre Perdu",
+   "communs": 210,
+   "compares": 220,
+   "cartesRelevees": 220
+  },
+  "SM10": {
+   "notre": "sm10",
+   "leurNom": "Alliance Infaillible",
+   "notreNom": "Alliance Infaillible",
+   "communs": 217,
+   "compares": 218,
+   "cartesRelevees": 218
+  },
+  "CRE": {
+   "notre": "swsh6",
+   "leurNom": "Règne de Glace",
+   "notreNom": "Règne de Glace",
+   "communs": 217,
+   "compares": 217,
+   "cartesRelevees": 217
+  },
+  "OBF": {
+   "notre": "sv03",
+   "leurNom": "Flammes Obsidiennes",
+   "notreNom": "Flammes Obsidiennes",
+   "communs": 213,
+   "compares": 214,
+   "cartesRelevees": 214
+  },
+  "CRZ": {
+   "notre": "swsh12.5",
+   "leurNom": "Zénith Suprême",
+   "notreNom": "Zénith Suprême",
+   "communs": 143,
+   "compares": 144,
+   "cartesRelevees": 214
+  },
+  "TWM": {
+   "notre": "sv06",
+   "leurNom": "Mascarade Crépusculaire",
+   "notreNom": "Mascarade Crépusculaire",
+   "communs": 210,
+   "compares": 210,
+   "cartesRelevees": 210
+  },
+  "TEF": {
+   "notre": "sv05",
+   "leurNom": "Forces Temporelles",
+   "notreNom": "Forces Temporelles",
+   "communs": 202,
+   "compares": 202,
+   "cartesRelevees": 202
+  },
+  "BRS": {
+   "notre": "swsh9",
+   "leurNom": "Stars Étincelantes",
+   "notreNom": "Stars Étincelantes",
+   "communs": 168,
+   "compares": 170,
+   "cartesRelevees": 200
+  },
+  "SWSH1": {
+   "notre": "swsh1",
+   "leurNom": "Épée et Bouclier",
+   "notreNom": "Épée et Bouclier",
+   "communs": 200,
+   "compares": 200,
+   "cartesRelevees": 200
+  },
+  "SWSH2": {
+   "notre": "swsh2",
+   "leurNom": "Clash des Rebelles",
+   "notreNom": "Clash des Rebelles",
+   "communs": 190,
+   "compares": 193,
+   "cartesRelevees": 193
+  },
+  "MEW": {
+   "notre": "sv03.5",
+   "leurNom": "151",
+   "notreNom": "151",
+   "communs": 190,
+   "compares": 191,
+   "cartesRelevees": 191
+  },
+  "SWSH4": {
+   "notre": "swsh4",
+   "leurNom": "Voltage Éclatant",
+   "notreNom": "Voltage Éclatant",
+   "communs": 184,
+   "compares": 187,
+   "cartesRelevees": 187
+  },
+  "SWSH3": {
+   "notre": "swsh3",
+   "leurNom": "Ténèbres Embrasées",
+   "notreNom": "Ténèbres Embrasées",
+   "communs": 182,
+   "compares": 185,
+   "cartesRelevees": 185
+  },
+  "SM09": {
+   "notre": "sm9",
+   "leurNom": "Duo de Choc",
+   "notreNom": "Duo de Choc",
+   "communs": 176,
+   "compares": 180,
+   "cartesRelevees": 180
+  },
+  "SWSH45": {
+   "notre": "swsh4.5",
+   "leurNom": "Destinées Radieuses",
+   "notreNom": "Destinées Radieuses",
+   "communs": 65,
+   "compares": 65,
+   "cartesRelevees": 179
+  },
+  "30C": {
+   "notre": "30th",
+   "leurNom": "30ᵉ Anniversaire",
+   "notreNom": "30th Celebration",
+   "communs": 142,
+   "compares": 142,
+   "cartesRelevees": 175
+  },
+  "JTG": {
+   "notre": "sv09",
+   "leurNom": "Aventures Ensemble",
+   "notreNom": "Aventures Ensemble",
+   "communs": 173,
+   "compares": 174,
+   "cartesRelevees": 174
+  },
+  "MEG": {
+   "notre": "me01",
+   "leurNom": "Méga-Évolution",
+   "notreNom": "Méga-Évolution",
+   "communs": 171,
+   "compares": 172,
+   "cartesRelevees": 172
+  },
+  "SWSH5": {
+   "notre": "swsh5",
+   "leurNom": "Styles de Combat",
+   "notreNom": "Styles de combat",
+   "communs": 166,
+   "compares": 167,
+   "cartesRelevees": 167
+  },
+  "SM07": {
+   "notre": "sm7",
+   "leurNom": "Tempête Céleste",
+   "notreNom": "Tempête Céleste",
+   "communs": 164,
+   "compares": 167,
+   "cartesRelevees": 167
+  },
+  "PRE": {
+   "notre": "sv08.5",
+   "leurNom": "Évolutions Prismatiques",
+   "notreNom": "Évolutions Prismatiques",
+   "communs": 160,
+   "compares": 164,
+   "cartesRelevees": 164
+  },
+  "SCR": {
+   "notre": "sv07",
+   "leurNom": "Couronne Stellaire",
+   "notreNom": "Couronne Stellaire",
+   "communs": 159,
+   "compares": 159,
+   "cartesRelevees": 159
+  },
+  "WHT": {
+   "notre": "sv10.5w",
+   "leurNom": "Flamme Blanche",
+   "notreNom": "Flamme Blanche",
+   "communs": 157,
+   "compares": 157,
+   "cartesRelevees": 157
+  },
+  "SM05": {
+   "notre": "sm5",
+   "leurNom": "Ultra-Prisme",
+   "notreNom": "Ultra-Prisme",
+   "communs": 147,
+   "compares": 157,
+   "cartesRelevees": 157
+  },
+  "BLK": {
+   "notre": "sv10.5b",
+   "leurNom": "Foudre Noire",
+   "notreNom": "Foudre Noire",
+   "communs": 155,
+   "compares": 156,
+   "cartesRelevees": 156
+  },
+  "SM03": {
+   "notre": "sm3",
+   "leurNom": "Ombres Ardentes",
+   "notreNom": "Ombres Ardentes",
+   "communs": 153,
+   "compares": 153,
+   "cartesRelevees": 153
+  },
+  "SM02": {
+   "notre": "sm2",
+   "leurNom": "Gardiens Ascendants",
+   "notreNom": "Gardiens Ascendants",
+   "communs": 153,
+   "compares": 153,
+   "cartesRelevees": 153
+  },
+  "EX": {
+   "notre": "ecard1",
+   "leurNom": "Expedition",
+   "notreNom": "Expedition",
+   "communs": 147,
+   "compares": 149,
+   "cartesRelevees": 149
+  },
+  "BKT": {
+   "notre": "xy8",
+   "leurNom": "Impulsion Turbo",
+   "notreNom": "Impulsion Turbo",
+   "communs": 148,
+   "compares": 148,
+   "cartesRelevees": 148
+  },
+  "PRC": {
+   "notre": "xy5",
+   "leurNom": "Primo-Choc",
+   "notreNom": "Primo-Choc",
+   "communs": 148,
+   "compares": 148,
+   "cartesRelevees": 148
+  },
+  "TOPPS": {
+   "notre": "sv03.5",
+   "leurNom": "Topps",
+   "notreNom": "151",
+   "communs": 125,
+   "compares": 148,
+   "cartesRelevees": 148
+  },
+  "SM115": {
+   "notre": "sm115",
+   "leurNom": "Destinées Occultes",
+   "notreNom": "Destinées Occultes",
+   "communs": 58,
+   "compares": 61,
+   "cartesRelevees": 147
+  },
+  "SM01": {
+   "notre": "sm1",
+   "leurNom": "Soleil et Lune",
+   "notreNom": "Soleil et Lune",
+   "communs": 147,
+   "compares": 147,
+   "cartesRelevees": 147
+  },
+  "BCR": {
+   "notre": "bw7",
+   "leurNom": "Frontières Franchies",
+   "notreNom": "Frontières Franchies",
+   "communs": 137,
+   "compares": 137,
+   "cartesRelevees": 137
+  },
+  "SV": {
+   "notre": "pl3",
+   "leurNom": "Platine : Vainqueurs Suprêmes",
+   "notreNom": "Vainqueurs Suprêmes",
+   "communs": 132,
+   "compares": 134,
+   "cartesRelevees": 137
+  },
+  "LMN5": {
+   "notre": "sv03.5",
+   "leurNom": "Lamincards 2005",
+   "notreNom": "151",
+   "communs": 125,
+   "compares": 134,
+   "cartesRelevees": 134
+  },
+  "SM06": {
+   "notre": "sm6",
+   "leurNom": "Lumière Interdite",
+   "notreNom": "Lumière Interdite",
+   "communs": 124,
+   "compares": 130,
+   "cartesRelevees": 130
+  },
+  "XY": {
+   "notre": "xy1",
+   "leurNom": "XY",
+   "notreNom": "XY",
+   "communs": 129,
+   "compares": 130,
+   "cartesRelevees": 130
+  },
+  "LA": {
+   "notre": "dp6",
+   "leurNom": "Diamant & Perle : Eveil des Légendes",
+   "notreNom": "Éveil des Légendes",
+   "communs": 122,
+   "compares": 130,
+   "cartesRelevees": 130
+  },
+  "UF": {
+   "notre": "ex10",
+   "leurNom": "EX : Forces Cachées",
+   "notreNom": "EX Forces Cachées",
+   "communs": 97,
+   "compares": 101,
+   "cartesRelevees": 129
+  },
+  "PT": {
+   "notre": "pl1",
+   "leurNom": "Platine",
+   "notreNom": "Platine",
+   "communs": 116,
+   "compares": 122,
+   "cartesRelevees": 125
+  },
+  "SW": {
+   "notre": "dp3",
+   "leurNom": "Diamant & Perle : Merveilles Secrètes",
+   "notreNom": "Merveilles Secrètes",
+   "communs": 122,
+   "compares": 124,
+   "cartesRelevees": 124
+  },
+  "PFL": {
+   "notre": "me02",
+   "leurNom": "Flammes Fantasmagoriques",
+   "notreNom": "Flammes Fantasmagoriques",
+   "communs": 122,
+   "compares": 122,
+   "cartesRelevees": 122
+  },
+  "PLS": {
+   "notre": "bw8",
+   "leurNom": "Tempête Plasma",
+   "notreNom": "Tempète Plasma",
+   "communs": 122,
+   "compares": 122,
+   "cartesRelevees": 122
+  },
+  "DP": {
+   "notre": "dp1",
+   "leurNom": "Diamant & Perle",
+   "notreNom": "Diamant & Perle",
+   "communs": 119,
+   "compares": 122,
+   "cartesRelevees": 122
+  },
+  "DRX": {
+   "notre": "bw6",
+   "leurNom": "Dragons Exaltés",
+   "notreNom": "Dragons Éxaltés",
+   "communs": 118,
+   "compares": 120,
+   "cartesRelevees": 120
+  },
+  "FAC": {
+   "notre": "xy10",
+   "leurNom": "Impact des Destins",
+   "notreNom": "Impact des Destins",
+   "communs": 116,
+   "compares": 117,
+   "cartesRelevees": 117
+  },
+  "POR": {
+   "notre": "me03",
+   "leurNom": "Équilibre Parfait",
+   "notreNom": "Équilibre Parfait",
+   "communs": 113,
+   "compares": 116,
+   "cartesRelevees": 116
+  },
+  "SM04": {
+   "notre": "sm4",
+   "leurNom": "Invasion Carmin",
+   "notreNom": "Invasion Carmin",
+   "communs": 116,
+   "compares": 116,
+   "cartesRelevees": 116
+  },
+  "HGSS": {
+   "notre": "hgss1",
+   "leurNom": "HeartGold SoulSilver",
+   "notreNom": "HeartGold SoulSilver",
+   "communs": 107,
+   "compares": 115,
+   "cartesRelevees": 116
+  },
+  "MT": {
+   "notre": "dp2",
+   "leurNom": "Diamant & Perle : Trésors Mystérieux",
+   "notreNom": "Trésors Mystérieux",
+   "communs": 111,
+   "compares": 116,
+   "cartesRelevees": 116
+  },
+  "BKP": {
+   "notre": "xy9",
+   "leurNom": "Rupture Turbo",
+   "notreNom": "Rupture Turbo",
+   "communs": 115,
+   "compares": 115,
+   "cartesRelevees": 115
+  },
+  "CRI": {
+   "notre": "me04",
+   "leurNom": "Chaos Ascendant",
+   "notreNom": "Chaos Ascendant",
+   "communs": 112,
+   "compares": 114,
+   "cartesRelevees": 114
+  },
+  "PHF": {
+   "notre": "xy4",
+   "leurNom": "Vigueur Spectrale",
+   "notreNom": "Vigueur Spectrale",
+   "communs": 114,
+   "compares": 114,
+   "cartesRelevees": 114
+  },
+  "PLF": {
+   "notre": "bw9",
+   "leurNom": "Glaciation Plasma",
+   "notreNom": "Glaciation Plasma",
+   "communs": 114,
+   "compares": 114,
+   "cartesRelevees": 114
+  },
+  "PBL": {
+   "notre": "me05",
+   "leurNom": "Nuit Noire",
+   "notreNom": "Nuit Noire",
+   "communs": 110,
+   "compares": 112,
+   "cartesRelevees": 112
+  },
+  "STS": {
+   "notre": "xy11",
+   "leurNom": "Offensive Vapeur",
+   "notreNom": "Offensive Vapeur",
+   "communs": 108,
+   "compares": 108,
+   "cartesRelevees": 108
+  },
+  "RFVF": {
+   "notre": "ex6",
+   "leurNom": "EX : Rouge Feu & Vert Feuille",
+   "notreNom": "EX Rouge Feu & Vert Feuille",
+   "communs": 105,
+   "compares": 108,
+   "cartesRelevees": 108
+  },
+  "GNR": {
+   "notre": "g1",
+   "leurNom": "Générations",
+   "notreNom": "Générations",
+   "communs": 66,
+   "compares": 75,
+   "cartesRelevees": 107
+  },
+  "BLW": {
+   "notre": "bw1",
+   "leurNom": "Noir & Blanc",
+   "notreNom": "Noir & Blanc",
+   "communs": 107,
+   "compares": 107,
+   "cartesRelevees": 107
+  },
+  "EVO": {
+   "notre": "xy12",
+   "leurNom": "Évolutions",
+   "notreNom": "Évolutions",
+   "communs": 104,
+   "compares": 105,
+   "cartesRelevees": 105
+  },
+  "FFI": {
+   "notre": "xy3",
+   "leurNom": "Poings Furieux",
+   "notreNom": "Poings Furieux",
+   "communs": 105,
+   "compares": 105,
+   "cartesRelevees": 105
+  },
+  "N4": {
+   "notre": "neo4",
+   "leurNom": "Neo Destiny",
+   "notreNom": "Neo Destiny",
+   "communs": 104,
+   "compares": 105,
+   "cartesRelevees": 105
+  },
+  "DEX": {
+   "notre": "bw5",
+   "leurNom": "Explorateurs Obscurs",
+   "notreNom": "Explorateurs Obscurs",
+   "communs": 103,
+   "compares": 103,
+   "cartesRelevees": 103
+  },
+  "NG": {
+   "notre": "neo1",
+   "leurNom": "Neo Genesis",
+   "notreNom": "Neo Genesis",
+   "communs": 102,
+   "compares": 103,
+   "cartesRelevees": 103
+  },
+  "ROS": {
+   "notre": "xy6",
+   "leurNom": "Ciel Rugissant",
+   "notreNom": "Ciel Rugissant",
+   "communs": 102,
+   "compares": 102,
+   "cartesRelevees": 102
+  },
+  "RS": {
+   "notre": "ex1",
+   "leurNom": "EX : Rubis & Saphir",
+   "notreNom": "EX Rubis & Saphir",
+   "communs": 101,
+   "compares": 101,
+   "cartesRelevees": 101
+  },
+  "PK": {
+   "notre": "ex16",
+   "leurNom": "EX : Gardiens du Pouvoir",
+   "notreNom": "EX Gardiens du Pouvoir",
+   "communs": 94,
+   "compares": 100,
+   "cartesRelevees": 100
+  },
+  "DX": {
+   "notre": "ex8",
+   "leurNom": "EX : Deoxys",
+   "notreNom": "EX Deoxys",
+   "communs": 96,
+   "compares": 100,
+   "cartesRelevees": 100
+  },
+  "EM": {
+   "notre": "ex9",
+   "leurNom": "EX : Émeraude",
+   "notreNom": "EX Émeraude",
+   "communs": 99,
+   "compares": 99,
+   "cartesRelevees": 99
+  },
+  "FLF": {
+   "notre": "xy2",
+   "leurNom": "Étincelles",
+   "notreNom": "Étincelles",
+   "communs": 98,
+   "compares": 98,
+   "cartesRelevees": 98
+  },
+  "CL": {
+   "notre": "col1",
+   "leurNom": "L'appel des légendes",
+   "notreNom": "L'appel des Légendes",
+   "communs": 86,
+   "compares": 87,
+   "cartesRelevees": 98
+  },
+  "SF": {
+   "notre": "dp7",
+   "leurNom": "Diamant & Perle : Tempête",
+   "notreNom": "Tempête",
+   "communs": 90,
+   "compares": 95,
+   "cartesRelevees": 98
+  },
+  "GE": {
+   "notre": "dp4",
+   "leurNom": "Diamant & Perle : Duels au Sommet",
+   "notreNom": "Duels au Sommets",
+   "communs": 94,
+   "compares": 98,
+   "cartesRelevees": 98
+  },
+  "PLB": {
+   "notre": "bw10",
+   "leurNom": "Explosion Plasma",
+   "notreNom": "Explosion Plasma",
+   "communs": 97,
+   "compares": 97,
+   "cartesRelevees": 97
+  },
+  "NXD": {
+   "notre": "bw4",
+   "leurNom": "Destinées Futures",
+   "notreNom": "Destinées Futures",
+   "communs": 95,
+   "compares": 95,
+   "cartesRelevees": 95
+  },
+  "TM": {
+   "notre": "hgss4",
+   "leurNom": "HS : Triomphe",
+   "notreNom": "Triomphant",
+   "communs": 94,
+   "compares": 94,
+   "cartesRelevees": 95
+  },
+  "NVI": {
+   "notre": "bw3",
+   "leurNom": "Nobles Victoires",
+   "notreNom": "Nobles Victoires",
+   "communs": 94,
+   "compares": 94,
+   "cartesRelevees": 94
+  },
+  "HL": {
+   "notre": "ex5",
+   "leurNom": "EX : Légendes Oubliées",
+   "notreNom": "EX Légendes Oubliées",
+   "communs": 94,
+   "compares": 94,
+   "cartesRelevees": 94
+  },
+  "BS": {
+   "notre": "base1",
+   "leurNom": "Set de base",
+   "notreNom": "Set de Base",
+   "communs": 93,
+   "compares": 94,
+   "cartesRelevees": 94
+  },
+  "AOR": {
+   "notre": "xy7",
+   "leurNom": "Origines Antiques",
+   "notreNom": "Origines Antiques",
+   "communs": 92,
+   "compares": 92,
+   "cartesRelevees": 92
+  },
+  "MD": {
+   "notre": "dp5",
+   "leurNom": "Diamant & Perle : Aube Majestueuse",
+   "notreNom": "Aube Majestueuse",
+   "communs": 88,
+   "compares": 92,
+   "cartesRelevees": 92
+  },
+  "CG": {
+   "notre": "ex14",
+   "leurNom": "EX : Gardiens de Cristal",
+   "notreNom": "EX Gardiens de Cristal",
+   "communs": 78,
+   "compares": 92,
+   "cartesRelevees": 92
+  },
+  "DR": {
+   "notre": "ex3",
+   "leurNom": "EX : Dragon",
+   "notreNom": "EX Dragon",
+   "communs": 91,
+   "compares": 92,
+   "cartesRelevees": 92
+  },
+  "SS": {
+   "notre": "ex2",
+   "leurNom": "EX : Tempête de Sable",
+   "notreNom": "EX Tempête de sable",
+   "communs": 92,
+   "compares": 92,
+   "cartesRelevees": 92
+  },
+  "SFA": {
+   "notre": "sv06.5",
+   "leurNom": "Fable Nébuleuse",
+   "notreNom": "Fable Nébuleuse",
+   "communs": 88,
+   "compares": 91,
+   "cartesRelevees": 91
+  },
+  "EPO": {
+   "notre": "bw2",
+   "leurNom": "Pouvoirs Émergents",
+   "notreNom": "Pouvoirs Émergents",
+   "communs": 90,
+   "compares": 90,
+   "cartesRelevees": 90
+  },
+  "TMTA": {
+   "notre": "ex4",
+   "leurNom": "EX : Team Magma VS Team Aqua",
+   "notreNom": "EX Team Magma vs Team Aqua",
+   "communs": 88,
+   "compares": 89,
+   "cartesRelevees": 89
+  },
+  "UL": {
+   "notre": "hgss2",
+   "leurNom": "HS : Déchaînement",
+   "notreNom": "Déchaînement",
+   "communs": 81,
+   "compares": 87,
+   "cartesRelevees": 88
+  },
+  "LM": {
+   "notre": "ex12",
+   "leurNom": "EX : Créateurs de Légendes",
+   "notreNom": "EX Créateurs de légendes",
+   "communs": 81,
+   "compares": 85,
+   "cartesRelevees": 85
+  },
+  "UD": {
+   "notre": "hgss3",
+   "leurNom": "HS : Indomptable",
+   "notreNom": "Indomptable",
+   "communs": 81,
+   "compares": 82,
+   "cartesRelevees": 83
+  },
+  "PGO": {
+   "notre": "swsh10.5",
+   "leurNom": "Pokémon GO",
+   "notreNom": "Pokémon GO",
+   "communs": 78,
+   "compares": 80,
+   "cartesRelevees": 80
+  },
+  "TR": {
+   "notre": "base5",
+   "leurNom": "Team Rocket",
+   "notreNom": "Team Rocket",
+   "communs": 72,
+   "compares": 75,
+   "cartesRelevees": 75
+  },
+  "SWSH35": {
+   "notre": "swsh3.5",
+   "leurNom": "La Voie du Maître",
+   "notreNom": "Champion's Path",
+   "communs": 72,
+   "compares": 72,
+   "cartesRelevees": 72
+  },
+  "SM75": {
+   "notre": "sm7.5",
+   "leurNom": "Majesté des Dragons",
+   "notreNom": "Majesté Des Dragons",
+   "communs": 68,
+   "compares": 70,
+   "cartesRelevees": 70
+  },
+  "SLE": {
+   "notre": "sm3.5",
+   "leurNom": "Légendes Brillantes",
+   "notreNom": "Légendes Brillantes",
+   "communs": 70,
+   "compares": 70,
+   "cartesRelevees": 70
+  },
+  "ND": {
+   "notre": "neo2",
+   "leurNom": "Neo Discovery",
+   "notreNom": "Neo Discovery",
+   "communs": 67,
+   "compares": 67,
+   "cartesRelevees": 67
+  },
+  "JU": {
+   "notre": "base2",
+   "leurNom": "Jungle",
+   "notreNom": "Jungle",
+   "communs": 61,
+   "compares": 64,
+   "cartesRelevees": 64
+  },
+  "FO": {
+   "notre": "base3",
+   "leurNom": "Fossile",
+   "notreNom": "Fossile",
+   "communs": 60,
+   "compares": 62,
+   "cartesRelevees": 62
+  },
+  "NR": {
+   "notre": "neo3",
+   "leurNom": "Neo Revelation",
+   "notreNom": "Neo Revelation",
+   "communs": 58,
+   "compares": 58,
+   "cartesRelevees": 58
+  },
+  "CEL": {
+   "notre": "cel25",
+   "leurNom": "Célébrations",
+   "notreNom": "Célébrations",
+   "communs": 25,
+   "compares": 25,
+   "cartesRelevees": 50
+  },
+  "PRNI": {
+   "notre": "np",
+   "leurNom": "Black Star Nintendo",
+   "notreNom": "Promo Nintendo",
+   "communs": 31,
+   "compares": 40,
+   "cartesRelevees": 40
+  },
+  "MC9": {
+   "notre": "2019sm-fr",
+   "leurNom": "Promo McDonald's 2019",
+   "notreNom": "Collection McDonald's 2019",
+   "communs": 40,
+   "compares": 40,
+   "cartesRelevees": 40
+  },
+  "KSS": {
+   "notre": "xy0",
+   "leurNom": "Bienvenue à Kalos",
+   "notreNom": "Bienvenue à Kalos",
+   "communs": 39,
+   "compares": 39,
+   "cartesRelevees": 39
+  },
+  "TK9-S": {
+   "notre": "tk-xy-su",
+   "leurNom": "XY Trainer Kit (Suicune)",
+   "notreNom": "XY Kit du dresseur (Suicune)",
+   "communs": 30,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "TK9-P": {
+   "notre": "tk-xy-p",
+   "leurNom": "XY Trainer Kit (Pikachu Catcheur)",
+   "notreNom": "XY Kit du dresseur (Pikachu Libre)",
+   "communs": 30,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "TK8-LO": {
+   "notre": "tk-xy-latio",
+   "leurNom": "XY Trainer Kit (Latios)",
+   "notreNom": "XY Kit du dresseur (Latios)",
+   "communs": 30,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "TK8-LA": {
+   "notre": "tk-xy-latia",
+   "leurNom": "XY Trainer Kit (Latias)",
+   "notreNom": "XY Kit du dresseur (Latias)",
+   "communs": 30,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "TK7-G": {
+   "notre": "tk-xy-w",
+   "leurNom": "XY Trainer Kit (Grodoudou)",
+   "notreNom": "XY Kit du dresseur (Grodoudou)",
+   "communs": 30,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "TK7-S": {
+   "notre": "tk-xy-b",
+   "leurNom": "XY Trainer Kit (Scalproie)",
+   "notreNom": "XY Kit du dresseur (Scalproie)",
+   "communs": 30,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "TK6-B": {
+   "notre": "tk-xy-n",
+   "leurNom": "XY Kit du Dresseur (Bruyverne)",
+   "notreNom": "XY Kit du dresseur (Bruyverne)",
+   "communs": 30,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "TK6-N": {
+   "notre": "tk-xy-sy",
+   "leurNom": "XY Kit du Dresseur (Nymphali)",
+   "notreNom": "XY Kit du dresseur (Nymphali)",
+   "communs": 30,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "TK5-M": {
+   "notre": "tk-bw-e",
+   "leurNom": "N&B Kit du Dresseur (Minotaupe)",
+   "notreNom": "BW Kit du dresseur (Minitaupe)",
+   "communs": 30,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "TK5-Z": {
+   "notre": "tk-bw-z",
+   "leurNom": "N&B Kit du Dresseur (Zoroark)",
+   "notreNom": "BW Kit du dresseur (Zoroark)",
+   "communs": 30,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "TK4-L": {
+   "notre": "tk-hs-g",
+   "leurNom": "HS Kit du Dresseur (Léviator)",
+   "notreNom": "HS Kit du dresseur (Léviator)",
+   "communs": 29,
+   "compares": 30,
+   "cartesRelevees": 30
+  },
+  "MC10US": {
+   "notre": "2021swsh",
+   "leurNom": "Promo McDonald's 2021",
+   "notreNom": "Collection McDonald's 2021",
+   "communs": 24,
+   "compares": 25,
+   "cartesRelevees": 25
+  },
+  "DRV": {
+   "notre": "dv1",
+   "leurNom": "Coffre des Dragons",
+   "notreNom": "Coffre des Dragons",
+   "communs": 21,
+   "compares": 21,
+   "cartesRelevees": 21
+  },
+  "DPK": {
+   "notre": "det1",
+   "leurNom": "Détective Pikachu",
+   "notreNom": "Détective Pikachu",
+   "communs": 18,
+   "compares": 18,
+   "cartesRelevees": 18
+  },
+  "POP9": {
+   "notre": "pop9",
+   "leurNom": "POP 9",
+   "notreNom": "POP Série 9",
+   "communs": 17,
+   "compares": 17,
+   "cartesRelevees": 17
+  },
+  "POP7": {
+   "notre": "pop7",
+   "leurNom": "POP 7",
+   "notreNom": "POP Série 7",
+   "communs": 17,
+   "compares": 17,
+   "cartesRelevees": 17
+  },
+  "POP6": {
+   "notre": "pop6",
+   "leurNom": "POP 6",
+   "notreNom": "POP Series 6",
+   "communs": 17,
+   "compares": 17,
+   "cartesRelevees": 17
+  },
+  "POP4": {
+   "notre": "pop4",
+   "leurNom": "POP 4",
+   "notreNom": "POP Série 4",
+   "communs": 14,
+   "compares": 17,
+   "cartesRelevees": 17
+  },
+  "POP3": {
+   "notre": "pop3",
+   "leurNom": "POP 3",
+   "notreNom": "POP Série 3",
+   "communs": 16,
+   "compares": 17,
+   "cartesRelevees": 17
+  },
+  "POP2": {
+   "notre": "pop2",
+   "leurNom": "POP 2",
+   "notreNom": "POP Série 2",
+   "communs": 17,
+   "compares": 17,
+   "cartesRelevees": 17
+  },
+  "POP1": {
+   "notre": "pop1",
+   "leurNom": "POP 1",
+   "notreNom": "POP Série 1",
+   "communs": 17,
+   "compares": 17,
+   "cartesRelevees": 17
+  },
+  "M24": {
+   "notre": "2024sv",
+   "leurNom": "Promo McDonald's 2024",
+   "notreNom": "Collection McDonald's 2024",
+   "communs": 15,
+   "compares": 15,
+   "cartesRelevees": 15
+  },
+  "M23": {
+   "notre": "2023sv",
+   "leurNom": "Promo McDonald's 2023",
+   "notreNom": "Collection McDonald's 2023",
+   "communs": 15,
+   "compares": 15,
+   "cartesRelevees": 15
+  },
+  "MC11US": {
+   "notre": "2022swsh",
+   "leurNom": "Promo McDonald's 2022",
+   "notreNom": "Collection McDonald's 2022",
+   "communs": 15,
+   "compares": 15,
+   "cartesRelevees": 15
+  },
+  "TK3-M": {
+   "notre": "tk-dp-m",
+   "leurNom": "D&P Kit Dresseur (Manaphy)",
+   "notreNom": "DP Kit dresseur (Manaphy)",
+   "communs": 12,
+   "compares": 12,
+   "cartesRelevees": 12
+  },
+  "TK2-P": {
+   "notre": "tk-ex-p",
+   "leurNom": "EX Kit Dresseur (Posipi)",
+   "notreNom": "EX Kit dresseur (Positi)",
+   "communs": 12,
+   "compares": 12,
+   "cartesRelevees": 12
+  },
+  "TK2-N": {
+   "notre": "tk-ex-m",
+   "leurNom": "EX Kit Dresseur (Negapi)",
+   "notreNom": "EX Kit dresseur (Négapi)",
+   "communs": 12,
+   "compares": 12,
+   "cartesRelevees": 12
+  },
+  "MC7": {
+   "notre": "2017sm",
+   "leurNom": "Promo McDonald's 2017",
+   "notreNom": "Collection McDonald's 2017",
+   "communs": 12,
+   "compares": 12,
+   "cartesRelevees": 12
+  },
+  "MC5": {
+   "notre": "2015xy",
+   "leurNom": "Promo McDonald's 2015",
+   "notreNom": "Collection McDonald's 2015",
+   "communs": 12,
+   "compares": 12,
+   "cartesRelevees": 12
+  },
+  "MC4": {
+   "notre": "2014xy",
+   "leurNom": "Promo McDonald's 2014",
+   "notreNom": "Collection McDonald's 2014",
+   "communs": 12,
+   "compares": 12,
+   "cartesRelevees": 12
+  },
+  "MC3": {
+   "notre": "2013bw",
+   "leurNom": "Promo McDonald's 2013",
+   "notreNom": "Collection McDonald's 2013",
+   "communs": 12,
+   "compares": 12,
+   "cartesRelevees": 12
+  },
+  "TK3-L": {
+   "notre": "tk-dp-l",
+   "leurNom": "D&P Kit Dresseur (Lucario)",
+   "notreNom": "DP Kit dresseur (Lucario)",
+   "communs": 10,
+   "compares": 11,
+   "cartesRelevees": 11
+  },
+  "TK1-LO": {
+   "notre": "tk-ex-latio",
+   "leurNom": "EX Kit Dresseur (Latios)",
+   "notreNom": "EX Kit dresseur (Latios)",
+   "communs": 10,
+   "compares": 10,
+   "cartesRelevees": 10
+  },
+  "TK1-LA": {
+   "notre": "tk-ex-latia",
+   "leurNom": "EX Kit Dresseur (Latias)",
+   "notreNom": "EX Kit dresseur (Latias)",
+   "communs": 10,
+   "compares": 10,
+   "cartesRelevees": 10
+  }
+ },
+ "douteux": [
+  {
+   "code": "JUMBO",
+   "leurNom": "Jumbo",
+   "cartesRelevees": 374,
+   "pistes": [
+    "2024sv (2/15)",
+    "tk-hs-r (1/28)",
+    "30th-c (1/28)"
+   ]
+  },
+  {
+   "code": "PRZP",
+   "leurNom": "Pack Récompense",
+   "cartesRelevees": 184,
+   "pistes": [
+    "ecard1 (1/35)",
+    "me01 (1/43)"
+   ]
+  },
+  {
+   "code": "AQ",
+   "leurNom": "Aquapolis",
+   "cartesRelevees": 170,
+   "pistes": [
+    "ecard2 (42/130)",
+    "neo3 (2/58)",
+    "pop7 (1/17)"
+   ]
+  },
+  {
+   "code": "SK",
+   "leurNom": "Skyridge",
+   "cartesRelevees": 166,
+   "pistes": [
+    "ecard3 (27/134)",
+    "ex12 (2/85)",
+    "neo1 (2/96)"
+   ]
+  },
+  {
+   "code": "LMN6",
+   "leurNom": "Lamincards 2006",
+   "cartesRelevees": 134,
+   "pistes": [
+    "ex1 (3/96)",
+    "swsh3 (3/134)",
+    "ex9 (1/96)"
+   ]
+  },
+  {
+   "code": "LTR",
+   "leurNom": "Legendary Treasures",
+   "cartesRelevees": 124,
+   "pistes": [
+    "bw11 (29/99)",
+    "sm8 (3/124)",
+    "swsh6 (3/124)"
+   ]
+  },
+  {
+   "code": "GC",
+   "leurNom": "Gym Challenge",
+   "cartesRelevees": 124,
+   "pistes": [
+    "gym2 (5/124)"
+   ]
+  },
+  {
+   "code": "GH",
+   "leurNom": "Gym Heroes",
+   "cartesRelevees": 124,
+   "pistes": [
+    "gym1 (2/124)"
+   ]
+  },
+  {
+   "code": "BS2",
+   "leurNom": "Base Set 2",
+   "cartesRelevees": 122,
+   "pistes": [
+    "base4 (28/122)",
+    "base1 (7/94)",
+    "lc (5/102)"
+   ]
+  },
+  {
+   "code": "RR",
+   "leurNom": "Platine : Rivaux Émergeants",
+   "cartesRelevees": 112,
+   "pistes": [
+    "pl2 (22/106)",
+    "ex6 (2/108)",
+    "tk-ex-m (1/12)"
+   ]
+  },
+  {
+   "code": "DS",
+   "leurNom": "EX : Espèces Delta",
+   "cartesRelevees": 106,
+   "pistes": [
+    "ex11 (64/106)",
+    "ex6 (3/106)",
+    "hgss1 (3/106)"
+   ]
+  },
+  {
+   "code": "AR",
+   "leurNom": "Platine : Arceus",
+   "cartesRelevees": 103,
+   "pistes": [
+    "pl4 (17/91)",
+    "ex8 (2/100)",
+    "2024sv (1/15)"
+   ]
+  },
+  {
+   "code": "HP",
+   "leurNom": "EX : Fantômes Holon",
+   "cartesRelevees": 103,
+   "pistes": [
+    "ex13 (51/103)",
+    "bw1 (6/103)",
+    "col1 (2/87)"
+   ]
+  },
+  {
+   "code": "TRR",
+   "leurNom": "EX : Team Rocket Returns",
+   "cartesRelevees": 103,
+   "pistes": [
+    "ex7 (12/103)",
+    "dp7 (5/95)",
+    "neo1 (4/103)"
+   ]
+  },
+  {
+   "code": "WC09",
+   "leurNom": "World Championships 2009",
+   "cartesRelevees": 103,
+   "pistes": [
+    "pop4 (1/17)",
+    "det1 (1/19)",
+    "tk-bw-e (1/30)"
+   ]
+  },
+  {
+   "code": "LC",
+   "leurNom": "Legendary Collection",
+   "cartesRelevees": 102,
+   "pistes": [
+    "lc (24/102)",
+    "base4 (5/102)",
+    "g1 (2/75)"
+   ]
+  },
+  {
+   "code": "WC10",
+   "leurNom": "World Championships 2010",
+   "cartesRelevees": 101,
+   "pistes": [
+    "tk-xy-p (1/30)",
+    "dp4 (1/98)",
+    "bw5 (1/101)"
+   ]
+  },
+  {
+   "code": "WC25",
+   "leurNom": "World Championships 2025",
+   "cartesRelevees": 99,
+   "pistes": [
+    "dp4 (1/98)",
+    "ex11 (1/99)",
+    "ex16 (1/99)"
+   ]
+  },
+  {
+   "code": "WC23",
+   "leurNom": "World Championships 2023",
+   "cartesRelevees": 97,
+   "pistes": [
+    "ex9 (3/97)",
+    "2018sm-fr (1/32)"
+   ]
+  },
+  {
+   "code": "WC22",
+   "leurNom": "World Championships 2022",
+   "cartesRelevees": 96,
+   "pistes": [
+    "tk-hs-r (1/30)",
+    "bw5 (1/96)"
+   ]
+  },
+  {
+   "code": "DF",
+   "leurNom": "EX : Île des Dragons",
+   "cartesRelevees": 93,
+   "pistes": [
+    "ex15 (19/93)",
+    "hgss2 (1/87)",
+    "swsh10 (1/93)"
+   ]
+  },
+  {
+   "code": "WC07",
+   "leurNom": "World Championships 2007",
+   "cartesRelevees": 93,
+   "pistes": [
+    "tk-hs-r (2/30)",
+    "ex11 (1/93)"
+   ]
+  },
+  {
+   "code": "WC14",
+   "leurNom": "World Championships 2014",
+   "cartesRelevees": 91,
+   "pistes": [
+    "sm3.5 (1/70)",
+    "base1 (1/91)",
+    "ex13 (1/91)"
+   ]
+  },
+  {
+   "code": "WC24",
+   "leurNom": "World Championships 2024",
+   "cartesRelevees": 90,
+   "pistes": [
+    "tk-bw-z (1/30)"
+   ]
+  },
+  {
+   "code": "WC17",
+   "leurNom": "World Championships 2017",
+   "cartesRelevees": 88,
+   "pistes": [
+    "xy6 (1/88)",
+    "xy8 (1/88)"
+   ]
+  },
+  {
+   "code": "WC04",
+   "leurNom": "World Championships 2004",
+   "cartesRelevees": 88,
+   "pistes": [
+    "tk-xy-n (1/30)",
+    "tk-xy-latia (1/30)",
+    "ecard2 (1/85)"
+   ]
+  },
+  {
+   "code": "WC08",
+   "leurNom": "World Championships 2008",
+   "cartesRelevees": 87,
+   "pistes": [
+    "sve (1/24)",
+    "tk-xy-latio (1/30)",
+    "swsh10.5 (1/80)"
+   ]
+  },
+  {
+   "code": "WC06",
+   "leurNom": "World Championships 2006",
+   "cartesRelevees": 87,
+   "pistes": [
+    "xy2 (3/87)",
+    "tk-ex-p (1/12)",
+    "ex11 (1/87)"
+   ]
+  },
+  {
+   "code": "WC18",
+   "leurNom": "World Championships 2018",
+   "cartesRelevees": 86,
+   "pistes": [
+    "tk-xy-latia (1/30)",
+    "col1 (1/86)",
+    "sm2 (1/86)"
+   ]
+  },
+  {
+   "code": "WC15",
+   "leurNom": "World Championships 2015",
+   "cartesRelevees": 86,
+   "pistes": [
+    "tk-xy-n (1/30)",
+    "np (1/32)",
+    "neo3 (1/58)"
+   ]
+  },
+  {
+   "code": "WC16",
+   "leurNom": "World Championships 2016",
+   "cartesRelevees": 85,
+   "pistes": [
+    "swsh4.5 (1/65)",
+    "sm3.5 (1/70)",
+    "swsh10.5 (1/80)"
+   ]
+  },
+  {
+   "code": "WC19",
+   "leurNom": "World Championships 2019",
+   "cartesRelevees": 84,
+   "pistes": [
+    "tk-xy-latia (1/30)",
+    "basep (1/45)",
+    "xy10 (1/84)"
+   ]
+  },
+  {
+   "code": "WC11",
+   "leurNom": "World Championships 2011",
+   "cartesRelevees": 82,
+   "pistes": [
+    "ex13 (1/82)",
+    "dp1 (1/82)",
+    "hgss4 (1/82)"
+   ]
+  },
+  {
+   "code": "WC05",
+   "leurNom": "World Championships 2005",
+   "cartesRelevees": 81,
+   "pistes": [
+    "ex9 (2/81)",
+    "ex2 (1/81)",
+    "ex16 (1/81)"
+   ]
+  },
+  {
+   "code": "WC13",
+   "leurNom": "World Championships 2013",
+   "cartesRelevees": 80,
+   "pistes": [
+    "sv10.5w (1/80)"
+   ]
+  },
+  {
+   "code": "WC12",
+   "leurNom": "World Championships 2012",
+   "cartesRelevees": 80,
+   "pistes": [
+    "sve (1/24)",
+    "tk-bw-e (1/30)",
+    "ex10 (1/80)"
+   ]
+  },
+  {
+   "code": "ADC3-P",
+   "leurNom": "Académie de Combat 2024 (Deck Pikachu)",
+   "cartesRelevees": 60,
+   "pistes": [
+    "tk-bw-e (1/30)",
+    "tk-xy-n (1/30)",
+    "tk-xy-w (1/30)"
+   ]
+  },
+  {
+   "code": "ADC3-C",
+   "leurNom": "Académie de Combat 2024 (Deck Carmadura)",
+   "cartesRelevees": 60,
+   "pistes": [
+    "neo2 (2/60)",
+    "mee (1/16)",
+    "tk-xy-b (1/30)"
+   ]
+  },
+  {
+   "code": "ADC2-P",
+   "leurNom": "Académie de Combat 2022 (Deck Pikachu)",
+   "cartesRelevees": 60,
+   "pistes": [
+    "tk-hs-r (5/30)",
+    "tk-xy-p (5/30)",
+    "tk-ex-latio (1/10)"
+   ]
+  },
+  {
+   "code": "ADC2-C",
+   "leurNom": "Académie de Combat 2022 (Deck Pyrobut)",
+   "cartesRelevees": 60,
+   "pistes": [
+    "sve (2/24)",
+    "tk-ex-latia (1/10)",
+    "tk-ex-m (1/12)"
+   ]
+  },
+  {
+   "code": "ADC-P",
+   "leurNom": "Académie de Combat (Deck Pikachu)",
+   "cartesRelevees": 60,
+   "pistes": [
+    "tk-hs-r (7/30)",
+    "tk-xy-p (6/30)",
+    "tk-ex-latio (1/10)"
+   ]
+  },
+  {
+   "code": "ADC-D",
+   "leurNom": "Académie de Combat (Deck Dracaufeu)",
+   "cartesRelevees": 60,
+   "pistes": [
+    "sve (2/24)",
+    "sm7.5 (2/60)",
+    "tk-ex-latia (1/10)"
+   ]
+  },
+  {
+   "code": "PRWC",
+   "leurNom": "Promo Black Star Wizards Of The Coast",
+   "cartesRelevees": 53,
+   "pistes": [
+    "basep (35/53)",
+    "det1 (2/19)",
+    "swsh9 (2/53)"
+   ]
+  },
+  {
+   "code": "MFB23",
+   "leurNom": "Mon Premier Combat",
+   "cartesRelevees": 48,
+   "pistes": [
+    "sv03 (4/48)",
+    "mfb (2/34)",
+    "sm3 (2/48)"
+   ]
+  },
+  {
+   "code": "DCR",
+   "leurNom": "Double Danger",
+   "cartesRelevees": 34,
+   "pistes": [
+    "dc1 (16/34)"
+   ]
+  },
+  {
+   "code": "CLB",
+   "leurNom": "TCG Classic Blastoise & Suicune",
+   "cartesRelevees": 34,
+   "pistes": [
+    "tk-hs-g (2/30)",
+    "2015xy (1/12)",
+    "tk-xy-n (1/30)"
+   ]
+  },
+  {
+   "code": "CLC",
+   "leurNom": "TCG Classic Charizard & Ho-Oh",
+   "cartesRelevees": 34,
+   "pistes": [
+    "sm7.5 (3/34)",
+    "tk-xy-n (2/30)",
+    "tk-hs-g (1/30)"
+   ]
+  },
+  {
+   "code": "CLV",
+   "leurNom": "TCG Classic Venusaur & Lugia",
+   "cartesRelevees": 34,
+   "pistes": [
+    "bw5 (3/34)",
+    "sm3.5 (3/34)",
+    "swsh10.5 (3/34)"
+   ]
+  },
+  {
+   "code": "TOT24",
+   "leurNom": "Trick or Trade 2024",
+   "cartesRelevees": 30,
+   "pistes": [
+    "pop5 (1/17)",
+    "np (1/30)"
+   ]
+  },
+  {
+   "code": "TOT23",
+   "leurNom": "Trick or Trade 2023",
+   "cartesRelevees": 30,
+   "pistes": [
+    "ex10 (1/30)",
+    "sv06.5 (1/30)"
+   ]
+  },
+  {
+   "code": "TOT22",
+   "leurNom": "Trick or Trade 2022",
+   "cartesRelevees": 30,
+   "pistes": [
+    "tk-ex-latio (1/10)",
+    "2015xy (1/12)",
+    "2023sv (1/15)"
+   ]
+  },
+  {
+   "code": "TK11-S",
+   "leurNom": "SL Kit du Dresseur (Sablaireau d'Alola)",
+   "cartesRelevees": 30,
+   "pistes": [
+    "tk-sm-l (5/18)",
+    "tk-hs-g (5/30)",
+    "tk-xy-b (4/30)"
+   ]
+  },
+  {
+   "code": "TK11-F",
+   "leurNom": "SL Kit du Dresseur (Feunard d'Alola)",
+   "cartesRelevees": 30,
+   "pistes": [
+    "tk-xy-latia (5/30)",
+    "tk-sm-r (5/30)",
+    "tk-sm-l (4/18)"
+   ]
+  },
+  {
+   "code": "TK10-R",
+   "leurNom": "SL Kit du Dresseur (Raichu d'Alola)",
+   "cartesRelevees": 30,
+   "pistes": [
+    "tk-sm-r (19/30)",
+    "tk-xy-p (6/30)",
+    "tk-hs-r (5/30)"
+   ]
+  },
+  {
+   "code": "TK10-L",
+   "leurNom": "SL Kit du Dresseur (Lougaroc)",
+   "cartesRelevees": 30,
+   "pistes": [
+    "tk-sm-l (18/18)",
+    "tk-bw-e (11/30)",
+    "tk-xy-latio (9/30)"
+   ]
+  },
+  {
+   "code": "TK4-R",
+   "leurNom": "HS Kit du Dresseur (Raichu)",
+   "cartesRelevees": 30,
+   "pistes": [
+    "30th (2/30)",
+    "ecard2 (1/29)",
+    "ex4 (1/30)"
+   ]
+  },
+  {
+   "code": "CP10",
+   "leurNom": "Calendrier Pokémon 2010",
+   "cartesRelevees": 24,
+   "pistes": [
+    "pop5 (1/17)",
+    "sm1 (1/24)",
+    "sm8 (1/24)"
+   ]
+  },
+  {
+   "code": "CP09",
+   "leurNom": "Calendrier Pokémon 2009",
+   "cartesRelevees": 24,
+   "pistes": [
+    "xy7 (1/24)",
+    "swsh6 (1/24)"
+   ]
+  },
+  {
+   "code": "ADC3-D",
+   "leurNom": "Académie de Combat 2024 (Deck Darkrai)",
+   "cartesRelevees": 19,
+   "pistes": [
+    "tk-dp-m (1/12)"
+   ]
+  },
+  {
+   "code": "SI",
+   "leurNom": "Southern Islands",
+   "cartesRelevees": 18,
+   "pistes": [
+    "si1 (5/18)",
+    "pop2 (1/17)",
+    "neo1 (1/18)"
+   ]
+  },
+  {
+   "code": "POP8",
+   "leurNom": "POP 8",
+   "cartesRelevees": 17,
+   "pistes": [
+    "pop8 (6/17)",
+    "pop6 (3/17)",
+    "pop9 (1/17)"
+   ]
+  },
+  {
+   "code": "POP5",
+   "leurNom": "POP 5",
+   "cartesRelevees": 17,
+   "pistes": [
+    "pop5 (7/17)",
+    "np (1/17)",
+    "cel25 (1/17)"
+   ]
+  },
+  {
+   "code": "ADC-M",
+   "leurNom": "Académie de Combat (Deck Mewtwo)",
+   "cartesRelevees": 17,
+   "pistes": [
+    "tk-xy-n (3/17)",
+    "tk-xy-latia (2/17)",
+    "hgss3 (1/17)"
+   ]
+  },
+  {
+   "code": "MEE",
+   "leurNom": "Énergies Méga-Évolution",
+   "cartesRelevees": 16,
+   "pistes": [
+    "mee (6/16)"
+   ]
+  },
+  {
+   "code": "RUM",
+   "leurNom": "Rumble set",
+   "cartesRelevees": 16,
+   "pistes": [
+    "ru1 (7/16)",
+    "2022swsh (1/15)",
+    "base1 (1/16)"
+   ]
+  },
+  {
+   "code": "UPC",
+   "leurNom": "Promos non numérotées",
+   "cartesRelevees": 14,
+   "pistes": [
+    "basep (1/14)",
+    "ecard2 (1/14)"
+   ]
+  },
+  {
+   "code": "BXT",
+   "leurNom": "Box Topper",
+   "cartesRelevees": 12,
+   "pistes": [
+    "base1 (1/12)",
+    "base4 (1/12)",
+    "lc (1/12)"
+   ]
+  },
+  {
+   "code": "MC9US",
+   "leurNom": "Promo McDonald's 2019 - USA",
+   "cartesRelevees": 12,
+   "pistes": [
+    "tk-sm-l (1/5)",
+    "tk-ex-latio (1/10)",
+    "2013bw (1/12)"
+   ]
+  },
+  {
+   "code": "MC8US",
+   "leurNom": "Promo McDonald's 2018 - USA",
+   "cartesRelevees": 12,
+   "pistes": [
+    "2018sm (2/12)",
+    "basep (1/12)"
+   ]
+  },
+  {
+   "code": "MC6",
+   "leurNom": "Promo McDonald's 2016",
+   "cartesRelevees": 12,
+   "pistes": [
+    "tk-ex-latio (1/10)",
+    "pop5 (1/12)",
+    "2013bw (1/12)"
+   ]
+  },
+  {
+   "code": "MC2",
+   "leurNom": "Promo McDonald's 2012",
+   "cartesRelevees": 12,
+   "pistes": [
+    "dv1 (1/12)",
+    "2013bw (1/12)",
+    "xy0 (1/12)"
+   ]
+  },
+  {
+   "code": "MC1",
+   "leurNom": "Promo McDonald's 2011",
+   "cartesRelevees": 12,
+   "pistes": [
+    "bw1 (1/12)",
+    "tk-bw-e (1/12)",
+    "sv10.5b (1/12)"
+   ]
+  },
+  {
+   "code": "ARTAC",
+   "leurNom": "Art Academy",
+   "cartesRelevees": 12,
+   "pistes": [
+    "ru1 (2/12)",
+    "basep (1/12)",
+    "ex12 (1/12)"
+   ]
+  },
+  {
+   "code": "PWC98",
+   "leurNom": "Pikachu World Collection 2000",
+   "cartesRelevees": 9,
+   "pistes": [
+    "ex5.5 (1/5)",
+    "basep (1/9)",
+    "tk-ex-latio (1/9)"
+   ]
+  },
+  {
+   "code": "PWC10",
+   "leurNom": "Pikachu World Collection 2010",
+   "cartesRelevees": 9,
+   "pistes": [
+    "basep (2/9)",
+    "ex5.5 (1/5)",
+    "tk-ex-latio (1/9)"
+   ]
+  },
+  {
+   "code": "CP25",
+   "leurNom": "Calendrier des Fêtes 2025",
+   "cartesRelevees": 8,
+   "pistes": [
+    "tk-hs-r (1/8)",
+    "2024sv (1/8)"
+   ]
+  },
+  {
+   "code": "CP24",
+   "leurNom": "Calendrier des Fêtes 2024",
+   "cartesRelevees": 8,
+   "pistes": [
+    "2023sv (1/8)"
+   ]
+  },
+  {
+   "code": "CP23",
+   "leurNom": "Calendrier des Fêtes 2023",
+   "cartesRelevees": 8,
+   "pistes": [
+    "ru1 (1/8)",
+    "2022swsh (1/8)"
+   ]
+  },
+  {
+   "code": "FUTSAL",
+   "leurNom": "Pokémon Futsal Collection",
+   "cartesRelevees": 5,
+   "pistes": [
+    "fut2020 (1/5)"
+   ]
+  },
+  {
+   "code": "PCP",
+   "leurNom": "Poké Card Creator Pack",
+   "cartesRelevees": 5,
+   "pistes": [
+    "2015xy (2/5)",
+    "ex5.5 (1/5)",
+    "2013bw (1/5)"
+   ]
+  }
+ ],
+ "orphelins": [
+  {
+   "code": "PRSWSH",
+   "leurNom": "Promos Épée et Bouclier",
+   "cartesRelevees": 283
+  },
+  {
+   "code": "PRSM",
+   "leurNom": "Promos Soleil et Lune",
+   "cartesRelevees": 232
+  },
+  {
+   "code": "SVP",
+   "leurNom": "Promos Écarlate et Violet",
+   "cartesRelevees": 209
+  },
+  {
+   "code": "PRXY",
+   "leurNom": "Promos X&Y",
+   "cartesRelevees": 195
+  },
+  {
+   "code": "MEP",
+   "leurNom": "Promos Méga-Évolution",
+   "cartesRelevees": 103
+  },
+  {
+   "code": "PRBW",
+   "leurNom": "Promos Black Star Noir & Blanc",
+   "cartesRelevees": 93
+  },
+  {
+   "code": "NRGY",
+   "leurNom": "Énergies",
+   "cartesRelevees": 88
+  },
+  {
+   "code": "PRAL",
+   "leurNom": "Promos Alternative",
+   "cartesRelevees": 71
+  },
+  {
+   "code": "PRDP",
+   "leurNom": "Promos Black Star DP",
+   "cartesRelevees": 56
+  },
+  {
+   "code": "PRHS",
+   "leurNom": "Promos Black Star HeartGold SoulSilver",
+   "cartesRelevees": 25
+  },
+  {
+   "code": "SVE",
+   "leurNom": "Énergies Écarlate et Violet",
+   "cartesRelevees": 24
+  },
+  {
+   "code": "ADC2-E",
+   "leurNom": "Académie de Combat 2022 (Deck Évoli)",
+   "cartesRelevees": 18
+  },
+  {
+   "code": "WBP",
+   "leurNom": "WOTC Best Promos",
+   "cartesRelevees": 9
+  },
+  {
+   "code": "CP22",
+   "leurNom": "Holiday Calendar 2022",
+   "cartesRelevees": 8
+  },
+  {
+   "code": "JFC",
+   "leurNom": "Premier Défi",
+   "cartesRelevees": 8
+  },
+  {
+   "code": "TPCI",
+   "leurNom": "TPCi Black Star Promo",
+   "cartesRelevees": 2
+  }
+ ]
+}
