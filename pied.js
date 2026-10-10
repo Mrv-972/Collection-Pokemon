@@ -177,7 +177,7 @@ const BULLE = {
   silenceApresFermeture: 30,   // en jours
   silenceApresClic: 90,        // en jours
   titre: 'Un coup de pouce ?',
-  pagesExclues: ['admin.html'], // inutile de se solliciter soi-même
+  pagesExclues: [],
 };
 
 const CLE_BULLE = 'pokeclasseur-bulle-soutien';

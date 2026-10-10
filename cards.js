@@ -174,9 +174,19 @@ function classeObtention(carteId){
   return typeof estObtenue === 'function' && !estObtenue(carteId) ? CLASSE_NON_OBTENUE : '';
 }
 
+// Une valeur posée dans un attribut HTML : un nom contenant un guillemet
+// (« Ho-Oh "brillant" ») fermerait l'attribut et casserait la vignette.
+const attrCarte = v => String(v ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
 function cardTile(c, subtitle){
+  // Les données de la carte voyagent avec sa vignette. L'environnement
+  // d'administration s'en sert pour préremplir sa fenêtre de modification
+  // sans qu'on ait à taper un identifiant. Rien de secret : tout cela est
+  // déjà affiché sur la vignette.
   return `
-    <div class="card-tile">
+    <div class="card-tile" data-carte="${attrCarte(c.id)}" data-local="${attrCarte(c.localId)}"
+         data-nom="${attrCarte(c.name)}" data-rarete="${attrCarte(c.rarity)}"
+         data-dex="${attrCarte(c.dexId)}">
       <div class="card-img-wrap">
         ${c.image
           ? `<img class="${classeObtention(c.id)}" src="${c.image}" alt="${c.name}" loading="lazy" data-card-id="${c.id}" data-haute="${c.imageHaute ?? c.image}" data-fallback="${c.imageSecours ?? `images/cards/${c.id}.png`}" onerror="cardImgFallback(this)">`

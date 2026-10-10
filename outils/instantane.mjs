@@ -758,7 +758,7 @@ async function absorberCorrections(lots){
   }
 
   console.log(`Corrections : ${lignes.length} lue(s) — ${visuels} visuel(s) copié(s), ${champs} champ(s) appliqué(s), ${ignorees} sans cible`);
-  console.log('  Elles restent dans Supabase : leur suppression se fait depuis admin.html, une fois marquées « absorbée ».');
+  console.log('  Elles restent dans Supabase : leur suppression se fait depuis le tiroir d\'administration (bouton « Corrections »), une fois marquées « absorbée ».');
 }
 
 // ------------------------- les extensions saisies à la main --------------

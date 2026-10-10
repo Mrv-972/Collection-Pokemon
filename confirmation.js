@@ -94,7 +94,9 @@ function demanderConfirmation({ titre, message, action, saisieAttendue = null, d
       resolve(reponse);
     }
     function auClavier(e){
-      if(e.key === 'Escape') fermer(false);
+      // Empêcher l'action par défaut d'Échap : posée au-dessus d'une fenêtre
+      // modale (le tiroir d'administration), elle la refermerait aussi.
+      if(e.key === 'Escape'){ e.preventDefault(); fermer(false); }
       // Entrée confirme : le bouton principal a le focus, mais on couvre
       // aussi le cas où il l'aurait perdu.
       if(e.key === 'Enter' && !e.target.classList?.contains('annuler') && !principal.disabled) fermer(true);
@@ -115,7 +117,11 @@ function demanderConfirmation({ titre, message, action, saisieAttendue = null, d
     voile.addEventListener('click', e => { if(e.target === voile) fermer(false); });
     document.addEventListener('keydown', auClavier);
 
-    document.body.appendChild(voile);
+    // Au-dessus d'une fenêtre modale ouverte, s'il y en a une, et pas au
+    // bas de la page : une fenêtre modale rend inerte tout ce qui est hors
+    // d'elle, et la confirmation y serait impossible à cliquer.
+    const modales = document.querySelectorAll('dialog[open]');
+    (modales[modales.length - 1] ?? document.body).appendChild(voile);
     requestAnimationFrame(() => {
       voile.classList.add('vue');
       (saisie ?? principal).focus();

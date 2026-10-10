@@ -1,7 +1,10 @@
-// Espace d'administration.
+// Les outils d'écriture de l'administration.
 //
-// Ce que cette page sait faire : remplacer le visuel d'une carte, corriger
-// une carte, en ajouter une, déclarer une extension. Tout passe par la table
+// Il n'y a plus de page d'administration : l'administrateur modifie le
+// catalogue en naviguant sur le site (admin-site.js), et retrouve comptes
+// et corrections dans un tiroir (admin-tiroir.js). Ce fichier-ci ne fait
+// que parler à la base : savoir si l'on est administrateur, déposer une
+// image, enregistrer ou retirer une correction. Tout passe par la table
 // « corrections », dont l'écriture est réservée à l'administrateur par les
 // règles de la base.
 //
@@ -15,8 +18,8 @@
 
 let dbAdmin = null;
 let jeSuisAdmin = false;
-// La page d'administration et le lien du menu posent la même question. On la
-// garde en mémoire pour n'interroger la base qu'une fois.
+// Plusieurs éléments d'une même page posent la même question. On la garde
+// en mémoire pour n'interroger la base qu'une fois.
 let verificationEnCours = null;
 
 async function clientAdmin(){
@@ -124,42 +127,4 @@ async function correctionAbsorbee(c){
   }catch(err){
     return false;
   }
-}
-
-// ------------------------------------------------ le lien de navigation --
-//
-// Le lien n'apparaît que pour un administrateur. C'est du confort, pas de la
-// sécurité : le masquer n'empêche personne d'ouvrir admin.html, et c'est
-// très bien ainsi — quiconque s'y rend sans les droits tombe sur un refus
-// poli, et la base refuserait de toute façon la moindre écriture.
-//
-// Il s'affiche aussi SUR la page d'administration. Le retirer là revenait à
-// faire disparaître le repère au moment précis où l'on s'en sert, et à
-// laisser croire qu'on a quitté le site.
-async function poserLienAdministration(){
-  if(document.querySelector('[data-lien-admin]')) return;
-  const etat = await verifierAdmin();
-  if(!etat.admin) return;
-
-  const liens = document.querySelector('nav .navlinks');
-  if(!liens) return;
-  const a = document.createElement('a');
-  a.href = 'admin.html';
-  a.textContent = 'Administrateur';
-  a.dataset.lienAdmin = '1';
-  a.style.color = 'var(--gold)';
-  // Sur la page elle-même, le lien se marque comme les autres liens actifs du
-  // site : la classe « active » pour l'affichage, aria-current pour les
-  // lecteurs d'écran, qui annoncent alors « page actuelle ».
-  if(location.pathname.endsWith('admin.html')){
-    a.classList.add('active');
-    a.setAttribute('aria-current', 'page');
-  }
-  liens.appendChild(a);
-}
-
-if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', poserLienAdministration);
-}else{
-  poserLienAdministration();
 }

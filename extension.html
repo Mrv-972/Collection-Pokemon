@@ -225,19 +225,20 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="sets.js?v=2026-10-03-mz0a"></script>
-<script src="univers.js?v=2026-10-03-mz0a"></script>
-<script src="catalogue.js?v=2026-10-03-mz0a"></script>
-<script src="supabase-config.js?v=2026-10-03-mz0a"></script>
-<script src="pied.js?v=2026-10-03-mz0a"></script>
-<script src="admin.js?v=2026-10-03-mz0a"></script>
-<script src="progression.js?v=2026-10-03-mz0a"></script>
-<script src="confirmation.js?v=2026-10-03-mz0a"></script>
-<script src="tags.js?v=2026-10-03-mz0a"></script>
-<script src="raretes.js?v=2026-10-03-mz0a"></script>
-<script src="cards.js?v=2026-10-03-mz0a"></script>
-<script src="prix.js?v=2026-10-03-mz0a"></script>
-<script src="compte.js?v=2026-10-03-mz0a"></script>
+<script src="sets.js?v=2026-10-10-imdp"></script>
+<script src="univers.js?v=2026-10-10-imdp"></script>
+<script src="catalogue.js?v=2026-10-10-imdp"></script>
+<script src="supabase-config.js?v=2026-10-10-imdp"></script>
+<script src="pied.js?v=2026-10-10-imdp"></script>
+<script src="admin.js?v=2026-10-10-imdp"></script>
+<script src="admin-site.js?v=2026-10-10-imdp"></script>
+<script src="progression.js?v=2026-10-10-imdp"></script>
+<script src="confirmation.js?v=2026-10-10-imdp"></script>
+<script src="tags.js?v=2026-10-10-imdp"></script>
+<script src="raretes.js?v=2026-10-10-imdp"></script>
+<script src="cards.js?v=2026-10-10-imdp"></script>
+<script src="prix.js?v=2026-10-10-imdp"></script>
+<script src="compte.js?v=2026-10-10-imdp"></script>
 <script>
 // Récupère les cartes d'une extension depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
@@ -351,7 +352,16 @@ function renderHead(set){
     reserves.push(`noms traduits automatiquement (${t.traduits}/${t.total})`);
   }
   if(set.visuelsAnglais) reserves.push('visuels des cartes en anglais');
-  document.getElementById('page-head').innerHTML = `
+  // Les données de l'extension voyagent avec son en-tête : l'environnement
+  // d'administration s'en sert pour préremplir sa fenêtre de modification.
+  const tete = document.getElementById('page-head');
+  Object.assign(tete.dataset, {
+    extension: setId,
+    nom: set.name ?? '',
+    serie,
+    date: String(set.releaseDate ?? set.dateSortie ?? '').slice(0, 10),
+  });
+  tete.innerHTML = `
     ${set.logo
       ? `<img class="logo-extension" src="${set.logo}" alt="Logo de ${set.name}"
              data-fallback="images/sets/${setId}.png" onerror="setLogoFallback(this)">`
