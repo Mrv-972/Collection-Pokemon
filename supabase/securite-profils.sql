@@ -39,9 +39,11 @@ revoke insert, update on profils from anon, authenticated;
 grant insert (id, pseudo, contact, ne_le, cgu_acceptees_le, cgu_version)
   on profils to authenticated;
 
--- Les modifications : le pseudo et le contact, la localisation, et une
--- nouvelle acceptation des conditions quand elles changent.
-grant update (pseudo, contact,
+-- Les modifications : le pseudo, le contact et la date de naissance (la
+-- règle d'accès « chacun modifie son profil » revérifie le seuil d'âge), la
+-- localisation, et une nouvelle acceptation des conditions quand elles
+-- changent.
+grant update (pseudo, contact, ne_le,
               ville, code_postal, departement, latitude, longitude,
               cgu_acceptees_le, cgu_version)
   on profils to authenticated;
@@ -73,9 +75,12 @@ create trigger proteger_est_admin
   before insert or update on profils
   for each row execute function proteger_est_admin();
 
--- --- vérification ---------------------------------------------------------
--- Les deux lignes doivent répondre « false ».
-select has_column_privilege('authenticated', 'profils', 'est_admin', 'UPDATE') as peut_modifier_est_admin,
-       has_column_privilege('authenticated', 'profils', 'est_admin', 'INSERT') as peut_inserer_est_admin;
-
 notify pgrst, 'reload schema';
+
+-- --- vérification ---------------------------------------------------------
+-- En dernier : l'éditeur SQL de Supabase n'affiche que le résultat de la
+-- dernière commande. Les deux premières colonnes doivent répondre « false »,
+-- la troisième « true ».
+select has_column_privilege('authenticated', 'profils', 'est_admin', 'UPDATE') as peut_modifier_est_admin,
+       has_column_privilege('authenticated', 'profils', 'est_admin', 'INSERT') as peut_inserer_est_admin,
+       has_column_privilege('authenticated', 'profils', 'ne_le', 'UPDATE')     as peut_modifier_naissance;
