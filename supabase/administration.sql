@@ -28,8 +28,13 @@
 -- ==========================================================================
 
 -- Qui est administrateur. Ce drapeau ne se coche PAS depuis le site : il se
--- pose à la main dans l'éditeur SQL de Supabase. Un compte ne peut donc pas
--- se promouvoir lui-même, même en trafiquant ce que son navigateur envoie.
+-- pose à la main dans l'éditeur SQL de Supabase.
+--
+-- ATTENTION : ce fichier seul ne suffit pas à empêcher un compte de se
+-- promouvoir. La règle « chacun modifie son profil » filtre des lignes, pas
+-- des colonnes, et Supabase accorde par défaut l'écriture de toutes les
+-- colonnes. C'est supabase/securite-profils.sql qui ferme cette porte —
+-- droits ramenés aux colonnes utiles, et déclencheur sur « est_admin ».
 --
 --   update profils set est_admin = true where pseudo = 'TonPseudo';
 --
