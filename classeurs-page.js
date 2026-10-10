@@ -405,6 +405,12 @@ function appliquerLaCouleur(classeur){
 }
 
 function dessiner(){
+  // Les classeurs appartiennent au TCG physique, qui n'est pas encore
+  // ouvert aux membres.
+  if(typeof physiqueAccessible === 'function' && !physiqueAccessible()){
+    contenu().innerHTML = blocAVenir();
+    return;
+  }
   const c = actif();
   appliquerLaCouleur(c);
   // Un classeur supprimé ailleurs, ou un identifiant retenu qui ne
@@ -1091,6 +1097,13 @@ function messageFugace(texte){
 // ---------------------------------------------------------- le démarrage ---
 
 async function demarrer(){
+  // Le TCG physique fermé aux membres : conseiller de « passer du côté
+  // physique » les enverrait vers une porte fermée. On dit plutôt qu'il
+  // arrive bientôt.
+  if(typeof physiqueAccessible === 'function' && !physiqueAccessible()){
+    contenu().innerHTML = blocAVenir();
+    return;
+  }
   if(estPocket()){
     contenu().innerHTML = `<p class="vide">Les classeurs sont faits pour des cartes
       qu'on peut tenir dans la main. Passe du côté TCG physique par le bandeau

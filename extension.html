@@ -225,20 +225,20 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="sets.js?v=2026-10-10-imdp"></script>
-<script src="univers.js?v=2026-10-10-imdp"></script>
-<script src="catalogue.js?v=2026-10-10-imdp"></script>
-<script src="supabase-config.js?v=2026-10-10-imdp"></script>
-<script src="pied.js?v=2026-10-10-imdp"></script>
-<script src="admin.js?v=2026-10-10-imdp"></script>
-<script src="admin-site.js?v=2026-10-10-imdp"></script>
-<script src="progression.js?v=2026-10-10-imdp"></script>
-<script src="confirmation.js?v=2026-10-10-imdp"></script>
-<script src="tags.js?v=2026-10-10-imdp"></script>
-<script src="raretes.js?v=2026-10-10-imdp"></script>
-<script src="cards.js?v=2026-10-10-imdp"></script>
-<script src="prix.js?v=2026-10-10-imdp"></script>
-<script src="compte.js?v=2026-10-10-imdp"></script>
+<script src="sets.js?v=2026-10-10-ysit"></script>
+<script src="univers.js?v=2026-10-10-ysit"></script>
+<script src="catalogue.js?v=2026-10-10-ysit"></script>
+<script src="supabase-config.js?v=2026-10-10-ysit"></script>
+<script src="pied.js?v=2026-10-10-ysit"></script>
+<script src="admin.js?v=2026-10-10-ysit"></script>
+<script src="admin-site.js?v=2026-10-10-ysit"></script>
+<script src="progression.js?v=2026-10-10-ysit"></script>
+<script src="confirmation.js?v=2026-10-10-ysit"></script>
+<script src="tags.js?v=2026-10-10-ysit"></script>
+<script src="raretes.js?v=2026-10-10-ysit"></script>
+<script src="cards.js?v=2026-10-10-ysit"></script>
+<script src="prix.js?v=2026-10-10-ysit"></script>
+<script src="compte.js?v=2026-10-10-ysit"></script>
 <script>
 // Récupère les cartes d'une extension depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
@@ -253,6 +253,9 @@ const setId = params.get('set') || (estPocket() ? 'A1' : 'sv03.5');
 // on bascule plutôt que d'afficher une extension Pocket sous les couleurs
 // du carton.
 if(isPocketSet(setId) !== estPocket()) adopterUnivers(isPocketSet(setId) ? 'pocket' : 'physique');
+// Le TCG physique n'est pas encore ouvert : une extension physique, ouverte
+// par un lien, affiche « À venir » au lieu de ses cartes.
+const extensionFermee = !isPocketSet(setId) && !physiqueAccessible();
 
 let allCards = [];
 let activeFilter = null; // un des FILTERS, ou null
@@ -270,6 +273,14 @@ async function loadRarities(){
 }
 
 async function init(){
+  if(extensionFermee){
+    document.getElementById('page-head').innerHTML = '';
+    document.getElementById('content').innerHTML = blocAVenir();
+    // « hidden » ne suffirait pas : les règles de style de ces barres posent
+    // un « display » qui l'emporte sur lui.
+    document.querySelectorAll('.toolbar, .tri-row, .bulk-row').forEach(b => { b.style.display = 'none'; });
+    return;
+  }
   document.getElementById('content').innerHTML = `<div class="card-grid">${Array(12).fill('<div class="skeleton"></div>').join('')}</div>`;
 
   // Avant le premier rendu, pour que les cartes s'affichent d'emblée avec

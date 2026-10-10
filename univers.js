@@ -15,15 +15,8 @@
 // partagé arrive au bon endroit, et se retient d'une visite à l'autre pour
 // qu'un signet nu ramène là où on s'était arrêté.
 
+// Pocket en premier : c'est la partie du site qui est terminée.
 const UNIVERS = {
-  physique: {
-    cle: 'physique',
-    nom: 'TCG physique',
-    court: 'Physique',
-    // Deux cartes l'une derrière l'autre.
-    icone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="12" height="15" rx="2"/><path d="M8.5 3H18a2 2 0 0 1 2 2v11"/></svg>',
-    logo: 'images/jeux/tcg-physique.png',
-  },
   pocket: {
     cle: 'pocket',
     nom: 'TCG Pocket',
@@ -32,18 +25,64 @@ const UNIVERS = {
     icone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10.5 18.3h3"/></svg>',
     logo: 'images/jeux/tcg-pocket.png',
   },
+  physique: {
+    cle: 'physique',
+    nom: 'TCG physique',
+    court: 'Physique',
+    // Deux cartes l'une derrière l'autre.
+    icone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="12" height="15" rx="2"/><path d="M8.5 3H18a2 2 0 0 1 2 2v11"/></svg>',
+    logo: 'images/jeux/tcg-physique.png',
+  },
 };
 
 const MEMOIRE_UNIVERS = 'pokeclasseur_univers';
 
+// --------------------------------------------- le TCG physique, à venir ----
+//
+// Le TCG physique n'est pas encore ouvert aux membres : des centaines de
+// cartes n'y ont pas encore de visuel français. Il reste accessible à
+// l'administrateur, qui y travaille. Le jour où il sera prêt, passer cette
+// constante à true l'ouvre à tous, sans rien d'autre à toucher.
+const PHYSIQUE_OUVERT_A_TOUS = false;
+
+// L'administrateur ne se reconnaît qu'en interrogeant la base, ce qui prend
+// un instant — trop tard pour choisir l'univers avant que la page ne se
+// dessine. On garde donc, le temps d'une visite, l'INDICE qu'on l'est déjà.
+//
+// Cet indice n'est pas une protection, et n'a pas à l'être : il ne donne
+// accès à aucune écriture, et les fichiers du TCG physique sont de toute
+// façon publics sur le serveur. Ce verrou dit « pas encore prêt », pas
+// « secret ». Il est revérifié auprès de la base à chaque page : un indice
+// périmé ou fabriqué ramène aussitôt côté Pocket.
+const INDICE_ADMIN = 'pokeclasseur-admin-indice';
+
+function indiceAdmin(){
+  try{ return sessionStorage.getItem(INDICE_ADMIN) === 'oui'; }catch(err){ return false; }
+}
+function physiqueAccessible(){
+  return PHYSIQUE_OUVERT_A_TOUS || indiceAdmin();
+}
+
+// Le physique a été demandé — par l'adresse, le souvenir de la dernière
+// visite, ou un lien d'extension — et refusé. On s'en souvient pour, si
+// l'administrateur se révèle, le ramener là où il voulait aller.
+let universRefuse = null;
+
 function universDemande(){
+  let voulu = 'pocket';
   const demande = new URLSearchParams(window.location.search).get('u');
-  if(demande && UNIVERS[demande]) return demande;
-  try{
-    const retenu = localStorage.getItem(MEMOIRE_UNIVERS);
-    if(retenu && UNIVERS[retenu]) return retenu;
-  }catch(err){}
-  return 'physique';
+  if(demande && UNIVERS[demande]) voulu = demande;
+  else{
+    try{
+      const retenu = localStorage.getItem(MEMOIRE_UNIVERS);
+      if(retenu && UNIVERS[retenu]) voulu = retenu;
+    }catch(err){}
+  }
+  if(voulu === 'physique' && !physiqueAccessible()){
+    universRefuse = 'physique';
+    return 'pocket';
+  }
+  return voulu;
 }
 
 let universCourant = universDemande();
@@ -92,13 +131,20 @@ function cibleBascule(cle){
 // Change d'univers sans recharger : sert quand on ouvre le lien partagé
 // d'une extension qui n'appartient pas à l'univers retenu.
 function adopterUnivers(cle){
-  if(!UNIVERS[cle] || cle === universCourant) return;
+  if(!UNIVERS[cle] || cle === universCourant) return true;
+  // Un lien vers une extension physique ne fait pas basculer un membre :
+  // la page appelante affiche alors « À venir » à la place.
+  if(cle === 'physique' && !physiqueAccessible()){
+    universRefuse = 'physique';
+    return false;
+  }
   universCourant = cle;
   memoriserUnivers();
   document.documentElement.dataset.univers = cle;
   document.querySelectorAll('.rail-item').forEach(a => {
     a.classList.toggle('on', a.dataset.cible === cle);
   });
+  return true;
 }
 
 function memoriserUnivers(){
@@ -121,6 +167,32 @@ const STYLE_RAIL = `
   }
 
   body{padding-left:56px;}
+
+  /* L'onglet du physique fermé : présent, pour qu'on sache qu'il existe,
+     mais visiblement en attente. */
+  button.rail-item{font:inherit;cursor:pointer;background:none;border-top:0;border-right:0;border-bottom:0}
+  .a-venir-onglet{opacity:.55}
+  .rail-badge{font-size:8.5px;line-height:1;letter-spacing:.2px;padding:3px 5px;border-radius:999px;
+              background:rgba(var(--teinte-rgb),.18);color:var(--teinte);white-space:nowrap}
+  .rail-badge-prive{background:rgba(140,140,140,.18);color:#B9BCB9}
+
+  #a-venir-annonce{position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:9500;
+    width:min(460px,calc(100vw - 32px));box-sizing:border-box;padding:14px 44px 14px 16px;border-radius:12px;
+    background:#1B1E24;color:#EDEAE0;border:1px solid rgba(201,162,39,.55);
+    box-shadow:0 10px 30px rgba(0,0,0,.45);font-size:14px;line-height:1.5}
+  #a-venir-annonce strong{display:block;color:#E3C766;margin-bottom:4px}
+  #a-venir-annonce p{margin:0;color:#B9BCB9}
+  #a-venir-annonce button{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.2);background:none;color:#EDEAE0;cursor:pointer;font-size:17px;line-height:1}
+
+  .a-venir{max-width:520px;margin:48px auto;padding:34px 26px;text-align:center;border-radius:16px;
+    border:1px solid rgba(201,162,39,.35);background:rgba(201,162,39,.05)}
+  .a-venir-icone{display:inline-flex;color:#C9A227}
+  .a-venir-icone svg{width:42px;height:42px}
+  .a-venir h2{margin:12px 0 10px}
+  .a-venir p{color:var(--text-on-ink-dim,#9B9E9C);line-height:1.6;margin:0 0 20px}
+  .a-venir-lien{display:inline-block;padding:11px 20px;border-radius:999px;text-decoration:none;
+    background:#4B96D8;color:#fff;font-weight:600}
   /* La barre est un <nav>, et chaque page habille déjà ses <nav> : sans ces
      remises à zéro explicites, elle héritait du justify-content:space-between
      de la barre du haut et se retrouvait avec un univers en haut de l'écran
@@ -216,6 +288,98 @@ const STYLE_RAIL = `
   }
 `;
 
+function ongletDUnivers(u){
+  const verrouille = u.cle === 'physique' && !physiqueAccessible();
+  if(verrouille){
+    // Un bouton, pas un lien : il n'y a nulle part où aller pour l'instant.
+    return `
+    <button type="button" class="rail-item a-venir-onglet" data-cible="${u.cle}"
+            title="${u.nom} — à venir" aria-describedby="a-venir-aide">
+      <span class="rail-compact">${u.icone}<span class="rail-nom">${u.court}</span>
+        <span class="rail-badge">À venir</span></span>
+      <img class="rail-logo" src="${u.logo}" alt="" aria-hidden="true" loading="lazy">
+    </button>`;
+  }
+  // L'administrateur voit le physique, avec un rappel que lui seul le voit.
+  const prive = u.cle === 'physique' && !PHYSIQUE_OUVERT_A_TOUS;
+  return `
+    <a class="rail-item ${u.cle === universCourant ? 'on' : ''}" data-cible="${u.cle}"
+       href="${cibleBascule(u.cle)}"
+       title="${u.nom}${prive ? ' — visible par toi seul pour l\'instant' : ''}"
+       ${u.cle === universCourant ? 'aria-current="page"' : ''}>
+      <span class="rail-compact">${u.icone}<span class="rail-nom">${u.court}</span>
+        ${prive ? '<span class="rail-badge rail-badge-prive">Privé</span>' : ''}</span>
+      <img class="rail-logo" src="${u.logo}" alt="" aria-hidden="true" loading="lazy">
+    </a>`;
+}
+
+const TEXTE_A_VENIR = `Le TCG physique arrive bientôt sur PokéClasseur. Nous terminons de
+  rassembler les visuels français de toutes les cartes, pour qu'aucune ne
+  s'affiche vide ou en anglais. En attendant, tout le TCG Pocket est disponible.`;
+
+function brancherOngletAVenir(rail){
+  const bouton = rail.querySelector('.a-venir-onglet');
+  if(!bouton) return;
+  bouton.addEventListener('click', () => annoncerAVenir());
+}
+
+// La petite annonce : affichée au clic sur l'onglet, ou quand un lien
+// menait au physique, pour qu'on comprenne pourquoi on arrive côté Pocket.
+function annoncerAVenir(){
+  document.getElementById('a-venir-annonce')?.remove();
+  const a = document.createElement('div');
+  a.id = 'a-venir-annonce';
+  a.setAttribute('role', 'status');
+  a.innerHTML = `
+    <strong>TCG physique — à venir</strong>
+    <p id="a-venir-aide">${TEXTE_A_VENIR}</p>
+    <button type="button" aria-label="Fermer">×</button>`;
+  a.querySelector('button').onclick = () => a.remove();
+  document.body.appendChild(a);
+  clearTimeout(annoncerAVenir.minuteur);
+  annoncerAVenir.minuteur = setTimeout(() => a.remove(), 9000);
+}
+
+// Ce qu'une page propre au physique affiche à la place de son contenu.
+function blocAVenir(){
+  return `
+    <div class="a-venir">
+      <span class="a-venir-icone" aria-hidden="true">${UNIVERS.physique.icone}</span>
+      <h2>TCG physique — à venir</h2>
+      <p>${TEXTE_A_VENIR}</p>
+      <a class="a-venir-lien" href="${avecUnivers('series.html', 'pocket')}">Voir le TCG Pocket</a>
+    </div>`;
+}
+
+// Confronter l'indice à la base. Trois issues :
+//   — administrateur sans indice : on le pose, et s'il voulait aller côté
+//     physique, on l'y emmène ;
+//   — administrateur avec indice : rien à faire ;
+//   — pas administrateur, mais physique affiché (indice périmé ou
+//     fabriqué) : retour immédiat côté Pocket.
+async function verifierAccesPhysique(){
+  if(PHYSIQUE_OUVERT_A_TOUS) return;
+  const avait = indiceAdmin();
+  let admin = false;
+  if(typeof verifierAdmin === 'function'){
+    try{ admin = (await verifierAdmin()).admin === true; }catch(err){ admin = false; }
+  }
+  try{
+    if(admin) sessionStorage.setItem(INDICE_ADMIN, 'oui');
+    else sessionStorage.removeItem(INDICE_ADMIN);
+  }catch(err){}
+
+  if(admin && !avait && (universRefuse === 'physique' || document.querySelector('.a-venir'))){
+    location.replace(avecUnivers(location.pathname + location.search, 'physique'));
+    return;
+  }
+  if(!admin && avait){
+    location.replace(avecUnivers(location.pathname + location.search, 'pocket'));
+    return;
+  }
+  if(!admin && universRefuse === 'physique' && !document.querySelector('.a-venir')) annoncerAVenir();
+}
+
 function poserRail(){
   document.documentElement.dataset.univers = universCourant;
   // L'univers lu dans l'adresse vaut choix : sans cette ligne, revenir sur
@@ -230,15 +394,9 @@ function poserRail(){
   const rail = document.createElement('nav');
   rail.className = 'rail';
   rail.setAttribute('aria-label', 'Univers');
-  rail.innerHTML = Object.values(UNIVERS).map(u => `
-    <a class="rail-item ${u.cle === universCourant ? 'on' : ''}" data-cible="${u.cle}"
-       href="${cibleBascule(u.cle)}" title="${u.nom}"
-       ${u.cle === universCourant ? 'aria-current="page"' : ''}>
-      <span class="rail-compact">${u.icone}<span class="rail-nom">${u.court}</span></span>
-      <img class="rail-logo" src="${u.logo}" alt="" aria-hidden="true" loading="lazy">
-    </a>
-  `).join('');
+  rail.innerHTML = Object.values(UNIVERS).map(ongletDUnivers).join('');
   document.body.prepend(rail);
+  brancherOngletAVenir(rail);
 
   // La barre est collante en haut sur téléphone : il lui faut un fond opaque,
   // qu'on prend sur la page plutôt que de le redire ici.
@@ -270,6 +428,9 @@ function masquerLiensHorsUnivers(){
 
 function initUnivers(){
   poserRail();
+  // admin.js est chargé plus bas dans la page : au moment où le document est
+  // prêt, verifierAdmin existe.
+  verifierAccesPhysique();
   propagerUnivers();
   masquerLiensHorsUnivers();
 
