@@ -1037,6 +1037,14 @@ async function brancherPokecardex(physique){
 
   const sansZeros = n => String(n ?? '').replace(/^0+/, '').toLowerCase();
 
+  // Leur serveur de cartes REFUSE l'adresse nue (403) et ne sert l'image
+  // qu'avec un paramètre de taille : « …/FR/63.jpg » échoue, « …/FR/63.jpg
+  // ?class=md » répond, en WebP, avec l'autorisation d'affichage. Le
+  // moissonneur retirait ce paramètre, et toutes les cartes branchées sur
+  // Pokécardex s'affichaient en point d'interrogation — y compris celles
+  // qui avaient jusque-là un visuel anglais. Mesuré, pas supposé.
+  const adresseServie = a => /[?&]class=/.test(a) ? a : `${a}${a.includes('?') ? '&' : '?'}class=md`;
+
   // notre identifiant d'extension -> leur code
   const leurCode = new Map();
   for(const [code, a] of Object.entries(appariement.apparies ?? {})) leurCode.set(a.notre, code);
@@ -1058,7 +1066,7 @@ async function brancherPokecardex(physique){
       const dejaFrancais = carte.imageSecours && !/\/en\//.test(carte.imageSecours);
       if(dejaFrancais) continue;
       if(carte.imageSecours && /\/en\//.test(carte.imageSecours)) remplaceDeLAnglais++;
-      carte.imageSecours = chez.adresse;
+      carte.imageSecours = adresseServie(chez.adresse);
       poses++;
       parExtension.set(setId, (parExtension.get(setId) ?? 0) + 1);
     }

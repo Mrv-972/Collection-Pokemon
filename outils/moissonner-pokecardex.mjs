@@ -112,9 +112,10 @@ for(const [i, code] of retenues.entries()){
     for(const c of lu.cartes){
       const m = DECOUPE.exec(c.src) ?? DECOUPE.exec(c.dataSrc);
       if(!m) continue;
-      // On garde l'adresse sans son « ?class=md » : la taille se choisira
-      // au moment de l'affichage, pas ici.
-      const adresse = (c.src || c.dataSrc).split('?')[0];
+      // On GARDE le « ?class=md » : leur serveur refuse l'adresse nue (403).
+      // Le retirer « pour choisir la taille plus tard » a rendu toutes les
+      // adresses inutilisables.
+      const adresse = c.src || c.dataSrc;
       // « Noeunoeuf 001/128 » -> « Noeunoeuf », mais aussi
       // « Méganium 001 » -> « Méganium » : dans les séries de promos, le
       // numéro n'a pas de « /total ». Ne retirer que la première forme

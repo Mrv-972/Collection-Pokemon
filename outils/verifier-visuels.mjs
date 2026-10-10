@@ -57,7 +57,14 @@ async function repond(adresse){
         await new Promise(r2 => setTimeout(r2, 1500 * (essai + 1)));
         continue;
       }
-      return r.ok;
+      if(r.ok) return true;
+      // Un serveur peut refuser l'en-tête seul et servir l'image : un
+      // navigateur, lui, demande l'image. Avant de conclure à une absence,
+      // on fait comme lui. Sinon la vérification compterait manquante une
+      // carte que le visiteur voit très bien.
+      const g = await fetch(adresse, { method: 'GET', redirect: 'follow', headers: IDENTITE });
+      await g.body?.cancel?.();
+      return g.ok;
     }catch{
       if(essai === 2) return null;   // indécis, et on le dira
       await new Promise(r2 => setTimeout(r2, 1200 * (essai + 1)));
