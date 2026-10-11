@@ -1089,6 +1089,24 @@ async function brancherPokecardex(physique){
     }
   }
 
+  // Le rattrapage : séries rattachées à la main, chaque carte retrouvée par
+  // son numéro imprimé, son numéro ou son nom, nom toujours vérifié. Même
+  // forme que les séries à préfixe, même usage.
+  for(const [setId, r] of Object.entries(appariement.rattrapages ?? {})){
+    const cartes = physique.cartesParSet.get(setId);
+    if(!cartes) continue;
+    for(const carte of cartes){
+      const adresse = r.cartes?.[carte.localId];
+      if(!adresse) continue;
+      const dejaFrancais = carte.imageSecours && !/\/en\//.test(carte.imageSecours);
+      if(dejaFrancais) continue;
+      if(carte.imageSecours && /\/en\//.test(carte.imageSecours)) remplaceDeLAnglais++;
+      carte.imageSecours = adresseServie(adresse);
+      poses++;
+      parExtension.set(setId, (parExtension.get(setId) ?? 0) + 1);
+    }
+  }
+
   console.log(`Secours français depuis Pokécardex : ${poses} cartes` +
     ` sur ${parExtension.size} extensions` +
     ` (dont ${remplaceDeLAnglais} qui étaient en anglais)` +

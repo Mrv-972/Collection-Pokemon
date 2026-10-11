@@ -1,0 +1,32 @@
+# Assemble des visuels de cartes en une planche, écrite dans le journal,
+# pour les regarder depuis un poste qui ne joint pas les serveurs d'images.
+# Lecture seule : rien n'est déposé.
+name: Planche de visuels
+
+on:
+  workflow_dispatch:
+    inputs:
+      adresses:
+        description: "Liste « étiquette=adresse », séparées par des espaces"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  planche:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Installer sharp
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install sharp
+      - name: Assembler
+        env:
+          ADRESSES: ${{ inputs.adresses }}
+        run: node outils/planche-visuels.mjs "$ADRESSES"
