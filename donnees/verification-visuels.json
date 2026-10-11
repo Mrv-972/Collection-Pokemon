@@ -1,15 +1,15 @@
 {
- "verifieLe": "2026-10-10T23:49:43.029Z",
+ "verifieLe": "2026-10-11T03:02:07.280Z",
  "methode": "une requête d'en-tête par carte, sur l'adresse que le site sert",
  "repriseDe": null,
  "total": 21393,
  "compte": {
-  "depot": 1322,
-  "principal": 17116,
-  "secoursFrancais": 2608,
-  "secoursAnglais": 72,
-  "manquant": 221,
-  "indecis": 54
+  "depot": 861,
+  "principal": 17275,
+  "secoursFrancais": 2616,
+  "secoursAnglais": 579,
+  "manquant": 17,
+  "indecis": 45
  },
  "extensions": {
   "miscp": {
@@ -17,16 +17,11 @@
    "total": 1,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 0,
+   "secoursFrancais": 1,
    "secoursAnglais": 0,
-   "manquant": 1,
+   "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": [
-    {
-     "id": "miscp-001",
-     "nom": "Ancient Mew"
-    }
-   ],
+   "cartesManquantes": [],
    "cartesIndecises": [],
    "cartesAnglaises": []
   },
@@ -61,13 +56,110 @@
    "total": 53,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 53,
-   "secoursAnglais": 0,
+   "secoursFrancais": 29,
+   "secoursAnglais": 24,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": []
+   "cartesAnglaises": [
+    {
+     "id": "basep-1",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "basep-7",
+     "nom": "Jigglypuff"
+    },
+    {
+     "id": "basep-10",
+     "nom": "Meowth"
+    },
+    {
+     "id": "basep-11",
+     "nom": "Eevee"
+    },
+    {
+     "id": "basep-12",
+     "nom": "Mewtwo"
+    },
+    {
+     "id": "basep-13",
+     "nom": "Venusaur"
+    },
+    {
+     "id": "basep-15",
+     "nom": "Cool Porygon"
+    },
+    {
+     "id": "basep-16",
+     "nom": "Computer Error"
+    },
+    {
+     "id": "basep-17",
+     "nom": "Dark Persian"
+    },
+    {
+     "id": "basep-18",
+     "nom": "Team Rocket's Meowth"
+    },
+    {
+     "id": "basep-19",
+     "nom": "Sabrina's Abra"
+    },
+    {
+     "id": "basep-27",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "basep-40",
+     "nom": "Pokémon Center"
+    },
+    {
+     "id": "basep-41",
+     "nom": "Lucky Stadium"
+    },
+    {
+     "id": "basep-42",
+     "nom": "Pokémon Tower"
+    },
+    {
+     "id": "basep-43",
+     "nom": "Machamp"
+    },
+    {
+     "id": "basep-44",
+     "nom": "Magmar"
+    },
+    {
+     "id": "basep-45",
+     "nom": "Scyther"
+    },
+    {
+     "id": "basep-46",
+     "nom": "Electabuzz"
+    },
+    {
+     "id": "basep-47",
+     "nom": "Mew"
+    },
+    {
+     "id": "basep-48",
+     "nom": "Articuno"
+    },
+    {
+     "id": "basep-49",
+     "nom": "Snorlax"
+    },
+    {
+     "id": "basep-50",
+     "nom": "Celebi"
+    },
+    {
+     "id": "basep-53",
+     "nom": "Suicune"
+    }
+   ]
   },
   "base3": {
    "nom": "Fossile",
@@ -85,15 +177,376 @@
   "base4": {
    "nom": "Base Set 2",
    "total": 130,
-   "depot": 95,
+   "depot": 5,
    "principal": 35,
    "secoursFrancais": 0,
-   "secoursAnglais": 0,
+   "secoursAnglais": 90,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": []
+   "cartesAnglaises": [
+    {
+     "id": "base4-5",
+     "nom": "Clefable"
+    },
+    {
+     "id": "base4-6",
+     "nom": "Clefairy"
+    },
+    {
+     "id": "base4-7",
+     "nom": "Gyarados"
+    },
+    {
+     "id": "base4-8",
+     "nom": "Hitmonchan"
+    },
+    {
+     "id": "base4-9",
+     "nom": "Magneton"
+    },
+    {
+     "id": "base4-10",
+     "nom": "Mewtwo"
+    },
+    {
+     "id": "base4-12",
+     "nom": "Nidoqueen"
+    },
+    {
+     "id": "base4-13",
+     "nom": "Ninetales"
+    },
+    {
+     "id": "base4-14",
+     "nom": "Pidgeot"
+    },
+    {
+     "id": "base4-15",
+     "nom": "Poliwrath"
+    },
+    {
+     "id": "base4-17",
+     "nom": "Scyther"
+    },
+    {
+     "id": "base4-18",
+     "nom": "Venusaur"
+    },
+    {
+     "id": "base4-19",
+     "nom": "Wigglytuff"
+    },
+    {
+     "id": "base4-20",
+     "nom": "Zapdos"
+    },
+    {
+     "id": "base4-21",
+     "nom": "Beedrill"
+    },
+    {
+     "id": "base4-22",
+     "nom": "Dragonair"
+    },
+    {
+     "id": "base4-23",
+     "nom": "Dugtrio"
+    },
+    {
+     "id": "base4-24",
+     "nom": "Electabuzz"
+    },
+    {
+     "id": "base4-25",
+     "nom": "Electrode"
+    },
+    {
+     "id": "base4-26",
+     "nom": "Kangaskhan"
+    },
+    {
+     "id": "base4-27",
+     "nom": "Mr. Mime"
+    },
+    {
+     "id": "base4-28",
+     "nom": "Pidgeotto"
+    },
+    {
+     "id": "base4-29",
+     "nom": "Pinsir"
+    },
+    {
+     "id": "base4-31",
+     "nom": "Venomoth"
+    },
+    {
+     "id": "base4-32",
+     "nom": "Victreebel"
+    },
+    {
+     "id": "base4-33",
+     "nom": "Arcanine"
+    },
+    {
+     "id": "base4-34",
+     "nom": "Butterfree"
+    },
+    {
+     "id": "base4-35",
+     "nom": "Charmeleon"
+    },
+    {
+     "id": "base4-36",
+     "nom": "Dewgong"
+    },
+    {
+     "id": "base4-37",
+     "nom": "Dodrio"
+    },
+    {
+     "id": "base4-38",
+     "nom": "Dratini"
+    },
+    {
+     "id": "base4-40",
+     "nom": "Farfetch'd"
+    },
+    {
+     "id": "base4-42",
+     "nom": "Growlithe"
+    },
+    {
+     "id": "base4-43",
+     "nom": "Haunter"
+    },
+    {
+     "id": "base4-44",
+     "nom": "Ivysaur"
+    },
+    {
+     "id": "base4-45",
+     "nom": "Jynx"
+    },
+    {
+     "id": "base4-48",
+     "nom": "Lickitung"
+    },
+    {
+     "id": "base4-49",
+     "nom": "Machoke"
+    },
+    {
+     "id": "base4-51",
+     "nom": "Magmar"
+    },
+    {
+     "id": "base4-52",
+     "nom": "Marowak"
+    },
+    {
+     "id": "base4-53",
+     "nom": "Nidorina"
+    },
+    {
+     "id": "base4-54",
+     "nom": "Nidorino"
+    },
+    {
+     "id": "base4-55",
+     "nom": "Parasect"
+    },
+    {
+     "id": "base4-56",
+     "nom": "Persian"
+    },
+    {
+     "id": "base4-57",
+     "nom": "Poliwhirl"
+    },
+    {
+     "id": "base4-58",
+     "nom": "Raticate"
+    },
+    {
+     "id": "base4-59",
+     "nom": "Rhydon"
+    },
+    {
+     "id": "base4-62",
+     "nom": "Tauros"
+    },
+    {
+     "id": "base4-63",
+     "nom": "Wartortle"
+    },
+    {
+     "id": "base4-64",
+     "nom": "Weepinbell"
+    },
+    {
+     "id": "base4-70",
+     "nom": "Cubone"
+    },
+    {
+     "id": "base4-72",
+     "nom": "Doduo"
+    },
+    {
+     "id": "base4-73",
+     "nom": "Drowzee"
+    },
+    {
+     "id": "base4-74",
+     "nom": "Exeggcute"
+    },
+    {
+     "id": "base4-75",
+     "nom": "Gastly"
+    },
+    {
+     "id": "base4-77",
+     "nom": "Jigglypuff"
+    },
+    {
+     "id": "base4-79",
+     "nom": "Magnemite"
+    },
+    {
+     "id": "base4-80",
+     "nom": "Meowth"
+    },
+    {
+     "id": "base4-84",
+     "nom": "Onix"
+    },
+    {
+     "id": "base4-87",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "base4-90",
+     "nom": "Rhyhorn"
+    },
+    {
+     "id": "base4-91",
+     "nom": "Sandshrew"
+    },
+    {
+     "id": "base4-93",
+     "nom": "Squirtle"
+    },
+    {
+     "id": "base4-94",
+     "nom": "Starmie"
+    },
+    {
+     "id": "base4-95",
+     "nom": "Staryu"
+    },
+    {
+     "id": "base4-96",
+     "nom": "Tangela"
+    },
+    {
+     "id": "base4-97",
+     "nom": "Venonat"
+    },
+    {
+     "id": "base4-98",
+     "nom": "Voltorb"
+    },
+    {
+     "id": "base4-99",
+     "nom": "Vulpix"
+    },
+    {
+     "id": "base4-101",
+     "nom": "Computer Search"
+    },
+    {
+     "id": "base4-102",
+     "nom": "Impostor Professor Oak"
+    },
+    {
+     "id": "base4-103",
+     "nom": "Item Finder"
+    },
+    {
+     "id": "base4-104",
+     "nom": "Lass"
+    },
+    {
+     "id": "base4-105",
+     "nom": "Pokémon Breeder"
+    },
+    {
+     "id": "base4-106",
+     "nom": "Pokémon Trader"
+    },
+    {
+     "id": "base4-107",
+     "nom": "Scoop Up"
+    },
+    {
+     "id": "base4-109",
+     "nom": "Defender"
+    },
+    {
+     "id": "base4-111",
+     "nom": "Full Heal"
+    },
+    {
+     "id": "base4-112",
+     "nom": "Maintenance"
+    },
+    {
+     "id": "base4-113",
+     "nom": "PlusPower"
+    },
+    {
+     "id": "base4-114",
+     "nom": "Pokémon Center"
+    },
+    {
+     "id": "base4-115",
+     "nom": "Pokédex"
+    },
+    {
+     "id": "base4-116",
+     "nom": "Professor Oak"
+    },
+    {
+     "id": "base4-117",
+     "nom": "Super Potion"
+    },
+    {
+     "id": "base4-118",
+     "nom": "Bill"
+    },
+    {
+     "id": "base4-119",
+     "nom": "Energy Removal"
+    },
+    {
+     "id": "base4-120",
+     "nom": "Gust of Wind"
+    },
+    {
+     "id": "base4-121",
+     "nom": "Poké Ball"
+    },
+    {
+     "id": "base4-122",
+     "nom": "Potion"
+    },
+    {
+     "id": "base4-123",
+     "nom": "Switch"
+    }
+   ]
   },
   "base5": {
    "nom": "Team Rocket",
@@ -111,28 +564,1026 @@
   "gym1": {
    "nom": "Gym Heroes",
    "total": 132,
-   "depot": 132,
+   "depot": 9,
    "principal": 0,
    "secoursFrancais": 0,
-   "secoursAnglais": 0,
+   "secoursAnglais": 123,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": []
+   "cartesAnglaises": [
+    {
+     "id": "gym1-1",
+     "nom": "Blaine's Moltres"
+    },
+    {
+     "id": "gym1-2",
+     "nom": "Brock's Rhydon"
+    },
+    {
+     "id": "gym1-3",
+     "nom": "Erika's Clefable"
+    },
+    {
+     "id": "gym1-4",
+     "nom": "Erika's Dragonair"
+    },
+    {
+     "id": "gym1-5",
+     "nom": "Erika's Vileplume"
+    },
+    {
+     "id": "gym1-6",
+     "nom": "Lt. Surge's Electabuzz"
+    },
+    {
+     "id": "gym1-7",
+     "nom": "Lt. Surge's Fearow"
+    },
+    {
+     "id": "gym1-8",
+     "nom": "Lt. Surge's Magneton"
+    },
+    {
+     "id": "gym1-9",
+     "nom": "Misty's Seadra"
+    },
+    {
+     "id": "gym1-10",
+     "nom": "Misty's Tentacruel"
+    },
+    {
+     "id": "gym1-11",
+     "nom": "Rocket's Hitmonchan"
+    },
+    {
+     "id": "gym1-12",
+     "nom": "Rocket's Moltres"
+    },
+    {
+     "id": "gym1-13",
+     "nom": "Rocket's Scyther"
+    },
+    {
+     "id": "gym1-14",
+     "nom": "Sabrina's Gengar"
+    },
+    {
+     "id": "gym1-15",
+     "nom": "Brock"
+    },
+    {
+     "id": "gym1-16",
+     "nom": "Erika"
+    },
+    {
+     "id": "gym1-17",
+     "nom": "Lt. Surge"
+    },
+    {
+     "id": "gym1-18",
+     "nom": "Misty"
+    },
+    {
+     "id": "gym1-19",
+     "nom": "The Rocket's Trap"
+    },
+    {
+     "id": "gym1-20",
+     "nom": "Brock's Golem"
+    },
+    {
+     "id": "gym1-21",
+     "nom": "Brock's Onix"
+    },
+    {
+     "id": "gym1-22",
+     "nom": "Brock's Rhyhorn"
+    },
+    {
+     "id": "gym1-23",
+     "nom": "Brock's Sandslash"
+    },
+    {
+     "id": "gym1-24",
+     "nom": "Brock's Zubat"
+    },
+    {
+     "id": "gym1-25",
+     "nom": "Erika's Clefairy"
+    },
+    {
+     "id": "gym1-26",
+     "nom": "Erika's Victreebel"
+    },
+    {
+     "id": "gym1-27",
+     "nom": "Lt. Surge's Electabuzz"
+    },
+    {
+     "id": "gym1-28",
+     "nom": "Lt. Surge's Raichu"
+    },
+    {
+     "id": "gym1-29",
+     "nom": "Misty's Cloyster"
+    },
+    {
+     "id": "gym1-30",
+     "nom": "Misty's Goldeen"
+    },
+    {
+     "id": "gym1-31",
+     "nom": "Misty's Poliwrath"
+    },
+    {
+     "id": "gym1-32",
+     "nom": "Misty's Tentacool"
+    },
+    {
+     "id": "gym1-33",
+     "nom": "Rocket's Snorlax"
+    },
+    {
+     "id": "gym1-34",
+     "nom": "Sabrina's Venomoth"
+    },
+    {
+     "id": "gym1-35",
+     "nom": "Blaine's Growlithe"
+    },
+    {
+     "id": "gym1-36",
+     "nom": "Blaine's Kangaskhan"
+    },
+    {
+     "id": "gym1-37",
+     "nom": "Blaine's Magmar"
+    },
+    {
+     "id": "gym1-38",
+     "nom": "Brock's Geodude"
+    },
+    {
+     "id": "gym1-39",
+     "nom": "Brock's Golbat"
+    },
+    {
+     "id": "gym1-40",
+     "nom": "Brock's Graveler"
+    },
+    {
+     "id": "gym1-41",
+     "nom": "Brock's Lickitung"
+    },
+    {
+     "id": "gym1-42",
+     "nom": "Erika's Dratini"
+    },
+    {
+     "id": "gym1-43",
+     "nom": "Erika's Exeggcute"
+    },
+    {
+     "id": "gym1-44",
+     "nom": "Erika's Exeggutor"
+    },
+    {
+     "id": "gym1-45",
+     "nom": "Erika's Gloom"
+    },
+    {
+     "id": "gym1-46",
+     "nom": "Erika's Gloom"
+    },
+    {
+     "id": "gym1-47",
+     "nom": "Erika's Oddish"
+    },
+    {
+     "id": "gym1-48",
+     "nom": "Erika's Weepinbell"
+    },
+    {
+     "id": "gym1-49",
+     "nom": "Erika's Weepinbell"
+    },
+    {
+     "id": "gym1-50",
+     "nom": "Lt. Surge's Magnemite"
+    },
+    {
+     "id": "gym1-51",
+     "nom": "Lt. Surge's Raticate"
+    },
+    {
+     "id": "gym1-53",
+     "nom": "Misty's Poliwhirl"
+    },
+    {
+     "id": "gym1-54",
+     "nom": "Misty's Psyduck"
+    },
+    {
+     "id": "gym1-55",
+     "nom": "Misty's Seaking"
+    },
+    {
+     "id": "gym1-56",
+     "nom": "Misty's Starmie"
+    },
+    {
+     "id": "gym1-57",
+     "nom": "Misty's Tentacool"
+    },
+    {
+     "id": "gym1-58",
+     "nom": "Sabrina's Haunter"
+    },
+    {
+     "id": "gym1-60",
+     "nom": "Sabrina's Slowbro"
+    },
+    {
+     "id": "gym1-61",
+     "nom": "Blaine's Charmander"
+    },
+    {
+     "id": "gym1-62",
+     "nom": "Blaine's Growlithe"
+    },
+    {
+     "id": "gym1-63",
+     "nom": "Blaine's Ponyta"
+    },
+    {
+     "id": "gym1-64",
+     "nom": "Blaine's Tauros"
+    },
+    {
+     "id": "gym1-65",
+     "nom": "Blaine's Vulpix"
+    },
+    {
+     "id": "gym1-66",
+     "nom": "Brock's Geodude"
+    },
+    {
+     "id": "gym1-67",
+     "nom": "Brock's Mankey"
+    },
+    {
+     "id": "gym1-68",
+     "nom": "Brock's Mankey"
+    },
+    {
+     "id": "gym1-69",
+     "nom": "Brock's Onix"
+    },
+    {
+     "id": "gym1-70",
+     "nom": "Brock's Rhyhorn"
+    },
+    {
+     "id": "gym1-71",
+     "nom": "Brock's Sandshrew"
+    },
+    {
+     "id": "gym1-72",
+     "nom": "Brock's Sandshrew"
+    },
+    {
+     "id": "gym1-73",
+     "nom": "Brock's Vulpix"
+    },
+    {
+     "id": "gym1-74",
+     "nom": "Brock's Zubat"
+    },
+    {
+     "id": "gym1-75",
+     "nom": "Erika's Bellsprout"
+    },
+    {
+     "id": "gym1-76",
+     "nom": "Erika's Bellsprout"
+    },
+    {
+     "id": "gym1-77",
+     "nom": "Erika's Exeggcute"
+    },
+    {
+     "id": "gym1-78",
+     "nom": "Erika's Oddish"
+    },
+    {
+     "id": "gym1-79",
+     "nom": "Erika's Tangela"
+    },
+    {
+     "id": "gym1-80",
+     "nom": "Lt. Surge's Magnemite"
+    },
+    {
+     "id": "gym1-81",
+     "nom": "Lt. Surge's Pikachu"
+    },
+    {
+     "id": "gym1-82",
+     "nom": "Lt. Surge's Rattata"
+    },
+    {
+     "id": "gym1-83",
+     "nom": "Lt. Surge's Spearow"
+    },
+    {
+     "id": "gym1-84",
+     "nom": "Lt. Surge's Voltorb"
+    },
+    {
+     "id": "gym1-85",
+     "nom": "Misty's Goldeen"
+    },
+    {
+     "id": "gym1-86",
+     "nom": "Misty's Horsea"
+    },
+    {
+     "id": "gym1-87",
+     "nom": "Misty's Poliwag"
+    },
+    {
+     "id": "gym1-89",
+     "nom": "Misty's Shellder"
+    },
+    {
+     "id": "gym1-90",
+     "nom": "Misty's Staryu"
+    },
+    {
+     "id": "gym1-91",
+     "nom": "Sabrina's Abra"
+    },
+    {
+     "id": "gym1-92",
+     "nom": "Sabrina's Drowzee"
+    },
+    {
+     "id": "gym1-93",
+     "nom": "Sabrina's Gastly"
+    },
+    {
+     "id": "gym1-94",
+     "nom": "Sabrina's Mr. Mime"
+    },
+    {
+     "id": "gym1-95",
+     "nom": "Sabrina's Slowpoke"
+    },
+    {
+     "id": "gym1-96",
+     "nom": "Sabrina's Venonat"
+    },
+    {
+     "id": "gym1-97",
+     "nom": "Blaine's Quiz #1"
+    },
+    {
+     "id": "gym1-98",
+     "nom": "Brock"
+    },
+    {
+     "id": "gym1-99",
+     "nom": "Charity"
+    },
+    {
+     "id": "gym1-100",
+     "nom": "Erika"
+    },
+    {
+     "id": "gym1-101",
+     "nom": "Lt. Surge"
+    },
+    {
+     "id": "gym1-102",
+     "nom": "Misty"
+    },
+    {
+     "id": "gym1-103",
+     "nom": "No Removal Gym"
+    },
+    {
+     "id": "gym1-104",
+     "nom": "The Rocket's Training Gym"
+    },
+    {
+     "id": "gym1-105",
+     "nom": "Blaine's Last Resort"
+    },
+    {
+     "id": "gym1-106",
+     "nom": "Brock's Training Method"
+    },
+    {
+     "id": "gym1-107",
+     "nom": "Celadon City Gym"
+    },
+    {
+     "id": "gym1-108",
+     "nom": "Cerulean City Gym"
+    },
+    {
+     "id": "gym1-109",
+     "nom": "Erika's Maids"
+    },
+    {
+     "id": "gym1-110",
+     "nom": "Erika's Perfume"
+    },
+    {
+     "id": "gym1-111",
+     "nom": "Good Manners"
+    },
+    {
+     "id": "gym1-112",
+     "nom": "Lt. Surge's Treaty"
+    },
+    {
+     "id": "gym1-113",
+     "nom": "Minion of Team Rocket"
+    },
+    {
+     "id": "gym1-114",
+     "nom": "Misty's Wrath"
+    },
+    {
+     "id": "gym1-115",
+     "nom": "Pewter City Gym"
+    },
+    {
+     "id": "gym1-116",
+     "nom": "Recall"
+    },
+    {
+     "id": "gym1-117",
+     "nom": "Sabrina's ESP"
+    },
+    {
+     "id": "gym1-118",
+     "nom": "Secret Mission"
+    },
+    {
+     "id": "gym1-119",
+     "nom": "Tickling Machine"
+    },
+    {
+     "id": "gym1-120",
+     "nom": "Vermilion City Gym"
+    },
+    {
+     "id": "gym1-121",
+     "nom": "Blaine's Gamble"
+    },
+    {
+     "id": "gym1-122",
+     "nom": "Energy Flow"
+    },
+    {
+     "id": "gym1-123",
+     "nom": "Misty's Duel"
+    },
+    {
+     "id": "gym1-124",
+     "nom": "Narrow Gym"
+    },
+    {
+     "id": "gym1-125",
+     "nom": "Sabrina's Gaze"
+    },
+    {
+     "id": "gym1-126",
+     "nom": "Trash Exchange"
+    }
+   ]
   },
   "gym2": {
    "nom": "Gym Challenge",
    "total": 132,
-   "depot": 132,
+   "depot": 6,
    "principal": 0,
    "secoursFrancais": 0,
-   "secoursAnglais": 0,
+   "secoursAnglais": 126,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": []
+   "cartesAnglaises": [
+    {
+     "id": "gym2-1",
+     "nom": "Blaine's Arcanine"
+    },
+    {
+     "id": "gym2-2",
+     "nom": "Blaine's Charizard"
+    },
+    {
+     "id": "gym2-3",
+     "nom": "Brock's Ninetales"
+    },
+    {
+     "id": "gym2-4",
+     "nom": "Erika's Venusaur"
+    },
+    {
+     "id": "gym2-5",
+     "nom": "Giovanni's Gyarados"
+    },
+    {
+     "id": "gym2-6",
+     "nom": "Giovanni's Machamp"
+    },
+    {
+     "id": "gym2-7",
+     "nom": "Giovanni's Nidoking"
+    },
+    {
+     "id": "gym2-8",
+     "nom": "Giovanni's Persian"
+    },
+    {
+     "id": "gym2-9",
+     "nom": "Koga's Beedrill"
+    },
+    {
+     "id": "gym2-10",
+     "nom": "Koga's Ditto"
+    },
+    {
+     "id": "gym2-11",
+     "nom": "Lt. Surge's Raichu"
+    },
+    {
+     "id": "gym2-12",
+     "nom": "Misty's Golduck"
+    },
+    {
+     "id": "gym2-13",
+     "nom": "Misty's Gyarados"
+    },
+    {
+     "id": "gym2-14",
+     "nom": "Rocket's Mewtwo"
+    },
+    {
+     "id": "gym2-15",
+     "nom": "Rocket's Zapdos"
+    },
+    {
+     "id": "gym2-16",
+     "nom": "Sabrina's Alakazam"
+    },
+    {
+     "id": "gym2-17",
+     "nom": "Blaine"
+    },
+    {
+     "id": "gym2-18",
+     "nom": "Giovanni"
+    },
+    {
+     "id": "gym2-19",
+     "nom": "Koga"
+    },
+    {
+     "id": "gym2-20",
+     "nom": "Sabrina"
+    },
+    {
+     "id": "gym2-21",
+     "nom": "Blaine's Ninetales"
+    },
+    {
+     "id": "gym2-22",
+     "nom": "Brock's Dugtrio"
+    },
+    {
+     "id": "gym2-23",
+     "nom": "Giovanni's Nidoqueen"
+    },
+    {
+     "id": "gym2-24",
+     "nom": "Giovanni's Pinsir"
+    },
+    {
+     "id": "gym2-25",
+     "nom": "Koga's Arbok"
+    },
+    {
+     "id": "gym2-26",
+     "nom": "Koga's Muk"
+    },
+    {
+     "id": "gym2-27",
+     "nom": "Koga's Pidgeotto"
+    },
+    {
+     "id": "gym2-28",
+     "nom": "Lt. Surge's Jolteon"
+    },
+    {
+     "id": "gym2-29",
+     "nom": "Sabrina's Gengar"
+    },
+    {
+     "id": "gym2-30",
+     "nom": "Sabrina's Golduck"
+    },
+    {
+     "id": "gym2-31",
+     "nom": "Blaine's Charmeleon"
+    },
+    {
+     "id": "gym2-32",
+     "nom": "Blaine's Dodrio"
+    },
+    {
+     "id": "gym2-33",
+     "nom": "Blaine's Rapidash"
+    },
+    {
+     "id": "gym2-34",
+     "nom": "Brock's Graveler"
+    },
+    {
+     "id": "gym2-35",
+     "nom": "Brock's Primeape"
+    },
+    {
+     "id": "gym2-36",
+     "nom": "Brock's Sandslash"
+    },
+    {
+     "id": "gym2-37",
+     "nom": "Brock's Vulpix"
+    },
+    {
+     "id": "gym2-38",
+     "nom": "Erika's Bellsprout"
+    },
+    {
+     "id": "gym2-39",
+     "nom": "Erika's Bulbasaur"
+    },
+    {
+     "id": "gym2-40",
+     "nom": "Erika's Clefairy"
+    },
+    {
+     "id": "gym2-41",
+     "nom": "Erika's Ivysaur"
+    },
+    {
+     "id": "gym2-42",
+     "nom": "Giovanni's Machoke"
+    },
+    {
+     "id": "gym2-43",
+     "nom": "Giovanni's Meowth"
+    },
+    {
+     "id": "gym2-44",
+     "nom": "Giovanni's Nidorina"
+    },
+    {
+     "id": "gym2-45",
+     "nom": "Giovanni's Nidorino"
+    },
+    {
+     "id": "gym2-46",
+     "nom": "Koga's Golbat"
+    },
+    {
+     "id": "gym2-47",
+     "nom": "Koga's Kakuna"
+    },
+    {
+     "id": "gym2-48",
+     "nom": "Koga's Koffing"
+    },
+    {
+     "id": "gym2-49",
+     "nom": "Koga's Pidgey"
+    },
+    {
+     "id": "gym2-50",
+     "nom": "Koga's Weezing"
+    },
+    {
+     "id": "gym2-51",
+     "nom": "Lt. Surge's Eevee"
+    },
+    {
+     "id": "gym2-52",
+     "nom": "Lt. Surge's Electrode"
+    },
+    {
+     "id": "gym2-53",
+     "nom": "Lt. Surge's Raticate"
+    },
+    {
+     "id": "gym2-54",
+     "nom": "Misty's Dewgong"
+    },
+    {
+     "id": "gym2-55",
+     "nom": "Sabrina's Haunter"
+    },
+    {
+     "id": "gym2-56",
+     "nom": "Sabrina's Hypno"
+    },
+    {
+     "id": "gym2-57",
+     "nom": "Sabrina's Jynx"
+    },
+    {
+     "id": "gym2-58",
+     "nom": "Sabrina's Kadabra"
+    },
+    {
+     "id": "gym2-59",
+     "nom": "Sabrina's Mr. Mime"
+    },
+    {
+     "id": "gym2-60",
+     "nom": "Blaine's Charmander"
+    },
+    {
+     "id": "gym2-61",
+     "nom": "Blaine's Doduo"
+    },
+    {
+     "id": "gym2-62",
+     "nom": "Blaine's Growlithe"
+    },
+    {
+     "id": "gym2-63",
+     "nom": "Blaine's Mankey"
+    },
+    {
+     "id": "gym2-64",
+     "nom": "Blaine's Ponyta"
+    },
+    {
+     "id": "gym2-65",
+     "nom": "Blaine's Rhyhorn"
+    },
+    {
+     "id": "gym2-66",
+     "nom": "Blaine's Vulpix"
+    },
+    {
+     "id": "gym2-67",
+     "nom": "Brock's Diglett"
+    },
+    {
+     "id": "gym2-68",
+     "nom": "Brock's Geodude"
+    },
+    {
+     "id": "gym2-69",
+     "nom": "Erika's Jigglypuff"
+    },
+    {
+     "id": "gym2-70",
+     "nom": "Erika's Oddish"
+    },
+    {
+     "id": "gym2-71",
+     "nom": "Erika's Paras"
+    },
+    {
+     "id": "gym2-72",
+     "nom": "Giovanni's Machop"
+    },
+    {
+     "id": "gym2-73",
+     "nom": "Giovanni's Magikarp"
+    },
+    {
+     "id": "gym2-74",
+     "nom": "Giovanni's Meowth"
+    },
+    {
+     "id": "gym2-75",
+     "nom": "Giovanni's Nidoran ♀"
+    },
+    {
+     "id": "gym2-76",
+     "nom": "Giovanni's Nidoran ♂"
+    },
+    {
+     "id": "gym2-77",
+     "nom": "Koga's Ekans"
+    },
+    {
+     "id": "gym2-78",
+     "nom": "Koga's Grimer"
+    },
+    {
+     "id": "gym2-79",
+     "nom": "Koga's Koffing"
+    },
+    {
+     "id": "gym2-80",
+     "nom": "Koga's Pidgey"
+    },
+    {
+     "id": "gym2-81",
+     "nom": "Koga's Tangela"
+    },
+    {
+     "id": "gym2-82",
+     "nom": "Koga's Weedle"
+    },
+    {
+     "id": "gym2-83",
+     "nom": "Koga's Zubat"
+    },
+    {
+     "id": "gym2-84",
+     "nom": "Lt. Surge's Pikachu"
+    },
+    {
+     "id": "gym2-85",
+     "nom": "Lt. Surge's Rattata"
+    },
+    {
+     "id": "gym2-86",
+     "nom": "Lt. Surge's Voltorb"
+    },
+    {
+     "id": "gym2-87",
+     "nom": "Misty's Horsea"
+    },
+    {
+     "id": "gym2-88",
+     "nom": "Misty's Magikarp"
+    },
+    {
+     "id": "gym2-89",
+     "nom": "Misty's Poliwag"
+    },
+    {
+     "id": "gym2-90",
+     "nom": "Misty's Psyduck"
+    },
+    {
+     "id": "gym2-91",
+     "nom": "Misty's Seel"
+    },
+    {
+     "id": "gym2-92",
+     "nom": "Misty's Staryu"
+    },
+    {
+     "id": "gym2-93",
+     "nom": "Sabrina's Abra"
+    },
+    {
+     "id": "gym2-94",
+     "nom": "Sabrina's Abra"
+    },
+    {
+     "id": "gym2-95",
+     "nom": "Sabrina's Drowzee"
+    },
+    {
+     "id": "gym2-96",
+     "nom": "Sabrina's Gastly"
+    },
+    {
+     "id": "gym2-97",
+     "nom": "Sabrina's Gastly"
+    },
+    {
+     "id": "gym2-98",
+     "nom": "Sabrina's Porygon"
+    },
+    {
+     "id": "gym2-99",
+     "nom": "Sabrina's Psyduck"
+    },
+    {
+     "id": "gym2-100",
+     "nom": "Blaine"
+    },
+    {
+     "id": "gym2-101",
+     "nom": "Brock's Protection"
+    },
+    {
+     "id": "gym2-102",
+     "nom": "Chaos Gym"
+    },
+    {
+     "id": "gym2-103",
+     "nom": "Erika's Kindness"
+    },
+    {
+     "id": "gym2-104",
+     "nom": "Giovanni"
+    },
+    {
+     "id": "gym2-105",
+     "nom": "Giovanni's Last Resort"
+    },
+    {
+     "id": "gym2-106",
+     "nom": "Koga"
+    },
+    {
+     "id": "gym2-107",
+     "nom": "Lt. Surge's Secret Plan"
+    },
+    {
+     "id": "gym2-108",
+     "nom": "Misty's Wish"
+    },
+    {
+     "id": "gym2-109",
+     "nom": "Resistance Gym"
+    },
+    {
+     "id": "gym2-110",
+     "nom": "Sabrina"
+    },
+    {
+     "id": "gym2-111",
+     "nom": "Blaine's Quiz #2"
+    },
+    {
+     "id": "gym2-112",
+     "nom": "Blaine's Quiz #3"
+    },
+    {
+     "id": "gym2-113",
+     "nom": "Cinnabar City Gym"
+    },
+    {
+     "id": "gym2-114",
+     "nom": "Fuchsia City Gym"
+    },
+    {
+     "id": "gym2-115",
+     "nom": "Koga's Ninja Trick"
+    },
+    {
+     "id": "gym2-116",
+     "nom": "Master Ball"
+    },
+    {
+     "id": "gym2-117",
+     "nom": "Max Revive"
+    },
+    {
+     "id": "gym2-118",
+     "nom": "Misty's Tears"
+    },
+    {
+     "id": "gym2-119",
+     "nom": "Rocket's Minefield Gym"
+    },
+    {
+     "id": "gym2-120",
+     "nom": "Rocket's Secret Experiment"
+    },
+    {
+     "id": "gym2-121",
+     "nom": "Sabrina's Psychic Control"
+    },
+    {
+     "id": "gym2-122",
+     "nom": "Saffron City Gym"
+    },
+    {
+     "id": "gym2-123",
+     "nom": "Viridian City Gym"
+    },
+    {
+     "id": "gym2-124",
+     "nom": "Fervor"
+    },
+    {
+     "id": "gym2-125",
+     "nom": "Transparent Walls"
+    },
+    {
+     "id": "gym2-126",
+     "nom": "Warp Point"
+    }
+   ]
   },
   "neo1": {
    "nom": "Neo Genesis",
@@ -151,8 +1602,8 @@
    "nom": "Neo Discovery",
    "total": 75,
    "depot": 0,
-   "principal": 63,
-   "secoursFrancais": 12,
+   "principal": 75,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -163,15 +1614,68 @@
   "si1": {
    "nom": "Southern Islands",
    "total": 18,
-   "depot": 18,
+   "depot": 5,
    "principal": 0,
    "secoursFrancais": 0,
-   "secoursAnglais": 0,
+   "secoursAnglais": 13,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": []
+   "cartesAnglaises": [
+    {
+     "id": "si1-2",
+     "nom": "Pidgeot"
+    },
+    {
+     "id": "si1-3",
+     "nom": "Onix"
+    },
+    {
+     "id": "si1-5",
+     "nom": "Ivysaur"
+    },
+    {
+     "id": "si1-6",
+     "nom": "Raticate"
+    },
+    {
+     "id": "si1-7",
+     "nom": "Ledyba"
+    },
+    {
+     "id": "si1-8",
+     "nom": "Jigglypuff"
+    },
+    {
+     "id": "si1-9",
+     "nom": "Butterfree"
+    },
+    {
+     "id": "si1-10",
+     "nom": "Tentacruel"
+    },
+    {
+     "id": "si1-12",
+     "nom": "Lapras"
+    },
+    {
+     "id": "si1-13",
+     "nom": "Exeggutor"
+    },
+    {
+     "id": "si1-15",
+     "nom": "Wartortle"
+    },
+    {
+     "id": "si1-16",
+     "nom": "Lickitung"
+    },
+    {
+     "id": "si1-18",
+     "nom": "Primeape"
+    }
+   ]
   },
   "neo3": {
    "nom": "Neo Revelation",
@@ -202,18 +1706,438 @@
   "lc": {
    "nom": "Legendary Collection",
    "total": 110,
-   "depot": 109,
+   "depot": 2,
    "principal": 0,
-   "secoursFrancais": 0,
-   "secoursAnglais": 1,
+   "secoursFrancais": 2,
+   "secoursAnglais": 106,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
    "cartesAnglaises": [
     {
+     "id": "lc-1",
+     "nom": "Alakazam"
+    },
+    {
+     "id": "lc-2",
+     "nom": "Articuno"
+    },
+    {
+     "id": "lc-3",
+     "nom": "Charizard"
+    },
+    {
+     "id": "lc-4",
+     "nom": "Dark Blastoise"
+    },
+    {
+     "id": "lc-5",
+     "nom": "Dark Dragonite"
+    },
+    {
+     "id": "lc-6",
+     "nom": "Dark Persian"
+    },
+    {
+     "id": "lc-7",
+     "nom": "Dark Raichu"
+    },
+    {
+     "id": "lc-8",
+     "nom": "Dark Slowbro"
+    },
+    {
+     "id": "lc-9",
+     "nom": "Dark Vaporeon"
+    },
+    {
+     "id": "lc-10",
+     "nom": "Flareon"
+    },
+    {
+     "id": "lc-11",
+     "nom": "Gengar"
+    },
+    {
+     "id": "lc-12",
+     "nom": "Gyarados"
+    },
+    {
+     "id": "lc-13",
+     "nom": "Hitmonlee"
+    },
+    {
+     "id": "lc-14",
+     "nom": "Jolteon"
+    },
+    {
+     "id": "lc-15",
+     "nom": "Machamp"
+    },
+    {
+     "id": "lc-16",
+     "nom": "Muk"
+    },
+    {
+     "id": "lc-17",
+     "nom": "Ninetales"
+    },
+    {
+     "id": "lc-18",
+     "nom": "Venusaur"
+    },
+    {
+     "id": "lc-19",
+     "nom": "Zapdos"
+    },
+    {
+     "id": "lc-20",
+     "nom": "Beedrill"
+    },
+    {
+     "id": "lc-21",
+     "nom": "Butterfree"
+    },
+    {
+     "id": "lc-22",
+     "nom": "Electrode"
+    },
+    {
+     "id": "lc-23",
+     "nom": "Exeggutor"
+    },
+    {
+     "id": "lc-24",
+     "nom": "Golem"
+    },
+    {
+     "id": "lc-25",
+     "nom": "Hypno"
+    },
+    {
+     "id": "lc-26",
+     "nom": "Jynx"
+    },
+    {
+     "id": "lc-27",
+     "nom": "Kabutops"
+    },
+    {
+     "id": "lc-28",
+     "nom": "Magneton"
+    },
+    {
+     "id": "lc-29",
+     "nom": "Mewtwo"
+    },
+    {
+     "id": "lc-30",
+     "nom": "Moltres"
+    },
+    {
+     "id": "lc-31",
+     "nom": "Nidoking"
+    },
+    {
+     "id": "lc-32",
+     "nom": "Nidoqueen"
+    },
+    {
+     "id": "lc-33",
+     "nom": "Pidgeot"
+    },
+    {
+     "id": "lc-34",
+     "nom": "Pidgeotto"
+    },
+    {
+     "id": "lc-35",
+     "nom": "Rhydon"
+    },
+    {
+     "id": "lc-36",
+     "nom": "Arcanine"
+    },
+    {
+     "id": "lc-37",
+     "nom": "Charmeleon"
+    },
+    {
+     "id": "lc-38",
+     "nom": "Dark Dragonair"
+    },
+    {
+     "id": "lc-39",
+     "nom": "Dark Wartortle"
+    },
+    {
+     "id": "lc-40",
+     "nom": "Dewgong"
+    },
+    {
+     "id": "lc-41",
+     "nom": "Dodrio"
+    },
+    {
+     "id": "lc-42",
+     "nom": "Fearow"
+    },
+    {
+     "id": "lc-43",
+     "nom": "Golduck"
+    },
+    {
+     "id": "lc-44",
+     "nom": "Graveler"
+    },
+    {
+     "id": "lc-45",
+     "nom": "Growlithe"
+    },
+    {
      "id": "lc-46",
      "nom": "Haunter"
+    },
+    {
+     "id": "lc-47",
+     "nom": "Ivysaur"
+    },
+    {
+     "id": "lc-48",
+     "nom": "Kabuto"
+    },
+    {
+     "id": "lc-49",
+     "nom": "Kadabra"
+    },
+    {
+     "id": "lc-50",
+     "nom": "Kakuna"
+    },
+    {
+     "id": "lc-51",
+     "nom": "Machoke"
+    },
+    {
+     "id": "lc-53",
+     "nom": "Meowth"
+    },
+    {
+     "id": "lc-54",
+     "nom": "Metapod"
+    },
+    {
+     "id": "lc-55",
+     "nom": "Nidorina"
+    },
+    {
+     "id": "lc-56",
+     "nom": "Nidorino"
+    },
+    {
+     "id": "lc-57",
+     "nom": "Omanyte"
+    },
+    {
+     "id": "lc-58",
+     "nom": "Omastar"
+    },
+    {
+     "id": "lc-59",
+     "nom": "Primeape"
+    },
+    {
+     "id": "lc-60",
+     "nom": "Rapidash"
+    },
+    {
+     "id": "lc-61",
+     "nom": "Raticate"
+    },
+    {
+     "id": "lc-62",
+     "nom": "Sandslash"
+    },
+    {
+     "id": "lc-63",
+     "nom": "Seadra"
+    },
+    {
+     "id": "lc-64",
+     "nom": "Snorlax"
+    },
+    {
+     "id": "lc-65",
+     "nom": "Tauros"
+    },
+    {
+     "id": "lc-66",
+     "nom": "Tentacruel"
+    },
+    {
+     "id": "lc-67",
+     "nom": "Abra"
+    },
+    {
+     "id": "lc-68",
+     "nom": "Bulbasaur"
+    },
+    {
+     "id": "lc-69",
+     "nom": "Caterpie"
+    },
+    {
+     "id": "lc-70",
+     "nom": "Charmander"
+    },
+    {
+     "id": "lc-71",
+     "nom": "Doduo"
+    },
+    {
+     "id": "lc-72",
+     "nom": "Dratini"
+    },
+    {
+     "id": "lc-73",
+     "nom": "Drowzee"
+    },
+    {
+     "id": "lc-74",
+     "nom": "Eevee"
+    },
+    {
+     "id": "lc-75",
+     "nom": "Exeggcute"
+    },
+    {
+     "id": "lc-76",
+     "nom": "Gastly"
+    },
+    {
+     "id": "lc-77",
+     "nom": "Geodude"
+    },
+    {
+     "id": "lc-78",
+     "nom": "Grimer"
+    },
+    {
+     "id": "lc-79",
+     "nom": "Machop"
+    },
+    {
+     "id": "lc-80",
+     "nom": "Magnemite"
+    },
+    {
+     "id": "lc-81",
+     "nom": "Mankey"
+    },
+    {
+     "id": "lc-82",
+     "nom": "Nidoran ♀"
+    },
+    {
+     "id": "lc-83",
+     "nom": "Nidoran ♂"
+    },
+    {
+     "id": "lc-84",
+     "nom": "Onix"
+    },
+    {
+     "id": "lc-85",
+     "nom": "Pidgey"
+    },
+    {
+     "id": "lc-86",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "lc-87",
+     "nom": "Ponyta"
+    },
+    {
+     "id": "lc-88",
+     "nom": "Psyduck"
+    },
+    {
+     "id": "lc-89",
+     "nom": "Rattata"
+    },
+    {
+     "id": "lc-90",
+     "nom": "Rhyhorn"
+    },
+    {
+     "id": "lc-91",
+     "nom": "Sandshrew"
+    },
+    {
+     "id": "lc-93",
+     "nom": "Slowpoke"
+    },
+    {
+     "id": "lc-94",
+     "nom": "Spearow"
+    },
+    {
+     "id": "lc-95",
+     "nom": "Squirtle"
+    },
+    {
+     "id": "lc-96",
+     "nom": "Tentacool"
+    },
+    {
+     "id": "lc-97",
+     "nom": "Voltorb"
+    },
+    {
+     "id": "lc-98",
+     "nom": "Vulpix"
+    },
+    {
+     "id": "lc-99",
+     "nom": "Weedle"
+    },
+    {
+     "id": "lc-102",
+     "nom": "Pokémon Breeder"
+    },
+    {
+     "id": "lc-103",
+     "nom": "Pokémon Trader"
+    },
+    {
+     "id": "lc-104",
+     "nom": "Scoop Up"
+    },
+    {
+     "id": "lc-105",
+     "nom": "The Boss's Way"
+    },
+    {
+     "id": "lc-106",
+     "nom": "Challenge!"
+    },
+    {
+     "id": "lc-107",
+     "nom": "Energy Retrieval"
+    },
+    {
+     "id": "lc-108",
+     "nom": "Bill"
+    },
+    {
+     "id": "lc-109",
+     "nom": "Mysterious Fossil"
+    },
+    {
+     "id": "lc-110",
+     "nom": "Potion"
     }
    ]
   },
@@ -233,8 +2157,34 @@
   "bog": {
    "nom": "Best of game",
    "total": 9,
-   "depot": 9,
+   "depot": 6,
    "principal": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 3,
+   "manquant": 0,
+   "indecis": 0,
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "bog-5",
+     "nom": "Rocket’s Sneasel"
+    },
+    {
+     "id": "bog-6",
+     "nom": "Dark Ivysaur"
+    },
+    {
+     "id": "bog-7",
+     "nom": "Dark Venusaur"
+    }
+   ]
+  },
+  "ecard2": {
+   "nom": "Aquapolis",
+   "total": 186,
+   "depot": 14,
+   "principal": 172,
    "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
@@ -243,66 +2193,30 @@
    "cartesIndecises": [],
    "cartesAnglaises": []
   },
-  "ecard2": {
-   "nom": "Aquapolis",
-   "total": 186,
-   "depot": 5,
-   "principal": 172,
-   "secoursFrancais": 0,
-   "secoursAnglais": 0,
-   "manquant": 9,
-   "indecis": 0,
-   "cartesManquantes": [
-    {
-     "id": "ecard2-H01",
-     "nom": "Pharamp"
-    },
-    {
-     "id": "ecard2-H02",
-     "nom": "Arcanin"
-    },
-    {
-     "id": "ecard2-H03",
-     "nom": "Migalos"
-    },
-    {
-     "id": "ecard2-H04",
-     "nom": "Azumarill"
-    },
-    {
-     "id": "ecard2-H05",
-     "nom": "Joliflor"
-    },
-    {
-     "id": "ecard2-H06",
-     "nom": "Leuphorie"
-    },
-    {
-     "id": "ecard2-H07",
-     "nom": "Électrode"
-    },
-    {
-     "id": "ecard2-H08",
-     "nom": "Entei"
-    },
-    {
-     "id": "ecard2-H09",
-     "nom": "Mentali"
-    }
-   ],
-   "cartesIndecises": [],
-   "cartesAnglaises": []
-  },
   "ecard3": {
    "nom": "Skyridge",
    "total": 182,
-   "depot": 26,
+   "depot": 3,
    "principal": 147,
    "secoursFrancais": 0,
-   "secoursAnglais": 0,
-   "manquant": 9,
+   "secoursAnglais": 32,
+   "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": [
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "ecard3-94",
+     "nom": "Seel"
+    },
+    {
+     "id": "ecard3-145",
+     "nom": "Celebi"
+    },
+    {
+     "id": "ecard3-146",
+     "nom": "Charizard"
+    },
     {
      "id": "ecard3-H01",
      "nom": "Alakazam"
@@ -332,16 +2246,94 @@
      "nom": "Flareon"
     },
     {
-     "id": "ecard3-H08",
-     "nom": "Forretress"
-    },
-    {
      "id": "ecard3-H09",
      "nom": "Gengar"
+    },
+    {
+     "id": "ecard3-H10",
+     "nom": "Gyarados"
+    },
+    {
+     "id": "ecard3-H11",
+     "nom": "Houndoom"
+    },
+    {
+     "id": "ecard3-H12",
+     "nom": "Jolteon"
+    },
+    {
+     "id": "ecard3-H13",
+     "nom": "Kabutops"
+    },
+    {
+     "id": "ecard3-H14",
+     "nom": "Ledian"
+    },
+    {
+     "id": "ecard3-H15",
+     "nom": "Machamp"
+    },
+    {
+     "id": "ecard3-H16",
+     "nom": "Magcargo"
+    },
+    {
+     "id": "ecard3-H17",
+     "nom": "Magcargo"
+    },
+    {
+     "id": "ecard3-H18",
+     "nom": "Magneton"
+    },
+    {
+     "id": "ecard3-H20",
+     "nom": "Moltres"
+    },
+    {
+     "id": "ecard3-H21",
+     "nom": "Nidoqueen"
+    },
+    {
+     "id": "ecard3-H22",
+     "nom": "Piloswine"
+    },
+    {
+     "id": "ecard3-H23",
+     "nom": "Politoed"
+    },
+    {
+     "id": "ecard3-H24",
+     "nom": "Poliwrath"
+    },
+    {
+     "id": "ecard3-H25",
+     "nom": "Raichu"
+    },
+    {
+     "id": "ecard3-H26",
+     "nom": "Raikou"
+    },
+    {
+     "id": "ecard3-H27",
+     "nom": "Rhydon"
+    },
+    {
+     "id": "ecard3-H28",
+     "nom": "Starmie"
+    },
+    {
+     "id": "ecard3-H30",
+     "nom": "Umbreon"
+    },
+    {
+     "id": "ecard3-H31",
+     "nom": "Vaporeon"
+    },
+    {
+     "id": "ecard3-H32",
+     "nom": "Xatu"
     }
-   ],
-   "cartesIndecises": [],
-   "cartesAnglaises": []
+   ]
   },
   "ex1": {
    "nom": "EX Rubis & Saphir",
@@ -372,9 +2364,9 @@
   "np": {
    "nom": "Promo Nintendo",
    "total": 40,
-   "depot": 40,
+   "depot": 22,
    "principal": 0,
-   "secoursFrancais": 0,
+   "secoursFrancais": 18,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -424,15 +2416,36 @@
   "ex5.5": {
    "nom": "Poké Card Creator Pack",
    "total": 5,
-   "depot": 5,
+   "depot": 0,
    "principal": 0,
    "secoursFrancais": 0,
-   "secoursAnglais": 0,
+   "secoursAnglais": 5,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": []
+   "cartesAnglaises": [
+    {
+     "id": "ex5.5-1",
+     "nom": "Treecko"
+    },
+    {
+     "id": "ex5.5-2",
+     "nom": "Wurmple"
+    },
+    {
+     "id": "ex5.5-3",
+     "nom": "Torchic"
+    },
+    {
+     "id": "ex5.5-4",
+     "nom": "Mudkip"
+    },
+    {
+     "id": "ex5.5-5",
+     "nom": "Pikachu"
+    }
+   ]
   },
   "tk-ex-latia": {
    "nom": "EX Kit dresseur (Latias)",
@@ -556,124 +2569,11 @@
    "total": 28,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 0,
+   "secoursFrancais": 28,
    "secoursAnglais": 0,
-   "manquant": 28,
+   "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": [
-    {
-     "id": "exu-!",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-%3F",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-A",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-B",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-C",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-D",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-E",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-F",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-G",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-H",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-I",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-J",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-K",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-L",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-M",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-N",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-O",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-P",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-Q",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-R",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-S",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-T",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-U",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-V",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-W",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-X",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-Y",
-     "nom": "Zarbi"
-    },
-    {
-     "id": "exu-Z",
-     "nom": "Zarbi"
-    }
-   ],
+   "cartesManquantes": [],
    "cartesIndecises": [],
    "cartesAnglaises": []
   },
@@ -823,15 +2723,72 @@
   "dpp": {
    "nom": "Promo DP",
    "total": 56,
-   "depot": 56,
+   "depot": 42,
    "principal": 0,
    "secoursFrancais": 0,
-   "secoursAnglais": 0,
+   "secoursAnglais": 14,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": []
+   "cartesAnglaises": [
+    {
+     "id": "dpp-DP04",
+     "nom": "Pachirisu"
+    },
+    {
+     "id": "dpp-DP06",
+     "nom": "Buneary"
+    },
+    {
+     "id": "dpp-DP13",
+     "nom": "Buizel"
+    },
+    {
+     "id": "dpp-DP14",
+     "nom": "Chatot"
+    },
+    {
+     "id": "dpp-DP15",
+     "nom": "Shinx"
+    },
+    {
+     "id": "dpp-DP41",
+     "nom": "Toxicroak G"
+    },
+    {
+     "id": "dpp-DP44",
+     "nom": "Magnezone"
+    },
+    {
+     "id": "dpp-DP45",
+     "nom": "Charizard G"
+    },
+    {
+     "id": "dpp-DP46",
+     "nom": "Garchomp C"
+    },
+    {
+     "id": "dpp-DP47",
+     "nom": "Rayquaza C"
+    },
+    {
+     "id": "dpp-DP49",
+     "nom": "Dialga"
+    },
+    {
+     "id": "dpp-DP51",
+     "nom": "Cresselia"
+    },
+    {
+     "id": "dpp-DP52",
+     "nom": "Darkrai"
+    },
+    {
+     "id": "dpp-DP56",
+     "nom": "Arceus"
+    }
+   ]
   },
   "dp1": {
    "nom": "Diamant & Perle",
@@ -916,46 +2873,13 @@
    "total": 106,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 98,
-   "secoursAnglais": 8,
+   "secoursFrancais": 106,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": [
-    {
-     "id": "dp4-33",
-     "nom": "Arbok"
-    },
-    {
-     "id": "dp4-34",
-     "nom": "Cacturne"
-    },
-    {
-     "id": "dp4-35",
-     "nom": "Galifeu"
-    },
-    {
-     "id": "dp4-36",
-     "nom": "Cadoizo"
-    },
-    {
-     "id": "dp4-37",
-     "nom": "Mustéflott"
-    },
-    {
-     "id": "dp4-38",
-     "nom": "Rosabyss"
-    },
-    {
-     "id": "dp4-39",
-     "nom": "Granbull"
-    },
-    {
-     "id": "dp4-40",
-     "nom": "Massko"
-    }
-   ]
+   "cartesAnglaises": []
   },
   "pop7": {
    "nom": "POP Série 7",
@@ -1014,26 +2938,13 @@
    "total": 106,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 103,
-   "secoursAnglais": 3,
+   "secoursFrancais": 106,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": [
-    {
-     "id": "dp7-SH1",
-     "nom": "Baudrive"
-    },
-    {
-     "id": "dp7-SH2",
-     "nom": "Skelénox"
-    },
-    {
-     "id": "dp7-SH3",
-     "nom": "Voltorbe"
-    }
-   ]
+   "cartesAnglaises": []
   },
   "pl1": {
    "nom": "Platine",
@@ -1065,60 +2976,8 @@
    "nom": "Rivaux Émergeants",
    "total": 120,
    "depot": 0,
-   "principal": 120,
+   "principal": 119,
    "secoursFrancais": 0,
-   "secoursAnglais": 0,
-   "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": [],
-   "cartesIndecises": [],
-   "cartesAnglaises": []
-  },
-  "pl3": {
-   "nom": "Vainqueurs Suprêmes",
-   "total": 162,
-   "depot": 0,
-   "principal": 161,
-   "secoursFrancais": 1,
-   "secoursAnglais": 0,
-   "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": [],
-   "cartesIndecises": [],
-   "cartesAnglaises": []
-  },
-  "pl4": {
-   "nom": "Arceus",
-   "total": 111,
-   "depot": 0,
-   "principal": 111,
-   "secoursFrancais": 0,
-   "secoursAnglais": 0,
-   "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": [],
-   "cartesIndecises": [],
-   "cartesAnglaises": []
-  },
-  "ru1": {
-   "nom": "Pokémon Rumble",
-   "total": 16,
-   "depot": 16,
-   "principal": 0,
-   "secoursFrancais": 0,
-   "secoursAnglais": 0,
-   "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": [],
-   "cartesIndecises": [],
-   "cartesAnglaises": []
-  },
-  "hgss1": {
-   "nom": "HeartGold SoulSilver",
-   "total": 124,
-   "depot": 0,
-   "principal": 122,
-   "secoursFrancais": 1,
    "secoursAnglais": 1,
    "manquant": 0,
    "indecis": 0,
@@ -1126,104 +2985,372 @@
    "cartesIndecises": [],
    "cartesAnglaises": [
     {
-     "id": "hgss1-ONE",
-     "nom": "Lithographie d’Alph"
+     "id": "pl2-38",
+     "nom": "Alakazam 4 Niv. 56"
     }
    ]
+  },
+  "pl3": {
+   "nom": "Vainqueurs Suprêmes",
+   "total": 162,
+   "depot": 0,
+   "principal": 124,
+   "secoursFrancais": 33,
+   "secoursAnglais": 1,
+   "manquant": 0,
+   "indecis": 4,
+   "cartesManquantes": [],
+   "cartesIndecises": [
+    {
+     "id": "pl3-AR2",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl3-AR4",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl3-AR5",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl3-AR8",
+     "nom": "Arceus"
+    }
+   ],
+   "cartesAnglaises": [
+    {
+     "id": "pl3-SH8",
+     "nom": "Relicanth"
+    }
+   ]
+  },
+  "pl4": {
+   "nom": "Arceus",
+   "total": 111,
+   "depot": 0,
+   "principal": 54,
+   "secoursFrancais": 0,
+   "secoursAnglais": 20,
+   "manquant": 0,
+   "indecis": 37,
+   "cartesManquantes": [],
+   "cartesIndecises": [
+    {
+     "id": "pl4-3",
+     "nom": "Heatran"
+    },
+    {
+     "id": "pl4-4",
+     "nom": "Kabutops"
+    },
+    {
+     "id": "pl4-23",
+     "nom": "Omastar"
+    },
+    {
+     "id": "pl4-24",
+     "nom": "Pelipper"
+    },
+    {
+     "id": "pl4-26",
+     "nom": "Porygon-Z G"
+    },
+    {
+     "id": "pl4-27",
+     "nom": "Raichu"
+    },
+    {
+     "id": "pl4-29",
+     "nom": "Raticate"
+    },
+    {
+     "id": "pl4-31",
+     "nom": "Sceptile"
+    },
+    {
+     "id": "pl4-37",
+     "nom": "Graveler"
+    },
+    {
+     "id": "pl4-39",
+     "nom": "Grovyle"
+    },
+    {
+     "id": "pl4-40",
+     "nom": "Gulpin"
+    },
+    {
+     "id": "pl4-45",
+     "nom": "Pelipper"
+    },
+    {
+     "id": "pl4-49",
+     "nom": "Wormadam Plant Cloak"
+    },
+    {
+     "id": "pl4-61",
+     "nom": "Croagunk"
+    },
+    {
+     "id": "pl4-64",
+     "nom": "Gastly"
+    },
+    {
+     "id": "pl4-67",
+     "nom": "Kabuto"
+    },
+    {
+     "id": "pl4-70",
+     "nom": "Omanyte"
+    },
+    {
+     "id": "pl4-73",
+     "nom": "Rattata"
+    },
+    {
+     "id": "pl4-74",
+     "nom": "Shinx"
+    },
+    {
+     "id": "pl4-76",
+     "nom": "Tangela"
+    },
+    {
+     "id": "pl4-77",
+     "nom": "Tangela"
+    },
+    {
+     "id": "pl4-78",
+     "nom": "Treecko"
+    },
+    {
+     "id": "pl4-84",
+     "nom": "Buffer Piece"
+    },
+    {
+     "id": "pl4-87",
+     "nom": "Expert Belt"
+    },
+    {
+     "id": "pl4-88",
+     "nom": "Lucky Egg"
+    },
+    {
+     "id": "pl4-89",
+     "nom": "Old Amber"
+    },
+    {
+     "id": "pl4-92",
+     "nom": "Dome Fossil"
+    },
+    {
+     "id": "pl4-93",
+     "nom": "Helix Fossil"
+    },
+    {
+     "id": "pl4-94",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-95",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-97",
+     "nom": "Gengar LV.X"
+    },
+    {
+     "id": "pl4-99",
+     "nom": "Tangrowth LV.X"
+    },
+    {
+     "id": "pl4-AR1",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-AR2",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-AR4",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-AR7",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-SH11",
+     "nom": "Ponyta"
+    }
+   ],
+   "cartesAnglaises": [
+    {
+     "id": "pl4-5",
+     "nom": "Luxray"
+    },
+    {
+     "id": "pl4-7",
+     "nom": "Probopass"
+    },
+    {
+     "id": "pl4-8",
+     "nom": "Salamence"
+    },
+    {
+     "id": "pl4-10",
+     "nom": "Tangrowth"
+    },
+    {
+     "id": "pl4-11",
+     "nom": "Toxicroak"
+    },
+    {
+     "id": "pl4-15",
+     "nom": "Cherrim"
+    },
+    {
+     "id": "pl4-17",
+     "nom": "Gengar"
+    },
+    {
+     "id": "pl4-25",
+     "nom": "Pichu"
+    },
+    {
+     "id": "pl4-41",
+     "nom": "Haunter"
+    },
+    {
+     "id": "pl4-59",
+     "nom": "Charmander"
+    },
+    {
+     "id": "pl4-66",
+     "nom": "Gulpin"
+    },
+    {
+     "id": "pl4-68",
+     "nom": "Makuhita"
+    },
+    {
+     "id": "pl4-71",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "pl4-75",
+     "nom": "Snorunt"
+    },
+    {
+     "id": "pl4-80",
+     "nom": "Wingull"
+    },
+    {
+     "id": "pl4-91",
+     "nom": "Zone ultime"
+    },
+    {
+     "id": "pl4-AR3",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-AR5",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-AR6",
+     "nom": "Arceus"
+    },
+    {
+     "id": "pl4-AR8",
+     "nom": "Arceus"
+    }
+   ]
+  },
+  "ru1": {
+   "nom": "Pokémon Rumble",
+   "total": 16,
+   "depot": 8,
+   "principal": 0,
+   "secoursFrancais": 0,
+   "secoursAnglais": 8,
+   "manquant": 0,
+   "indecis": 0,
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": [
+    {
+     "id": "ru1-1",
+     "nom": "Venusaur"
+    },
+    {
+     "id": "ru1-4",
+     "nom": "Heatran"
+    },
+    {
+     "id": "ru1-5",
+     "nom": "Starmie"
+    },
+    {
+     "id": "ru1-6",
+     "nom": "Gyarados"
+    },
+    {
+     "id": "ru1-7",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "ru1-13",
+     "nom": "Skuntank"
+    },
+    {
+     "id": "ru1-15",
+     "nom": "Rattata"
+    },
+    {
+     "id": "ru1-16",
+     "nom": "Bibarel"
+    }
+   ]
+  },
+  "hgss1": {
+   "nom": "HeartGold SoulSilver",
+   "total": 124,
+   "depot": 0,
+   "principal": 69,
+   "secoursFrancais": 55,
+   "secoursAnglais": 0,
+   "manquant": 0,
+   "indecis": 0,
+   "cartesManquantes": [],
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "hgssp": {
    "nom": "Promo HGSS",
    "total": 25,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 0,
-   "secoursAnglais": 16,
-   "manquant": 7,
+   "secoursFrancais": 20,
+   "secoursAnglais": 3,
+   "manquant": 0,
    "indecis": 2,
-   "cartesManquantes": [
+   "cartesManquantes": [],
+   "cartesIndecises": [
+    {
+     "id": "hgssp-HGSS16",
+     "nom": "Posipi"
+    },
     {
      "id": "hgssp-HGSS17",
      "nom": "Négapi"
-    },
-    {
-     "id": "hgssp-HGSS18",
-     "nom": "Raz-de-marée tropical"
-    },
-    {
-     "id": "hgssp-HGSS19",
-     "nom": "Raikou"
-    },
-    {
-     "id": "hgssp-HGSS20",
-     "nom": "Entei"
-    },
-    {
-     "id": "hgssp-HGSS21",
-     "nom": "Suicune"
-    },
-    {
-     "id": "hgssp-HGSS24",
-     "nom": "Tygnon"
-    },
-    {
-     "id": "hgssp-HGSS25",
-     "nom": "Kicklee"
-    }
-   ],
-   "cartesIndecises": [
-    {
-     "id": "hgssp-HGSS22",
-     "nom": "Porygon"
-    },
-    {
-     "id": "hgssp-HGSS23",
-     "nom": "Porygon2"
     }
    ],
    "cartesAnglaises": [
     {
-     "id": "hgssp-HGSS01",
-     "nom": "Ho-Oh"
-    },
-    {
-     "id": "hgssp-HGSS02",
-     "nom": "Lugia"
-    },
-    {
-     "id": "hgssp-HGSS03",
-     "nom": "Pikachu"
-    },
-    {
-     "id": "hgssp-HGSS04",
-     "nom": "Qulbutoké"
-    },
-    {
-     "id": "hgssp-HGSS05",
-     "nom": "Hoothoot"
-    },
-    {
      "id": "hgssp-HGSS06",
      "nom": "Noarfang"
-    },
-    {
-     "id": "hgssp-HGSS07",
-     "nom": "Aligatueur"
-    },
-    {
-     "id": "hgssp-HGSS08",
-     "nom": "Méganium"
-    },
-    {
-     "id": "hgssp-HGSS09",
-     "nom": "Typhlosion"
-    },
-    {
-     "id": "hgssp-HGSS10",
-     "nom": "Latias"
-    },
-    {
-     "id": "hgssp-HGSS11",
-     "nom": "Latios"
     },
     {
      "id": "hgssp-HGSS12",
@@ -1232,18 +3359,6 @@
     {
      "id": "hgssp-HGSS13",
      "nom": "Lippouti"
-    },
-    {
-     "id": "hgssp-HGSS14",
-     "nom": "Lokhlass"
-    },
-    {
-     "id": "hgssp-HGSS15",
-     "nom": "Caratroc"
-    },
-    {
-     "id": "hgssp-HGSS16",
-     "nom": "Posipi"
     }
    ]
   },
@@ -1277,121 +3392,60 @@
    "nom": "Déchaînement",
    "total": 96,
    "depot": 0,
-   "principal": 93,
-   "secoursFrancais": 2,
-   "secoursAnglais": 1,
+   "principal": 91,
+   "secoursFrancais": 5,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": [
-    {
-     "id": "hgss2-TWO",
-     "nom": "Lithographie d'Alpha"
-    }
-   ]
+   "cartesAnglaises": []
   },
   "hgss3": {
    "nom": "Indomptable",
    "total": 91,
    "depot": 0,
    "principal": 90,
-   "secoursFrancais": 0,
-   "secoursAnglais": 1,
+   "secoursFrancais": 1,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": [
-    {
-     "id": "hgss3-THREE",
-     "nom": "Lithographie d’Alph"
-    }
-   ]
+   "cartesAnglaises": []
   },
   "hgss4": {
    "nom": "Triomphant",
    "total": 103,
    "depot": 0,
-   "principal": 87,
-   "secoursFrancais": 15,
-   "secoursAnglais": 1,
+   "principal": 102,
+   "secoursFrancais": 1,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": [
-    {
-     "id": "hgss4-FOUR",
-     "nom": "Lithographie d’Alpha"
-    }
-   ]
+   "cartesAnglaises": []
   },
   "col1": {
    "nom": "L'appel des Légendes",
    "total": 106,
-   "depot": 0,
+   "depot": 11,
    "principal": 0,
    "secoursFrancais": 95,
-   "secoursAnglais": 5,
+   "secoursAnglais": 0,
    "manquant": 0,
-   "indecis": 6,
+   "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": [
-    {
-     "id": "col1-SL1",
-     "nom": "Deoxys"
-    },
-    {
-     "id": "col1-SL2",
-     "nom": "Dialga"
-    },
-    {
-     "id": "col1-SL3",
-     "nom": "Entei"
-    },
-    {
-     "id": "col1-SL5",
-     "nom": "Ho-Oh"
-    },
-    {
-     "id": "col1-SL8",
-     "nom": "Palkia"
-    },
-    {
-     "id": "col1-SL9",
-     "nom": "Raikou"
-    }
-   ],
-   "cartesAnglaises": [
-    {
-     "id": "col1-SL4",
-     "nom": "Groudon"
-    },
-    {
-     "id": "col1-SL6",
-     "nom": "Kyogre"
-    },
-    {
-     "id": "col1-SL7",
-     "nom": "Lugia"
-    },
-    {
-     "id": "col1-SL10",
-     "nom": "Rayquaza"
-    },
-    {
-     "id": "col1-SL11",
-     "nom": "Suicune"
-    }
-   ]
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "bw1": {
    "nom": "Noir & Blanc",
    "total": 115,
    "depot": 0,
-   "principal": 74,
-   "secoursFrancais": 41,
+   "principal": 115,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -1403,32 +3457,14 @@
    "nom": "Promo BW",
    "total": 101,
    "depot": 0,
-   "principal": 42,
-   "secoursFrancais": 55,
-   "secoursAnglais": 3,
+   "principal": 101,
+   "secoursFrancais": 0,
+   "secoursAnglais": 0,
    "manquant": 0,
-   "indecis": 1,
+   "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": [
-    {
-     "id": "bwp-BW35",
-     "nom": "Miaouss"
-    }
-   ],
-   "cartesAnglaises": [
-    {
-     "id": "bwp-BW36",
-     "nom": "Reshiram ex"
-    },
-    {
-     "id": "bwp-BW37",
-     "nom": "Kyurem ex"
-    },
-    {
-     "id": "bwp-BW40",
-     "nom": "Pyrax"
-    }
-   ]
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "2011bw": {
    "nom": "Collection McDonald's 2011",
@@ -1447,8 +3483,8 @@
    "nom": "Pouvoirs Émergents",
    "total": 98,
    "depot": 0,
-   "principal": 37,
-   "secoursFrancais": 61,
+   "principal": 97,
+   "secoursFrancais": 1,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -1499,8 +3535,8 @@
    "nom": "Destinées Futures",
    "total": 103,
    "depot": 0,
-   "principal": 102,
-   "secoursFrancais": 1,
+   "principal": 103,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -1512,8 +3548,8 @@
    "nom": "Explorateurs Obscurs",
    "total": 111,
    "depot": 0,
-   "principal": 109,
-   "secoursFrancais": 2,
+   "principal": 111,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -1617,13 +3653,18 @@
    "total": 216,
    "depot": 0,
    "principal": 214,
-   "secoursFrancais": 2,
-   "secoursAnglais": 0,
+   "secoursFrancais": 1,
+   "secoursAnglais": 1,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": []
+   "cartesAnglaises": [
+    {
+     "id": "xyp-XY94",
+     "nom": "Desséliande"
+    }
+   ]
   },
   "2013bw": {
    "nom": "Collection McDonald's 2013",
@@ -1641,52 +3682,15 @@
   "bw11": {
    "nom": "Trésors Légendaires",
    "total": 140,
-   "depot": 0,
+   "depot": 9,
    "principal": 131,
    "secoursFrancais": 0,
-   "secoursAnglais": 9,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": [
-    {
-     "id": "bw11-RC3",
-     "nom": "Serperior"
-    },
-    {
-     "id": "bw11-RC4",
-     "nom": "Growlithe"
-    },
-    {
-     "id": "bw11-RC6",
-     "nom": "Piplup"
-    },
-    {
-     "id": "bw11-RC7",
-     "nom": "Pikachu"
-    },
-    {
-     "id": "bw11-RC10",
-     "nom": "Gardevoir"
-    },
-    {
-     "id": "bw11-RC12",
-     "nom": "Stunfisk"
-    },
-    {
-     "id": "bw11-RC13",
-     "nom": "Purrloin"
-    },
-    {
-     "id": "bw11-RC14",
-     "nom": "Eevee"
-    },
-    {
-     "id": "bw11-RC19",
-     "nom": "Cinccino"
-    }
-   ]
+   "cartesAnglaises": []
   },
   "xy0": {
    "nom": "Bienvenue à Kalos",
@@ -2016,8 +4020,8 @@
    "nom": "Impact des Destins",
    "total": 129,
    "depot": 0,
-   "principal": 127,
-   "secoursFrancais": 2,
+   "principal": 129,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -2029,8 +4033,8 @@
    "nom": "Offensive Vapeur",
    "total": 116,
    "depot": 0,
-   "principal": 113,
-   "secoursFrancais": 3,
+   "principal": 116,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -2082,50 +4086,13 @@
    "total": 172,
    "depot": 0,
    "principal": 163,
-   "secoursFrancais": 0,
-   "secoursAnglais": 9,
+   "secoursFrancais": 9,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": [
-    {
-     "id": "sm1-164",
-     "nom": "Grass Energy"
-    },
-    {
-     "id": "sm1-165",
-     "nom": "Fire Energy"
-    },
-    {
-     "id": "sm1-166",
-     "nom": "Water Energy"
-    },
-    {
-     "id": "sm1-167",
-     "nom": "Lightning Energy"
-    },
-    {
-     "id": "sm1-168",
-     "nom": "Psychic Energy"
-    },
-    {
-     "id": "sm1-169",
-     "nom": "Fighting Energy"
-    },
-    {
-     "id": "sm1-170",
-     "nom": "Darkness Energy"
-    },
-    {
-     "id": "sm1-171",
-     "nom": "Metal Energy"
-    },
-    {
-     "id": "sm1-172",
-     "nom": "Fairy Energy"
-    }
-   ]
+   "cartesAnglaises": []
   },
   "tk-sm-r": {
    "nom": "SM Kit du dresseur (Raichu d'Alola)",
@@ -2157,8 +4124,8 @@
    "nom": "Gardiens Ascendants",
    "total": 169,
    "depot": 0,
-   "principal": 166,
-   "secoursFrancais": 3,
+   "principal": 169,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -2209,8 +4176,8 @@
    "nom": "Invasion Carmin",
    "total": 125,
    "depot": 0,
-   "principal": 123,
-   "secoursFrancais": 2,
+   "principal": 121,
+   "secoursFrancais": 4,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -2222,8 +4189,8 @@
    "nom": "Ultra-Prisme",
    "total": 173,
    "depot": 0,
-   "principal": 162,
-   "secoursFrancais": 11,
+   "principal": 167,
+   "secoursFrancais": 6,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -2235,8 +4202,8 @@
    "nom": "Lumière Interdite",
    "total": 146,
    "depot": 0,
-   "principal": 112,
-   "secoursFrancais": 34,
+   "principal": 143,
+   "secoursFrancais": 3,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -2247,184 +4214,22 @@
   "2018sm-fr": {
    "nom": "Collection McDonald's 2018",
    "total": 40,
-   "depot": 0,
+   "depot": 40,
    "principal": 0,
    "secoursFrancais": 0,
    "secoursAnglais": 0,
-   "manquant": 3,
-   "indecis": 37,
-   "cartesManquantes": [
-    {
-     "id": "2018sm-fr-4",
-     "nom": "Salamèche"
-    },
-    {
-     "id": "2018sm-fr-30",
-     "nom": "Mélofée"
-    },
-    {
-     "id": "2018sm-fr-37",
-     "nom": "Évoli"
-    }
-   ],
-   "cartesIndecises": [
-    {
-     "id": "2018sm-fr-1",
-     "nom": "Feuillajou"
-    },
-    {
-     "id": "2018sm-fr-2",
-     "nom": "Croquine"
-    },
-    {
-     "id": "2018sm-fr-3",
-     "nom": "Sovkipou"
-    },
-    {
-     "id": "2018sm-fr-5",
-     "nom": "Caninos"
-    },
-    {
-     "id": "2018sm-fr-6",
-     "nom": "Chartor"
-    },
-    {
-     "id": "2018sm-fr-7",
-     "nom": "Flamajou"
-    },
-    {
-     "id": "2018sm-fr-8",
-     "nom": "Sabelette d'Alola"
-    },
-    {
-     "id": "2018sm-fr-9",
-     "nom": "Goupix d'Alola"
-    },
-    {
-     "id": "2018sm-fr-10",
-     "nom": "Psykokwak"
-    },
-    {
-     "id": "2018sm-fr-11",
-     "nom": "Ptitard"
-    },
-    {
-     "id": "2018sm-fr-12",
-     "nom": "Cadoizo"
-    },
-    {
-     "id": "2018sm-fr-13",
-     "nom": "Goélise"
-    },
-    {
-     "id": "2018sm-fr-14",
-     "nom": "Wailmer"
-    },
-    {
-     "id": "2018sm-fr-15",
-     "nom": "Flotajou"
-    },
-    {
-     "id": "2018sm-fr-16",
-     "nom": "Froussardine"
-    },
-    {
-     "id": "2018sm-fr-17",
-     "nom": "Pikachu"
-    },
-    {
-     "id": "2018sm-fr-18",
-     "nom": "Racaillou d'Alola"
-    },
-    {
-     "id": "2018sm-fr-19",
-     "nom": "Loupio"
-    },
-    {
-     "id": "2018sm-fr-20",
-     "nom": "Togedemaru"
-    },
-    {
-     "id": "2018sm-fr-21",
-     "nom": "Ramoloss"
-    },
-    {
-     "id": "2018sm-fr-22",
-     "nom": "Machoc"
-    },
-    {
-     "id": "2018sm-fr-23",
-     "nom": "Makuhita"
-    },
-    {
-     "id": "2018sm-fr-24",
-     "nom": "Riolu"
-    },
-    {
-     "id": "2018sm-fr-25",
-     "nom": "Rocabot"
-    },
-    {
-     "id": "2018sm-fr-26",
-     "nom": "Tiboudet"
-    },
-    {
-     "id": "2018sm-fr-27",
-     "nom": "Cornèbre"
-    },
-    {
-     "id": "2018sm-fr-28",
-     "nom": "Farfuret"
-    },
-    {
-     "id": "2018sm-fr-29",
-     "nom": "Airmure"
-    },
-    {
-     "id": "2018sm-fr-31",
-     "nom": "Tarsal"
-    },
-    {
-     "id": "2018sm-fr-32",
-     "nom": "Minidraco"
-    },
-    {
-     "id": "2018sm-fr-33",
-     "nom": "Mucuscule"
-    },
-    {
-     "id": "2018sm-fr-34",
-     "nom": "Bébécaille"
-    },
-    {
-     "id": "2018sm-fr-35",
-     "nom": "Miaouss"
-    },
-    {
-     "id": "2018sm-fr-36",
-     "nom": "Leveinard"
-    },
-    {
-     "id": "2018sm-fr-38",
-     "nom": "Passerouge"
-    },
-    {
-     "id": "2018sm-fr-39",
-     "nom": "Passerouge"
-    },
-    {
-     "id": "2018sm-fr-40",
-     "nom": "Nounourson"
-    }
-   ],
+   "manquant": 0,
+   "indecis": 0,
+   "cartesManquantes": [],
+   "cartesIndecises": [],
    "cartesAnglaises": []
   },
   "sm7": {
    "nom": "Tempête Céleste",
    "total": 183,
    "depot": 0,
-   "principal": 118,
-   "secoursFrancais": 65,
+   "principal": 90,
+   "secoursFrancais": 93,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -2450,70 +4255,20 @@
    "total": 12,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 0,
+   "secoursFrancais": 12,
    "secoursAnglais": 0,
-   "manquant": 8,
-   "indecis": 4,
-   "cartesManquantes": [
-    {
-     "id": "2018sm-2",
-     "nom": "Psyduck"
-    },
-    {
-     "id": "2018sm-3",
-     "nom": "Horsea"
-    },
-    {
-     "id": "2018sm-4",
-     "nom": "Pikachu"
-    },
-    {
-     "id": "2018sm-5",
-     "nom": "Slowpoke"
-    },
-    {
-     "id": "2018sm-6",
-     "nom": "Machop"
-    },
-    {
-     "id": "2018sm-9",
-     "nom": "Dratini"
-    },
-    {
-     "id": "2018sm-11",
-     "nom": "Eevee"
-    },
-    {
-     "id": "2018sm-12",
-     "nom": "Porygon"
-    }
-   ],
-   "cartesIndecises": [
-    {
-     "id": "2018sm-1",
-     "nom": "Growlithe"
-    },
-    {
-     "id": "2018sm-7",
-     "nom": "Cubone"
-    },
-    {
-     "id": "2018sm-8",
-     "nom": "Magnemite"
-    },
-    {
-     "id": "2018sm-10",
-     "nom": "Chansey"
-    }
-   ],
+   "manquant": 0,
+   "indecis": 0,
+   "cartesManquantes": [],
+   "cartesIndecises": [],
    "cartesAnglaises": []
   },
   "sm8": {
    "nom": "Tonnerre Perdu",
    "total": 236,
    "depot": 0,
-   "principal": 231,
-   "secoursFrancais": 5,
+   "principal": 216,
+   "secoursFrancais": 20,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -2525,8 +4280,8 @@
    "nom": "Duo de Choc",
    "total": 196,
    "depot": 0,
-   "principal": 196,
-   "secoursFrancais": 0,
+   "principal": 195,
+   "secoursFrancais": 1,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -2596,106 +4351,24 @@
    "total": 94,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 86,
-   "secoursAnglais": 8,
+   "secoursFrancais": 94,
+   "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
    "cartesManquantes": [],
    "cartesIndecises": [],
-   "cartesAnglaises": [
-    {
-     "id": "sma-SV36",
-     "nom": "Diancie"
-    },
-    {
-     "id": "sma-SV37",
-     "nom": "Altaria"
-    },
-    {
-     "id": "sma-SV38",
-     "nom": "Griknot"
-    },
-    {
-     "id": "sma-SV39",
-     "nom": "Carmache"
-    },
-    {
-     "id": "sma-SV40",
-     "nom": "Carchacrok"
-    },
-    {
-     "id": "sma-SV41",
-     "nom": "Évoli"
-    },
-    {
-     "id": "sma-SV42",
-     "nom": "Tylton"
-    },
-    {
-     "id": "sma-SV43",
-     "nom": "Sonistrelle"
-    }
-   ]
+   "cartesAnglaises": []
   },
   "2019sm": {
    "nom": "McDonald's Collection 2019",
    "total": 12,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 0,
+   "secoursFrancais": 12,
    "secoursAnglais": 0,
-   "manquant": 12,
+   "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": [
-    {
-     "id": "2019sm-1",
-     "nom": "Surprise Attack"
-    },
-    {
-     "id": "2019sm-2",
-     "nom": "Tropical Shake"
-    },
-    {
-     "id": "2019sm-3",
-     "nom": "Controlled Burn"
-    },
-    {
-     "id": "2019sm-4",
-     "nom": "Fury Swipes"
-    },
-    {
-     "id": "2019sm-5",
-     "nom": "Aqua Bullet"
-    },
-    {
-     "id": "2019sm-6",
-     "nom": "Iron Tail"
-    },
-    {
-     "id": "2019sm-7",
-     "nom": "Ominous Eyes"
-    },
-    {
-     "id": "2019sm-8",
-     "nom": "Three-Step Strike"
-    },
-    {
-     "id": "2019sm-9",
-     "nom": "Screech"
-    },
-    {
-     "id": "2019sm-10",
-     "nom": "Spoil the Fun"
-    },
-    {
-     "id": "2019sm-11",
-     "nom": "Gold Rush"
-    },
-    {
-     "id": "2019sm-12",
-     "nom": "Gnaw"
-    }
-   ],
+   "cartesManquantes": [],
    "cartesIndecises": [],
    "cartesAnglaises": []
   },
@@ -2735,9 +4408,9 @@
    "total": 307,
    "depot": 0,
    "principal": 285,
-   "secoursFrancais": 0,
+   "secoursFrancais": 17,
    "secoursAnglais": 0,
-   "manquant": 22,
+   "manquant": 5,
    "indecis": 0,
    "cartesManquantes": [
     {
@@ -2753,80 +4426,12 @@
      "nom": "Special Delivery Bidoof"
     },
     {
-     "id": "swshp-SWSH251",
-     "nom": "Ordres du Boss"
-    },
-    {
-     "id": "swshp-SWSH282",
-     "nom": "Artikodin de Galar"
-    },
-    {
-     "id": "swshp-SWSH283",
-     "nom": "Électhor de Galar"
-    },
-    {
-     "id": "swshp-SWSH284",
-     "nom": "Sulfura de Galar"
-    },
-    {
-     "id": "swshp-SWSH287",
-     "nom": "Morpeko V-UNION"
-    },
-    {
-     "id": "swshp-SWSH288",
-     "nom": "Morpeko V-UNION"
-    },
-    {
-     "id": "swshp-SWSH289",
-     "nom": "Morpeko V-UNION"
-    },
-    {
-     "id": "swshp-SWSH290",
-     "nom": "Morpeko V-UNION"
-    },
-    {
-     "id": "swshp-SWSH292",
-     "nom": "Zacian V"
-    },
-    {
-     "id": "swshp-SWSH293",
-     "nom": "Zamazenta V"
-    },
-    {
-     "id": "swshp-SWSH299",
-     "nom": "Jirachi V"
-    },
-    {
-     "id": "swshp-SWSH300",
-     "nom": "Zarbi V"
-    },
-    {
-     "id": "swshp-SWSH301",
-     "nom": "Lugia V"
-    },
-    {
-     "id": "swshp-SWSH302",
-     "nom": "Sophora"
-    },
-    {
      "id": "swshp-SWSH303",
      "nom": "Bulbasaur"
     },
     {
-     "id": "swshp-SWSH304",
-     "nom": "Arcanine"
-    },
-    {
      "id": "swshp-SWSH305",
      "nom": "Greninja"
-    },
-    {
-     "id": "swshp-SWSH306",
-     "nom": "Arceus V"
-    },
-    {
-     "id": "swshp-SWSH307",
-     "nom": "Arceus VSTAR"
     }
    ],
    "cartesIndecises": [],
@@ -2962,44 +4567,11 @@
    "total": 122,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 114,
+   "secoursFrancais": 122,
    "secoursAnglais": 0,
-   "manquant": 8,
+   "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": [
-    {
-     "id": "swsh4.5sv-SV032",
-     "nom": "Hastacuda"
-    },
-    {
-     "id": "swsh4.5sv-SV033",
-     "nom": "Frissonille"
-    },
-    {
-     "id": "swsh4.5sv-SV034",
-     "nom": "Beldeneige"
-    },
-    {
-     "id": "swsh4.5sv-SV035",
-     "nom": "Bekaglaçon"
-    },
-    {
-     "id": "swsh4.5sv-SV036",
-     "nom": "Hydragon"
-    },
-    {
-     "id": "swsh4.5sv-SV037",
-     "nom": "Hydragla"
-    },
-    {
-     "id": "swsh4.5sv-SV038",
-     "nom": "Motisma"
-    },
-    {
-     "id": "swsh4.5sv-SV039",
-     "nom": "Voltoutou"
-    }
-   ],
+   "cartesManquantes": [],
    "cartesIndecises": [],
    "cartesAnglaises": []
   },
@@ -3007,8 +4579,8 @@
    "nom": "Styles de combat",
    "total": 183,
    "depot": 0,
-   "principal": 182,
-   "secoursFrancais": 1,
+   "principal": 183,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3020,8 +4592,8 @@
    "nom": "Règne de Glace",
    "total": 233,
    "depot": 0,
-   "principal": 229,
-   "secoursFrancais": 4,
+   "principal": 233,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3033,8 +4605,8 @@
    "nom": "Évolution Céleste",
    "total": 237,
    "depot": 0,
-   "principal": 226,
-   "secoursFrancais": 11,
+   "principal": 237,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3060,16 +4632,11 @@
    "total": 25,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 24,
+   "secoursFrancais": 25,
    "secoursAnglais": 0,
-   "manquant": 1,
+   "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": [
-    {
-     "id": "cel25cc-CC006",
-     "nom": "Et voila les Team Rocket !"
-    }
-   ],
+   "cartesManquantes": [],
    "cartesIndecises": [],
    "cartesAnglaises": []
   },
@@ -3077,8 +4644,8 @@
    "nom": "Poing de Fusion",
    "total": 284,
    "depot": 0,
-   "principal": 220,
-   "secoursFrancais": 64,
+   "principal": 284,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3090,8 +4657,8 @@
    "nom": "Stars Étincelantes",
    "total": 186,
    "depot": 0,
-   "principal": 133,
-   "secoursFrancais": 53,
+   "principal": 186,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3116,8 +4683,8 @@
    "nom": "Astres Radieux",
    "total": 216,
    "depot": 0,
-   "principal": 186,
-   "secoursFrancais": 30,
+   "principal": 216,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3168,8 +4735,8 @@
    "nom": "Origine Perdue",
    "total": 217,
    "depot": 0,
-   "principal": 216,
-   "secoursFrancais": 1,
+   "principal": 212,
+   "secoursFrancais": 5,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3194,8 +4761,8 @@
    "nom": "Tempête Argentée",
    "total": 215,
    "depot": 0,
-   "principal": 215,
-   "secoursFrancais": 0,
+   "principal": 214,
+   "secoursFrancais": 1,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3220,8 +4787,8 @@
    "nom": "Zénith Suprême",
    "total": 160,
    "depot": 0,
-   "principal": 160,
-   "secoursFrancais": 0,
+   "principal": 158,
+   "secoursFrancais": 2,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3246,14 +4813,40 @@
    "nom": "SVP Black Star Promos",
    "total": 226,
    "depot": 0,
-   "principal": 192,
-   "secoursFrancais": 33,
-   "secoursAnglais": 1,
-   "manquant": 0,
-   "indecis": 0,
-   "cartesManquantes": [],
-   "cartesIndecises": [],
+   "principal": 173,
+   "secoursFrancais": 46,
+   "secoursAnglais": 4,
+   "manquant": 1,
+   "indecis": 2,
+   "cartesManquantes": [
+    {
+     "id": "svp-102",
+     "nom": "Oddish"
+    }
+   ],
+   "cartesIndecises": [
+    {
+     "id": "svp-085",
+     "nom": "Pikachu with Grey Felt Hat"
+    },
+    {
+     "id": "svp-190",
+     "nom": "Pikachu"
+    }
+   ],
    "cartesAnglaises": [
+    {
+     "id": "svp-213",
+     "nom": "Feraligatr"
+    },
+    {
+     "id": "svp-214",
+     "nom": "Pikachu"
+    },
+    {
+     "id": "svp-215",
+     "nom": "Toxtricity ex"
+    },
     {
      "id": "svp-500",
      "nom": "Terapagos & Friends"
@@ -3264,8 +4857,8 @@
    "nom": "Écarlate et Violet",
    "total": 258,
    "depot": 0,
-   "principal": 258,
-   "secoursFrancais": 0,
+   "principal": 204,
+   "secoursFrancais": 54,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3278,108 +4871,11 @@
    "total": 24,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 0,
+   "secoursFrancais": 24,
    "secoursAnglais": 0,
-   "manquant": 24,
+   "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": [
-    {
-     "id": "sve-001",
-     "nom": "Énergie Plante"
-    },
-    {
-     "id": "sve-002",
-     "nom": "Énergie Feu"
-    },
-    {
-     "id": "sve-003",
-     "nom": "Énergie Eau"
-    },
-    {
-     "id": "sve-004",
-     "nom": "Énergie Electrik"
-    },
-    {
-     "id": "sve-005",
-     "nom": "Énergie Psy"
-    },
-    {
-     "id": "sve-006",
-     "nom": "Énergie Combat"
-    },
-    {
-     "id": "sve-007",
-     "nom": "Énergie Obscurité"
-    },
-    {
-     "id": "sve-008",
-     "nom": "Énergie Métal"
-    },
-    {
-     "id": "sve-009",
-     "nom": "Énergie Plante"
-    },
-    {
-     "id": "sve-010",
-     "nom": "Énergie Feu"
-    },
-    {
-     "id": "sve-011",
-     "nom": "Énergie Eau"
-    },
-    {
-     "id": "sve-012",
-     "nom": "Énergie Electrik"
-    },
-    {
-     "id": "sve-013",
-     "nom": "Énergie Psy"
-    },
-    {
-     "id": "sve-014",
-     "nom": "Énergie Combat"
-    },
-    {
-     "id": "sve-015",
-     "nom": "Énergie Obscurité"
-    },
-    {
-     "id": "sve-016",
-     "nom": "Énergie Métal"
-    },
-    {
-     "id": "sve-017",
-     "nom": "Énergie Plante"
-    },
-    {
-     "id": "sve-018",
-     "nom": "Énergie Feu"
-    },
-    {
-     "id": "sve-019",
-     "nom": "Énergie Eau"
-    },
-    {
-     "id": "sve-020",
-     "nom": "Énergie Electrik"
-    },
-    {
-     "id": "sve-021",
-     "nom": "Énergie Psy"
-    },
-    {
-     "id": "sve-022",
-     "nom": "Énergie Combat"
-    },
-    {
-     "id": "sve-023",
-     "nom": "Énergie Obscurité"
-    },
-    {
-     "id": "sve-024",
-     "nom": "Énergie Métal"
-    }
-   ],
+   "cartesManquantes": [],
    "cartesIndecises": [],
    "cartesAnglaises": []
   },
@@ -3387,8 +4883,8 @@
    "nom": "Évolutions à Paldea",
    "total": 279,
    "depot": 0,
-   "principal": 278,
-   "secoursFrancais": 1,
+   "principal": 252,
+   "secoursFrancais": 27,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3413,8 +4909,8 @@
    "nom": "Flammes Obsidiennes",
    "total": 230,
    "depot": 0,
-   "principal": 230,
-   "secoursFrancais": 0,
+   "principal": 228,
+   "secoursFrancais": 2,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3426,8 +4922,8 @@
    "nom": "151",
    "total": 207,
    "depot": 0,
-   "principal": 207,
-   "secoursFrancais": 0,
+   "principal": 206,
+   "secoursFrancais": 1,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3440,148 +4936,11 @@
    "total": 34,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 0,
+   "secoursFrancais": 34,
    "secoursAnglais": 0,
-   "manquant": 34,
+   "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": [
-    {
-     "id": "mfb-1",
-     "nom": "Bulbasaur"
-    },
-    {
-     "id": "mfb-2",
-     "nom": "Ivysaur"
-    },
-    {
-     "id": "mfb-3",
-     "nom": "Oddish"
-    },
-    {
-     "id": "mfb-4",
-     "nom": "Gloom"
-    },
-    {
-     "id": "mfb-5",
-     "nom": "Exeggcute"
-    },
-    {
-     "id": "mfb-6",
-     "nom": "Exeggutor"
-    },
-    {
-     "id": "mfb-7",
-     "nom": "Scyther"
-    },
-    {
-     "id": "mfb-8",
-     "nom": "Grass Energy"
-    },
-    {
-     "id": "mfb-9",
-     "nom": "Charmander"
-    },
-    {
-     "id": "mfb-10",
-     "nom": "Charmeleon"
-    },
-    {
-     "id": "mfb-11",
-     "nom": "Vulpix"
-    },
-    {
-     "id": "mfb-12",
-     "nom": "Ninetales"
-    },
-    {
-     "id": "mfb-13",
-     "nom": "Growlithe"
-    },
-    {
-     "id": "mfb-14",
-     "nom": "Arcanine"
-    },
-    {
-     "id": "mfb-15",
-     "nom": "Magmar"
-    },
-    {
-     "id": "mfb-16",
-     "nom": "Fire Energy"
-    },
-    {
-     "id": "mfb-17",
-     "nom": "Pikachu"
-    },
-    {
-     "id": "mfb-18",
-     "nom": "Raichu"
-    },
-    {
-     "id": "mfb-19",
-     "nom": "Magnemite"
-    },
-    {
-     "id": "mfb-20",
-     "nom": "Magneton"
-    },
-    {
-     "id": "mfb-21",
-     "nom": "Voltorb"
-    },
-    {
-     "id": "mfb-22",
-     "nom": "Electrode"
-    },
-    {
-     "id": "mfb-23",
-     "nom": "Electabuzz"
-    },
-    {
-     "id": "mfb-24",
-     "nom": "Lightning Energy"
-    },
-    {
-     "id": "mfb-25",
-     "nom": "Squirtle"
-    },
-    {
-     "id": "mfb-26",
-     "nom": "Wartortle"
-    },
-    {
-     "id": "mfb-27",
-     "nom": "Poliwag"
-    },
-    {
-     "id": "mfb-28",
-     "nom": "Poliwhirl"
-    },
-    {
-     "id": "mfb-29",
-     "nom": "Magikarp"
-    },
-    {
-     "id": "mfb-30",
-     "nom": "Gyarados"
-    },
-    {
-     "id": "mfb-31",
-     "nom": "Lapras"
-    },
-    {
-     "id": "mfb-32",
-     "nom": "Water Energy"
-    },
-    {
-     "id": "mfb-33",
-     "nom": "Potion"
-    },
-    {
-     "id": "mfb-34",
-     "nom": "Échange"
-    }
-   ],
+   "cartesManquantes": [],
    "cartesIndecises": [],
    "cartesAnglaises": []
   },
@@ -3654,8 +5013,8 @@
    "nom": "Couronne Stellaire",
    "total": 175,
    "depot": 0,
-   "principal": 174,
-   "secoursFrancais": 1,
+   "principal": 175,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3667,8 +5026,8 @@
    "nom": "Étincelles Déferlantes",
    "total": 252,
    "depot": 0,
-   "principal": 235,
-   "secoursFrancais": 17,
+   "principal": 251,
+   "secoursFrancais": 1,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3693,8 +5052,8 @@
    "nom": "Évolutions Prismatiques",
    "total": 180,
    "depot": 0,
-   "principal": 154,
-   "secoursFrancais": 26,
+   "principal": 180,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3706,8 +5065,8 @@
    "nom": "Aventures Ensemble",
    "total": 190,
    "depot": 0,
-   "principal": 169,
-   "secoursFrancais": 21,
+   "principal": 190,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3719,8 +5078,8 @@
    "nom": "Rivalités Destinées",
    "total": 244,
    "depot": 0,
-   "principal": 207,
-   "secoursFrancais": 37,
+   "principal": 244,
+   "secoursFrancais": 0,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3732,8 +5091,8 @@
    "nom": "Foudre Noire",
    "total": 172,
    "depot": 0,
-   "principal": 118,
-   "secoursFrancais": 54,
+   "principal": 169,
+   "secoursFrancais": 3,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3745,8 +5104,8 @@
    "nom": "Flamme Blanche",
    "total": 173,
    "depot": 0,
-   "principal": 167,
-   "secoursFrancais": 6,
+   "principal": 172,
+   "secoursFrancais": 1,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3759,78 +5118,12 @@
    "total": 16,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 0,
+   "secoursFrancais": 16,
    "secoursAnglais": 0,
-   "manquant": 12,
-   "indecis": 4,
-   "cartesManquantes": [
-    {
-     "id": "mee-002",
-     "nom": "Énergie Feu"
-    },
-    {
-     "id": "mee-003",
-     "nom": "Énergie Eau"
-    },
-    {
-     "id": "mee-004",
-     "nom": "Énergie Electrik"
-    },
-    {
-     "id": "mee-008",
-     "nom": "Énergie Métal"
-    },
-    {
-     "id": "mee-009",
-     "nom": "Énergie Plante de base"
-    },
-    {
-     "id": "mee-010",
-     "nom": "Énergie Feu de base"
-    },
-    {
-     "id": "mee-011",
-     "nom": "Énergie Eau de base"
-    },
-    {
-     "id": "mee-012",
-     "nom": "Énergie Electrik de base"
-    },
-    {
-     "id": "mee-013",
-     "nom": "Énergie Psy de base"
-    },
-    {
-     "id": "mee-014",
-     "nom": "Énergie Combat de base"
-    },
-    {
-     "id": "mee-015",
-     "nom": "Énergie Obscurité de base"
-    },
-    {
-     "id": "mee-016",
-     "nom": "Énergie Métal de base"
-    }
-   ],
-   "cartesIndecises": [
-    {
-     "id": "mee-001",
-     "nom": "Énergie Plante"
-    },
-    {
-     "id": "mee-005",
-     "nom": "Énergie Psy"
-    },
-    {
-     "id": "mee-006",
-     "nom": "Énergie Combat"
-    },
-    {
-     "id": "mee-007",
-     "nom": "Énergie Obscurité"
-    }
-   ],
+   "manquant": 0,
+   "indecis": 0,
+   "cartesManquantes": [],
+   "cartesIndecises": [],
    "cartesAnglaises": []
   },
   "mep": {
@@ -3838,26 +5131,18 @@
    "total": 112,
    "depot": 0,
    "principal": 40,
-   "secoursFrancais": 67,
+   "secoursFrancais": 69,
    "secoursAnglais": 0,
-   "manquant": 5,
+   "manquant": 3,
    "indecis": 0,
    "cartesManquantes": [
     {
-     "id": "mep-033",
-     "nom": "Méga-Lucario-ex"
+     "id": "mep-078",
+     "nom": "Toxizap"
     },
     {
-     "id": "mep-034",
-     "nom": "Méga-Méganium-ex"
-    },
-    {
-     "id": "mep-035",
-     "nom": "Méga-Roitiflam-ex"
-    },
-    {
-     "id": "mep-036",
-     "nom": "Méga-Aligatueur-ex"
+     "id": "mep-120",
+     "nom": "Celebratory Fanfare"
     },
     {
      "id": "mep-Museum",
@@ -3897,8 +5182,8 @@
    "nom": "Héros Transcendants",
    "total": 295,
    "depot": 0,
-   "principal": 295,
-   "secoursFrancais": 0,
+   "principal": 280,
+   "secoursFrancais": 15,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3910,8 +5195,8 @@
    "nom": "Équilibre Parfait",
    "total": 124,
    "depot": 0,
-   "principal": 124,
-   "secoursFrancais": 0,
+   "principal": 110,
+   "secoursFrancais": 14,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3923,8 +5208,8 @@
    "nom": "Chaos Ascendant",
    "total": 122,
    "depot": 0,
-   "principal": 122,
-   "secoursFrancais": 0,
+   "principal": 106,
+   "secoursFrancais": 16,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3936,8 +5221,8 @@
    "nom": "Nuit Noire",
    "total": 120,
    "depot": 0,
-   "principal": 120,
-   "secoursFrancais": 0,
+   "principal": 102,
+   "secoursFrancais": 18,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3949,8 +5234,8 @@
    "nom": "30th Celebration",
    "total": 161,
    "depot": 0,
-   "principal": 157,
-   "secoursFrancais": 4,
+   "principal": 130,
+   "secoursFrancais": 31,
    "secoursAnglais": 0,
    "manquant": 0,
    "indecis": 0,
@@ -3963,132 +5248,11 @@
    "total": 30,
    "depot": 0,
    "principal": 0,
-   "secoursFrancais": 0,
+   "secoursFrancais": 30,
    "secoursAnglais": 0,
-   "manquant": 30,
+   "manquant": 0,
    "indecis": 0,
-   "cartesManquantes": [
-    {
-     "id": "30th-c-001",
-     "nom": "Dracaufeu"
-    },
-    {
-     "id": "30th-c-002",
-     "nom": "Delcatty"
-    },
-    {
-     "id": "30th-c-003",
-     "nom": "Metalosse"
-    },
-    {
-     "id": "30th-c-004",
-     "nom": "Genesect EX"
-    },
-    {
-     "id": "30th-c-005",
-     "nom": "Ondine"
-    },
-    {
-     "id": "30th-c-006",
-     "nom": "Tyranocif obscur"
-    },
-    {
-     "id": "30th-c-007",
-     "nom": "Farfuret"
-    },
-    {
-     "id": "30th-c-008",
-     "nom": "Pikachu et Zekrom GX"
-    },
-    {
-     "id": "30th-c-009",
-     "nom": "Amphinobi TURBO"
-    },
-    {
-     "id": "30th-c-010",
-     "nom": "Créhelf"
-    },
-    {
-     "id": "30th-c-011",
-     "nom": "Nostenfert G"
-    },
-    {
-     "id": "30th-c-012",
-     "nom": "Raikou"
-    },
-    {
-     "id": "30th-c-013",
-     "nom": "Mouscoto GX"
-    },
-    {
-     "id": "30th-c-014",
-     "nom": "Pikachu"
-    },
-    {
-     "id": "30th-c-015",
-     "nom": "Rondoudou d'Erika"
-    },
-    {
-     "id": "30th-c-016",
-     "nom": "Rayquaza EX"
-    },
-    {
-     "id": "30th-c-017",
-     "nom": "Solgaleo GX"
-    },
-    {
-     "id": "30th-c-018",
-     "nom": "Ectoplasma"
-    },
-    {
-     "id": "30th-c-019",
-     "nom": "Darkrai & Cresselia LÉGENDE"
-    },
-    {
-     "id": "30th-c-020",
-     "nom": "Darkrai & Cresselia LÉGENDE"
-    },
-    {
-     "id": "30th-c-021",
-     "nom": "N"
-    },
-    {
-     "id": "30th-c-022",
-     "nom": "Palkia"
-    },
-    {
-     "id": "30th-c-023",
-     "nom": "M-Gardevoir EX"
-    },
-    {
-     "id": "30th-c-024",
-     "nom": "Celebi brillant"
-    },
-    {
-     "id": "30th-c-025",
-     "nom": "Cizayox ex"
-    },
-    {
-     "id": "30th-c-026",
-     "nom": "Mew-VMAX"
-    },
-    {
-     "id": "30th-c-027",
-     "nom": "Arceus-VSTAR"
-    },
-    {
-     "id": "30th-c-028",
-     "nom": "Zacian-V"
-    },
-    {
-     "id": "30th-c-029",
-     "nom": "Lugia"
-    },
-    {
-     "id": "30th-c-030",
-     "nom": "Magicarpe"
-    }
-   ],
+   "cartesManquantes": [],
    "cartesIndecises": [],
    "cartesAnglaises": []
   }
