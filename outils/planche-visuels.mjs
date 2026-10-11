@@ -31,7 +31,13 @@ for(const d of demandes){
   let image;
   try{
     const r = await fetch(d.adresse, { headers: IDENTITE });
-    console.log(`${d.etiquette} : ${r.status} ${r.headers.get('content-type') ?? ''} ${d.adresse}`);
+    let taille = '';
+    if(r.ok && !brut){
+      const tampon = Buffer.from(await r.clone().arrayBuffer());
+      const m = await sharp(tampon).metadata().catch(() => ({}));
+      taille = `${m.width ?? '?'}×${m.height ?? '?'} ${tampon.length} octets`;
+    }
+    console.log(`${d.etiquette} : ${r.status} ${r.headers.get('content-type') ?? ''} ${taille} ${d.adresse}`);
     if(r.ok && brut){
       const octets = Buffer.from(await r.arrayBuffer()).toString('base64');
       octets.match(/.{1,6000}/g).forEach((m, i) => console.log(`IMAGE ${d.etiquette} ${String(i).padStart(3, '0')} ${m}`));
