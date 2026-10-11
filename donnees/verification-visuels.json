@@ -1,15 +1,15 @@
 {
- "verifieLe": "2026-10-11T03:02:07.280Z",
+ "verifieLe": "2026-10-11T03:05:33.667Z",
  "methode": "une requête d'en-tête par carte, sur l'adresse que le site sert",
- "repriseDe": null,
+ "repriseDe": "2026-10-11T03:02:07.280Z",
  "total": 21393,
  "compte": {
   "depot": 861,
-  "principal": 17275,
-  "secoursFrancais": 2616,
-  "secoursAnglais": 579,
-  "manquant": 17,
-  "indecis": 45
+  "principal": 17385,
+  "secoursFrancais": 2568,
+  "secoursAnglais": 559,
+  "manquant": 20,
+  "indecis": 0
  },
  "extensions": {
   "miscp": {
@@ -2994,279 +2994,27 @@
    "nom": "Vainqueurs Suprêmes",
    "total": 162,
    "depot": 0,
-   "principal": 124,
-   "secoursFrancais": 33,
-   "secoursAnglais": 1,
+   "principal": 158,
+   "secoursFrancais": 4,
+   "secoursAnglais": 0,
    "manquant": 0,
-   "indecis": 4,
+   "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": [
-    {
-     "id": "pl3-AR2",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl3-AR4",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl3-AR5",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl3-AR8",
-     "nom": "Arceus"
-    }
-   ],
-   "cartesAnglaises": [
-    {
-     "id": "pl3-SH8",
-     "nom": "Relicanth"
-    }
-   ]
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "pl4": {
    "nom": "Arceus",
    "total": 111,
    "depot": 0,
-   "principal": 54,
+   "principal": 111,
    "secoursFrancais": 0,
-   "secoursAnglais": 20,
+   "secoursAnglais": 0,
    "manquant": 0,
-   "indecis": 37,
+   "indecis": 0,
    "cartesManquantes": [],
-   "cartesIndecises": [
-    {
-     "id": "pl4-3",
-     "nom": "Heatran"
-    },
-    {
-     "id": "pl4-4",
-     "nom": "Kabutops"
-    },
-    {
-     "id": "pl4-23",
-     "nom": "Omastar"
-    },
-    {
-     "id": "pl4-24",
-     "nom": "Pelipper"
-    },
-    {
-     "id": "pl4-26",
-     "nom": "Porygon-Z G"
-    },
-    {
-     "id": "pl4-27",
-     "nom": "Raichu"
-    },
-    {
-     "id": "pl4-29",
-     "nom": "Raticate"
-    },
-    {
-     "id": "pl4-31",
-     "nom": "Sceptile"
-    },
-    {
-     "id": "pl4-37",
-     "nom": "Graveler"
-    },
-    {
-     "id": "pl4-39",
-     "nom": "Grovyle"
-    },
-    {
-     "id": "pl4-40",
-     "nom": "Gulpin"
-    },
-    {
-     "id": "pl4-45",
-     "nom": "Pelipper"
-    },
-    {
-     "id": "pl4-49",
-     "nom": "Wormadam Plant Cloak"
-    },
-    {
-     "id": "pl4-61",
-     "nom": "Croagunk"
-    },
-    {
-     "id": "pl4-64",
-     "nom": "Gastly"
-    },
-    {
-     "id": "pl4-67",
-     "nom": "Kabuto"
-    },
-    {
-     "id": "pl4-70",
-     "nom": "Omanyte"
-    },
-    {
-     "id": "pl4-73",
-     "nom": "Rattata"
-    },
-    {
-     "id": "pl4-74",
-     "nom": "Shinx"
-    },
-    {
-     "id": "pl4-76",
-     "nom": "Tangela"
-    },
-    {
-     "id": "pl4-77",
-     "nom": "Tangela"
-    },
-    {
-     "id": "pl4-78",
-     "nom": "Treecko"
-    },
-    {
-     "id": "pl4-84",
-     "nom": "Buffer Piece"
-    },
-    {
-     "id": "pl4-87",
-     "nom": "Expert Belt"
-    },
-    {
-     "id": "pl4-88",
-     "nom": "Lucky Egg"
-    },
-    {
-     "id": "pl4-89",
-     "nom": "Old Amber"
-    },
-    {
-     "id": "pl4-92",
-     "nom": "Dome Fossil"
-    },
-    {
-     "id": "pl4-93",
-     "nom": "Helix Fossil"
-    },
-    {
-     "id": "pl4-94",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl4-95",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl4-97",
-     "nom": "Gengar LV.X"
-    },
-    {
-     "id": "pl4-99",
-     "nom": "Tangrowth LV.X"
-    },
-    {
-     "id": "pl4-AR1",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl4-AR2",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl4-AR4",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl4-AR7",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl4-SH11",
-     "nom": "Ponyta"
-    }
-   ],
-   "cartesAnglaises": [
-    {
-     "id": "pl4-5",
-     "nom": "Luxray"
-    },
-    {
-     "id": "pl4-7",
-     "nom": "Probopass"
-    },
-    {
-     "id": "pl4-8",
-     "nom": "Salamence"
-    },
-    {
-     "id": "pl4-10",
-     "nom": "Tangrowth"
-    },
-    {
-     "id": "pl4-11",
-     "nom": "Toxicroak"
-    },
-    {
-     "id": "pl4-15",
-     "nom": "Cherrim"
-    },
-    {
-     "id": "pl4-17",
-     "nom": "Gengar"
-    },
-    {
-     "id": "pl4-25",
-     "nom": "Pichu"
-    },
-    {
-     "id": "pl4-41",
-     "nom": "Haunter"
-    },
-    {
-     "id": "pl4-59",
-     "nom": "Charmander"
-    },
-    {
-     "id": "pl4-66",
-     "nom": "Gulpin"
-    },
-    {
-     "id": "pl4-68",
-     "nom": "Makuhita"
-    },
-    {
-     "id": "pl4-71",
-     "nom": "Pikachu"
-    },
-    {
-     "id": "pl4-75",
-     "nom": "Snorunt"
-    },
-    {
-     "id": "pl4-80",
-     "nom": "Wingull"
-    },
-    {
-     "id": "pl4-91",
-     "nom": "Zone ultime"
-    },
-    {
-     "id": "pl4-AR3",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl4-AR5",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl4-AR6",
-     "nom": "Arceus"
-    },
-    {
-     "id": "pl4-AR8",
-     "nom": "Arceus"
-    }
-   ]
+   "cartesIndecises": [],
+   "cartesAnglaises": []
   },
   "ru1": {
    "nom": "Pokémon Rumble",
@@ -3333,20 +3081,16 @@
    "depot": 0,
    "principal": 0,
    "secoursFrancais": 20,
-   "secoursAnglais": 3,
-   "manquant": 0,
-   "indecis": 2,
-   "cartesManquantes": [],
-   "cartesIndecises": [
-    {
-     "id": "hgssp-HGSS16",
-     "nom": "Posipi"
-    },
+   "secoursAnglais": 4,
+   "manquant": 1,
+   "indecis": 0,
+   "cartesManquantes": [
     {
      "id": "hgssp-HGSS17",
      "nom": "Négapi"
     }
    ],
+   "cartesIndecises": [],
    "cartesAnglaises": [
     {
      "id": "hgssp-HGSS06",
@@ -3359,6 +3103,10 @@
     {
      "id": "hgssp-HGSS13",
      "nom": "Lippouti"
+    },
+    {
+     "id": "hgssp-HGSS16",
+     "nom": "Posipi"
     }
    ]
   },
@@ -4813,27 +4561,26 @@
    "nom": "SVP Black Star Promos",
    "total": 226,
    "depot": 0,
-   "principal": 173,
-   "secoursFrancais": 46,
+   "principal": 192,
+   "secoursFrancais": 27,
    "secoursAnglais": 4,
-   "manquant": 1,
-   "indecis": 2,
+   "manquant": 3,
+   "indecis": 0,
    "cartesManquantes": [
-    {
-     "id": "svp-102",
-     "nom": "Oddish"
-    }
-   ],
-   "cartesIndecises": [
     {
      "id": "svp-085",
      "nom": "Pikachu with Grey Felt Hat"
+    },
+    {
+     "id": "svp-102",
+     "nom": "Oddish"
     },
     {
      "id": "svp-190",
      "nom": "Pikachu"
     }
    ],
+   "cartesIndecises": [],
    "cartesAnglaises": [
     {
      "id": "svp-213",
