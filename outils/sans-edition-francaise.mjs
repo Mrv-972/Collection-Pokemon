@@ -15,7 +15,8 @@
 //
 //   — « sans édition française » : aucun visuel français ET nom anglais,
 //     ou carte d'une extension dont la plupart des cartes sont dans ce cas
-//     (Gym Heroes…) ;
+//     (Gym Heroes…) — sauf si au moins trois cartes de cette extension ont
+//     été lues en français sur leur image : elle existe alors en français ;
 //   — « visuel anglais » : aucun visuel français, mais un nom français —
 //     la carte existe, seul son scan nous manque. On montre l'image
 //     anglaise en le disant.
@@ -49,6 +50,18 @@ function langueDuNom(carte){
 // prouve rien.
 const SERIE_ANGLAISE = 0.6;
 
+// La langue lue sur les images (outils/langue-visuels.mjs) : une carte de
+// l'extension formellement lue en français prouve que l'extension existe
+// en français, quoi que dise TCGdex de ses noms.
+let langues = {};
+try{ langues = JSON.parse(await readFile('donnees/langue-visuels.json', 'utf8')).verdicts ?? {}; }catch{}
+const lueEnFrancais = c => [c.image, String(c.image ?? '').replace('/low.webp', '/high.webp'),
+  c.imageSecours, c.imageSecours && !/[?&]class=/.test(c.imageSecours) ? `${c.imageSecours}?class=md` : null,
+  `depot:${c.id}`].some(u => u && langues[u]?.langue === 'fr');
+// Trois cartes lues en français suffisent ; une seule pourrait être une
+// erreur de lecture.
+const PREUVE_FRANCAISE = 3;
+
 const verdict = JSON.parse(await readFile('donnees/verification-visuels.json', 'utf8'));
 const sansEdition = [], visuelAnglais = [], introuvables = [];
 const parExtension = {};
@@ -68,12 +81,19 @@ for(const [ext, e] of Object.entries(verdict.extensions)){
   // promos de 226 cartes dont 7 posent problème, elle rangerait des
   // « Pikachu » du côté anglais sur la foi de leurs voisines.
   const jugees = concernees.filter(c => c.langueNom !== '?');
-  const anglaise = concernees.length >= cartes.length / 2 && jugees.length >= 3 &&
+  const serieAuxNomsAnglais = concernees.length >= cartes.length / 2 && jugees.length >= 3 &&
     jugees.filter(c => c.langueNom === 'en').length / jugees.length >= SERIE_ANGLAISE;
+  // Platine : Arceus — noms anglais chez TCGdex, scans anglais presque
+  // partout, mais AR1 à AR9 lues en français : l'extension existe en
+  // français, il ne manque que des scans. Ses noms anglais ne prouvent
+  // alors rien, ni pour l'extension ni pour ses cartes.
+  const editionFrancaisePrisee = serieAuxNomsAnglais &&
+    cartes.filter(lueEnFrancais).length >= PREUVE_FRANCAISE;
+  const anglaise = serieAuxNomsAnglais && !editionFrancaisePrisee;
 
   const b = parExtension[ext] = { nom: e.nom, sansEdition: 0, visuelAnglais: 0, introuvables: 0 };
   for(const c of concernees){
-    if(anglaise || c.langueNom === 'en'){ sansEdition.push(c.id); b.sansEdition++; }
+    if(anglaise || (c.langueNom === 'en' && !editionFrancaisePrisee)){ sansEdition.push(c.id); b.sansEdition++; }
     else if(etat.get(c.id) === 'anglais'){ visuelAnglais.push(c.id); b.visuelAnglais++; }
     else { introuvables.push(c.id); b.introuvables++; }
   }
