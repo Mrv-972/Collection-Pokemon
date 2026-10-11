@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-11-cgk1"></script>
+<script src="theme.js?v=2026-10-11-bxah"></script>
 <title>Paramètres — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -271,14 +271,6 @@
       </div>
       <p class="etat-notif" id="etat-notif" role="status"></p>
       <button type="button" class="essai-notif" id="essai-notif" hidden>Essayer une notification</button>
-
-      <div class="bascule" style="margin-top:20px;padding-top:18px;border-top:1px solid rgba(var(--trait-rgb),0.08)">
-        <label for="notif-email" id="libelle-email">Recevoir un e-mail, même site fermé
-          <span class="precision">Quand des messages t'attendent (au plus un e-mail toutes les six heures),
-            et une fois par semaine si de nouveaux échanges sont possibles.</span></label>
-        <button type="button" class="interrupteur" id="notif-email" role="switch" aria-checked="false" aria-labelledby="libelle-email"></button>
-      </div>
-      <p class="etat-notif" id="etat-email" role="status"></p>
     </section>
 
     <section class="reglage" id="partage" aria-labelledby="titre-partage">
@@ -293,12 +285,12 @@
   <footer data-note="Ton compte sert à retrouver ta collection sur tous tes appareils et à te mettre en relation avec d'autres collectionneurs."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-cgk1"></script>
-<script src="supabase-config.js?v=2026-10-11-cgk1"></script>
-<script src="pied.js?v=2026-10-11-cgk1"></script>
-<script src="admin.js?v=2026-10-11-cgk1"></script>
-<script src="admin-site.js?v=2026-10-11-cgk1"></script>
-<script src="compte.js?v=2026-10-11-cgk1"></script>
+<script src="univers.js?v=2026-10-11-bxah"></script>
+<script src="supabase-config.js?v=2026-10-11-bxah"></script>
+<script src="pied.js?v=2026-10-11-bxah"></script>
+<script src="admin.js?v=2026-10-11-bxah"></script>
+<script src="admin-site.js?v=2026-10-11-bxah"></script>
+<script src="compte.js?v=2026-10-11-bxah"></script>
 <script>
 // --- Apparence --------------------------------------------------------
 function marquerTheme(){
@@ -391,28 +383,6 @@ boutonGriser.addEventListener('click', () => {
   garderSurLeCompte({ pref_griser: voulu });
 });
 
-// --- E-mails ----------------------------------------------------------
-const boutonEmail = document.getElementById('notif-email');
-const etatEmail = document.getElementById('etat-email');
-function afficherEmail(){
-  const disponible = estConnecte() && profil && 'pref_notif_email' in profil;
-  boutonEmail.disabled = !disponible;
-  boutonEmail.setAttribute('aria-checked', String(!!profil?.pref_notif_email));
-  etatEmail.className = 'etat-notif';
-  etatEmail.textContent = !estConnecte() ? 'Connecte-toi pour recevoir des e-mails.'
-    : !disponible ? 'Bientôt disponible.'
-    : profil.pref_notif_email ? `Les e-mails partent vers ${membre.email}.` : '';
-}
-boutonEmail.addEventListener('click', async () => {
-  try{
-    await enregistrerPreferences({ pref_notif_email: !profil.pref_notif_email });
-  }catch(err){
-    etatEmail.className = 'etat-notif err';
-    return etatEmail.textContent = `Le réglage n'a pas pu être enregistré : ${err.message}`;
-  }
-  afficherEmail();
-});
-
 // --- Liste de souhaits partageable ----------------------------------
 //
 // Le lien porte un jeton tiré au hasard, impossible à deviner. En changer
@@ -477,7 +447,6 @@ function afficherPartage(message = ''){
     'Ces réglages suivent ton compte : tu les retrouveras sur tous tes appareils.';
   afficherNotifications();
   marquerAffichage();   // le compte a pu apporter ses propres réglages
-  afficherEmail();
   afficherPartage();
   if(location.hash === '#partage') document.getElementById('partage').scrollIntoView();
 })();

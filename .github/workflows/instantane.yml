@@ -39,6 +39,11 @@ jobs:
       - name: Construire l'instantané
         run: node outils/instantane.mjs --tcgdex tcgdex --sortie donnees
 
+      # Le nombre de cartes de chaque extension, pour le badge « Extension
+      # complète » : la base le reçoit du navigateur de l'administrateur.
+      - name: Résumer le nombre de cartes par extension
+        run: node outils/totaux-extensions.mjs --sortie donnees
+
       - name: Publier s'il a changé
         run: |
           rm -rf tcgdex

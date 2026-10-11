@@ -50,6 +50,39 @@ async function demarrer(){
   // Les pages redessinent leur contenu à chaque filtre, recherche ou
   // changement d'univers : on décore à mesure, au lieu d'une seule fois.
   new MutationObserver(planifier).observe(document.body, { childList: true, subtree: true });
+  recopierLesTotaux().catch(err => console.info('Totaux des extensions non recopiés', err?.message ?? err));
+}
+
+// ------------------------------------------ totaux des extensions -----
+//
+// Le badge « Extension complète » se calcule dans la base, qui doit savoir
+// combien de cartes compte chaque extension. La construction nocturne le
+// résume dans donnees/totaux-extensions.json ; le navigateur de
+// l'administrateur le recopie dans la base, au plus une fois par jour et
+// seulement s'il a changé. Aucune clé secrète à ranger : la base n'accepte
+// cette écriture que d'une session d'administrateur.
+const CLE_TOTAUX = 'pokeclasseur-totaux-recopies';
+
+async function recopierLesTotaux(){
+  const aujourdhui = new Date().toISOString().slice(0, 10);
+  let memoire = {};
+  try{ memoire = JSON.parse(localStorage.getItem(CLE_TOTAUX) || '{}'); }catch{}
+  if(memoire.jour === aujourdhui) return;
+
+  const reponse = await fetch('donnees/totaux-extensions.json', { cache: 'no-cache' });
+  if(!reponse.ok) return;
+  const texte = await reponse.text();
+  let h = 0;
+  for(let i = 0; i < texte.length; i++) h = (h * 31 + texte.charCodeAt(i)) | 0;
+  const empreinte = `${texte.length}-${h}`;
+
+  if(empreinte !== memoire.empreinte){
+    const db = await clientAdmin();
+    const { error } = await db.rpc('enregistrer_totaux', { totaux: JSON.parse(texte) });
+    // Base pas encore à jour : rien n'est retenu, on réessaiera.
+    if(error) throw error;
+  }
+  try{ localStorage.setItem(CLE_TOTAUX, JSON.stringify({ jour: aujourdhui, empreinte })); }catch{}
 }
 
 let prevu = null;

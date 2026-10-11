@@ -1,5 +1,5 @@
 -- Communauté : profil public, badges, avis, signalements, liste de souhaits
--- partageable, réglages d'affichage, notifications par e-mail.
+-- partageable, réglages d'affichage.
 -- ==========================================================================
 --
 -- Prérequis : schema.sql, administration.sql, rgpd.sql, securite-profils.sql
@@ -7,7 +7,6 @@
 -- sans dommage.
 
 -- --- 1. nouveaux réglages du membre -----------------------------------------
-alter table profils add column if not exists pref_notif_email boolean not null default false;
 alter table profils add column if not exists pref_vignettes   text    not null default 'normale';
 alter table profils add column if not exists pref_contraste   boolean not null default false;
 -- Vide tant que le membre n'a rien choisi : la grisaille existait avant,
@@ -17,10 +16,6 @@ alter table profils add column if not exists pref_griser      boolean;
 -- navigateur. Sans jeton, la liste n'est pas partagée ; en changer révoque
 -- l'ancien lien.
 alter table profils add column if not exists souhaits_jeton   text;
--- Ce que l'envoi d'e-mails retient : jamais modifiable par le membre.
-alter table profils add column if not exists dernier_email_le          timestamptz;
-alter table profils add column if not exists dernier_email_echanges_le timestamptz;
-alter table profils add column if not exists echanges_annonces         integer not null default 0;
 
 alter table profils drop constraint if exists pref_vignettes_valeurs;
 alter table profils add  constraint pref_vignettes_valeurs
@@ -30,7 +25,7 @@ alter table profils add  constraint souhaits_jeton_forme
   check (souhaits_jeton is null or souhaits_jeton ~ '^[A-Za-z0-9_-]{20,64}$');
 create unique index if not exists profils_souhaits_jeton on profils (souhaits_jeton) where souhaits_jeton is not null;
 
-grant update (pref_notif_email, pref_vignettes, pref_contraste, pref_griser, souhaits_jeton)
+grant update (pref_vignettes, pref_contraste, pref_griser, souhaits_jeton)
   on profils to authenticated;
 
 -- mon_profil(), avec ces réglages. Mêmes colonnes qu'avant, plus les
@@ -42,7 +37,7 @@ returns table (
   latitude double precision, longitude double precision,
   avatar text, photo_url text, photo_en_attente text, photo_statut text, photo_motif text,
   pref_notif_messages boolean, pref_theme text,
-  pref_notif_email boolean, pref_vignettes text, pref_contraste boolean, pref_griser boolean,
+  pref_vignettes text, pref_contraste boolean, pref_griser boolean,
   souhaits_jeton text, cree_le timestamptz
 )
 language sql
@@ -54,12 +49,21 @@ as $$
          p.latitude, p.longitude,
          p.avatar, p.photo_url, p.photo_en_attente, p.photo_statut, p.photo_motif,
          p.pref_notif_messages, p.pref_theme,
-         p.pref_notif_email, p.pref_vignettes, p.pref_contraste, p.pref_griser,
+         p.pref_vignettes, p.pref_contraste, p.pref_griser,
          p.souhaits_jeton, p.cree_le
   from profils p
   where p.id = auth.uid();
 $$;
 grant execute on function mon_profil() to authenticated;
+
+-- Une première version de ce script préparait des notifications par e-mail,
+-- abandonnées depuis. Le relancer retire ce qu'elle avait créé.
+drop function if exists emails_a_envoyer();
+drop function if exists marquer_email_envoye(uuid, text, integer);
+alter table profils drop column if exists pref_notif_email,
+                    drop column if exists dernier_email_le,
+                    drop column if exists dernier_email_echanges_le,
+                    drop column if exists echanges_annonces;
 
 -- --- 2. avis après un échange -------------------------------------------------
 -- Un avis par membre et par partenaire, modifiable. Seul celui qui a
@@ -201,9 +205,12 @@ $$;
 grant execute on function retirer_photo_de(uuid, text) to authenticated;
 
 -- --- 4. badges -------------------------------------------------------------------
--- Le nombre de cartes de chaque extension, tenu à jour chaque nuit par la
--- construction du site (outils/instantane.mjs). Sans lui, la base ne
--- saurait pas dire qu'une extension est complète.
+-- Le nombre de cartes de chaque extension. Sans lui, la base ne saurait pas
+-- dire qu'une extension est complète. La construction nocturne le résume
+-- dans donnees/totaux-extensions.json, et le navigateur de l'administrateur
+-- le recopie ici, au plus une fois par jour (admin-site.js), par
+-- enregistrer_totaux() : personne d'autre ne peut l'écrire, sans quoi un
+-- membre se déclarerait une extension complète en abaissant son total.
 create table if not exists extensions_totaux (
   id     text primary key,
   total  integer not null check (total > 0),
@@ -214,6 +221,31 @@ drop policy if exists "totaux lisibles" on extensions_totaux;
 create policy "totaux lisibles" on extensions_totaux for select to anon, authenticated using (true);
 revoke insert, update, delete, truncate on extensions_totaux from anon, authenticated;
 grant select on extensions_totaux to anon, authenticated;
+
+drop function if exists enregistrer_totaux(jsonb);
+create function enregistrer_totaux(totaux jsonb)
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  changes integer;
+begin
+  if not est_admin() then
+    raise exception 'Réservé à l''administrateur.' using errcode = '42501';
+  end if;
+  insert into extensions_totaux (id, total, maj_le)
+  select key, value::integer, now()
+  from jsonb_each_text(totaux)
+  where key ~ '^[A-Za-z0-9._-]{1,40}$' and value ~ '^[1-9][0-9]{0,4}$'
+  on conflict (id) do update set total = excluded.total, maj_le = now()
+    where extensions_totaux.total is distinct from excluded.total;
+  get diagnostics changes = row_count;
+  return changes;
+end;
+$$;
+grant execute on function enregistrer_totaux(jsonb) to authenticated;
 
 -- Les badges d'un membre, calculés par la base à partir de faits qu'elle
 -- tient elle-même : rien ne se déclare, donc rien ne se triche. Seul le
@@ -319,87 +351,12 @@ as $$
 $$;
 grant execute on function liste_souhaits(text) to anon, authenticated;
 
--- --- 7. notifications par e-mail ------------------------------------------------
--- Appelées par l'envoi programmé (outils/notifier-par-email.mjs), avec la
--- clé « service_role » : ni un visiteur ni un membre ne peuvent les
--- appeler, puisqu'elles touchent aux adresses e-mail.
---
--- Messages : un e-mail si des messages attendent depuis au moins dix
--- minutes (pas pendant une conversation en cours), qu'ils sont arrivés
--- depuis le dernier e-mail, et au plus un toutes les six heures.
--- Échanges : un récapitulatif hebdomadaire, s'il y a plus de partenaires
--- possibles que la dernière fois.
-drop function if exists emails_a_envoyer();
-create function emails_a_envoyer()
-returns table (membre uuid, email text, pseudo text, non_lus integer,
-               partenaires integer, annonces integer, envoyer_messages boolean, envoyer_echanges boolean)
-language sql
-security definer
-stable
-set search_path = public
-as $$
-  with candidats as (
-    select p.id, p.pseudo, p.dernier_email_le, p.dernier_email_echanges_le, p.echanges_annonces
-    from profils p where p.pref_notif_email
-  ),
-  attente as (
-    select c.id as membre, count(*)::int as non_lus, max(m.envoye_le) as dernier
-    from candidats c
-    join conversations v on c.id in (v.membre_a, v.membre_b)
-    join messages m on m.conversation_id = v.id and m.auteur_id <> c.id
-    left join lectures l on l.conversation_id = v.id and l.utilisateur_id = c.id
-    where m.id > coalesce(l.dernier_message_lu, 0) and not est_bloque(v.membre_a, v.membre_b)
-    group by c.id
-  ),
-  partenaires as (
-    select c.id as membre, count(distinct o.utilisateur_id)::int as nb
-    from candidats c
-    join cartes moi on moi.utilisateur_id = c.id and (moi.recherchee or moi.echangeable)
-    join cartes o on o.carte_id = moi.carte_id and o.utilisateur_id <> c.id
-                 and ((moi.recherchee and o.echangeable) or (moi.echangeable and o.recherchee))
-    where not est_bloque(c.id, o.utilisateur_id)
-    group by c.id
-  )
-  select c.id, u.email::text, c.pseudo, coalesce(a.non_lus, 0), coalesce(pa.nb, 0), c.echanges_annonces,
-         coalesce(a.non_lus, 0) > 0
-           and a.dernier <= now() - interval '10 minutes'
-           and a.dernier > coalesce(c.dernier_email_le, '-infinity'::timestamptz)
-           and coalesce(c.dernier_email_le, '-infinity'::timestamptz) <= now() - interval '6 hours',
-         coalesce(pa.nb, 0) > c.echanges_annonces
-           and coalesce(c.dernier_email_echanges_le, '-infinity'::timestamptz) <= now() - interval '7 days'
-  from candidats c
-  join auth.users u on u.id = c.id
-  left join attente a on a.membre = c.id
-  left join partenaires pa on pa.membre = c.id
-  where u.email is not null;
-$$;
-
-drop function if exists marquer_email_envoye(uuid, text, integer);
-create function marquer_email_envoye(membre uuid, genre text, partenaires integer default null)
-returns void
-language sql
-security definer
-set search_path = public
-as $$
-  update profils set
-    dernier_email_le          = case when genre = 'messages' then now() else dernier_email_le end,
-    dernier_email_echanges_le = case when genre = 'echanges' then now() else dernier_email_echanges_le end,
-    echanges_annonces         = case when genre = 'echanges' then coalesce(partenaires, echanges_annonces) else echanges_annonces end
-  where id = membre;
-$$;
-
-revoke execute on function emails_a_envoyer() from public, anon, authenticated;
-revoke execute on function marquer_email_envoye(uuid, text, integer) from public, anon, authenticated;
-grant  execute on function emails_a_envoyer() to service_role;
-grant  execute on function marquer_email_envoye(uuid, text, integer) to service_role;
-
 notify pgrst, 'reload schema';
 
 -- --- vérification ------------------------------------------------------------
 -- En dernier, seule commande affichée par l'éditeur SQL. Attendu :
--- true, true, false, false, false.
+-- true, true, true, false.
 select has_column_privilege('authenticated', 'profils', 'pref_vignettes', 'UPDATE')         as peut_regler_vignettes,
        has_table_privilege('authenticated', 'avis', 'INSERT')                               as peut_donner_un_avis,
-       has_column_privilege('authenticated', 'profils', 'dernier_email_le', 'UPDATE')       as peut_fausser_les_emails,
-       has_function_privilege('authenticated', 'emails_a_envoyer()', 'EXECUTE')             as peut_lire_les_emails,
+       to_regprocedure('emails_a_envoyer()') is null                                        as envoi_emails_retire,
        has_table_privilege('authenticated', 'extensions_totaux', 'INSERT')                  as peut_fausser_les_totaux;

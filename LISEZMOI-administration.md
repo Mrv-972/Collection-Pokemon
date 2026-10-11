@@ -24,8 +24,8 @@ modifie, et ajoute un verrou indépendant sur `est_admin`.
 **`supabase/administration.sql`**, **`supabase/administration-comptes.sql`**,
 **`supabase/profil-photo-parametres.sql`** puis
 **`supabase/communaute.sql`** (profils publics, badges, avis, signalements,
-liste de souhaits partageable, réglages d'affichage, e-mails). Chacun peut
-être relancé sans dommage.
+liste de souhaits partageable, réglages d'affichage). Chacun peut être
+relancé sans dommage.
 
 **3. Te désigner administrateur.** Toujours dans l'éditeur SQL :
 
@@ -120,47 +120,15 @@ au plus ancien :
 Pour lire une discussion entière, passe par l'onglet **Comptes** : sa
 lecture demande un motif, inscrit au journal.
 
-## Notifications par e-mail
+## Le badge « Extension complète »
 
-Un membre peut demander, dans ses **Paramètres**, à être prévenu par e-mail
-quand des messages l'attendent (au plus un e-mail toutes les six heures) et,
-une fois par semaine au plus, quand de nouveaux échanges sont possibles. Les
-e-mails partent d'une tâche programmée du dépôt
-(`.github/workflows/notifier-par-email.yml`), toutes les vingt minutes.
-
-Elle a besoin de trois **secrets** (des valeurs gardées par GitHub, que
-personne ne peut relire, pas même toi) :
-
-| Nom du secret | Ce qu'il contient |
-|---|---|
-| `SUPABASE_CLE_SERVICE` | la clé `service_role` du projet Supabase |
-| `EMAIL_ADRESSE` | l'adresse Gmail qui enverra les e-mails |
-| `EMAIL_MOT_DE_PASSE` | un « mot de passe d'application » de cette adresse |
-
-1. **La clé Supabase.** Dans Supabase : *Project Settings* → *API Keys* →
-   onglet *Legacy API Keys* → ligne `service_role` → *Reveal*, puis copie.
-   Cette clé ouvre toute la base : elle ne va **que** dans les secrets de
-   GitHub, jamais dans un fichier du site.
-2. **Le mot de passe d'application Gmail.** La validation en deux étapes
-   doit être activée sur le compte Google. Ouvre
-   <https://myaccount.google.com/apppasswords>, donne un nom
-   (« PokéClasseur »), puis copie les 16 lettres affichées.
-3. **Les secrets.** Ouvre
-   <https://github.com/Mrv-972/Collection-Pokemon/settings/secrets/actions>,
-   bouton *New repository secret*, et crée les trois secrets du tableau,
-   un par un (le nom exact à gauche, la valeur à droite).
-4. **L'essai.** Onglet *Actions* du dépôt → *Notifier par e-mail* →
-   *Run workflow*, case *Essai* cochée : le journal dit qui serait prévenu,
-   sans rien envoyer. Relance sans la case pour un envoi réel.
-
-Les e-mails portent le nom « PokéClasseur » ; l'adresse d'envoi visible est
-celle de `EMAIL_ADRESSE`. Une adresse dédiée (par exemple
-`pokeclasseur.notifications@gmail.com`) évite de montrer la tienne.
-
-Tant que les secrets manquent, la tâche s'arrête tout de suite, sans erreur ;
-le reste du site n'en dépend pas. Une fois par jour, la même tâche recopie
-aussi dans la base le nombre de cartes de chaque extension, pour le badge
-« Extension complète ».
+La base doit connaître le nombre de cartes de chaque extension pour décerner
+ce badge. La construction nocturne le résume dans
+`donnees/totaux-extensions.json`, et **ton navigateur le recopie dans la
+base tout seul**, au plus une fois par jour, quand tu ouvres le site en étant
+connecté. Tu n'as rien à faire. Seul un compte administrateur peut écrire ces
+nombres : un membre ne peut donc pas abaisser le total d'une extension pour
+se l'attribuer.
 
 ## Ce qui protège vraiment
 
@@ -177,9 +145,8 @@ Ce qui protège, ce sont les règles de la base :
   lui-même** : elle attend dans un dépôt privé, que seuls lui et toi pouvez
   lire, et seule ta validation la rend publique ;
 - `communaute.sql` ne laisse donner un **avis** qu'à qui a réellement
-  échangé des messages avec le membre noté, calcule les **badges** à partir
-  des données de la base (rien ne se déclare), et réserve les **adresses
-  e-mail** à la tâche d'envoi, qui seule détient la clé `service_role` ;
+  échangé des messages avec le membre noté, et calcule les **badges** à
+  partir des données de la base : rien ne se déclare ;
 - la colonne `est_admin` n'est lisible par personne, pas même par toi : le
   site passe par une fonction qui ne répond que pour le compte qui la pose.
 
