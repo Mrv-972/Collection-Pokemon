@@ -1,11 +1,11 @@
 {
- "majLe": "2026-10-11T12:56:34.460Z",
- "verificationDu": "2026-10-11T12:56:34.402Z",
+ "majLe": "2026-10-11T13:42:25.666Z",
+ "verificationDu": "2026-10-11T13:42:25.582Z",
  "regle": "aucun visuel français trouvé ; « sans édition » si TCGdex n'en connaît que le nom anglais, ou si l'extension a au moins la moitié de ses cartes sans visuel français, dont au moins 60 % à nom anglais",
  "couverture": {
   "catalogue": 21393,
-  "editeesEnFrancais": 20470,
-  "avecVisuelFrancais": 20402
+  "editeesEnFrancais": 20473,
+  "avecVisuelFrancais": 20409
  },
  "sansEdition": [
   "basep-7",
@@ -86,7 +86,6 @@
   "base4-67",
   "base4-69",
   "base4-70",
-  "base4-71",
   "base4-72",
   "base4-73",
   "base4-74",
@@ -107,7 +106,6 @@
   "base4-92",
   "base4-93",
   "base4-94",
-  "base4-95",
   "base4-96",
   "base4-97",
   "base4-98",
@@ -856,7 +854,6 @@
   "pl4-44",
   "pl4-45",
   "pl4-46",
-  "pl4-47",
   "pl4-48",
   "pl4-49",
   "pl4-50",
@@ -869,7 +866,6 @@
   "pl4-57",
   "pl4-58",
   "pl4-59",
-  "pl4-60",
   "pl4-61",
   "pl4-62",
   "pl4-63",
@@ -905,8 +901,6 @@
   "pl4-97",
   "pl4-98",
   "pl4-99",
-  "pl4-SH10",
-  "pl4-SH12",
   "ru1-1",
   "ru1-4",
   "ru1-5",
@@ -915,12 +909,15 @@
   "ru1-13",
   "ru1-15",
   "ru1-16",
+  "bw11-72",
+  "bw11-RC17",
   "det1-25",
   "swshp-SWSH074",
   "swshp-SWSH075",
   "swshp-SWSH177",
   "swshp-SWSH303",
   "swshp-SWSH305",
+  "fut2020-1",
   "fut2020-2",
   "fut2020-3",
   "fut2020-4",
@@ -956,7 +953,8 @@
   "np-28",
   "np-34",
   "np-40",
-  "ex6-57",
+  "pop5-1",
+  "pop5-9",
   "dpp-DP04",
   "dpp-DP44",
   "dpp-DP47",
@@ -964,15 +962,14 @@
   "dpp-DP51",
   "dpp-DP52",
   "dpp-DP56",
-  "pop7-11",
-  "pop7-14",
-  "pop7-16",
   "hgssp-HGSS06",
   "hgssp-HGSS12",
   "hgssp-HGSS13",
   "hgssp-HGSS16",
   "xyp-XY94",
-  "svp-214"
+  "xyp-XY193",
+  "xyp-XY195",
+  "bw11-RC16"
  ],
  "introuvables": [
   "hgssp-HGSS17",
@@ -983,8 +980,6 @@
   "xya-92a",
   "xya-107a",
   "2019sm-fr-33b",
-  "svp-190",
-  "mep-078",
   "mep-120"
  ],
  "parExtension": {
@@ -996,7 +991,7 @@
   },
   "base4": {
    "nom": "Base Set 2",
-   "sansEdition": 117,
+   "sansEdition": 115,
    "visuelAnglais": 0,
    "introuvables": 0
   },
@@ -1048,28 +1043,22 @@
    "visuelAnglais": 0,
    "introuvables": 0
   },
-  "ex6": {
-   "nom": "EX Rouge Feu & Vert Feuille",
-   "sansEdition": 0,
-   "visuelAnglais": 1,
-   "introuvables": 0
-  },
   "ex7": {
    "nom": "Team Rocket Returns",
    "sansEdition": 107,
    "visuelAnglais": 0,
    "introuvables": 0
   },
+  "pop5": {
+   "nom": "POP Series 5",
+   "sansEdition": 0,
+   "visuelAnglais": 2,
+   "introuvables": 0
+  },
   "dpp": {
    "nom": "Promo DP",
    "sansEdition": 7,
    "visuelAnglais": 7,
-   "introuvables": 0
-  },
-  "pop7": {
-   "nom": "POP Série 7",
-   "sansEdition": 0,
-   "visuelAnglais": 3,
    "introuvables": 0
   },
   "pop8": {
@@ -1080,7 +1069,7 @@
   },
   "pl4": {
    "nom": "Arceus",
-   "sansEdition": 97,
+   "sansEdition": 93,
    "visuelAnglais": 0,
    "introuvables": 0
   },
@@ -1099,6 +1088,12 @@
   "xyp": {
    "nom": "Promo XY",
    "sansEdition": 0,
+   "visuelAnglais": 3,
+   "introuvables": 0
+  },
+  "bw11": {
+   "nom": "Trésors Légendaires",
+   "sansEdition": 2,
    "visuelAnglais": 1,
    "introuvables": 0
   },
@@ -1128,21 +1123,21 @@
   },
   "fut2020": {
    "nom": "Pokémon Futsal 2020",
-   "sansEdition": 4,
+   "sansEdition": 5,
    "visuelAnglais": 0,
    "introuvables": 0
   },
   "svp": {
    "nom": "SVP Black Star Promos",
    "sansEdition": 5,
-   "visuelAnglais": 1,
-   "introuvables": 1
+   "visuelAnglais": 0,
+   "introuvables": 0
   },
   "mep": {
    "nom": "MEP Black Star Promos",
    "sansEdition": 1,
    "visuelAnglais": 0,
-   "introuvables": 2
+   "introuvables": 1
   }
  }
 }
