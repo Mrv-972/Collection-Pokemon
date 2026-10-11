@@ -1,0 +1,70 @@
+# Lit la langue des visuels de cartes sur l'image elle-même (reconnaissance
+# de caractères), et dépose les verdicts dans donnees/langue-visuels.json.
+name: Langue des visuels
+
+on:
+  workflow_dispatch:
+    inputs:
+      adresses:
+        description: "Essai sur une liste d'adresses, séparées par des espaces (rien n'est déposé)"
+        default: ""
+      pokecardex:
+        description: "Lire les scans Pokécardex en service et proposés"
+        type: boolean
+        default: true
+      echantillon_pkmcards:
+        description: "Échantillon de visuels PkmCards à lire (0 = aucun)"
+        default: "0"
+      echantillon_depot:
+        description: "Échantillon de visuels copiés dans le dépôt à lire (0 = aucun)"
+        default: "0"
+
+permissions:
+  contents: write
+
+jobs:
+  lire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Installer la reconnaissance de caractères
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq tesseract-ocr tesseract-ocr-fra tesseract-ocr-eng >/dev/null
+          tesseract --version | head -1
+          npm init -y >/dev/null 2>&1 || true
+          npm install sharp
+      - name: Lire
+        env:
+          ADRESSES: ${{ inputs.adresses }}
+        run: |
+          if [ -n "$ADRESSES" ]; then
+            node outils/langue-visuels.mjs --adresses "$ADRESSES"
+          else
+            node outils/langue-visuels.mjs \
+              ${{ inputs.pokecardex && '--pokecardex' || '' }} \
+              --echantillon-pkmcards "${{ inputs.echantillon_pkmcards }}" \
+              --echantillon-depot "${{ inputs.echantillon_depot }}"
+          fi
+      - name: Publier
+        if: ${{ inputs.adresses == '' }}
+        run: |
+          rm -rf node_modules package.json package-lock.json
+          git config user.name  "Langue des visuels"
+          git config user.email "actions@users.noreply.github.com"
+          git add donnees/langue-visuels.json
+          if git diff --cached --quiet; then echo "Rien de nouveau."; exit 0; fi
+          git commit -m "Lit la langue des visuels de cartes"
+          for essai in 1 2 3 4 5; do
+            if git pull --rebase --autostash -q origin "$GITHUB_REF_NAME" \
+               && git push -q origin HEAD:"$GITHUB_REF_NAME"; then
+              echo "déposé."; exit 0
+            fi
+            echo "dépôt refusé (tentative $essai) — on reprend la branche et on réessaie."
+            sleep $((essai * 5))
+          done
+          echo "::error::dépôt impossible après cinq tentatives."; exit 1
