@@ -22,7 +22,7 @@
 //
 //   node outils/langue-visuels.mjs --pokecardex            les scans Pokécardex en service
 //   node outils/langue-visuels.mjs --adresses "url url …"  une liste, pour éprouver l'outil
-//        [--echantillon-pkmcards 300] [--echantillon-depot 200] [--essai]
+//        [--depot-pokepedia] [--echantillon-pkmcards 300] [--echantillon-depot 200] [--essai]
 
 import { readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -154,6 +154,15 @@ if(nPk) for(const c of auHasard(cartes.filter(c => /pkmcards/.test(c.imageSecour
 const nDepot = Number(args['echantillon-depot'] ?? 0);
 if(nDepot) for(const c of auHasard(cartes.filter(c => existsSync(`images/cards/${c.id}.webp`)), nDepot))
   sources.set(`depot:${c.id}`, 'depot');
+
+// Toutes les images copiées depuis Poképédia : un wiki français héberge
+// aussi le scan anglais d'une carte jamais éditée en France.
+if(args['depot-pokepedia']){
+  try{
+    const copies = JSON.parse(await readFile('donnees/visuels-pokepedia-copies.json', 'utf8')).cartes ?? [];
+    for(const c of copies) if(existsSync(`images/cards/${c.id}.webp`)) sources.set(`depot:${c.id}`, 'poképédia');
+  }catch{}
+}
 
 const aLire = [...sources.keys()].filter(s => !memoire[s] || memoire[s].langue === '?' && memoire[s].erreur);
 console.log(`${sources.size} images retenues, ${aLire.length} à lire (${sources.size - aLire.length} déjà lues).`);

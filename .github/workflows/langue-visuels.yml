@@ -12,6 +12,10 @@ on:
         description: "Lire les scans Pokécardex en service et proposés"
         type: boolean
         default: true
+      depot_pokepedia:
+        description: "Lire toutes les images copiées depuis Poképédia"
+        type: boolean
+        default: true
       echantillon_pkmcards:
         description: "Échantillon de visuels PkmCards à lire (0 = aucun)"
         default: "0"
@@ -47,6 +51,7 @@ jobs:
           else
             node outils/langue-visuels.mjs \
               ${{ inputs.pokecardex && '--pokecardex' || '' }} \
+              ${{ inputs.depot_pokepedia && '--depot-pokepedia' || '' }} \
               --echantillon-pkmcards "${{ inputs.echantillon_pkmcards }}" \
               --echantillon-depot "${{ inputs.echantillon_depot }}"
           fi

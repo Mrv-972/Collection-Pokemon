@@ -69,6 +69,17 @@ const leurs = new Map(Object.keys(releve.series).map(nom => [aplatir(nom), nom])
 const ALIAS = {
   '2018sm-fr': "Collection McDonald's 2018 (France)",
   '2019sm-fr': "Collection McDonald's 2019 (France)",
+  // Pokécardex n'a ses « RC » qu'en anglais (vu sur planche).
+  'bw11':      'Noir & Blanc Trésors Légendaires',
+};
+
+// Leurs numéros spéciaux s'écrivent « rc3 », « h1 », « bw004 » ; les
+// nôtres « RC3 », « H01 », « BW04 ». On compare une forme commune : le
+// préfixe, puis le numéro sans ses zéros.
+const formeCode = c => {
+  const h = String(c ?? '').toLowerCase();
+  const m = /^([a-z]*)0*(\d+)([a-z]?)$/.exec(h);
+  return m ? m[1] + m[2] + m[3] : h;
 };
 const serieDe = ext => ALIAS[ext.id] && releve.series[ALIAS[ext.id]]
   ? ALIAS[ext.id] : leurs.get(aplatir(ext.name));
@@ -140,13 +151,14 @@ for(const ext of extensions){
   let cartes;
   try{ cartes = JSON.parse(await readFile(`donnees/physique/sets/${ext.id}.json`, 'utf8')); }
   catch{ continue; }
-  const chezEux = releve.series[leurNom];
+  const chezEux = Object.fromEntries(Object.entries(releve.series[leurNom])
+    .map(([n, adresse]) => [formeCode(n), adresse]));
   for(const carte of cartes){
     // Déjà chez nous : on ne redemande rien. C'est ce qui rend l'outil
     // relançable sans repayer les mêmes téléchargements.
     if(aDeja(carte.id)) continue;
     if(cartesVisees && !cartesVisees.has(carte.id)) continue;
-    const adresse = chezEux[sansZeros(carte.localId)];
+    const adresse = chezEux[formeCode(carte.localId)];
     if(!adresse) continue;
     if(!(await visuelFrancaisManque(carte))){
       dejaBon++;
