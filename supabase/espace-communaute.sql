@@ -404,12 +404,55 @@ as $$
 $$;
 grant execute on function signalements_a_traiter() to authenticated;
 
+-- --- 7. les badges de la communauté --------------------------------------------
+-- Calculés, comme ceux de la collection (communaute.sql, badges_de), à partir
+-- de ce que la base sait elle-même. Ce qu'un membre fait pour lui-même ne
+-- compte pas : répondre à ses propres questions, choisir sa propre réponse,
+-- soutenir sa propre idée. Sans quoi ces badges s'obtiendraient seul.
+drop function if exists badges_communaute(uuid);
+create function badges_communaute(membre uuid)
+returns table (badge text)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  with faits as (
+    select
+      (select count(*) from sujets where auteur_id = membre)
+        + (select count(*) from reponses where auteur_id = membre) as messages,
+      (select count(distinct r.sujet_id) from reponses r join sujets s on s.id = r.sujet_id
+        where r.auteur_id = membre and s.espace = 'question' and s.auteur_id <> membre) as questions_aidees,
+      (select count(*) from sujets s join reponses r on r.id = s.reponse_acceptee
+        where r.auteur_id = membre and s.auteur_id <> membre) as meilleures_reponses,
+      (select coalesce(max(n), 0) from (
+         select count(*) as n from sujets s
+         join votes v on v.sujet_id = s.id and v.membre_id <> membre
+         where s.auteur_id = membre and s.espace = 'amelioration'
+         group by s.id) idees) as soutiens_meilleure_idee,
+      (select count(*) from sujets
+        where auteur_id = membre and espace = 'amelioration' and statut in ('prevue', 'faite')) as idees_retenues
+  )
+  select b from faits, lateral (values
+    (case when messages >= 1 then 'premier-message' end),
+    (case when messages >= 50 then 'pilier-du-forum' end),
+    (case when questions_aidees >= 10 then 'serviable' end),
+    (case when meilleures_reponses >= 1 then 'bonne-reponse' end),
+    (case when meilleures_reponses >= 5 then 'expert' end),
+    (case when soutiens_meilleure_idee >= 10 then 'idee-populaire' end),
+    (case when idees_retenues >= 1 then 'idee-retenue' end)
+  ) as v(b)
+  where auth.uid() is not null and b is not null;
+$$;
+grant execute on function badges_communaute(uuid) to authenticated;
+
 notify pgrst, 'reload schema';
 
 -- --- vérification ------------------------------------------------------------
 -- En dernier, seule commande affichée par l'éditeur SQL. Attendu :
--- true, true, false, false.
+-- true, true, false, false, true.
 select has_table_privilege('anon', 'sujets', 'SELECT')                          as visiteurs_lisent,
        has_column_privilege('authenticated', 'sujets', 'titre', 'INSERT')       as membres_publient,
        has_column_privilege('authenticated', 'sujets', 'epingle', 'UPDATE')     as membres_epinglent,
-       has_column_privilege('authenticated', 'sujets', 'nb_votes', 'UPDATE')    as membres_faussent_les_votes;
+       has_column_privilege('authenticated', 'sujets', 'nb_votes', 'UPDATE')    as membres_faussent_les_votes,
+       has_function_privilege('authenticated', 'badges_communaute(uuid)', 'EXECUTE') as badges_de_la_communaute;

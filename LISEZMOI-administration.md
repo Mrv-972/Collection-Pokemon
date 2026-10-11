@@ -136,6 +136,15 @@ aussi **supprimer** n'importe quel sujet ou réponse. Les messages signalés
 arrivent dans le tiroir, onglet **Signalements**, avec un lien vers le sujet
 et un bouton pour supprimer le contenu.
 
+**Les badges de la communauté**, calculés par la base comme ceux de la
+collection, s'affichent sur les profils : Premier message, Bonne réponse
+(une réponse choisie comme la meilleure), Serviable (avoir répondu aux
+questions de 10 membres), Idée populaire (10 soutiens), Idée retenue (une
+idée que tu passes en « Prévue » ou « Réalisée »), Expert (5 meilleures
+réponses) et Pilier du forum (50 messages). Ce qu'un membre fait pour
+lui-même ne compte pas : répondre à sa propre question, choisir sa propre
+réponse, soutenir sa propre idée.
+
 **Les contenus automatiques.**
 
 - *Noms des Pokémon* et les anecdotes des Pokémon sont lus sur Poképédia

@@ -6,19 +6,32 @@
 // nombre d'avis, droit de donner un avis — l'est par la base
 // (supabase/communaute.sql) : le navigateur affiche, il ne décide pas.
 
-// L'ordre est celui de l'affichage : du plus accessible au plus rare.
+// L'ordre est celui de l'affichage : du plus accessible au plus rare, par
+// famille. Ceux de la collection viennent de badges_de (communaute.sql),
+// ceux de la communauté de badges_communaute (espace-communaute.sql).
+const FAMILLES_BADGES = [
+  { cle: 'collection', nom: 'Collection et échanges' },
+  { cle: 'communaute', nom: 'Communauté' },
+];
 const BADGES = [
-  { cle: 'premiere-carte',         icone: '🌱', nom: 'Premiers pas',          texte: 'A marqué sa première carte obtenue.' },
-  { cle: 'cent-cartes',            icone: '📒', nom: 'Cent cartes',           texte: 'Possède au moins 100 cartes.' },
-  { cle: 'cinq-cents-cartes',      icone: '📚', nom: 'Cinq cents cartes',     texte: 'Possède au moins 500 cartes.' },
-  { cle: 'mille-cartes',           icone: '🏛️', nom: 'Mille cartes',          texte: 'Possède au moins 1 000 cartes.' },
-  { cle: 'extension-complete',     icone: '🏆', nom: 'Extension complète',    texte: 'A réuni toutes les cartes d\'une extension.' },
-  { cle: 'cinq-extensions',        icone: '👑', nom: 'Cinq extensions',       texte: 'A complété cinq extensions.' },
-  { cle: 'genereux',               icone: '🎁', nom: 'Généreux',              texte: 'Propose au moins 20 cartes à l\'échange.' },
-  { cle: 'premier-echange',        icone: '🤝', nom: 'Premier échange',       texte: 'A reçu un premier avis positif après un échange.' },
-  { cle: 'echangeur-de-confiance', icone: '⭐', nom: 'Échangeur de confiance', texte: 'Au moins 5 avis positifs, et quatre fois plus de positifs que de négatifs.' },
-  { cle: 'un-an',                  icone: '🎂', nom: 'Un an parmi nous',      texte: 'Inscrit depuis plus d\'un an.' },
-  { cle: 'pionnier',               icone: '🚀', nom: 'Pionnier',              texte: 'Parmi les cent premiers inscrits.' },
+  { cle: 'premiere-carte',         famille: 'collection', icone: '🌱', nom: 'Premiers pas',          texte: 'A marqué sa première carte obtenue.' },
+  { cle: 'cent-cartes',            famille: 'collection', icone: '📒', nom: 'Cent cartes',           texte: 'Possède au moins 100 cartes.' },
+  { cle: 'cinq-cents-cartes',      famille: 'collection', icone: '📚', nom: 'Cinq cents cartes',     texte: 'Possède au moins 500 cartes.' },
+  { cle: 'mille-cartes',           famille: 'collection', icone: '🏛️', nom: 'Mille cartes',          texte: 'Possède au moins 1 000 cartes.' },
+  { cle: 'extension-complete',     famille: 'collection', icone: '🏆', nom: 'Extension complète',    texte: 'A réuni toutes les cartes d\'une extension.' },
+  { cle: 'cinq-extensions',        famille: 'collection', icone: '👑', nom: 'Cinq extensions',       texte: 'A complété cinq extensions.' },
+  { cle: 'genereux',               famille: 'collection', icone: '🎁', nom: 'Généreux',              texte: 'Propose au moins 20 cartes à l\'échange.' },
+  { cle: 'premier-echange',        famille: 'collection', icone: '🤝', nom: 'Premier échange',       texte: 'A reçu un premier avis positif après un échange.' },
+  { cle: 'echangeur-de-confiance', famille: 'collection', icone: '⭐', nom: 'Échangeur de confiance', texte: 'Au moins 5 avis positifs, et quatre fois plus de positifs que de négatifs.' },
+  { cle: 'un-an',                  famille: 'collection', icone: '🎂', nom: 'Un an parmi nous',      texte: 'Inscrit depuis plus d\'un an.' },
+  { cle: 'pionnier',               famille: 'collection', icone: '🚀', nom: 'Pionnier',              texte: 'Parmi les cent premiers inscrits.' },
+  { cle: 'premier-message',        famille: 'communaute', icone: '✍️', nom: 'Premier message',       texte: 'A publié son premier message dans la Communauté.' },
+  { cle: 'bonne-reponse',          famille: 'communaute', icone: '✅', nom: 'Bonne réponse',         texte: 'Une de ses réponses a été choisie comme la meilleure.' },
+  { cle: 'serviable',              famille: 'communaute', icone: '🧭', nom: 'Serviable',             texte: 'A répondu aux questions de 10 membres.' },
+  { cle: 'idee-populaire',         famille: 'communaute', icone: '🔥', nom: 'Idée populaire',        texte: 'Une de ses idées a été soutenue par au moins 10 membres.' },
+  { cle: 'idee-retenue',           famille: 'communaute', icone: '🛠️', nom: 'Idée retenue',          texte: 'Une de ses idées est prévue ou réalisée sur le site.' },
+  { cle: 'expert',                 famille: 'communaute', icone: '🎓', nom: 'Expert',                texte: 'Cinq de ses réponses ont été choisies comme les meilleures.' },
+  { cle: 'pilier-du-forum',        famille: 'communaute', icone: '🏅', nom: 'Pilier du forum',       texte: 'A publié au moins 50 messages dans la Communauté.' },
 ];
 
 const lienProfil = id => `profil.html?membre=${encodeURIComponent(id)}`;
@@ -38,7 +51,15 @@ async function appeler(fonction, args){
 }
 
 async function profilPublic(id){ return (await appeler('profil_public', { membre: id }))?.[0] ?? null; }
-async function badgesDe(id){ return new Set((await appeler('badges_de', { membre: id }) ?? []).map(l => l.badge)); }
+// Les deux familles de badges d'un coup. Celle de la communauté manque tant
+// que supabase/espace-communaute.sql n'a pas été relancé : on s'en passe.
+async function badgesDe(id){
+  const [collection, communaute] = await Promise.all([
+    appeler('badges_de', { membre: id }),
+    appeler('badges_communaute', { membre: id }).catch(err => { if(fonctionAbsente(err)) return []; throw err; }),
+  ]);
+  return new Set([...(collection ?? []), ...(communaute ?? [])].map(l => l.badge));
+}
 async function avisRecus(id){ return await appeler('avis_recus', { membre: id }) ?? []; }
 async function peutDonnerAvis(id){ return !!(await appeler('a_discute_avec', { autre: id })); }
 
@@ -117,12 +138,20 @@ const FORMAT_JOUR_AVIS = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', mont
 function badgesHtml(obtenus, complet){
   const montres = complet ? BADGES : BADGES.filter(b => obtenus.has(b.cle));
   if(!montres.length) return '<p class="vide-doux">Pas encore de badge.</p>';
-  return `<div class="badges">${montres.map(b => `
-    <div class="badge-collection ${obtenus.has(b.cle) ? '' : 'verrouille'}"
-         ${obtenus.has(b.cle) ? '' : 'aria-label="Badge à obtenir"'}>
-      <span class="icone" aria-hidden="true">${b.icone}</span>
-      <span><b>${b.nom}</b><small>${b.texte}</small></span>
-    </div>`).join('')}</div>`;
+  // Rangés par famille ; une famille sans badge à montrer n'a pas de titre.
+  return FAMILLES_BADGES.map(f => {
+    const dans = montres.filter(b => b.famille === f.cle);
+    if(!dans.length) return '';
+    const nb = dans.filter(b => obtenus.has(b.cle)).length;
+    return `
+      <h3 class="famille-badges">${f.nom}${complet ? ` <small>${nb} sur ${dans.length}</small>` : ''}</h3>
+      <div class="badges">${dans.map(b => `
+        <div class="badge-collection ${obtenus.has(b.cle) ? '' : 'verrouille'}"
+             ${obtenus.has(b.cle) ? '' : 'aria-label="Badge à obtenir"'}>
+          <span class="icone" aria-hidden="true">${b.icone}</span>
+          <span><b>${b.nom}</b><small>${b.texte}</small></span>
+        </div>`).join('')}</div>`;
+  }).join('');
 }
 
 function avisHtml(liste, moi){
@@ -306,7 +335,10 @@ const STYLE_COMMUNAUTE = `
   .bloc-profil h2{font-family:'Newsreader',serif;font-weight:500;font-size:23px;margin:0 0 4px;display:flex;align-items:baseline;gap:10px}
   .bloc-profil h2 small{font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--text-on-ink-dim,#9B9E9C);font-weight:400}
   .bloc-profil > p{font-size:13.5px;color:var(--text-on-ink-dim,#9B9E9C);margin:0 0 14px}
-  .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:12px}
+  .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:10px}
+  .famille-badges{font-family:'IBM Plex Sans',sans-serif;font-size:12.5px;font-weight:600;letter-spacing:.3px;
+    text-transform:uppercase;color:var(--text-on-ink-dim,#9B9E9C);margin:18px 0 0}
+  .famille-badges small{font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px}
   .badge-collection{display:flex;gap:11px;align-items:flex-start;padding:13px;border-radius:12px;
     border:1px solid rgba(var(--gold-rgb,201,162,39),0.35);background:rgba(var(--gold-rgb,201,162,39),0.08)}
   .badge-collection .icone{font-size:26px;line-height:1;flex:none}

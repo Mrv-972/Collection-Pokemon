@@ -573,6 +573,8 @@ async function afficherAccueil(vue, encore){
       <h1>La communauté PokéClasseur</h1>
       <p>Pose tes questions, propose tes idées pour le site, discute avec d'autres collectionneurs, et découvre
          l'origine du nom de chaque Pokémon.</p>
+      <p class="badges-annonce">🏅 Participer rapporte des badges — Bonne réponse, Idée retenue, Expert… —,
+         affichés sur ton profil.${estConnecte() ? ' <a href="connexion.html">Voir mes badges →</a>' : ''}</p>
       ${estConnecte() ? '' : '<a class="bouton-principal" href="connexion.html">Rejoindre la communauté</a>'}
     </section>
     <div id="savoir-du-jour"></div>
