@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-11-xf85"></script>
+<script src="theme.js?v=2026-10-11-r4pu"></script>
 <title>Communauté — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -135,7 +135,10 @@
   .communaute .etat.erreur{color:var(--alerte)}
   .communaute .etat.vide{padding:22px 0}
 
+  /* C'est un <nav> : il ne doit pas hériter de la mise en page de la barre
+     principale (étalement, retour à la ligne sur téléphone). */
   .sous-onglets{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:4px 0 14px;
+    justify-content:flex-start;flex-wrap:nowrap;align-items:center;
     border-bottom:1px solid rgba(var(--trait-rgb),0.08);margin-bottom:26px}
   .sous-onglets::-webkit-scrollbar{display:none}
   .sous-onglets a{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font-size:13.5px;padding:8px 14px;
@@ -209,10 +212,11 @@
   .petit,.vote{font:inherit;font-size:12.5px;padding:6px 12px;border-radius:999px;cursor:pointer;background:transparent;
     color:var(--text-on-ink);border:1px solid rgba(var(--trait-rgb),0.18)}
   .petit:hover,.vote:hover{background:rgba(var(--trait-rgb),0.07)}
-  .petit.discret{border-color:transparent;color:var(--text-on-ink-dim)}
+  .petit.leger{border-color:transparent;color:var(--text-on-ink-dim)}
   .petit.danger:hover{color:var(--alerte);border-color:rgba(168,67,28,0.5)}
   .petit.actif,.vote.actif{border-color:rgba(var(--gold-rgb),0.6);background:rgba(var(--gold-rgb),0.12)}
   .vote{font-size:13.5px;padding:8px 14px}
+  .vote b{margin-left:6px}
   .moderation{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px;padding-top:14px;border-top:1px dashed rgba(var(--gold-rgb),0.4)}
   .insigne-admin{font-size:12px;font-weight:600;color:var(--accent-clair)}
   .statut-choix{font-size:12.5px;color:var(--text-on-ink-dim);display:inline-flex;align-items:center;gap:6px}
@@ -240,7 +244,7 @@
   .bienvenue h1{font-size:34px;margin-bottom:8px}
   .bienvenue p{color:var(--text-on-ink-dim);font-size:15px;line-height:1.6;max-width:680px;margin:0 0 16px}
   .bienvenue p:last-child{margin:0}
-  .accueil-grille{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:18px}
+  .accueil-grille{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:18px;align-items:start}
   .bloc-accueil{padding:18px 20px;border-radius:14px;background:rgba(var(--trait-rgb),0.04);border:1px solid rgba(var(--trait-rgb),0.10)}
   .bloc-accueil h2{font-size:19px;margin-bottom:8px}
   .bloc-accueil h2 a:hover{text-decoration:underline;text-underline-offset:3px}
@@ -345,15 +349,15 @@
   <footer data-note="Ce que tu publies dans la Communauté est visible de tous les visiteurs, avec ton pseudo et ton image de profil."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-xf85"></script>
-<script src="supabase-config.js?v=2026-10-11-xf85"></script>
-<script src="pied.js?v=2026-10-11-xf85"></script>
-<script src="admin.js?v=2026-10-11-xf85"></script>
-<script src="admin-site.js?v=2026-10-11-xf85"></script>
-<script src="compte.js?v=2026-10-11-xf85"></script>
-<script src="communaute.js?v=2026-10-11-xf85"></script>
-<script src="confirmation.js?v=2026-10-11-xf85"></script>
-<script src="espace-communaute.js?v=2026-10-11-xf85"></script>
+<script src="univers.js?v=2026-10-11-r4pu"></script>
+<script src="supabase-config.js?v=2026-10-11-r4pu"></script>
+<script src="pied.js?v=2026-10-11-r4pu"></script>
+<script src="admin.js?v=2026-10-11-r4pu"></script>
+<script src="admin-site.js?v=2026-10-11-r4pu"></script>
+<script src="compte.js?v=2026-10-11-r4pu"></script>
+<script src="communaute.js?v=2026-10-11-r4pu"></script>
+<script src="confirmation.js?v=2026-10-11-r4pu"></script>
+<script src="espace-communaute.js?v=2026-10-11-r4pu"></script>
 
 </body>
 </html>

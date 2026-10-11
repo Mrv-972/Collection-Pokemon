@@ -69,10 +69,19 @@ for(const flux of FLUX){
   }catch(err){ console.warn(`échec ${flux.url} : ${err.message}`); }
 }
 
+// Au plus huit articles par site : un site très prolifique (les guides
+// Pokémon GO de Dexerto…) ne doit pas occuper toute la liste.
+const PAR_SOURCE = 8;
 const limite = Date.now() - JOURS * 86400000;
+const parSource = new Map();
 const articles = [...vus.values()]
   .filter(a => new Date(a.date).getTime() > limite && new Date(a.date).getTime() <= Date.now() + 3600000)
   .sort((a, b) => b.date.localeCompare(a.date))
+  .filter(a => {
+    const cle = a.source.toLowerCase().replace(/\.\w+$/, '');
+    parSource.set(cle, (parSource.get(cle) ?? 0) + 1);
+    return parSource.get(cle) <= PAR_SOURCE;
+  })
   .slice(0, MAXIMUM);
 
 if(articles.length < 5){

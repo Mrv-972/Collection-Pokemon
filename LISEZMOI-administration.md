@@ -24,8 +24,9 @@ modifie, et ajoute un verrou indépendant sur `est_admin`.
 **`supabase/administration.sql`**, **`supabase/administration-comptes.sql`**,
 **`supabase/profil-photo-parametres.sql`** puis
 **`supabase/communaute.sql`** (profils publics, badges, avis, signalements,
-liste de souhaits partageable, réglages d'affichage). Chacun peut être
-relancé sans dommage.
+liste de souhaits partageable, réglages d'affichage), puis
+**`supabase/espace-communaute.sql`** (l'onglet Communauté : questions,
+idées, forums). Chacun peut être relancé sans dommage.
 
 **3. Te désigner administrateur.** Toujours dans l'éditeur SQL :
 
@@ -120,6 +121,38 @@ au plus ancien :
 Pour lire une discussion entière, passe par l'onglet **Comptes** : sa
 lecture demande un motif, inscrit au journal.
 
+## L'onglet Communauté
+
+Sept rubriques : Accueil, Questions, Améliorations, Forums, Le saviez-vous ?,
+Noms des Pokémon, Actualités. Tout le monde peut lire ; seuls les membres
+connectés publient. La base freine les rafales (trois sujets par dizaine de
+minutes, huit réponses par tranche de deux minutes).
+
+**Modérer.** Connecté en administrateur, ouvre un sujet : un bandeau
+« ◆ Modération » propose de l'**épingler** (il reste en tête de liste), de le
+**verrouiller** (plus de réponses) et, pour une idée, de régler son
+**avancement** — Proposée, À l'étude, Prévue, Réalisée, Écartée. Tu peux
+aussi **supprimer** n'importe quel sujet ou réponse. Les messages signalés
+arrivent dans le tiroir, onglet **Signalements**, avec un lien vers le sujet
+et un bouton pour supprimer le contenu.
+
+**Les contenus automatiques.**
+
+- *Noms des Pokémon* et les anecdotes des Pokémon sont lus sur Poképédia
+  chaque mois (tâche « Noms des Pokémon » de l'onglet *Actions*). Poképédia
+  publie sous licence CC BY-NC-SA 3.0 : le site la cite à chaque texte.
+- *Actualités* : les titres sont récoltés deux fois par jour (tâche
+  « Actualités Pokémon ») sur Google Actualités, jeuxvideo.com et Dexerto. Seuls
+  les sites de jeux vidéo et de Pokémon sont gardés, les faits divers écartés.
+- *Le saviez-vous ?* mêle ces anecdotes de Poképédia et celles du fichier
+  **`donnees/le-saviez-vous.json`**, que tu peux enrichir depuis GitHub
+  (bouton crayon du fichier) en recopiant une ligne existante.
+- Les sites conseillés de la rubrique Actualités sont dans
+  **`donnees/sites-pokemon.json`**.
+
+Chacune de ces tâches peut se relancer à la main : onglet *Actions* du
+dépôt, choisir la tâche, *Run workflow*.
+
 ## Le badge « Extension complète »
 
 La base doit connaître le nombre de cartes de chaque extension pour décerner
@@ -147,6 +180,10 @@ Ce qui protège, ce sont les règles de la base :
 - `communaute.sql` ne laisse donner un **avis** qu'à qui a réellement
   échangé des messages avec le membre noté, et calcule les **badges** à
   partir des données de la base : rien ne se déclare ;
+- `espace-communaute.sql` ne laisse un membre publier, modifier ou supprimer
+  que **ses propres** messages ; épingler, verrouiller et faire avancer une
+  idée sont réservés à l'administrateur, et les compteurs (réponses,
+  soutiens) sont tenus par la base, pas par le navigateur ;
 - la colonne `est_admin` n'est lisible par personne, pas même par toi : le
   site passe par une fonction qui ne répond que pour le compte qui la pose.
 

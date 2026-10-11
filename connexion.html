@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-11-xf85"></script>
+<script src="theme.js?v=2026-10-11-r4pu"></script>
 <title>Mon compte — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -156,18 +156,18 @@
   <footer data-note="Ton compte sert à retrouver ta collection sur tous tes appareils et à te mettre en relation avec d'autres collectionneurs."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-xf85"></script>
-<script src="supabase-config.js?v=2026-10-11-xf85"></script>
-<script src="pied.js?v=2026-10-11-xf85"></script>
-<script src="admin.js?v=2026-10-11-xf85"></script>
-<script src="admin-site.js?v=2026-10-11-xf85"></script>
-<script src="tags.js?v=2026-10-11-xf85"></script>
-<script src="localisation.js?v=2026-10-11-xf85"></script>
-<script src="confirmation.js?v=2026-10-11-xf85"></script>
-<script src="photo-profil.js?v=2026-10-11-xf85"></script>
-<script src="compte.js?v=2026-10-11-xf85"></script>
-<script src="messagerie.js?v=2026-10-11-xf85"></script>
-<script src="communaute.js?v=2026-10-11-xf85"></script>
+<script src="univers.js?v=2026-10-11-r4pu"></script>
+<script src="supabase-config.js?v=2026-10-11-r4pu"></script>
+<script src="pied.js?v=2026-10-11-r4pu"></script>
+<script src="admin.js?v=2026-10-11-r4pu"></script>
+<script src="admin-site.js?v=2026-10-11-r4pu"></script>
+<script src="tags.js?v=2026-10-11-r4pu"></script>
+<script src="localisation.js?v=2026-10-11-r4pu"></script>
+<script src="confirmation.js?v=2026-10-11-r4pu"></script>
+<script src="photo-profil.js?v=2026-10-11-r4pu"></script>
+<script src="compte.js?v=2026-10-11-r4pu"></script>
+<script src="messagerie.js?v=2026-10-11-r4pu"></script>
+<script src="communaute.js?v=2026-10-11-r4pu"></script>
 <script>
 let ongletActif = 'connexion';
 let motDePasseOublie = false;
@@ -280,8 +280,8 @@ function rendre(){
 
       <div class="danger-zone">
         <h2>Supprimer mon compte</h2>
-        <p>Ton compte, ta collection, tes échanges et tes discussions seront
-           effacés définitivement. Cette action ne peut pas être annulée, et
+        <p>Ton compte, ta collection, tes échanges, tes discussions et tes
+           messages dans la Communauté seront effacés définitivement. Cette action ne peut pas être annulée, et
            rien ne pourra être restauré ensuite.</p>
         <button class="destructeur" id="btn-supprimer-compte">Supprimer définitivement mon compte</button>
       </div>
@@ -656,8 +656,8 @@ async function supprimerCompte(){
   const pseudo = profil?.pseudo ?? '';
   const accord = await demanderConfirmation({
     titre: 'Supprimer définitivement ton compte ?',
-    message: `Ton profil, ta collection, tes échanges possibles et toutes tes
-              discussions vont être effacés. <b>Cette action est définitive :
+    message: `Ton profil, ta collection, tes échanges possibles, toutes tes
+              discussions et tes messages dans la Communauté vont être effacés. <b>Cette action est définitive :
               rien ne pourra être restauré.</b>`,
     action: 'Supprimer mon compte',
     saisieAttendue: pseudo || undefined,

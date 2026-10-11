@@ -396,7 +396,7 @@ async function afficherFil(vue, id, encore){
           ${def.vote} <b>${s.nb_votes}</b></button>` : ''}
         ${moi && !s.verrouille ? '<button type="button" class="petit" id="modifier-sujet">Modifier</button>' : ''}
         ${moi || jeSuisAdmin ? '<button type="button" class="petit danger" id="supprimer-sujet">Supprimer</button>' : ''}
-        ${!moi && estConnecte() ? '<button type="button" class="petit discret" id="signaler-sujet">Signaler</button>' : ''}
+        ${!moi && estConnecte() ? '<button type="button" class="petit leger" id="signaler-sujet">Signaler</button>' : ''}
       </div>
       ${jeSuisAdmin ? `
         <div class="moderation" aria-label="Modération">
@@ -439,7 +439,7 @@ function reponseHtml(r, s){
           ${acceptee ? 'Retirer « meilleure réponse »' : '✓ C\'est la meilleure réponse'}</button>` : ''}
         ${moi ? `<button type="button" class="petit" data-modifier="${r.id}">Modifier</button>` : ''}
         ${moi || jeSuisAdmin ? `<button type="button" class="petit danger" data-supprimer="${r.id}">Supprimer</button>` : ''}
-        ${!moi && estConnecte() && r.pseudo ? `<button type="button" class="petit discret" data-signaler="${r.id}">Signaler</button>` : ''}
+        ${!moi && estConnecte() && r.pseudo ? `<button type="button" class="petit leger" data-signaler="${r.id}">Signaler</button>` : ''}
       </div>
     </article>`;
 }
@@ -774,6 +774,9 @@ async function afficherNoms(vue, encore, rubrique, p){
   champ.addEventListener('input', () => {
     clearTimeout(attente);
     attente = setTimeout(() => {
+      // Entre-temps, le visiteur a pu changer de vue : la recherche en
+      // attente ne doit pas réécrire l'adresse ni la page suivante.
+      if(!encore()) return;
       history.replaceState({}, '', lien({ r: 'noms', gen: gen || '', q: champ.value.trim() }));
       filtrer();
     }, 180);
