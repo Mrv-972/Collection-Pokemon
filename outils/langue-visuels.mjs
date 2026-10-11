@@ -58,22 +58,37 @@ function verdict(texte){
     .split(/[^a-z]+/).filter(m => m.length >= 2));
   let fr = 0, en = 0;
   for(const m of mots){ if(FRANCAIS.has(m)) fr++; if(ANGLAIS.has(m)) en++; }
-  const langue = fr >= 3 && fr >= 2 * en ? 'fr' : en >= 3 && en >= 2 * fr ? 'en' : '?';
+  // Réglé sur seize cartes dont la langue a été vérifiée à l'œil : les
+  // françaises donnent de 2 à 18 mots français et AUCUN anglais, les
+  // anglaises de 4 à 15 mots anglais et au plus un français. Un écart du
+  // simple au triple, avec au moins deux mots, ne laisse pas de doute.
+  const langue = fr >= 2 && fr >= 3 * en ? 'fr' : en >= 2 && en >= 3 * fr ? 'en' : '?';
   return { langue, fr, en };
 }
 
 // --- la lecture ----------------------------------------------------------
+// « --psm 6 » lit l'image comme un bloc de texte : sur une carte, c'est
+// ce qui a donné le plus de mots. Une lecture qui s'éternise (cela arrive
+// sur les fonds très chargés) est coupée au bout de soixante secondes.
 function tesseract(png){
   return new Promise((ok, ko) => {
-    const p = spawn('tesseract', ['stdin', 'stdout', '-l', 'fra+eng', '--psm', '3'],
-                    { stdio: ['pipe', 'pipe', 'ignore'] });
+    // Un seul fil par lecture : on en mène plusieurs de front, et des
+    // lectures qui se disputent les mêmes processeurs vont moins vite.
+    const p = spawn('tesseract', ['stdin', 'stdout', '-l', 'fra+eng', '--psm', '6'],
+                    { stdio: ['pipe', 'pipe', 'ignore'], env: { ...process.env, OMP_THREAD_LIMIT: '1' } });
     let sortie = '';
+    const minuteur = setTimeout(() => p.kill('SIGKILL'), 60000);
     p.stdout.on('data', d => { sortie += d; });
-    p.on('error', ko);
-    p.on('close', () => ok(sortie));
+    p.on('error', err => { clearTimeout(minuteur); ko(err); });
+    p.on('close', () => { clearTimeout(minuteur); ok(sortie); });
     p.stdin.end(png);
   });
 }
+
+// Pokécardex sert la même image en deux tailles : « md » (214 px de large,
+// celle que le site affiche) et « hd » (444 px). Le texte d'une carte en
+// 214 px fait quatre pixels de haut — illisible ; en 444 px, il se lit.
+const versionLisible = a => /pokecardex/.test(a) ? a.replace(/([?&]class=)md\b/, '$1hd') : a;
 
 async function lire(source){
   let brut;
@@ -83,13 +98,19 @@ async function lire(source){
     if(!chemin) return { langue: '?', erreur: 'fichier absent' };
     brut = await readFile(chemin);
   }else{
-    const r = await fetch(source, { headers: IDENTITE });
+    const r = await fetch(versionLisible(source), { headers: IDENTITE });
     if(!r.ok) return { langue: '?', erreur: `HTTP ${r.status}` };
     brut = Buffer.from(await r.arrayBuffer());
   }
-  // Agrandie et en niveaux de gris : le texte d'une vignette de 400 px
-  // est trop petit pour être lu tel quel.
-  const png = await sharp(brut).resize({ width: 1100 }).grayscale().normalize().sharpen().png().toBuffer();
+  // Le bas de la carte seulement — attaques, talents, faiblesse, retraite :
+  // c'est là qu'est presque tout le texte, et la lecture va deux fois plus
+  // vite qu'avec l'illustration. Puis agrandie trois fois et en niveaux de
+  // gris : même en 444 px, le texte est trop petit pour être lu tel quel.
+  const { width = 444, height = 620 } = await sharp(brut).metadata();
+  const haut = Math.round(height * 0.42);
+  const png = await sharp(brut).extract({ left: 0, top: haut, width, height: height - haut })
+    .resize({ width: width * 3, kernel: 'lanczos3' })
+    .grayscale().normalize().sharpen().png().toBuffer();
   return verdict(await tesseract(png));
 }
 
