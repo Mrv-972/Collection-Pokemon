@@ -1,5 +1,5 @@
 {
- "majLe": "2026-10-03T21:43:19.527Z",
+ "majLe": "2026-10-11T01:04:59.862Z",
  "licence": {
   "texte": "Paternité-Pas d'Utilisation Commerciale-Partage des Conditions Initiales à l'Identique 3.0",
   "adresse": "https://www.pokepedia.fr/Pok%C3%A9p%C3%A9dia:Copyrights",
@@ -503,6 +503,246 @@
    "nom": "Taupiqueur d'Alola",
    "serie": "Collection McDonald's 2017",
    "source": "https://www.pokepedia.fr/images/7/73/Carte_Collection_McDonald%27s_2017_9.png"
+  },
+  {
+   "id": "2018sm-fr-1",
+   "nom": "Feuillajou",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/4/4d/Carte_Collection_McDonald%27s_2018_%28France%29_1.png"
+  },
+  {
+   "id": "2018sm-fr-10",
+   "nom": "Psykokwak",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/d/d0/Carte_Collection_McDonald%27s_2018_%28France%29_10.png"
+  },
+  {
+   "id": "2018sm-fr-11",
+   "nom": "Ptitard",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/9/98/Carte_Collection_McDonald%27s_2018_%28France%29_11.png"
+  },
+  {
+   "id": "2018sm-fr-12",
+   "nom": "Cadoizo",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/e/eb/Carte_Collection_McDonald%27s_2018_%28France%29_12.png"
+  },
+  {
+   "id": "2018sm-fr-13",
+   "nom": "Goélise",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/7/77/Carte_Collection_McDonald%27s_2018_%28France%29_13.png"
+  },
+  {
+   "id": "2018sm-fr-14",
+   "nom": "Wailmer",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/4/49/Carte_Collection_McDonald%27s_2018_%28France%29_14.png"
+  },
+  {
+   "id": "2018sm-fr-15",
+   "nom": "Flotajou",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/c/c3/Carte_Collection_McDonald%27s_2018_%28France%29_15.png"
+  },
+  {
+   "id": "2018sm-fr-16",
+   "nom": "Froussardine",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/1/15/Carte_Collection_McDonald%27s_2018_%28France%29_16.png"
+  },
+  {
+   "id": "2018sm-fr-17",
+   "nom": "Pikachu",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/0/0a/Carte_Collection_McDonald%27s_2018_%28France%29_17.png"
+  },
+  {
+   "id": "2018sm-fr-18",
+   "nom": "Racaillou d'Alola",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/6/6f/Carte_Collection_McDonald%27s_2018_%28France%29_18.png"
+  },
+  {
+   "id": "2018sm-fr-19",
+   "nom": "Loupio",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/e/e4/Carte_Collection_McDonald%27s_2018_%28France%29_19.png"
+  },
+  {
+   "id": "2018sm-fr-2",
+   "nom": "Croquine",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/3/37/Carte_Collection_McDonald%27s_2018_%28France%29_2.png"
+  },
+  {
+   "id": "2018sm-fr-20",
+   "nom": "Togedemaru",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/8/81/Carte_Collection_McDonald%27s_2018_%28France%29_20.png"
+  },
+  {
+   "id": "2018sm-fr-21",
+   "nom": "Ramoloss",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/7/7e/Carte_Collection_McDonald%27s_2018_%28France%29_21.png"
+  },
+  {
+   "id": "2018sm-fr-22",
+   "nom": "Machoc",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/3/3f/Carte_Collection_McDonald%27s_2018_%28France%29_22.png"
+  },
+  {
+   "id": "2018sm-fr-23",
+   "nom": "Makuhita",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/5/52/Carte_Collection_McDonald%27s_2018_%28France%29_23.png"
+  },
+  {
+   "id": "2018sm-fr-24",
+   "nom": "Riolu",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/a/a3/Carte_Collection_McDonald%27s_2018_%28France%29_24.png"
+  },
+  {
+   "id": "2018sm-fr-25",
+   "nom": "Rocabot",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/b/b6/Carte_Collection_McDonald%27s_2018_%28France%29_25.png"
+  },
+  {
+   "id": "2018sm-fr-26",
+   "nom": "Tiboudet",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/9/9a/Carte_Collection_McDonald%27s_2018_%28France%29_26.png"
+  },
+  {
+   "id": "2018sm-fr-27",
+   "nom": "Cornèbre",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/4/43/Carte_Collection_McDonald%27s_2018_%28France%29_27.png"
+  },
+  {
+   "id": "2018sm-fr-28",
+   "nom": "Farfuret",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/f/f4/Carte_Collection_McDonald%27s_2018_%28France%29_28.png"
+  },
+  {
+   "id": "2018sm-fr-29",
+   "nom": "Airmure",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/3/38/Carte_Collection_McDonald%27s_2018_%28France%29_29.png"
+  },
+  {
+   "id": "2018sm-fr-3",
+   "nom": "Sovkipou",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/3/3f/Carte_Collection_McDonald%27s_2018_%28France%29_3.png"
+  },
+  {
+   "id": "2018sm-fr-30",
+   "nom": "Mélofée",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/d/df/Carte_Collection_McDonald%27s_2018_%28France%29_30.png"
+  },
+  {
+   "id": "2018sm-fr-31",
+   "nom": "Tarsal",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/a/a3/Carte_Collection_McDonald%27s_2018_%28France%29_31.png"
+  },
+  {
+   "id": "2018sm-fr-32",
+   "nom": "Minidraco",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/9/9a/Carte_Collection_McDonald%27s_2018_%28France%29_32.png"
+  },
+  {
+   "id": "2018sm-fr-33",
+   "nom": "Mucuscule",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/8/83/Carte_Collection_McDonald%27s_2018_%28France%29_33.png"
+  },
+  {
+   "id": "2018sm-fr-34",
+   "nom": "Bébécaille",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/7/74/Carte_Collection_McDonald%27s_2018_%28France%29_34.png"
+  },
+  {
+   "id": "2018sm-fr-35",
+   "nom": "Miaouss",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/7/73/Carte_Collection_McDonald%27s_2018_%28France%29_35.png"
+  },
+  {
+   "id": "2018sm-fr-36",
+   "nom": "Leveinard",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/c/c0/Carte_Collection_McDonald%27s_2018_%28France%29_36.png"
+  },
+  {
+   "id": "2018sm-fr-37",
+   "nom": "Évoli",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/8/81/Carte_Collection_McDonald%27s_2018_%28France%29_37.png"
+  },
+  {
+   "id": "2018sm-fr-38",
+   "nom": "Passerouge",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/8/85/Carte_Collection_McDonald%27s_2018_%28France%29_38.png"
+  },
+  {
+   "id": "2018sm-fr-39",
+   "nom": "Passerouge",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/7/78/Carte_Collection_McDonald%27s_2018_%28France%29_39.png"
+  },
+  {
+   "id": "2018sm-fr-4",
+   "nom": "Salamèche",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/d/d6/Carte_Collection_McDonald%27s_2018_%28France%29_4.png"
+  },
+  {
+   "id": "2018sm-fr-40",
+   "nom": "Nounourson",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/1/14/Carte_Collection_McDonald%27s_2018_%28France%29_40.png"
+  },
+  {
+   "id": "2018sm-fr-5",
+   "nom": "Caninos",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/0/0b/Carte_Collection_McDonald%27s_2018_%28France%29_5.png"
+  },
+  {
+   "id": "2018sm-fr-6",
+   "nom": "Chartor",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/4/4e/Carte_Collection_McDonald%27s_2018_%28France%29_6.png"
+  },
+  {
+   "id": "2018sm-fr-7",
+   "nom": "Flamajou",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/3/3e/Carte_Collection_McDonald%27s_2018_%28France%29_7.png"
+  },
+  {
+   "id": "2018sm-fr-8",
+   "nom": "Sabelette d'Alola",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/0/05/Carte_Collection_McDonald%27s_2018_%28France%29_8.png"
+  },
+  {
+   "id": "2018sm-fr-9",
+   "nom": "Goupix d'Alola",
+   "serie": "Collection McDonald's 2018 (France)",
+   "source": "https://www.pokepedia.fr/images/b/b8/Carte_Collection_McDonald%27s_2018_%28France%29_9.png"
   },
   {
    "id": "2021swsh-1",
@@ -1381,6 +1621,126 @@
    "source": "https://www.pokepedia.fr/images/6/6a/Carte_Best_of_Game_9.png"
   },
   {
+   "id": "bw11-RC10",
+   "nom": "Gardevoir",
+   "serie": "Noir & Blanc Trésors Légendaires",
+   "source": "https://www.pokepedia.fr/images/d/dd/Carte_Noir_%26_Blanc_Tr%C3%A9sors_L%C3%A9gendaires_RC10.png"
+  },
+  {
+   "id": "bw11-RC12",
+   "nom": "Stunfisk",
+   "serie": "Noir & Blanc Trésors Légendaires",
+   "source": "https://www.pokepedia.fr/images/f/f0/Carte_Noir_%26_Blanc_Tr%C3%A9sors_L%C3%A9gendaires_RC12.png"
+  },
+  {
+   "id": "bw11-RC13",
+   "nom": "Purrloin",
+   "serie": "Noir & Blanc Trésors Légendaires",
+   "source": "https://www.pokepedia.fr/images/2/24/Carte_Noir_%26_Blanc_Tr%C3%A9sors_L%C3%A9gendaires_RC13.png"
+  },
+  {
+   "id": "bw11-RC14",
+   "nom": "Eevee",
+   "serie": "Noir & Blanc Trésors Légendaires",
+   "source": "https://www.pokepedia.fr/images/9/94/Carte_Noir_%26_Blanc_Tr%C3%A9sors_L%C3%A9gendaires_RC14.png"
+  },
+  {
+   "id": "bw11-RC19",
+   "nom": "Cinccino",
+   "serie": "Noir & Blanc Trésors Légendaires",
+   "source": "https://www.pokepedia.fr/images/8/82/Carte_Noir_%26_Blanc_Tr%C3%A9sors_L%C3%A9gendaires_RC19.png"
+  },
+  {
+   "id": "bw11-RC3",
+   "nom": "Serperior",
+   "serie": "Noir & Blanc Trésors Légendaires",
+   "source": "https://www.pokepedia.fr/images/a/a0/Carte_Noir_%26_Blanc_Tr%C3%A9sors_L%C3%A9gendaires_RC3.png"
+  },
+  {
+   "id": "bw11-RC4",
+   "nom": "Growlithe",
+   "serie": "Noir & Blanc Trésors Légendaires",
+   "source": "https://www.pokepedia.fr/images/b/b7/Carte_Noir_%26_Blanc_Tr%C3%A9sors_L%C3%A9gendaires_RC4.png"
+  },
+  {
+   "id": "bw11-RC6",
+   "nom": "Piplup",
+   "serie": "Noir & Blanc Trésors Légendaires",
+   "source": "https://www.pokepedia.fr/images/e/e9/Carte_Noir_%26_Blanc_Tr%C3%A9sors_L%C3%A9gendaires_RC6.png"
+  },
+  {
+   "id": "bw11-RC7",
+   "nom": "Pikachu",
+   "serie": "Noir & Blanc Trésors Légendaires",
+   "source": "https://www.pokepedia.fr/images/2/2f/Carte_Noir_%26_Blanc_Tr%C3%A9sors_L%C3%A9gendaires_RC7.png"
+  },
+  {
+   "id": "col1-SL1",
+   "nom": "Deoxys",
+   "serie": "L'Appel des Légendes",
+   "source": "https://www.pokepedia.fr/images/a/a8/Carte_L%27Appel_des_L%C3%A9gendes_SL1.png"
+  },
+  {
+   "id": "col1-SL10",
+   "nom": "Rayquaza",
+   "serie": "L'Appel des Légendes",
+   "source": "https://www.pokepedia.fr/images/8/82/Carte_L%27Appel_des_L%C3%A9gendes_SL10.png"
+  },
+  {
+   "id": "col1-SL11",
+   "nom": "Suicune",
+   "serie": "L'Appel des Légendes",
+   "source": "https://www.pokepedia.fr/images/e/e5/Carte_L%27Appel_des_L%C3%A9gendes_SL11.png"
+  },
+  {
+   "id": "col1-SL2",
+   "nom": "Dialga",
+   "serie": "L'Appel des Légendes",
+   "source": "https://www.pokepedia.fr/images/d/d8/Carte_L%27Appel_des_L%C3%A9gendes_SL2.png"
+  },
+  {
+   "id": "col1-SL3",
+   "nom": "Entei",
+   "serie": "L'Appel des Légendes",
+   "source": "https://www.pokepedia.fr/images/6/69/Carte_L%27Appel_des_L%C3%A9gendes_SL3.png"
+  },
+  {
+   "id": "col1-SL4",
+   "nom": "Groudon",
+   "serie": "L'Appel des Légendes",
+   "source": "https://www.pokepedia.fr/images/9/95/Carte_L%27Appel_des_L%C3%A9gendes_SL4.png"
+  },
+  {
+   "id": "col1-SL5",
+   "nom": "Ho-Oh",
+   "serie": "L'Appel des Légendes",
+   "source": "https://www.pokepedia.fr/images/2/2f/Carte_L%27Appel_des_L%C3%A9gendes_SL5.png"
+  },
+  {
+   "id": "col1-SL6",
+   "nom": "Kyogre",
+   "serie": "L'Appel des Légendes",
+   "source": "https://www.pokepedia.fr/images/9/95/Carte_L%27Appel_des_L%C3%A9gendes_SL6.png"
+  },
+  {
+   "id": "col1-SL7",
+   "nom": "Lugia",
+   "serie": "L'Appel des Légendes",
+   "source": "https://www.pokepedia.fr/images/6/62/Carte_L%27Appel_des_L%C3%A9gendes_SL7.png"
+  },
+  {
+   "id": "col1-SL8",
+   "nom": "Palkia",
+   "serie": "L'Appel des Légendes",
+   "source": "https://www.pokepedia.fr/images/8/8f/Carte_L%27Appel_des_L%C3%A9gendes_SL8.png"
+  },
+  {
+   "id": "col1-SL9",
+   "nom": "Raikou",
+   "serie": "L'Appel des Légendes",
+   "source": "https://www.pokepedia.fr/images/8/82/Carte_L%27Appel_des_L%C3%A9gendes_SL9.png"
+  },
+  {
    "id": "det1-1",
    "nom": "Bulbizarre",
    "serie": "Détective Pikachu",
@@ -1825,6 +2185,60 @@
    "source": "https://www.pokepedia.fr/images/9/9a/Carte_Promo_DP_DP56.png"
   },
   {
+   "id": "ecard2-H01",
+   "nom": "Pharamp",
+   "serie": "Aquapolis",
+   "source": "https://www.pokepedia.fr/images/e/e8/Carte_Aquapolis_H1.png"
+  },
+  {
+   "id": "ecard2-H02",
+   "nom": "Arcanin",
+   "serie": "Aquapolis",
+   "source": "https://www.pokepedia.fr/images/7/70/Carte_Aquapolis_H2.png"
+  },
+  {
+   "id": "ecard2-H03",
+   "nom": "Migalos",
+   "serie": "Aquapolis",
+   "source": "https://www.pokepedia.fr/images/d/d7/Carte_Aquapolis_H3.png"
+  },
+  {
+   "id": "ecard2-H04",
+   "nom": "Azumarill",
+   "serie": "Aquapolis",
+   "source": "https://www.pokepedia.fr/images/5/53/Carte_Aquapolis_H4.png"
+  },
+  {
+   "id": "ecard2-H05",
+   "nom": "Joliflor",
+   "serie": "Aquapolis",
+   "source": "https://www.pokepedia.fr/images/8/88/Carte_Aquapolis_H5.png"
+  },
+  {
+   "id": "ecard2-H06",
+   "nom": "Leuphorie",
+   "serie": "Aquapolis",
+   "source": "https://www.pokepedia.fr/images/c/cf/Carte_Aquapolis_H6.png"
+  },
+  {
+   "id": "ecard2-H07",
+   "nom": "Électrode",
+   "serie": "Aquapolis",
+   "source": "https://www.pokepedia.fr/images/e/ec/Carte_Aquapolis_H7.png"
+  },
+  {
+   "id": "ecard2-H08",
+   "nom": "Entei",
+   "serie": "Aquapolis",
+   "source": "https://www.pokepedia.fr/images/5/5f/Carte_Aquapolis_H8.png"
+  },
+  {
+   "id": "ecard2-H09",
+   "nom": "Mentali",
+   "serie": "Aquapolis",
+   "source": "https://www.pokepedia.fr/images/b/b3/Carte_Aquapolis_H9.png"
+  },
+  {
    "id": "ecard2-H14",
    "nom": "Hyporoi",
    "serie": "Aquapolis",
@@ -1871,6 +2285,60 @@
    "nom": "Seel",
    "serie": "Skyridge",
    "source": "https://www.pokepedia.fr/images/a/a1/Carte_Skyridge_94.png"
+  },
+  {
+   "id": "ecard3-H01",
+   "nom": "Alakazam",
+   "serie": "Skyridge",
+   "source": "https://www.pokepedia.fr/images/3/3d/Carte_Skyridge_H1.png"
+  },
+  {
+   "id": "ecard3-H02",
+   "nom": "Arcanine",
+   "serie": "Skyridge",
+   "source": "https://www.pokepedia.fr/images/5/58/Carte_Skyridge_H2.png"
+  },
+  {
+   "id": "ecard3-H03",
+   "nom": "Articuno",
+   "serie": "Skyridge",
+   "source": "https://www.pokepedia.fr/images/a/a7/Carte_Skyridge_H3.png"
+  },
+  {
+   "id": "ecard3-H04",
+   "nom": "Beedrill",
+   "serie": "Skyridge",
+   "source": "https://www.pokepedia.fr/images/9/98/Carte_Skyridge_H4.png"
+  },
+  {
+   "id": "ecard3-H05",
+   "nom": "Crobat",
+   "serie": "Skyridge",
+   "source": "https://www.pokepedia.fr/images/1/10/Carte_Skyridge_H5.png"
+  },
+  {
+   "id": "ecard3-H06",
+   "nom": "Dewgong",
+   "serie": "Skyridge",
+   "source": "https://www.pokepedia.fr/images/2/2a/Carte_Skyridge_H6.png"
+  },
+  {
+   "id": "ecard3-H07",
+   "nom": "Flareon",
+   "serie": "Skyridge",
+   "source": "https://www.pokepedia.fr/images/c/c2/Carte_Skyridge_H7.png"
+  },
+  {
+   "id": "ecard3-H08",
+   "nom": "Forretress",
+   "serie": "Skyridge",
+   "source": "https://www.pokepedia.fr/images/1/16/Carte_Skyridge_H8.png"
+  },
+  {
+   "id": "ecard3-H09",
+   "nom": "Gengar",
+   "serie": "Skyridge",
+   "source": "https://www.pokepedia.fr/images/9/93/Carte_Skyridge_H9.png"
   },
   {
    "id": "ecard3-H10",
@@ -3929,6 +4397,12 @@
    "nom": "Growlithe",
    "serie": "Legendary Collection",
    "source": "https://www.pokepedia.fr/images/e/ed/Carte_Legendary_Collection_45.png"
+  },
+  {
+   "id": "lc-46",
+   "nom": "Haunter",
+   "serie": "Legendary Collection",
+   "source": "https://www.pokepedia.fr/images/c/c9/Carte_Legendary_Collection_46.png"
   },
   {
    "id": "lc-47",
