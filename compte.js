@@ -40,7 +40,7 @@ async function initCompte(){
     });
     const { data } = await db.auth.getSession();
     membre = data.session?.user ?? null;
-    if(membre){ await chargerProfil(); synchroniserTheme(); }
+    if(membre){ await chargerProfil(); synchroniserTheme(); synchroniserAffichage(); }
   }catch(err){
     console.warn('Compte indisponible', err);
   }
@@ -88,7 +88,7 @@ const PSEUDO_EN_ATTENTE = 'pokeclasseur_profil_en_attente';
 // conditions changent, cette valeur change aussi, et l'on sait alors qui a
 // accepté quoi — c'est ce que le RGPD appelle pouvoir démontrer le
 // consentement. Elle doit suivre la date de « miseAJour » dans legal.js.
-const VERSION_CONDITIONS = '2026-09-22';
+const VERSION_CONDITIONS = '2026-10-11';
 
 async function sInscrire(email, motDePasse, pseudo, contact, dateNaissance){
   const refus = refusAge(dateNaissance);
@@ -530,6 +530,29 @@ const profilAPreferences = () => profil && 'pref_theme' in profil;
 function synchroniserTheme(){
   if(!profilAPreferences() || typeof choisirTheme !== 'function') return;
   if(profil.pref_theme && profil.pref_theme !== themeChoisi()) choisirTheme(profil.pref_theme);
+}
+
+// Taille des vignettes, contraste, grisaille : mêmes principes, colonnes
+// ajoutées par supabase/communaute.sql.
+const CLE_GRISER = 'pokeclasseur-griser-manquantes';   // celle de progression.js
+const profilAAffichage = () => profil && 'pref_vignettes' in profil;
+
+function synchroniserAffichage(){
+  if(!profilAAffichage()) return;
+  if(typeof choisirAffichage === 'function')
+    choisirAffichage({ vignettes: profil.pref_vignettes, contraste: !!profil.pref_contraste });
+  // La grisaille n'est reprise du compte qu'une fois choisie : avant, le
+  // choix fait sur l'appareil reste.
+  if(typeof profil.pref_griser !== 'boolean') return;
+  try{ localStorage.setItem(CLE_GRISER, profil.pref_griser ? 'oui' : 'non'); }catch{}
+  if(document.documentElement.dataset.griser)
+    document.documentElement.dataset.griser = profil.pref_griser ? 'oui' : 'non';
+  document.dispatchEvent(new CustomEvent('pokeclasseur:grisaille'));
+}
+
+async function enregistrerAffichage(changements){
+  if(!estConnecte() || !profilAAffichage()) return false;
+  return enregistrerPreferences(changements);
 }
 
 async function enregistrerPreferences(changements){

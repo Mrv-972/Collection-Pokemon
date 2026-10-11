@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-11-haq6"></script>
+<script src="theme.js?v=2026-10-11-cgk1"></script>
 <title>Échanges — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,6 +58,7 @@
   .membre-tete{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:4px;}
   .membre-tete h2{font-size:22px;}
   .membre-nom{display:inline-flex;align-items:center;gap:10px}
+  .membre-tete h2{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
   .lieu{font-size:12.5px;color:var(--text-on-ink-dim);margin-bottom:14px;}
   .lieu .proche{color:var(--succes)}
   .badge{font-size:11.5px;padding:3px 10px;border-radius:20px;font-weight:500;}
@@ -173,23 +174,25 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-haq6"></script>
-<script src="catalogue.js?v=2026-10-11-haq6"></script>
-<script src="supabase-config.js?v=2026-10-11-haq6"></script>
-<script src="pied.js?v=2026-10-11-haq6"></script>
-<script src="admin.js?v=2026-10-11-haq6"></script>
-<script src="admin-site.js?v=2026-10-11-haq6"></script>
-<script src="sets.js?v=2026-10-11-haq6"></script>
-<script src="confirmation.js?v=2026-10-11-haq6"></script>
-<script src="tags.js?v=2026-10-11-haq6"></script>
-<script src="raretes.js?v=2026-10-11-haq6"></script>
-<script src="cards.js?v=2026-10-11-haq6"></script>
-<script src="prix.js?v=2026-10-11-haq6"></script>
-<script src="localisation.js?v=2026-10-11-haq6"></script>
-<script src="compte.js?v=2026-10-11-haq6"></script>
-<script src="messagerie.js?v=2026-10-11-haq6"></script>
+<script src="univers.js?v=2026-10-11-cgk1"></script>
+<script src="catalogue.js?v=2026-10-11-cgk1"></script>
+<script src="supabase-config.js?v=2026-10-11-cgk1"></script>
+<script src="pied.js?v=2026-10-11-cgk1"></script>
+<script src="admin.js?v=2026-10-11-cgk1"></script>
+<script src="admin-site.js?v=2026-10-11-cgk1"></script>
+<script src="sets.js?v=2026-10-11-cgk1"></script>
+<script src="confirmation.js?v=2026-10-11-cgk1"></script>
+<script src="tags.js?v=2026-10-11-cgk1"></script>
+<script src="raretes.js?v=2026-10-11-cgk1"></script>
+<script src="cards.js?v=2026-10-11-cgk1"></script>
+<script src="prix.js?v=2026-10-11-cgk1"></script>
+<script src="localisation.js?v=2026-10-11-cgk1"></script>
+<script src="compte.js?v=2026-10-11-cgk1"></script>
+<script src="communaute.js?v=2026-10-11-cgk1"></script>
+<script src="messagerie.js?v=2026-10-11-cgk1"></script>
 <script>
 let correspondances = [];
+let avisConnus = new Map();   // résumé des avis reçus par chaque membre listé
 let equilibresSeulement = false;
 
 // Distance maximale retenue, en kilomètres, ou null pour « partout ». Le
@@ -396,7 +399,7 @@ function rendre(){
   content.innerHTML = liste.map(m => `
     <div class="membre ${estEquilibre(m) ? 'equilibre' : ''}">
       <div class="membre-tete">
-        <h2 class="membre-nom">${avatarHtml({ pseudo: m.pseudo, ...avatarsConnus.get(m.membre_id) }, 34)}${texteEchappe(m.pseudo)}</h2>
+        <h2><a class="membre-nom lien-profil" href="${lienProfil(m.membre_id)}" title="Voir son profil">${avatarHtml({ pseudo: m.pseudo, ...avatarsConnus.get(m.membre_id) }, 34)}<span class="nom-lien">${texteEchappe(m.pseudo)}</span></a>${resumeAvisHtml(avisConnus.get(m.membre_id))}</h2>
         <span class="badge ${estEquilibre(m) ? 'equilibre' : 'simple'}">
           ${estEquilibre(m) ? 'Échange équilibré' : 'Échange à sens unique'}
         </span>
@@ -538,7 +541,8 @@ async function chargerCorrespondances(){
       || (b.il_me_donne.length + b.je_lui_donne.length) - (a.il_me_donne.length + a.je_lui_donne.length));
 
     const ids = [...new Set(correspondances.flatMap(m => [...m.il_me_donne, ...m.je_lui_donne]))];
-    await Promise.all([chargerInfosCartes(ids), avatarsDe(correspondances.map(m => m.membre_id))]);
+    await Promise.all([chargerInfosCartes(ids), avatarsDe(correspondances.map(m => m.membre_id)),
+      resumesAvis(correspondances.map(m => m.membre_id)).then(r => { avisConnus = r; })]);
     majResume();
     rendre();
     afficherPrix().catch(err => console.warn('Cotes indisponibles', err));

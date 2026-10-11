@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js?v=2026-10-11-cgk1"></script>
+<title>Liste de souhaits — PokéClasseur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B; --ink-soft:#20232A; --teal:#1F6F63; --teal-deep:#123F38;
+    --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:#E3C766; --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a:hover{color:var(--text-on-ink)}
+
+  .panel{max-width:440px;margin:56px auto 80px;}
+  .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
+  .panel h1{font-size:32px;margin-bottom:10px;}
+  .panel p.intro{color:var(--text-on-ink-dim);font-size:15px;margin:0 0 28px;}
+
+  .tabs{display:flex;gap:8px;margin-bottom:24px;}
+  .tab{flex:1;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink-dim);padding:10px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .tab.on{color:var(--text-on-ink);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
+
+  label{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:16px 0 6px;}
+  input{width:100%;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  input:focus{outline:none;border-color:rgba(var(--gold-rgb),0.5)}
+  /* La case n'est jamais pré-cochée : un consentement pré-coché n'en est
+     pas un, et ne prouve rien. Les liens s'ouvrent dans un nouvel onglet
+     pour qu'on ne perde pas ce qu'on vient de saisir. */
+  /* Séparée du reste par un trait et par sa couleur : on ne tombe pas sur ce
+     bouton en visant « Enregistrer ». */
+  .danger-zone{margin-top:40px;padding-top:24px;border-top:1px solid rgba(192,57,43,0.35)}
+  .danger-zone h2{font-family:'Newsreader',serif;font-size:18px;font-weight:500;
+                  color:var(--alerte);margin:0 0 8px;}
+  .danger-zone p{font-size:13px;line-height:1.6;color:var(--text-on-ink-dim);margin:0 0 14px}
+  .destructeur{font-family:inherit;font-size:13.5px;padding:10px 18px;border-radius:5px;
+               cursor:pointer;background:transparent;color:var(--alerte);
+               border:1px solid rgba(192,57,43,0.5);transition:.12s;}
+  .destructeur:hover{background:rgba(192,57,43,0.14);color:#F0A088}
+
+  .consentement{display:flex;align-items:flex-start;gap:10px;margin:20px 0 4px;
+                font-size:13.5px;line-height:1.55;color:var(--text-on-ink-dim);cursor:pointer;}
+  .consentement input{width:19px;height:19px;flex-shrink:0;margin:1px 0 0;accent-color:var(--gold);cursor:pointer}
+  .consentement a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:2px}
+
+  .aide{font-size:12px;color:var(--text-on-ink-dim);margin-top:6px;}
+
+  button.principal{width:100%;margin-top:26px;background:var(--teal);border:none;color:#EDF5F3;padding:12px;border-radius:3px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}
+  button.principal:hover{background:var(--teal-deep)}
+  button.principal:disabled{opacity:.5;cursor:default}
+  button.discret{margin-top:14px;width:100%;background:transparent;border:1px solid rgba(var(--trait-rgb),0.14);color:var(--text-on-ink-dim);padding:10px;border-radius:3px;font-size:13px;cursor:pointer;font-family:inherit;}
+  button.discret:hover{border-color:rgba(var(--trait-rgb),0.3)}
+
+  .message{margin-top:20px;font-size:13.5px;padding:12px 14px;border-radius:4px;}
+  .message.err{color:var(--alerte);background:rgba(168,67,28,0.1);border:1px solid rgba(168,67,28,0.35)}
+  .message.ok{color:var(--succes);background:rgba(31,111,99,0.12);border:1px solid rgba(31,111,99,0.35)}
+
+  .compte-actuel{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:22px;}
+  .compte-actuel .pseudo{font-family:'Newsreader',serif;font-size:24px;}
+  .compte-actuel .detail{color:var(--text-on-ink-dim);font-size:13.5px;margin-top:4px;}
+  .bloques{margin-top:30px;border-top:1px solid rgba(var(--trait-rgb),0.08);padding-top:22px;}
+  .bloques h2{font-size:19px;margin-bottom:4px;}
+  .bloques p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
+  .bloque{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid rgba(var(--trait-rgb),0.06);font-size:14px;}
+  .bloque button{background:transparent;border:1px solid rgba(var(--trait-rgb),0.14);color:var(--text-on-ink-dim);padding:5px 12px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit;}
+  .bloque button:hover{border-color:rgba(var(--trait-rgb),0.35);color:var(--text-on-ink)}
+
+  .zone{margin-top:30px;border-top:1px solid rgba(var(--trait-rgb),0.08);padding-top:22px;}
+  .zone h2{font-size:19px;margin-bottom:4px;}
+  .zone > p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
+  .zone-actuelle{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:12px 14px;font-size:14px;}
+  .zone-actuelle.vide{color:var(--text-on-ink-dim);font-size:13.5px;}
+  .recherche{display:flex;gap:8px;align-items:stretch;}
+  .recherche input{flex:1}
+  .recherche button{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:0 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .recherche button:hover{border-color:rgba(var(--gold-rgb),0.5)}
+  .recherche button:disabled{opacity:.5;cursor:default}
+  .communes{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;}
+  .commune{text-align:left;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:9px 12px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .commune:hover{border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.06)}
+  .commune small{display:block;color:var(--text-on-ink-dim);font-size:11.5px;margin-top:1px;}
+  .zone-msg{font-size:12.5px;margin-top:10px;}
+  .zone-msg.err{color:var(--alerte)}
+  .zone-msg.ok{color:var(--succes)}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
+
+  /* ========================= Téléphone =========================
+     Les liens de navigation passaient en display:none sous 720 px : depuis
+     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
+     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
+     visibles, et assez hauts pour être touchés sans viser. La règle de
+     débordement horizontal n'est là que pour les très petits écrans, où
+     quatre libellés ne tiennent plus côte à côte.
+
+     Le reste resserre des marges verticales taillées pour un grand écran,
+     et porte les commandes à une hauteur tactile confortable — en bas de
+     42 px, un doigt touche la voisine une fois sur trois. */
+  @media(max-width:720px){
+    nav{flex-wrap:wrap;padding:18px 0 0;}
+    .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
+              justify-content:space-between;overflow-x:auto;scrollbar-width:none;}
+    .navlinks::-webkit-scrollbar{display:none}
+    .navlinks a{white-space:nowrap;padding:12px 6px;border-bottom:2px solid transparent;}
+    .navlinks a.active{border-bottom-color:currentColor;}
+    .brand{font-size:19px;padding:6px 0}
+    .compte-lien{padding:11px 0 11px 12px}
+
+    .panel{margin:30px auto 60px}
+    .panel h1{font-size:26px}
+    .tab{min-height:44px}
+    input{min-height:44px}
+    button.discret{min-height:44px}
+    .recherche button{min-height:44px}
+    .commune{min-height:44px}
+  }
+</style>
+<style>
+  .souhaits{max-width:1000px;margin:44px auto 80px}
+  .souhaits .etat{color:var(--text-on-ink-dim);font-size:15px;padding:30px 0}
+  .tete-liste{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+  .tete-liste .avatar-membre{box-shadow:0 0 0 3px rgba(var(--gold-rgb),0.45)}
+  .tete-liste .kicker{margin-bottom:4px}
+  .tete-liste h1{font-size:34px;line-height:1.15;word-break:break-word}
+  .tete-liste .resume{color:var(--text-on-ink-dim);font-size:14px;margin:4px 0 0}
+  .actions-liste{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+  .actions-liste a{font-size:13.5px;padding:9px 16px;border-radius:999px;border:1px solid rgba(var(--trait-rgb),0.18);color:var(--text-on-ink)}
+  .actions-liste a:hover{background:rgba(var(--trait-rgb),0.07)}
+  .actions-liste a.principal{background:var(--teal);border-color:var(--teal);color:#EDF5F3}
+  .invitation{margin:24px 0 0;padding:16px 18px;border-radius:12px;font-size:14px;line-height:1.6;
+    background:rgba(var(--gold-rgb),0.08);border:1px solid rgba(var(--gold-rgb),0.30)}
+  .invitation a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:3px;font-weight:500}
+  .section-liste{margin-top:36px}
+  .section-liste h2{font-size:24px;margin-bottom:4px}
+  .section-liste > p{font-size:13.5px;color:var(--text-on-ink-dim);margin:0 0 16px}
+  .grille-souhaits{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:14px}
+  .souhait{display:flex;flex-direction:column;gap:6px;min-width:0}
+  .souhait .visuel{position:relative;aspect-ratio:5/7;border-radius:7px;overflow:hidden;background:rgba(var(--trait-rgb),0.05);
+    display:flex;align-items:center;justify-content:center}
+  .souhait .visuel img{width:100%;height:100%;object-fit:contain;display:block}
+  .souhait .visuel .glyph{font-size:28px}
+  .souhait .nom{font-size:13px;font-weight:500;line-height:1.3;overflow-wrap:anywhere}
+  .souhait .ext{font-size:11.5px;color:var(--text-on-ink-dim);line-height:1.35}
+  .souhait .accord{align-self:flex-start;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;
+    background:rgba(31,111,99,0.18);color:var(--succes)}
+  .vide-doux{font-size:14px;color:var(--text-on-ink-dim)}
+  @media(max-width:640px){
+    .souhaits{margin:26px auto 60px}
+    .tete-liste h1{font-size:27px}
+    .actions-liste{margin-left:0}
+    .actions-liste a{min-height:44px;display:inline-flex;align-items:center}
+    .grille-souhaits{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="index.html">Poké<span>Classeur</span></a>
+    <div class="navlinks">
+      <a href="series.html">Par extension</a>
+      <a href="pokemon.html">Par Pokémon</a>
+      <a href="missions.html" class="lien-pocket">Missions secrètes</a>
+      <a href="classeurs.html" class="lien-physique">Mes classeurs</a>
+      <a href="echanges.html">Échanges</a>
+      <a href="discussions.html">Discussions</a>
+    </div>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
+  </nav>
+
+
+
+  <main class="souhaits" id="souhaits" aria-live="polite">
+    <p class="etat">Chargement de la liste…</p>
+  </main>
+
+  <footer data-note="Cette page ne montre que ce que son auteur a choisi de partager : les cartes qu'il recherche et celles qu'il propose."></footer>
+</div>
+
+<script src="univers.js?v=2026-10-11-cgk1"></script>
+<script src="sets.js?v=2026-10-11-cgk1"></script>
+<script src="supabase-config.js?v=2026-10-11-cgk1"></script>
+<script src="pied.js?v=2026-10-11-cgk1"></script>
+<script src="admin.js?v=2026-10-11-cgk1"></script>
+<script src="admin-site.js?v=2026-10-11-cgk1"></script>
+<script src="compte.js?v=2026-10-11-cgk1"></script>
+<script src="communaute.js?v=2026-10-11-cgk1"></script>
+<script>
+const zone = document.getElementById('souhaits');
+const jeton = new URLSearchParams(location.search).get('j') ?? '';
+
+function etat(html){ zone.innerHTML = `<p class="etat">${html}</p>`; }
+
+const extensionDe = id => String(id).replace(/-[^-]+$/, '');
+const universDe = setId => (typeof isPocketSet === 'function' && isPocketSet(setId)) ? 'pocket' : 'physique';
+
+// Nom, visuel et extension de chaque carte, lus dans les fichiers du site
+// — un fichier par extension concernée, pas un par carte.
+async function infosDesCartes(ids){
+  const infos = {}, noms = {};
+  const parExtension = {};
+  ids.forEach(id => (parExtension[extensionDe(id)] ||= []).push(id));
+  const univers = [...new Set(Object.keys(parExtension).map(universDe))];
+  await Promise.all([
+    ...Object.keys(parExtension).map(async setId => {
+      try{
+        const r = await fetch(`donnees/${universDe(setId)}/sets/${encodeURIComponent(setId)}.json`);
+        if(r.ok) (await r.json()).forEach(c => { infos[c.id] = c; });
+      }catch{ /* la carte s'affichera sous son seul identifiant */ }
+    }),
+    ...univers.map(async u => {
+      try{
+        const r = await fetch(`donnees/${u}/extensions.json`);
+        if(r.ok) (await r.json()).forEach((e, rang) => { noms[e.id] = { nom: e.name, rang }; });
+      }catch{}
+    }),
+  ]);
+  return { infos, noms };
+}
+
+function vignette(id, { infos, noms }, accord){
+  const c = infos[id] ?? {};
+  const setId = extensionDe(id);
+  const nom = echapperCommun(c.name ?? id);
+  const secours = c.imageSecours ? ` data-secours="${echapperCommun(c.imageSecours)}"` : '';
+  return `
+    <div class="souhait">
+      <div class="visuel">${c.image
+        ? `<img src="${echapperCommun(c.image)}" alt="${nom}" loading="lazy"${secours}
+             onerror="if(this.dataset.secours){this.src=this.dataset.secours;this.removeAttribute('data-secours')}else{this.replaceWith(Object.assign(document.createElement('span'),{className:'glyph',textContent:'?'}))}">`
+        : '<span class="glyph">?</span>'}</div>
+      <div class="nom">${nom}</div>
+      <div class="ext">${echapperCommun(noms[setId]?.nom ?? setId)}${c.localId ? ` · n° ${echapperCommun(c.localId)}` : ''}</div>
+      ${accord ? `<span class="accord">${accord}</span>` : ''}
+    </div>`;
+}
+
+// Par extension, dans l'ordre du catalogue, puis par numéro.
+function trier(ids, { infos, noms }){
+  const num = id => parseInt(infos[id]?.localId ?? '', 10);
+  return ids.sort((a, b) =>
+    (noms[extensionDe(a)]?.rang ?? 1e6) - (noms[extensionDe(b)]?.rang ?? 1e6)
+    || extensionDe(a).localeCompare(extensionDe(b))
+    || (num(a) - num(b)) || a.localeCompare(b));
+}
+
+async function afficher(){
+  if(CONFIG_MANQUANTE) return etat("Le site n'est pas encore relié à sa base.");
+  if(jeton.length < 20) return etat("Ce lien est incomplet. Vérifie qu'il a été copié en entier.");
+
+  let lignes;
+  try{
+    const db = await clientSupabase();
+    const { data, error } = await db.rpc('liste_souhaits', { jeton });
+    if(error) throw error;
+    lignes = data ?? [];
+  }catch(err){
+    return etat(`La liste n'a pas pu être chargée : ${echapperCommun(err.message)}`);
+  }
+  if(!lignes.length) return etat("Ce lien ne mène plus à aucune liste : son auteur a arrêté le partage, ou en a créé un nouveau.");
+
+  const auteur = lignes[0];
+  const recherchees = lignes.filter(l => l.genre === 'recherchee').map(l => l.carte_id);
+  const proposees = lignes.filter(l => l.genre === 'echangeable').map(l => l.carte_id);
+  document.title = `Liste de souhaits de ${auteur.pseudo} — PokéClasseur`;
+
+  // Un visiteur connecté voit, en plus, ce qui colle avec sa propre
+  // collection : les cartes qu'il peut offrir, celles qu'il cherche.
+  let mienne = {};
+  const moi = estConnecte() && auteur.membre === membre.id;
+  if(estConnecte() && !moi){ try{ mienne = await lireCollection(); }catch{} }
+
+  const catalogue = await infosDesCartes([...recherchees, ...proposees]);
+  trier(recherchees, catalogue); trier(proposees, catalogue);
+  const nb = (n, un, plusieurs) => `${n} ${n > 1 ? plusieurs : un}`;
+
+  const actions = auteur.membre && !moi ? `
+      <div class="actions-liste">
+        <a href="${lienProfil(auteur.membre)}">Voir son profil</a>
+        <a class="principal" href="discussions.html?membre=${encodeURIComponent(auteur.membre)}">💬 Lui écrire</a>
+      </div>` : moi ? `<div class="actions-liste"><a href="parametres.html#partage">Gérer le partage</a></div>` : '';
+
+  zone.innerHTML = `
+    <header class="tete-liste">
+      ${avatarHtml(auteur, 84)}
+      <div>
+        <div class="kicker">Liste de souhaits</div>
+        <h1>${echapperCommun(auteur.pseudo)}</h1>
+        <p class="resume">${nb(recherchees.length, 'carte recherchée', 'cartes recherchées')} · ${nb(proposees.length, 'carte proposée', 'cartes proposées')} à l'échange</p>
+      </div>
+      ${actions}
+    </header>
+    ${estConnecte() ? '' : `
+    <p class="invitation">Tu as une carte que ${echapperCommun(auteur.pseudo)} recherche ?
+      <a href="connexion.html">Crée ton compte PokéClasseur</a> — c'est gratuit — pour lui écrire,
+      et tenir toi aussi ton classeur.</p>`}
+
+    <section class="section-liste" aria-labelledby="titre-recherchees">
+      <h2 id="titre-recherchees">❤️ Recherchées</h2>
+      <p>Les cartes que ${echapperCommun(auteur.pseudo)} aimerait obtenir.</p>
+      ${recherchees.length ? `<div class="grille-souhaits">${recherchees.map(id =>
+        vignette(id, catalogue, mienne[id]?.ech ? 'Tu la proposes ✓' : '')).join('')}</div>`
+        : '<p class="vide-doux">Aucune pour le moment.</p>'}
+    </section>
+
+    <section class="section-liste" aria-labelledby="titre-proposees">
+      <h2 id="titre-proposees">🔁 À échanger</h2>
+      <p>Les cartes que ${echapperCommun(auteur.pseudo)} propose en échange.</p>
+      ${proposees.length ? `<div class="grille-souhaits">${proposees.map(id =>
+        vignette(id, catalogue, mienne[id]?.rech ? 'Tu la cherches ✓' : '')).join('')}</div>`
+        : '<p class="vide-doux">Aucune pour le moment.</p>'}
+    </section>`;
+}
+
+(async () => {
+  await initCompte();
+  afficherEtatCompte();
+  afficher();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+# Prévient par e-mail les membres qui l'ont demandé (Paramètres du site) :
+# messages en attente, nouveaux échanges possibles. Une fois par jour,
+# recopie aussi dans la base le nombre de cartes de chaque extension, pour le
+# badge « Extension complète ».
+#
+# Tant que les secrets ne sont pas renseignés, chaque passage s'arrête tout de
+# suite, sans erreur. Voir LISEZMOI-administration.md, « Notifications par
+# e-mail ».
+name: Notifier par e-mail
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+    - cron: '7 4 * * *'
+  workflow_dispatch:
+    inputs:
+      essai:
+        description: "Essai : montrer ce qui partirait, sans rien envoyer"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Deux passages ne se chevauchent jamais : un e-mail ne part pas deux fois.
+concurrency:
+  group: notifier-par-email
+  cancel-in-progress: false
+
+jobs:
+  notifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_CLE_SERVICE: ${{ secrets.SUPABASE_CLE_SERVICE }}
+      EMAIL_ADRESSE: ${{ secrets.EMAIL_ADRESSE }}
+      EMAIL_MOT_DE_PASSE: ${{ secrets.EMAIL_MOT_DE_PASSE }}
+      EMAIL_SERVEUR: ${{ secrets.EMAIL_SERVEUR }}
+      EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Préparer l'envoi
+        if: env.SUPABASE_CLE_SERVICE != ''
+        run: |
+          npm init -y >/dev/null 2>&1 || true
+          npm install --no-audit --no-fund nodemailer@6.9.16
+
+      - name: Recopier les totaux des extensions
+        if: env.SUPABASE_CLE_SERVICE != '' && (github.event_name == 'workflow_dispatch' || github.event.schedule == '7 4 * * *')
+        run: node outils/synchroniser-totaux.mjs
+
+      - name: Envoyer les e-mails
+        if: env.SUPABASE_CLE_SERVICE != ''
+        run: node outils/notifier-par-email.mjs ${{ inputs.essai && '--essai' || '' }}
+
+      - name: Pas encore configuré
+        if: env.SUPABASE_CLE_SERVICE == ''
+        run: echo "Secrets absents : rien à envoyer. Voir LISEZMOI-administration.md, « Notifications par e-mail »."

@@ -1,4 +1,4 @@
-// Le tiroir d'administration : corrections en cours, comptes, discussions.
+// Le tiroir d'administration : corrections, comptes, photos, signalements.
 // ========================================================================
 //
 // Ces fonctions n'ont pas de place « en naviguant » : elles ne portent sur
@@ -83,6 +83,8 @@ function dessiner(){
                 aria-selected="${ongletActif === 'comptes'}">Comptes</button>
         <button type="button" role="tab" data-onglet="photos"
                 aria-selected="${ongletActif === 'photos'}">Photos à valider</button>
+        <button type="button" role="tab" data-onglet="signalements"
+                aria-selected="${ongletActif === 'signalements'}">Signalements</button>
       </div>
       <button type="button" class="tiroir-fermer" aria-label="Fermer">×</button>
     </div>
@@ -93,6 +95,8 @@ function dessiner(){
          <div id="zone-comptes"><p class="intro">Chargement…</p></div>`
       : ongletActif === 'photos'
       ? `<div id="zone-photos"><p class="intro">Chargement…</p></div>`
+      : ongletActif === 'signalements'
+      ? `<div id="zone-signalements"><p class="intro">Chargement…</p></div>`
       : `<div id="zone-liste"><p class="intro">Chargement…</p></div>`}`;
 
   tiroir.querySelector('.tiroir-fermer').onclick = () => tiroir.close();
@@ -102,6 +106,7 @@ function dessiner(){
   });
   if(ongletActif === 'comptes') afficherComptes();
   else if(ongletActif === 'photos') afficherPhotos();
+  else if(ongletActif === 'signalements') afficherSignalements();
   else afficherListe();
 }
 
@@ -198,6 +203,95 @@ async function refuserPhoto(p, motif){
   const { error } = await db.rpc('refuser_photo', { membre: p.id, motif });
   if(error) throw error;
   await db.storage.from('avatars-attente').remove([p.photo_en_attente]).catch(() => {});
+}
+
+// ------------------------------------------------------ signalements ---
+//
+// Ce que les membres signalent : un comportement, une photo, un pseudo, un
+// avis, un message. Classer un signalement le retire de la liste ; il reste
+// en base, consultable depuis le tableau de bord Supabase.
+
+const OBJETS_SIGNALES = {
+  profil: 'Comportement', membre: 'Comportement', message: 'Message',
+  photo: 'Photo de profil', pseudo: 'Pseudo', avis: 'Avis',
+};
+
+async function afficherSignalements(){
+  const zone = tiroir.querySelector('#zone-signalements');
+  try{
+    const db = await clientSupabase();
+    const { data, error } = await db.rpc('signalements_a_traiter');
+    if(error) throw error;
+    if(!data?.length){
+      zone.innerHTML = '<p class="intro">Aucun signalement en attente.</p>';
+      return;
+    }
+    const date = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+    zone.innerHTML = `
+      <p class="aide">Pour une discussion entière, passe par l'onglet Comptes : sa lecture
+        demande un motif, inscrit au journal.</p>
+      ${data.map((s, i) => `
+        <div class="signalement" data-index="${i}">
+          ${s.objet === 'photo' && s.signale_photo
+            ? `<img src="${echapper(s.signale_photo)}" alt="Photo de ${echapper(s.signale)}">` : ''}
+          <div class="quoi">
+            <div><span class="etiquette attente">${echapper(OBJETS_SIGNALES[s.objet] ?? s.objet)}</span>
+              <b>${echapper(s.signaleur ?? 'Un membre')}</b> signale
+              <b>${echapper(s.signale ?? 'un compte supprimé')}</b>
+              <span class="detail">· ${echapper(date.format(new Date(s.cree_le)))}</span></div>
+            <p class="motif">${echapper(s.motif)}</p>
+            ${s.message_texte ? `<blockquote class="message-signale">${echapper(s.message_texte)}</blockquote>` : ''}
+            <div class="actions-photo">
+              ${s.signale ? `<a class="discret-admin" href="profil.html?membre=${encodeURIComponent(s.signale_id)}" target="_blank" rel="noopener">Voir son profil</a>` : ''}
+              ${s.signale_photo ? '<button type="button" class="discret-admin retirer-sa-photo">Retirer sa photo…</button>' : ''}
+              <button type="button" class="valider-photo classer">Classer</button>
+            </div>
+          </div>
+        </div>`).join('')}`;
+    zone.querySelectorAll('.signalement').forEach(bloc => {
+      const s = data[Number(bloc.dataset.index)];
+      bloc.querySelector('.classer').onclick = () => traiterSignalement(bloc, async () => {
+        const { error } = await db.rpc('traiter_signalement', { signalement: s.id });
+        if(error) throw error;
+      }, 'Signalement classé.');
+      const retirer = bloc.querySelector('.retirer-sa-photo');
+      if(retirer) retirer.onclick = async () => {
+        const motif = await demanderMotif({
+          titre: `Retirer la photo de ${s.signale} ?`,
+          texte: 'La photo disparaît de son profil, et le membre lit ce motif sur sa page. Le signalement est classé dans la foulée.',
+          libelle: 'Motif du retrait',
+          exemple: 'Photo inappropriée',
+          action: 'Retirer la photo',
+          minimum: 3,
+        });
+        if(!motif) return;
+        traiterSignalement(bloc, async () => {
+          const { error } = await db.rpc('retirer_photo_de', { membre: s.signale_id, motif });
+          if(error) throw error;
+          const fichier = /\/avatars\/([^?]+)/.exec(s.signale_photo ?? '');
+          if(fichier) await db.storage.from('avatars').remove([decodeURIComponent(fichier[1])]).catch(() => {});
+          const { error: e2 } = await db.rpc('traiter_signalement', { signalement: s.id });
+          if(e2) throw e2;
+        }, `Photo de ${s.signale} retirée.`);
+      };
+    });
+  }catch(err){
+    zone.innerHTML = `<p class="msg ko">Lecture impossible : ${echapper(err.message)}</p>
+      <p class="aide">Si le message parle d'une fonction introuvable, le fichier
+         <b>supabase/communaute.sql</b> n'a pas encore été exécuté.</p>`;
+  }
+}
+
+async function traiterSignalement(bloc, action, reussite){
+  bloc.querySelectorAll('button').forEach(b => { b.disabled = true; });
+  try{
+    await action();
+    message(reussite, 'ok');
+    afficherSignalements();
+  }catch(err){
+    message(`Échec : ${err.message}`, 'ko');
+    bloc.querySelectorAll('button').forEach(b => { b.disabled = false; });
+  }
 }
 
 // -------------------------------------------- les corrections en cours ---
@@ -554,6 +648,13 @@ function poserStyle(){
   #admin-tiroir .actions-photo{display:flex;gap:8px;margin-top:10px}
   #admin-tiroir .valider-photo{font:inherit;font-size:13px;padding:7px 14px;border-radius:6px;cursor:pointer;
     border:0;background:#1F6F63;color:#EDF5F3}
+  #admin-tiroir .signalement{display:flex;gap:16px;align-items:flex-start;padding:14px 0;border-bottom:1px solid rgba(237,234,224,.08)}
+  #admin-tiroir .signalement img{width:84px;height:84px;border-radius:50%;object-fit:cover;flex:none;background:rgba(255,255,255,.05)}
+  #admin-tiroir .signalement .etiquette{margin-right:6px}
+  #admin-tiroir .signalement .motif{margin:8px 0 0;font-size:14px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+  #admin-tiroir .message-signale{margin:8px 0 0;padding:8px 12px;border-left:3px solid rgba(201,162,39,.5);
+    background:rgba(237,234,224,.04);font-size:13.5px;color:#B9BCB9;white-space:pre-wrap;overflow-wrap:anywhere}
+  #admin-tiroir a.discret-admin{display:inline-flex;align-items:center;text-decoration:none}
   #admin-tiroir .etiquette{font-size:12px;padding:3px 9px;border-radius:999px;white-space:nowrap}
   #admin-tiroir .etiquette.attente{background:rgba(201,162,39,.16);color:#E8D89A}
   #admin-tiroir .etiquette.absorbee{background:rgba(31,111,99,.22);color:#9FD9CE}

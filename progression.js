@@ -109,7 +109,8 @@ const CLASSE_NON_OBTENUE = 'non-obtenue';
 
 // Griser ou non, c'est au lecteur de choisir : certains veulent voir d'un
 // coup d'œil ce qui leur manque, d'autres veulent regarder les cartes.
-// Le choix est retenu sur l'appareil et vaut pour tout le site.
+// Le choix est retenu sur l'appareil et vaut pour tout le site ; pour un
+// membre connecté, il l'est aussi sur son compte (compte.js).
 const CLE_GRISAILLE = 'pokeclasseur-griser-manquantes';
 
 function grisailleActive(){
@@ -186,7 +187,12 @@ function poserInterrupteurGrisaille(conteneur){
     catch{ /* mémoire refusée : le choix ne durera pas, mais la page suit */ }
     appliquerLaGrisaille();
     rafraichir();
+    // Pour un membre connecté, le choix suit aussi le compte (Paramètres).
+    if(typeof enregistrerAffichage === 'function')
+      enregistrerAffichage({ pref_griser: grisailleActive() }).catch(() => {});
   });
+  // Le compte, chargé après coup, peut apporter un autre choix.
+  document.addEventListener('pokeclasseur:grisaille', () => { appliquerLaGrisaille(); rafraichir(); });
 
   rafraichir();
   conteneur.appendChild(bouton);

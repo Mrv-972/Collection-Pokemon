@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-11-haq6"></script>
+<script src="theme.js?v=2026-10-11-cgk1"></script>
 <title>Discussions — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -63,6 +63,7 @@
   .conv .pastille{display:inline-block;min-width:18px;padding:1px 5px;margin-left:6px;border-radius:9px;background:#A8431C;color:#F6EFEA;font-size:11px;font-weight:600;line-height:16px;text-align:center;}
   .conv .qui{display:flex;align-items:center;justify-content:space-between;gap:8px;}
   .conv .qui-nom,.fil-nom{display:inline-flex;align-items:center;gap:9px;min-width:0}
+  .fil-tete h2 a.fil-nom{text-decoration:none;color:inherit;font-size:inherit}
 
   .fil-corps{flex:1;overflow-y:auto;max-height:52vh;padding:20px;display:flex;flex-direction:column;gap:10px;}
   .bulle{max-width:74%;padding:9px 13px;border-radius:12px;font-size:14px;word-wrap:break-word;overflow-wrap:anywhere;white-space:pre-wrap;}
@@ -145,14 +146,15 @@
   <footer data-note="Les discussions ne sont lisibles que par leurs deux participants."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-haq6"></script>
-<script src="supabase-config.js?v=2026-10-11-haq6"></script>
-<script src="pied.js?v=2026-10-11-haq6"></script>
-<script src="admin.js?v=2026-10-11-haq6"></script>
-<script src="admin-site.js?v=2026-10-11-haq6"></script>
-<script src="tags.js?v=2026-10-11-haq6"></script>
-<script src="compte.js?v=2026-10-11-haq6"></script>
-<script src="messagerie.js?v=2026-10-11-haq6"></script>
+<script src="univers.js?v=2026-10-11-cgk1"></script>
+<script src="supabase-config.js?v=2026-10-11-cgk1"></script>
+<script src="pied.js?v=2026-10-11-cgk1"></script>
+<script src="admin.js?v=2026-10-11-cgk1"></script>
+<script src="admin-site.js?v=2026-10-11-cgk1"></script>
+<script src="tags.js?v=2026-10-11-cgk1"></script>
+<script src="compte.js?v=2026-10-11-cgk1"></script>
+<script src="messagerie.js?v=2026-10-11-cgk1"></script>
+<script src="communaute.js?v=2026-10-11-cgk1"></script>
 <script>
 const params = new URLSearchParams(window.location.search);
 const membreDemande = params.get('membre'); // conversation à ouvrir d'emblée
@@ -238,9 +240,11 @@ function rendreFil(){
   }
   fil.innerHTML = `
     <div class="fil-tete">
-      <h2 class="fil-nom">${avatarHtml({ pseudo: conversationOuverte.pseudo, ...avatarsConnus.get(conversationOuverte.autre_id) }, 34)}${texteEchappe(conversationOuverte.pseudo)}</h2>
+      <h2><a class="fil-nom lien-profil" href="${lienProfil(conversationOuverte.autre_id)}" title="Voir son profil">${avatarHtml({ pseudo: conversationOuverte.pseudo, ...avatarsConnus.get(conversationOuverte.autre_id) }, 34)}<span class="nom-lien">${texteEchappe(conversationOuverte.pseudo)}</span></a></h2>
+      <a href="${lienProfil(conversationOuverte.autre_id)}">Voir son profil</a>
       <a href="echanges.html">Voir les échanges possibles</a>
       <div class="fil-actions">
+        <button id="btn-avis" hidden>Donner un avis</button>
         <button id="btn-archiver">${conversationOuverte.archivee ? 'Sortir des archives' : 'Archiver'}</button>
         <button id="btn-supprimer" class="danger">Supprimer</button>
         <button id="btn-signaler">Signaler</button>
@@ -259,6 +263,7 @@ function rendreFil(){
   document.getElementById('btn-supprimer').addEventListener('click', supprimer);
   document.getElementById('btn-bloquer').addEventListener('click', bloquer);
   document.getElementById('btn-signaler').addEventListener('click', signaler);
+  preparerAvis();
   const saisie = document.getElementById('saisie');
   saisie.addEventListener('keydown', (e) => {
     // Entrée envoie, Maj+Entrée passe à la ligne.
@@ -385,6 +390,29 @@ async function bloquer(){
   }catch(err){
     alert('Le blocage a échoué : ' + (err.message ?? err));
   }
+}
+
+// Un avis se donne une fois que les deux ont écrit : la base le vérifie,
+// le bouton n'apparaît qu'à ce moment-là.
+async function preparerAvis(){
+  const conv = conversationOuverte;
+  const bouton = document.getElementById('btn-avis');
+  if(!conv || !bouton) return;
+  try{
+    if(!await peutDonnerAvis(conv.autre_id) || conversationOuverte !== conv) return;
+    const actuel = await monAvisSur(conv.autre_id);
+    bouton.textContent = actuel ? 'Modifier mon avis' : 'Donner un avis';
+    bouton.hidden = false;
+    bouton.onclick = async () => {
+      const reponse = await demanderAvis(conv.pseudo, await monAvisSur(conv.autre_id).catch(() => actuel));
+      if(!reponse) return;
+      try{
+        if(reponse.retirer){ await retirerAvis(conv.autre_id); annoncer('Ton avis a été retiré.'); }
+        else { await donnerAvis(conv.autre_id, reponse.note, reponse.commentaire); annoncer(`Merci, ton avis sur ${conv.pseudo} est publié.`); }
+        preparerAvis();
+      }catch(err){ annoncer(err.message, 'ko'); }
+    };
+  }catch{ /* base pas encore à jour : pas de bouton */ }
 }
 
 async function signaler(){

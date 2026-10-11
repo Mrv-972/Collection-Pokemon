@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-11-haq6"></script>
+<script src="theme.js?v=2026-10-11-cgk1"></script>
 <title>Paramètres — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -166,7 +166,27 @@
   .essai-notif{margin-top:12px;font:inherit;font-size:13px;padding:7px 13px;border-radius:999px;cursor:pointer;
     border:1px solid rgba(var(--trait-rgb),0.18);background:transparent;color:var(--text-on-ink)}
   .essai-notif:hover{background:rgba(var(--trait-rgb),0.07)}
-  @media(max-width:560px){ .themes{grid-template-columns:1fr} .reglages{margin:30px auto 60px} }
+  .tailles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:6px}
+  .apercu-taille{height:58px;border-radius:7px;display:grid;gap:3px;padding:6px;align-content:center;
+    background:rgba(var(--trait-rgb),0.06);border:1px solid rgba(var(--trait-rgb),0.12)}
+  .apercu-taille i{display:block;aspect-ratio:5/7;border-radius:2px;background:rgba(var(--gold-rgb),0.55)}
+  .apercu-taille.compacte{grid-template-columns:repeat(7,1fr)}
+  .apercu-taille.normale{grid-template-columns:repeat(5,1fr);padding:6px 14px}
+  .apercu-taille.grande{grid-template-columns:repeat(4,1fr);padding:4px 26px}
+  .reglage .bascule + .bascule{margin-top:16px;padding-top:16px;border-top:1px solid rgba(var(--trait-rgb),0.08)}
+  .bascule .precision{display:block;font-size:12.5px;color:var(--text-on-ink-dim);margin-top:2px;line-height:1.5}
+  .lien-partage{display:flex;gap:8px;margin:4px 0 10px}
+  .lien-partage input{flex:1;min-width:0;font:inherit;font-size:13px;padding:10px 12px;border-radius:8px;
+    background:var(--ink);color:var(--text-on-ink);border:1px solid rgba(var(--trait-rgb),0.16)}
+  .boutons-partage{display:flex;flex-wrap:wrap;gap:8px}
+  .boutons-partage button,.boutons-partage a,.lien-partage button{font:inherit;font-size:13px;padding:8px 14px;border-radius:999px;cursor:pointer;
+    border:1px solid rgba(var(--trait-rgb),0.18);background:transparent;color:var(--text-on-ink);white-space:nowrap}
+  .boutons-partage button:hover,.boutons-partage a:hover,.lien-partage button:hover{background:rgba(var(--trait-rgb),0.07)}
+  .boutons-partage .principal-partage,.lien-partage .principal-partage{background:var(--teal);border-color:var(--teal);color:#EDF5F3}
+  .boutons-partage .principal-partage:hover,.lien-partage .principal-partage:hover{background:var(--teal-deep)}
+  .boutons-partage .arreter{color:var(--alerte);border-color:transparent}
+  @media(max-width:560px){ .themes,.tailles{grid-template-columns:1fr} .reglages{margin:30px auto 60px}
+    .lien-partage{flex-direction:column} }
   @media(prefers-reduced-motion:reduce){ .interrupteur,.interrupteur::after{transition:none} }
 </style>
 </head>
@@ -211,6 +231,35 @@
       </div>
     </section>
 
+    <section class="reglage" aria-labelledby="titre-affichage">
+      <h2 id="titre-affichage">Affichage des cartes</h2>
+      <p>La taille des vignettes dans les pages d'extension et de Pokémon.</p>
+      <div class="tailles" role="radiogroup" aria-labelledby="titre-affichage">
+        <button type="button" class="theme-choix" role="radio" data-taille="compacte">
+          <span class="apercu-taille compacte"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+          <span>Compactes<small>Plus de cartes à la fois</small></span>
+        </button>
+        <button type="button" class="theme-choix" role="radio" data-taille="normale">
+          <span class="apercu-taille normale"><i></i><i></i><i></i><i></i><i></i></span>
+          <span>Normales<small>Le réglage d'origine</small></span>
+        </button>
+        <button type="button" class="theme-choix" role="radio" data-taille="grande">
+          <span class="apercu-taille grande"><i></i><i></i><i></i><i></i></span>
+          <span>Grandes<small>Pour bien voir chaque carte</small></span>
+        </button>
+      </div>
+      <div class="bascule" style="margin-top:20px">
+        <label for="reglage-griser" id="libelle-griser">Cartes manquantes en gris
+          <span class="precision">Ce que tu possèdes reste en couleur. Le bouton « ◐ » des pages de cartes change ce réglage aussi.</span></label>
+        <button type="button" class="interrupteur" id="reglage-griser" role="switch" aria-checked="true" aria-labelledby="libelle-griser"></button>
+      </div>
+      <div class="bascule">
+        <label for="reglage-contraste" id="libelle-contraste">Contraste renforcé
+          <span class="precision">Textes secondaires plus nets et couleurs plus appuyées, pour une lecture plus confortable.</span></label>
+        <button type="button" class="interrupteur" id="reglage-contraste" role="switch" aria-checked="false" aria-labelledby="libelle-contraste"></button>
+      </div>
+    </section>
+
     <section class="reglage" aria-labelledby="titre-notif">
       <h2 id="titre-notif">Notifications</h2>
       <p>Une notification s'affiche quand un nouveau message arrive alors que PokéClasseur est
@@ -222,18 +271,34 @@
       </div>
       <p class="etat-notif" id="etat-notif" role="status"></p>
       <button type="button" class="essai-notif" id="essai-notif" hidden>Essayer une notification</button>
+
+      <div class="bascule" style="margin-top:20px;padding-top:18px;border-top:1px solid rgba(var(--trait-rgb),0.08)">
+        <label for="notif-email" id="libelle-email">Recevoir un e-mail, même site fermé
+          <span class="precision">Quand des messages t'attendent (au plus un e-mail toutes les six heures),
+            et une fois par semaine si de nouveaux échanges sont possibles.</span></label>
+        <button type="button" class="interrupteur" id="notif-email" role="switch" aria-checked="false" aria-labelledby="libelle-email"></button>
+      </div>
+      <p class="etat-notif" id="etat-email" role="status"></p>
+    </section>
+
+    <section class="reglage" id="partage" aria-labelledby="titre-partage">
+      <h2 id="titre-partage">Partager ma liste de souhaits</h2>
+      <p>Un lien à envoyer sur Discord, à un ami ou sur un forum. Il montre les cartes que tu
+         recherches et celles que tu proposes à l'échange, sans qu'il faille un compte pour le
+         lire. Le reste de ta collection reste privé.</p>
+      <div id="zone-partage"></div>
     </section>
   </div>
 
   <footer data-note="Ton compte sert à retrouver ta collection sur tous tes appareils et à te mettre en relation avec d'autres collectionneurs."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-haq6"></script>
-<script src="supabase-config.js?v=2026-10-11-haq6"></script>
-<script src="pied.js?v=2026-10-11-haq6"></script>
-<script src="admin.js?v=2026-10-11-haq6"></script>
-<script src="admin-site.js?v=2026-10-11-haq6"></script>
-<script src="compte.js?v=2026-10-11-haq6"></script>
+<script src="univers.js?v=2026-10-11-cgk1"></script>
+<script src="supabase-config.js?v=2026-10-11-cgk1"></script>
+<script src="pied.js?v=2026-10-11-cgk1"></script>
+<script src="admin.js?v=2026-10-11-cgk1"></script>
+<script src="admin-site.js?v=2026-10-11-cgk1"></script>
+<script src="compte.js?v=2026-10-11-cgk1"></script>
 <script>
 // --- Apparence --------------------------------------------------------
 function marquerTheme(){
@@ -292,7 +357,117 @@ essai.addEventListener('click', () => {
   }catch(err){ dire("Ce navigateur n'a pas pu afficher la notification.", 'err'); }
 });
 
+// --- Affichage des cartes ------------------------------------------
+const boutonGriser = document.getElementById('reglage-griser');
+const boutonContraste = document.getElementById('reglage-contraste');
+const griserActif = () => { try{ return localStorage.getItem(CLE_GRISER) !== 'non'; }catch{ return true; } };
+
+function marquerAffichage(){
+  const taille = vignettesChoisies();
+  document.querySelectorAll('[data-taille]').forEach(b =>
+    b.setAttribute('aria-checked', String(b.dataset.taille === taille)));
+  boutonGriser.setAttribute('aria-checked', String(griserActif()));
+  boutonContraste.setAttribute('aria-checked', String(contrasteRenforce()));
+}
+
+const garderSurLeCompte = changements =>
+  enregistrerAffichage(changements).catch(err => console.warn('Réglage non enregistré sur le compte', err));
+
+document.querySelectorAll('[data-taille]').forEach(b => b.addEventListener('click', () => {
+  choisirAffichage({ vignettes: b.dataset.taille });
+  marquerAffichage();
+  garderSurLeCompte({ pref_vignettes: b.dataset.taille });
+}));
+boutonContraste.addEventListener('click', () => {
+  const voulu = !contrasteRenforce();
+  choisirAffichage({ contraste: voulu });
+  marquerAffichage();
+  garderSurLeCompte({ pref_contraste: voulu });
+});
+boutonGriser.addEventListener('click', () => {
+  const voulu = !griserActif();
+  try{ localStorage.setItem(CLE_GRISER, voulu ? 'oui' : 'non'); }catch{}
+  marquerAffichage();
+  garderSurLeCompte({ pref_griser: voulu });
+});
+
+// --- E-mails ----------------------------------------------------------
+const boutonEmail = document.getElementById('notif-email');
+const etatEmail = document.getElementById('etat-email');
+function afficherEmail(){
+  const disponible = estConnecte() && profil && 'pref_notif_email' in profil;
+  boutonEmail.disabled = !disponible;
+  boutonEmail.setAttribute('aria-checked', String(!!profil?.pref_notif_email));
+  etatEmail.className = 'etat-notif';
+  etatEmail.textContent = !estConnecte() ? 'Connecte-toi pour recevoir des e-mails.'
+    : !disponible ? 'Bientôt disponible.'
+    : profil.pref_notif_email ? `Les e-mails partent vers ${membre.email}.` : '';
+}
+boutonEmail.addEventListener('click', async () => {
+  try{
+    await enregistrerPreferences({ pref_notif_email: !profil.pref_notif_email });
+  }catch(err){
+    etatEmail.className = 'etat-notif err';
+    return etatEmail.textContent = `Le réglage n'a pas pu être enregistré : ${err.message}`;
+  }
+  afficherEmail();
+});
+
+// --- Liste de souhaits partageable ----------------------------------
+//
+// Le lien porte un jeton tiré au hasard, impossible à deviner. En changer
+// rend l'ancien lien muet ; l'effacer arrête le partage.
+const zonePartage = document.getElementById('zone-partage');
+
+function nouveauJeton(){
+  const octets = crypto.getRandomValues(new Uint8Array(18));
+  return btoa(String.fromCharCode(...octets)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+const lienDeListe = jeton => new URL(`souhaits.html?j=${jeton}`, location.href).href;
+
+function afficherPartage(message = ''){
+  if(!estConnecte()){
+    zonePartage.innerHTML = '<p class="etat-notif">Connecte-toi pour partager ta liste.</p>';
+    return;
+  }
+  if(!profil || !('souhaits_jeton' in profil)){
+    zonePartage.innerHTML = '<p class="etat-notif">Bientôt disponible.</p>';
+    return;
+  }
+  const jeton = profil.souhaits_jeton;
+  zonePartage.innerHTML = jeton ? `
+      <div class="lien-partage">
+        <input id="lien-liste" type="text" readonly value="${lienDeListe(jeton)}" aria-label="Lien de ta liste">
+        <button type="button" class="principal-partage" id="copier-lien">Copier le lien</button>
+      </div>
+      <div class="boutons-partage">
+        <a href="${lienDeListe(jeton)}" target="_blank" rel="noopener">Voir la page</a>
+        <button type="button" id="changer-lien">Changer de lien</button>
+        <button type="button" class="arreter" id="arreter-partage">Arrêter le partage</button>
+      </div>
+      <p class="etat-notif ${message ? 'ok' : ''}" role="status">${message || "Changer de lien rend l'ancien inutilisable : pratique s'il a circulé plus que prévu."}</p>`
+    : `
+      <div class="boutons-partage"><button type="button" class="principal-partage" id="creer-lien">Créer mon lien de partage</button></div>
+      ${message ? `<p class="etat-notif ok" role="status">${message}</p>` : ''}`;
+
+  const changer = async (valeur, annonce) => {
+    try{ await enregistrerPreferences({ souhaits_jeton: valeur }); afficherPartage(annonce); }
+    catch(err){ afficherPartage(); zonePartage.insertAdjacentHTML('beforeend', `<p class="etat-notif err">Échec : ${err.message}</p>`); }
+  };
+  document.getElementById('creer-lien')?.addEventListener('click', () => changer(nouveauJeton(), 'Ton lien est prêt : copie-le et partage-le.'));
+  document.getElementById('changer-lien')?.addEventListener('click', () => changer(nouveauJeton(), "Nouveau lien créé. L'ancien ne fonctionne plus."));
+  document.getElementById('arreter-partage')?.addEventListener('click', () => changer(null, 'Le partage est arrêté : le lien ne montre plus rien.'));
+  document.getElementById('copier-lien')?.addEventListener('click', async e => {
+    const champ = document.getElementById('lien-liste');
+    try{ await navigator.clipboard.writeText(champ.value); }
+    catch{ champ.select(); document.execCommand('copy'); }
+    e.target.textContent = 'Copié ✓';
+    setTimeout(() => { e.target.textContent = 'Copier le lien'; }, 2000);
+  });
+}
+
 (async () => {
+  marquerAffichage();
   marquerTheme();
   document.addEventListener('pokeclasseur:theme', marquerTheme);
   await initCompte();
@@ -301,6 +476,10 @@ essai.addEventListener('click', () => {
   if(estConnecte()) document.getElementById('intro-reglages').textContent =
     'Ces réglages suivent ton compte : tu les retrouveras sur tous tes appareils.';
   afficherNotifications();
+  marquerAffichage();   // le compte a pu apporter ses propres réglages
+  afficherEmail();
+  afficherPartage();
+  if(location.hash === '#partage') document.getElementById('partage').scrollIntoView();
 })();
 </script>
 

@@ -40,7 +40,7 @@ const IDENTITE = {
   emailSignalement: '',
 
   // La date de dernière mise à jour des trois pages, en toutes lettres.
-  miseAJour: '22 septembre 2026',
+  miseAJour: '11 octobre 2026',
 };
 
 // Les deux prestataires dont dépend le site. Leurs coordonnées sont

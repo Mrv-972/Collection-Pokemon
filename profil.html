@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js?v=2026-10-11-cgk1"></script>
+<title>Profil — PokéClasseur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B; --ink-soft:#20232A; --teal:#1F6F63; --teal-deep:#123F38;
+    --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:#E3C766; --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a:hover{color:var(--text-on-ink)}
+
+  .panel{max-width:440px;margin:56px auto 80px;}
+  .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
+  .panel h1{font-size:32px;margin-bottom:10px;}
+  .panel p.intro{color:var(--text-on-ink-dim);font-size:15px;margin:0 0 28px;}
+
+  .tabs{display:flex;gap:8px;margin-bottom:24px;}
+  .tab{flex:1;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink-dim);padding:10px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .tab.on{color:var(--text-on-ink);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
+
+  label{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:16px 0 6px;}
+  input{width:100%;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  input:focus{outline:none;border-color:rgba(var(--gold-rgb),0.5)}
+  /* La case n'est jamais pré-cochée : un consentement pré-coché n'en est
+     pas un, et ne prouve rien. Les liens s'ouvrent dans un nouvel onglet
+     pour qu'on ne perde pas ce qu'on vient de saisir. */
+  /* Séparée du reste par un trait et par sa couleur : on ne tombe pas sur ce
+     bouton en visant « Enregistrer ». */
+  .danger-zone{margin-top:40px;padding-top:24px;border-top:1px solid rgba(192,57,43,0.35)}
+  .danger-zone h2{font-family:'Newsreader',serif;font-size:18px;font-weight:500;
+                  color:var(--alerte);margin:0 0 8px;}
+  .danger-zone p{font-size:13px;line-height:1.6;color:var(--text-on-ink-dim);margin:0 0 14px}
+  .destructeur{font-family:inherit;font-size:13.5px;padding:10px 18px;border-radius:5px;
+               cursor:pointer;background:transparent;color:var(--alerte);
+               border:1px solid rgba(192,57,43,0.5);transition:.12s;}
+  .destructeur:hover{background:rgba(192,57,43,0.14);color:#F0A088}
+
+  .consentement{display:flex;align-items:flex-start;gap:10px;margin:20px 0 4px;
+                font-size:13.5px;line-height:1.55;color:var(--text-on-ink-dim);cursor:pointer;}
+  .consentement input{width:19px;height:19px;flex-shrink:0;margin:1px 0 0;accent-color:var(--gold);cursor:pointer}
+  .consentement a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:2px}
+
+  .aide{font-size:12px;color:var(--text-on-ink-dim);margin-top:6px;}
+
+  button.principal{width:100%;margin-top:26px;background:var(--teal);border:none;color:#EDF5F3;padding:12px;border-radius:3px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}
+  button.principal:hover{background:var(--teal-deep)}
+  button.principal:disabled{opacity:.5;cursor:default}
+  button.discret{margin-top:14px;width:100%;background:transparent;border:1px solid rgba(var(--trait-rgb),0.14);color:var(--text-on-ink-dim);padding:10px;border-radius:3px;font-size:13px;cursor:pointer;font-family:inherit;}
+  button.discret:hover{border-color:rgba(var(--trait-rgb),0.3)}
+
+  .message{margin-top:20px;font-size:13.5px;padding:12px 14px;border-radius:4px;}
+  .message.err{color:var(--alerte);background:rgba(168,67,28,0.1);border:1px solid rgba(168,67,28,0.35)}
+  .message.ok{color:var(--succes);background:rgba(31,111,99,0.12);border:1px solid rgba(31,111,99,0.35)}
+
+  .compte-actuel{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:22px;}
+  .compte-actuel .pseudo{font-family:'Newsreader',serif;font-size:24px;}
+  .compte-actuel .detail{color:var(--text-on-ink-dim);font-size:13.5px;margin-top:4px;}
+  .bloques{margin-top:30px;border-top:1px solid rgba(var(--trait-rgb),0.08);padding-top:22px;}
+  .bloques h2{font-size:19px;margin-bottom:4px;}
+  .bloques p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
+  .bloque{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid rgba(var(--trait-rgb),0.06);font-size:14px;}
+  .bloque button{background:transparent;border:1px solid rgba(var(--trait-rgb),0.14);color:var(--text-on-ink-dim);padding:5px 12px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit;}
+  .bloque button:hover{border-color:rgba(var(--trait-rgb),0.35);color:var(--text-on-ink)}
+
+  .zone{margin-top:30px;border-top:1px solid rgba(var(--trait-rgb),0.08);padding-top:22px;}
+  .zone h2{font-size:19px;margin-bottom:4px;}
+  .zone > p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
+  .zone-actuelle{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:12px 14px;font-size:14px;}
+  .zone-actuelle.vide{color:var(--text-on-ink-dim);font-size:13.5px;}
+  .recherche{display:flex;gap:8px;align-items:stretch;}
+  .recherche input{flex:1}
+  .recherche button{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:0 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .recherche button:hover{border-color:rgba(var(--gold-rgb),0.5)}
+  .recherche button:disabled{opacity:.5;cursor:default}
+  .communes{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;}
+  .commune{text-align:left;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:9px 12px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .commune:hover{border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.06)}
+  .commune small{display:block;color:var(--text-on-ink-dim);font-size:11.5px;margin-top:1px;}
+  .zone-msg{font-size:12.5px;margin-top:10px;}
+  .zone-msg.err{color:var(--alerte)}
+  .zone-msg.ok{color:var(--succes)}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
+
+  /* ========================= Téléphone =========================
+     Les liens de navigation passaient en display:none sous 720 px : depuis
+     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
+     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
+     visibles, et assez hauts pour être touchés sans viser. La règle de
+     débordement horizontal n'est là que pour les très petits écrans, où
+     quatre libellés ne tiennent plus côte à côte.
+
+     Le reste resserre des marges verticales taillées pour un grand écran,
+     et porte les commandes à une hauteur tactile confortable — en bas de
+     42 px, un doigt touche la voisine une fois sur trois. */
+  @media(max-width:720px){
+    nav{flex-wrap:wrap;padding:18px 0 0;}
+    .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
+              justify-content:space-between;overflow-x:auto;scrollbar-width:none;}
+    .navlinks::-webkit-scrollbar{display:none}
+    .navlinks a{white-space:nowrap;padding:12px 6px;border-bottom:2px solid transparent;}
+    .navlinks a.active{border-bottom-color:currentColor;}
+    .brand{font-size:19px;padding:6px 0}
+    .compte-lien{padding:11px 0 11px 12px}
+
+    .panel{margin:30px auto 60px}
+    .panel h1{font-size:26px}
+    .tab{min-height:44px}
+    input{min-height:44px}
+    button.discret{min-height:44px}
+    .recherche button{min-height:44px}
+    .commune{min-height:44px}
+  }
+</style>
+<style>
+  .profil{max-width:760px;margin:48px auto 80px}
+  .profil .chargement,.profil .etat{color:var(--text-on-ink-dim);font-size:15px;padding:30px 0}
+  .profil .etat a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:3px}
+  .carte-profil{display:flex;gap:24px;align-items:center;padding:26px;border-radius:16px;
+    background:rgba(var(--trait-rgb),0.04);border:1px solid rgba(var(--trait-rgb),0.10)}
+  .carte-profil .avatar-membre{box-shadow:0 0 0 3px rgba(var(--gold-rgb),0.45)}
+  .carte-profil h1{font-size:34px;line-height:1.15;word-break:break-word}
+  .carte-profil .meta{color:var(--text-on-ink-dim);font-size:14px;margin:4px 0 0}
+  .actions-profil{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .actions-profil a,.actions-profil button{font:inherit;font-size:13.5px;padding:8px 15px;border-radius:999px;cursor:pointer;
+    border:1px solid rgba(var(--trait-rgb),0.18);background:transparent;color:var(--text-on-ink);display:inline-flex;align-items:center;gap:6px}
+  .actions-profil a:hover,.actions-profil button:hover{background:rgba(var(--trait-rgb),0.07)}
+  .actions-profil .principal{background:var(--teal);border-color:var(--teal);color:#EDF5F3}
+  .actions-profil .principal:hover{background:var(--teal-deep)}
+  .actions-profil .signaler{color:var(--text-on-ink-dim);border-color:transparent}
+  .actions-profil .signaler:hover{color:var(--alerte)}
+  .avertissement-blocage{margin:14px 0 0;font-size:13px;color:var(--alerte)}
+
+  .chiffres{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 0}
+  .chiffre{padding:16px;border-radius:12px;background:rgba(var(--trait-rgb),0.04);border:1px solid rgba(var(--trait-rgb),0.08)}
+  .chiffre b{display:block;font-family:'Newsreader',serif;font-weight:500;font-size:30px;line-height:1.1}
+  .chiffre span{font-size:12.5px;color:var(--text-on-ink-dim)}
+
+  .bloc-profil{margin-top:38px}
+  .bloc-profil h2{font-size:23px;margin-bottom:4px;display:flex;align-items:baseline;gap:10px}
+  .bloc-profil h2 small{font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--text-on-ink-dim);font-weight:400}
+  .bloc-profil > p{font-size:13.5px;color:var(--text-on-ink-dim);margin:0 0 14px}
+  .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:12px}
+  .badge-collection{display:flex;gap:11px;align-items:flex-start;padding:13px;border-radius:12px;
+    border:1px solid rgba(var(--gold-rgb),0.35);background:rgba(var(--gold-rgb),0.08)}
+  .badge-collection .icone{font-size:26px;line-height:1;flex:none}
+  .badge-collection b{display:block;font-size:13.5px;font-weight:600}
+  .badge-collection small{display:block;font-size:11.5px;line-height:1.45;color:var(--text-on-ink-dim);margin-top:2px}
+  .badge-collection.verrouille{border-color:rgba(var(--trait-rgb),0.10);background:transparent}
+  .badge-collection.verrouille .icone{filter:grayscale(1);opacity:.4}
+  .badge-collection.verrouille b{color:var(--text-on-ink-dim)}
+
+  .liste-avis{list-style:none;margin:12px 0 0;padding:0}
+  .un-avis{display:flex;gap:12px;padding:14px 0;border-top:1px solid rgba(var(--trait-rgb),0.08)}
+  .un-avis .tete-avis{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px}
+  .un-avis .tete-avis b{font-weight:600}
+  .un-avis .date{font-size:12px;color:var(--text-on-ink-dim)}
+  .un-avis p{margin:5px 0 0;font-size:14px;line-height:1.55;overflow-wrap:anywhere}
+  .un-avis .signaler-avis{margin-left:auto;font:inherit;font-size:12px;background:none;border:0;cursor:pointer;
+    color:var(--text-on-ink-dim);text-decoration:underline;text-underline-offset:2px;padding:4px}
+  .un-avis .signaler-avis:hover{color:var(--alerte)}
+  .vide-doux{font-size:14px;color:var(--text-on-ink-dim);padding:6px 0}
+
+  @media(max-width:640px){
+    .profil{margin:28px auto 60px}
+    .carte-profil{flex-direction:column;text-align:center;padding:22px 18px}
+    .carte-profil h1{font-size:28px}
+    .actions-profil{justify-content:center}
+    .actions-profil a,.actions-profil button{min-height:44px}
+    .chiffres{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="index.html">Poké<span>Classeur</span></a>
+    <div class="navlinks">
+      <a href="series.html">Par extension</a>
+      <a href="pokemon.html">Par Pokémon</a>
+      <a href="missions.html" class="lien-pocket">Missions secrètes</a>
+      <a href="classeurs.html" class="lien-physique">Mes classeurs</a>
+      <a href="echanges.html">Échanges</a>
+      <a href="discussions.html">Discussions</a>
+    </div>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
+  </nav>
+
+
+  <main class="profil" id="profil" aria-live="polite">
+    <p class="chargement">Chargement du profil…</p>
+  </main>
+
+  <footer data-note="Un profil ne montre que des nombres et des badges : la liste de tes cartes, ta commune et ta date de naissance restent privées."></footer>
+</div>
+
+<script src="univers.js?v=2026-10-11-cgk1"></script>
+<script src="supabase-config.js?v=2026-10-11-cgk1"></script>
+<script src="pied.js?v=2026-10-11-cgk1"></script>
+<script src="admin.js?v=2026-10-11-cgk1"></script>
+<script src="admin-site.js?v=2026-10-11-cgk1"></script>
+<script src="compte.js?v=2026-10-11-cgk1"></script>
+<script src="communaute.js?v=2026-10-11-cgk1"></script>
+<script>
+const zone = document.getElementById('profil');
+const idDemande = new URLSearchParams(location.search).get('membre');
+const FORMAT_MOIS = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' });
+const FORMAT_JOUR = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+const pluriel = (n, un, plusieurs) => `${n} ${n > 1 ? plusieurs : un}`;
+
+function etat(html){ zone.innerHTML = `<p class="etat">${html}</p>`; }
+
+function badgesHtml(obtenus, moi){
+  // Sur son propre profil, on voit aussi ceux qui restent à gagner : de
+  // quoi donner envie. Chez les autres, seulement ce qu'ils ont obtenu.
+  const montres = moi ? BADGES : BADGES.filter(b => obtenus.has(b.cle));
+  if(!montres.length) return '<p class="vide-doux">Pas encore de badge.</p>';
+  return `<div class="badges">${montres.map(b => `
+    <div class="badge-collection ${obtenus.has(b.cle) ? '' : 'verrouille'}"
+         ${obtenus.has(b.cle) ? '' : 'aria-label="Badge à obtenir"'}>
+      <span class="icone" aria-hidden="true">${b.icone}</span>
+      <span><b>${b.nom}</b><small>${b.texte}</small></span>
+    </div>`).join('')}</div>`;
+}
+
+function avisHtml(liste, moi){
+  if(!liste.length) return `<p class="vide-doux">${moi
+    ? "Aucun avis pour l'instant. Après un échange, ton partenaire pourra en laisser un depuis votre discussion ou ton profil."
+    : "Aucun avis pour l'instant."}</p>`;
+  return `<ul class="liste-avis">${liste.map((a, i) => `
+    <li class="un-avis">
+      <a class="lien-profil" href="${lienProfil(a.auteur_id)}">${avatarHtml(a, 34)}</a>
+      <div style="flex:1;min-width:0">
+        <div class="tete-avis">
+          <a class="lien-profil" href="${lienProfil(a.auteur_id)}"><b class="nom-lien">${echapperCommun(a.pseudo)}</b></a>
+          <span>${a.note === 'positif' ? '👍 Bien passé' : '👎 Mal passé'}</span>
+          <span class="date">${FORMAT_JOUR.format(new Date(a.maj_le))}</span>
+          ${a.auteur_id !== membre.id ? `<button type="button" class="signaler-avis" data-avis="${i}">Signaler</button>` : ''}
+        </div>
+        ${a.commentaire ? `<p>${echapperCommun(a.commentaire)}</p>` : ''}
+      </div>
+    </li>`).join('')}</ul>`;
+}
+
+async function afficher(){
+  if(CONFIG_MANQUANTE) return etat("La base n'est pas encore configurée.");
+  if(!estConnecte()) return etat('Les profils sont visibles des membres connectés. <a href="connexion.html">Se connecter</a>');
+  const id = idDemande || membre.id;
+  const moi = id === membre.id;
+
+  let p, obtenus, avis, peutAvis = false, monAvis = null;
+  try{
+    [p, obtenus, avis] = await Promise.all([profilPublic(id), badgesDe(id), avisRecus(id)]);
+    if(p && !moi) [peutAvis, monAvis] = await Promise.all([peutDonnerAvis(id), monAvisSur(id)]);
+  }catch(err){
+    if(fonctionAbsente(err)) return etat("Les profils publics seront disponibles dès que la base aura été mise à jour (fichier <b>supabase/communaute.sql</b>).");
+    return etat(`Le profil n'a pas pu être chargé : ${echapperCommun(err.message)}`);
+  }
+  if(!p) return etat("Ce membre n'existe pas, ou a supprimé son compte.");
+
+  document.title = `${p.pseudo} — PokéClasseur`;
+  const lieu = !estPocket() && p.departement ? `Département ${echapperCommun(p.departement)} · ` : '';
+  const actions = moi ? `
+      <a href="connexion.html">✏️ Modifier mon profil</a>
+      <a href="parametres.html#partage">🔗 Partager ma liste de souhaits</a>`
+    : `
+      ${p.bloque ? '' : `<a class="principal" href="discussions.html?membre=${encodeURIComponent(id)}">💬 Lui écrire</a>`}
+      ${peutAvis ? `<button type="button" id="donner-avis">${monAvis ? '✏️ Modifier mon avis' : '⭐ Donner un avis'}</button>` : ''}
+      <button type="button" class="signaler" id="signaler-profil">Signaler</button>`;
+
+  zone.innerHTML = `
+    <header class="carte-profil">
+      ${avatarHtml(p, 104)}
+      <div>
+        <h1>${echapperCommun(p.pseudo)}</h1>
+        <p class="meta">${lieu}Membre depuis ${FORMAT_MOIS.format(new Date(p.cree_le))}</p>
+        <div class="actions-profil">${actions}</div>
+        ${!moi && !peutAvis && !p.bloque ? '<p class="meta" style="font-size:12.5px;margin-top:10px">Tu pourras donner un avis après avoir échangé des messages avec ce membre.</p>' : ''}
+        ${p.bloque ? '<p class="avertissement-blocage">Vous vous êtes bloqués : vous ne pouvez plus vous écrire.</p>' : ''}
+      </div>
+    </header>
+
+    <section class="chiffres" aria-label="En chiffres">
+      <div class="chiffre"><b>${p.nb_proposees}</b><span>${p.nb_proposees > 1 ? 'cartes proposées' : 'carte proposée'} à l'échange</span></div>
+      <div class="chiffre"><b>${p.nb_recherchees}</b><span>${p.nb_recherchees > 1 ? 'cartes recherchées' : 'carte recherchée'}</span></div>
+      <div class="chiffre"><b>${p.avis_positifs}</b><span>👍 ${p.avis_positifs > 1 ? 'avis positifs' : 'avis positif'}</span></div>
+      <div class="chiffre"><b>${p.avis_negatifs}</b><span>👎 ${p.avis_negatifs > 1 ? 'avis négatifs' : 'avis négatif'}</span></div>
+    </section>
+
+    <section class="bloc-profil" aria-labelledby="titre-badges">
+      <h2 id="titre-badges">Badges <small>${obtenus.size} sur ${BADGES.length}</small></h2>
+      ${badgesHtml(obtenus, moi)}
+    </section>
+
+    <section class="bloc-profil" aria-labelledby="titre-avis">
+      <h2 id="titre-avis">Avis reçus <small>${pluriel(avis.length, 'avis', 'avis')}</small></h2>
+      <p>Laissés par des membres qui ont échangé avec ${moi ? 'toi' : echapperCommun(p.pseudo)}.</p>
+      ${avisHtml(avis, moi)}
+    </section>`;
+
+  document.getElementById('donner-avis')?.addEventListener('click', async () => {
+    const reponse = await demanderAvis(p.pseudo, monAvis);
+    if(!reponse) return;
+    try{
+      if(reponse.retirer){ await retirerAvis(id); annoncer('Ton avis a été retiré.'); }
+      else { await donnerAvis(id, reponse.note, reponse.commentaire); annoncer('Merci, ton avis est publié.'); }
+      afficher();
+    }catch(err){ annoncer(err.message, 'ko'); }
+  });
+
+  document.getElementById('signaler-profil')?.addEventListener('click', async () => {
+    const reponse = await demanderSignalement(p.pseudo, { photo: !!p.photo_url });
+    if(!reponse) return;
+    try{
+      await signalerContenu({ membreId: id, ...reponse });
+      annoncer("Signalement envoyé. Merci : l'administrateur va l'examiner.");
+    }catch(err){ annoncer(`Le signalement n'est pas parti : ${err.message}`, 'ko'); }
+  });
+
+  zone.querySelectorAll('.signaler-avis').forEach(b => b.addEventListener('click', async () => {
+    const a = avis[Number(b.dataset.avis)];
+    const reponse = await demanderSignalement(a.pseudo, { objet: 'avis' });
+    if(!reponse) return;
+    try{
+      await signalerContenu({ membreId: a.auteur_id, objet: 'avis',
+        motif: `Avis laissé à ${p.pseudo} : « ${a.commentaire ?? (a.note === 'positif' ? '👍' : '👎')} » — ${reponse.motif}` });
+      annoncer("Signalement envoyé. Merci : l'administrateur va l'examiner.");
+    }catch(err){ annoncer(`Le signalement n'est pas parti : ${err.message}`, 'ko'); }
+  }));
+}
+
+(async () => {
+  await initCompte();
+  afficherEtatCompte();
+  afficher();
+})();
+</script>
+
+</body>
+</html>

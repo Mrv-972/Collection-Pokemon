@@ -20,9 +20,12 @@ modifie, et ajoute un verrou indépendant sur `est_admin`.
 À la fin, deux cases doivent afficher **`false`** :
 `peut_modifier_est_admin` et `peut_inserer_est_admin`.
 
-**2. Si ce n'est pas déjà fait**, exécuter aussi
-**`supabase/administration.sql`** puis
-**`supabase/administration-comptes.sql`**.
+**2. Si ce n'est pas déjà fait**, exécuter aussi, dans cet ordre,
+**`supabase/administration.sql`**, **`supabase/administration-comptes.sql`**,
+**`supabase/profil-photo-parametres.sql`** puis
+**`supabase/communaute.sql`** (profils publics, badges, avis, signalements,
+liste de souhaits partageable, réglages d'affichage, e-mails). Chacun peut
+être relancé sans dommage.
 
 **3. Te désigner administrateur.** Toujours dans l'éditeur SQL :
 
@@ -100,6 +103,65 @@ Avant la première utilisation, le fichier
 dans l'éditeur SQL de Supabase (il crée les colonnes, le stockage des photos
 et les règles de validation).
 
+## Traiter les signalements
+
+Depuis un profil, un avis ou une discussion, un membre peut signaler un
+comportement, une photo, un pseudo, un avis ou un message. Le bouton
+**« Signalements »** de la barre d'administration les liste, du plus récent
+au plus ancien :
+
+- **Voir son profil** ouvre le profil du membre signalé dans un nouvel
+  onglet ;
+- **Retirer sa photo…** (pour une photo signalée) : la photo disparaît de
+  son profil, il lit ton motif sur sa page, et le signalement est classé ;
+- **Classer** retire le signalement de la liste une fois traité. Il reste
+  consultable dans le tableau de bord Supabase (table `signalements`).
+
+Pour lire une discussion entière, passe par l'onglet **Comptes** : sa
+lecture demande un motif, inscrit au journal.
+
+## Notifications par e-mail
+
+Un membre peut demander, dans ses **Paramètres**, à être prévenu par e-mail
+quand des messages l'attendent (au plus un e-mail toutes les six heures) et,
+une fois par semaine au plus, quand de nouveaux échanges sont possibles. Les
+e-mails partent d'une tâche programmée du dépôt
+(`.github/workflows/notifier-par-email.yml`), toutes les vingt minutes.
+
+Elle a besoin de trois **secrets** (des valeurs gardées par GitHub, que
+personne ne peut relire, pas même toi) :
+
+| Nom du secret | Ce qu'il contient |
+|---|---|
+| `SUPABASE_CLE_SERVICE` | la clé `service_role` du projet Supabase |
+| `EMAIL_ADRESSE` | l'adresse Gmail qui enverra les e-mails |
+| `EMAIL_MOT_DE_PASSE` | un « mot de passe d'application » de cette adresse |
+
+1. **La clé Supabase.** Dans Supabase : *Project Settings* → *API Keys* →
+   onglet *Legacy API Keys* → ligne `service_role` → *Reveal*, puis copie.
+   Cette clé ouvre toute la base : elle ne va **que** dans les secrets de
+   GitHub, jamais dans un fichier du site.
+2. **Le mot de passe d'application Gmail.** La validation en deux étapes
+   doit être activée sur le compte Google. Ouvre
+   <https://myaccount.google.com/apppasswords>, donne un nom
+   (« PokéClasseur »), puis copie les 16 lettres affichées.
+3. **Les secrets.** Ouvre
+   <https://github.com/Mrv-972/Collection-Pokemon/settings/secrets/actions>,
+   bouton *New repository secret*, et crée les trois secrets du tableau,
+   un par un (le nom exact à gauche, la valeur à droite).
+4. **L'essai.** Onglet *Actions* du dépôt → *Notifier par e-mail* →
+   *Run workflow*, case *Essai* cochée : le journal dit qui serait prévenu,
+   sans rien envoyer. Relance sans la case pour un envoi réel.
+
+Les e-mails portent le nom « PokéClasseur » ; l'adresse d'envoi visible est
+celle de `EMAIL_ADRESSE`. Une adresse dédiée (par exemple
+`pokeclasseur.notifications@gmail.com`) évite de montrer la tienne.
+
+Tant que les secrets manquent, la tâche s'arrête tout de suite, sans erreur ;
+le reste du site n'en dépend pas. Une fois par jour, la même tâche recopie
+aussi dans la base le nombre de cartes de chaque extension, pour le badge
+« Extension complète ».
+
 ## Ce qui protège vraiment
 
 Pas le fait que les boutons soient cachés. Un site statique livre tout son
@@ -114,6 +176,10 @@ Ce qui protège, ce sont les règles de la base :
 - `profil-photo-parametres.sql` empêche un membre de **publier sa photo
   lui-même** : elle attend dans un dépôt privé, que seuls lui et toi pouvez
   lire, et seule ta validation la rend publique ;
+- `communaute.sql` ne laisse donner un **avis** qu'à qui a réellement
+  échangé des messages avec le membre noté, calcule les **badges** à partir
+  des données de la base (rien ne se déclare), et réserve les **adresses
+  e-mail** à la tâche d'envoi, qui seule détient la clé `service_role` ;
 - la colonne `est_admin` n'est lisible par personne, pas même par toi : le
   site passe par une fonction qui ne répond que pour le compte qui la pose.
 

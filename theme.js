@@ -1,5 +1,5 @@
-// Thème clair ou sombre.
-// ======================
+// Thème clair ou sombre, et réglages d'affichage.
+// ===============================================
 //
 // Chargé en tête de chaque page, AVANT ses styles : le thème est posé sur
 // <html> avant le premier affichage. Plus tard, la page aurait d'abord
@@ -52,6 +52,41 @@ function choisirTheme(choix){
   appliquerTheme(choix);
 }
 
+// --- Affichage : taille des vignettes et contraste renforcé ------------
+//
+// Posés ici pour la même raison que le thème : avant le premier affichage,
+// sans quoi la grille de cartes se réarrangerait sous les yeux.
+const CLE_VIGNETTES = 'pokeclasseur-vignettes';
+const CLE_CONTRASTE = 'pokeclasseur-contraste';
+const TAILLES_VIGNETTES = ['compacte', 'normale', 'grande'];
+
+function vignettesChoisies(){
+  try{
+    const v = localStorage.getItem(CLE_VIGNETTES);
+    return TAILLES_VIGNETTES.includes(v) ? v : 'normale';
+  }catch{ return 'normale'; }
+}
+
+function contrasteRenforce(){
+  try{ return localStorage.getItem(CLE_CONTRASTE) === 'oui'; }catch{ return false; }
+}
+
+function appliquerAffichage(){
+  document.documentElement.dataset.vignettes = vignettesChoisies();
+  document.documentElement.dataset.contraste = contrasteRenforce() ? 'oui' : 'non';
+}
+
+function choisirAffichage({ vignettes, contraste } = {}){
+  try{
+    if(TAILLES_VIGNETTES.includes(vignettes)) localStorage.setItem(CLE_VIGNETTES, vignettes);
+    if(typeof contraste === 'boolean') localStorage.setItem(CLE_CONTRASTE, contraste ? 'oui' : 'non');
+  }catch{ /* le choix vaudra pour cette page */ }
+  appliquerAffichage();
+  // Mémoire refusée : la page suit quand même le choix.
+  if(TAILLES_VIGNETTES.includes(vignettes)) document.documentElement.dataset.vignettes = vignettes;
+  if(typeof contraste === 'boolean') document.documentElement.dataset.contraste = contraste ? 'oui' : 'non';
+}
+
 // Les couleurs du mode clair. Un papier crème plutôt qu'un blanc pur : le
 // site évoque un classeur de cartes, et le blanc pur fatigue l'œil sur de
 // grandes surfaces. Les ors et les bleus sont assombris : ceux du mode
@@ -96,6 +131,41 @@ const STYLE_THEME = `
   html[data-theme="clair"] ::placeholder{color:#7C8087}
   html[data-theme="clair"] img.glyph,
   html[data-theme="clair"] .glyph{color:#A3A6AB}
+
+  /* Taille des vignettes, sur les grilles de cartes. « normale » garde la
+     grille de chaque page telle quelle. */
+  html[data-vignettes="compacte"] .card-grid{grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
+  html[data-vignettes="grande"] .card-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
+  @media(max-width:960px){
+    html[data-vignettes="compacte"] .card-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+    html[data-vignettes="grande"] .card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  }
+  @media(max-width:720px){
+    html[data-vignettes="compacte"] .card-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+    html[data-vignettes="grande"] .card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  }
+  @media(max-width:360px){
+    html[data-vignettes="compacte"] .card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+    html[data-vignettes="grande"] .card-grid{grid-template-columns:1fr}
+  }
+
+  /* Contraste renforcé : textes secondaires plus nets, accents plus
+     appuyés, contour de sélection bien visible au clavier. */
+  html[data-contraste="oui"]{
+    --text-on-ink:#FFFFFF; --text-on-ink-dim:#D4D6D2;
+    --accent-clair:#F4DF92; --trait-rgb:255,255,255;
+  }
+  html[data-contraste="oui"][data-theme="clair"]{
+    --text-on-ink:#000000; --text-on-ink-dim:#2B2F35;
+    --text:#000000; --text-soft:#2B2F35; --dim:#2B2F35;
+    --gold:#4A3702; --gold-rgb:74,55,2; --accent-clair:#3E2E02;
+    --trait-rgb:0,0,0; --alerte:#8A3312; --succes:#12524A;
+  }
+  html[data-contraste="oui"][data-theme="clair"][data-univers="pocket"]{
+    --gold:#0F3A66; --gold-rgb:15,58,102; --accent-clair:#0C3157;
+  }
+  html[data-contraste="oui"] :focus-visible{outline:3px solid var(--gold,#C9A227) !important;outline-offset:2px}
+  html[data-contraste="oui"] .tag-toggle:not(.active){opacity:.7}
 `;
 
 (function(){
@@ -107,6 +177,7 @@ const STYLE_THEME = `
   // (html[data-theme="clair"]), l'emporte sur leurs « :root ».
   document.head.prepend(style);
   appliquerTheme();
+  appliquerAffichage();
 
   // En « auto », suivre l'appareil s'il change en cours de visite (bascule
   // automatique le soir, par exemple).
@@ -117,5 +188,8 @@ const STYLE_THEME = `
   }catch{ /* navigateur ancien : le thème restera celui du chargement */ }
 
   // Un autre onglet a changé le thème : celui-ci suit.
-  window.addEventListener('storage', e => { if(e.key === CLE_THEME) appliquerTheme(); });
+  window.addEventListener('storage', e => {
+    if(e.key === CLE_THEME) appliquerTheme();
+    if(e.key === CLE_VIGNETTES || e.key === CLE_CONTRASTE) appliquerAffichage();
+  });
 })();
