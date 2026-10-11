@@ -264,7 +264,10 @@ for(const [id, x] of Object.entries(sousSeries))
 // garantit pas une carte imprimée en français. Leurs scans des « Special
 // Delivery » et du Futsal sont en anglais — ces cartes n'ont jamais été
 // éditées en France —, ils sont donc écartés : les compter comme français
-// serait mentir sur la couverture. Ceux des McDonald's « USA » sont bien
+// serait mentir sur la couverture. Leurs séries « Legendary Treasures » et
+// « Skyridge » sont des scans anglais (nom anglais, texte anglais) : elles
+// ne figurent pas ici ; les « RC » de Trésors Légendaires viennent de
+// Poképédia, en français. Ceux des McDonald's « USA » sont bien
 // en français (« Pika Dessin », « Lancez une pièce ») : l'édition
 // canadienne, vraisemblablement.
 const RATTRAPAGES = [
@@ -273,9 +276,7 @@ const RATTRAPAGES = [
   { notre: 'bwp',       code: 'PRBW',   regle: 'code'   },
   { notre: 'svp',       code: 'SVP',    regle: 'code'   },
   { notre: 'mep',       code: 'MEP',    regle: 'code'   },
-  { notre: 'bw11',      code: 'LTR',    regle: 'code'   },
   { notre: 'ecard2',    code: 'AQ',     regle: 'code'   },
-  { notre: 'ecard3',    code: 'SK',     regle: 'code'   },
   { notre: 'xya',       code: 'PRAL',   regle: 'code'   },
   { notre: 'dp7',       code: 'SF',     regle: 'code'   },
   { notre: 'hgss1',     code: 'HGSS',   regle: 'code'   },
@@ -407,7 +408,10 @@ for(const r of RATTRAPAGES){
     if(r.epingles?.[carte.localId]) trouve = leurs.find(c => c.num === r.epingles[carte.localId]);
     else if(r.regle === 'code'){
       const notre = formeCode(carte.localId);
-      trouve = leurs.find(c => formeCode(codeImprime(c.nom)) === notre && noteNom(carte, c.nom) >= 1);
+      // Le numéro imprimé, gardé à part par le moissonneur ou resté dans le
+      // nom ; à défaut, la position elle-même — c'est le cas des promos,
+      // où « Évoli 200 » est à la fois imprimé 200 et rangé au n° 200.
+      trouve = leurs.find(c => formeCode(c.imprime ?? codeImprime(c.nom) ?? c.num) === notre && noteNom(carte, c.nom) >= 1);
     }else if(r.regle === 'numero'){
       const base = Number(String(carte.localId).replace(/^[A-Za-z]+/, ''));
       if(Number.isFinite(base)) trouve = leurs.find(c => c.n === base + (r.decalage ?? 0) && noteNom(carte, c.nom) >= 1);

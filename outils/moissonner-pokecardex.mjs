@@ -146,8 +146,20 @@ for(const [i, code] of retenues.entries()){
       // numéro n'a pas de « /total ». Ne retirer que la première forme
       // laissait le numéro collé au nom de toutes les promos. On exige un
       // chiffre dans le mot retiré, pour garder « Pikachu V » entier.
-      const nom = c.alt.replace(/\s+[a-z]{0,3}[0-9]+[a-z]?(?:\/[0-9a-z]+)?\s*$/i, '').trim();
-      parNumero[String(m[2]).toLowerCase()] = { adresse, nom };
+      const FIN = /\s+([a-z]{0,3}[0-9]+[a-z]?)(?:\/[0-9a-z]+)?\s*$/i;
+      const nom = c.alt.replace(FIN, '').trim();
+      // Ce mot retiré est parfois le numéro IMPRIMÉ de la carte, distinct
+      // de sa position dans leur liste : « Baudrive SH1 » est leur n° 104,
+      // « Pharamp H1/H32 » leur n° 155. C'est la clé qui permet de la
+      // retrouver chez nous, où elle s'appelle « SH1 » et « H01 ». Le
+      // retirer sans le garder a fait perdre ces rattachements d'un relevé
+      // à l'autre ; on le garde donc à part, quand il n'est pas la simple
+      // position.
+      const imprime = FIN.exec(c.alt)?.[1] ?? null;
+      const position = String(m[2]).toLowerCase();
+      const fiche = { adresse, nom };
+      if(imprime && imprime.replace(/^0+/, '').toLowerCase() !== position.replace(/^0+/, '')) fiche.imprime = imprime;
+      parNumero[position] = fiche;
     }
 
     const combien = Object.keys(parNumero).length;
