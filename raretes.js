@@ -22,6 +22,16 @@ const ICONES_RARETE = {
   'Chromatique deux étoiles': ['chromatique', 2],
 };
 
+// Les raretés de Pocket, de la plus courante à la plus rare. Une seule liste
+// pour tout le site : le filtre des pages de cartes la suit, les missions
+// secrètes aussi. Les chromatiques se placent avant les trois étoiles, qui
+// sortent moins souvent des boosters.
+const ORDRE_RARETES_POCKET = [
+  'Un Diamant', 'Deux Diamants', 'Trois Diamants', 'Quatre Diamants',
+  'Une Étoile', 'Deux Étoiles', 'Chromatique', 'Chromatique deux étoiles',
+  'Trois Étoiles', 'Couronne',
+];
+
 function rarityIcon(rarity){
   const icone = ICONES_RARETE[rarity];
   if(icone){

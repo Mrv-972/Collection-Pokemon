@@ -85,11 +85,8 @@ const PREFERENCES_PAR_VERSION = [
 // Du plus courant au plus rare. Sert de repli quand la version demandée
 // n'existe pas pour cette carte, et de choix par défaut quand rien n'est
 // précisé : une carte nommée sans façon, c'est la carte ordinaire.
-const ORDRE_DES_RARETES = [
-  'Un Diamant', 'Deux Diamants', 'Trois Diamants', 'Quatre Diamants',
-  'Une Étoile', 'Deux Étoiles', 'Chromatique', 'Chromatique deux étoiles',
-  'Trois Étoiles', 'Couronne',
-];
+// La liste vit dans raretes.js, partagée avec le filtre des pages de cartes.
+const ORDRE_DES_RARETES = ORDRE_RARETES_POCKET;
 
 const rangDeRarete = r => {
   const i = ORDRE_DES_RARETES.indexOf(r);

@@ -80,9 +80,16 @@ function raritySymbol(rarity){
 // partage avec les grilles de cartes.
 
 // Ordre d'affichage dans le filtre : du plus commun au plus rare.
+//
+// Pocket suit sa propre liste (raretes.js). Classées par symbole, ses
+// raretés se mélangeaient : « Deux Diamants » (◆◆) n'avait pas de rang et
+// tombait en fin de liste, après les étoiles. Le jeu physique, lui, garde
+// le classement par symbole.
 const SYMBOL_RANK = { '': 0, '●': 1, '◆': 2, '★': 3, '★★': 4, '★★★': 5, '★★★★': 6, '✦': 7 };
 function rarityRank(rarity){
-  return SYMBOL_RANK[raritySymbol(rarity)] ?? 9;
+  const rangPocket = typeof ORDRE_RARETES_POCKET !== 'undefined' ? ORDRE_RARETES_POCKET.indexOf(rarity) : -1;
+  if(rangPocket >= 0) return rangPocket;
+  return 100 + (SYMBOL_RANK[raritySymbol(rarity)] ?? 9);
 }
 
 function populateRarityFilter(cards){
