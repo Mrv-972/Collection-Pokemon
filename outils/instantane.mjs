@@ -1285,6 +1285,15 @@ async function principal(){
   await brancherPokecardex(physique);
 
   const { vignettes, hautes } = trierVisuels(await recenserVisuelsLocaux());
+  // Un fichier copié qu'on a lu EN ANGLAIS (outils/langue-visuels.mjs) ne
+  // passe plus devant un scan français : Poképédia héberge aussi les scans
+  // anglais des cartes jamais éditées en France — Gym Heroes, par exemple.
+  // On ne l'écarte que si Pokécardex a fourni, pour cette carte, un scan
+  // non lu en anglais ; sinon il reste — une image anglaise vaut mieux
+  // qu'un point d'interrogation.
+  let languesLocales = {};
+  try{ languesLocales = JSON.parse(await readFile('donnees/langue-visuels.json', 'utf8')).verdicts ?? {}; }catch{}
+  let localesAnglaises = 0;
   if(vignettes.size){
     let poses = 0, posesHd = 0;
     for(const lot of [physique, pocket]){
@@ -1292,6 +1301,10 @@ async function principal(){
         for(const carte of cartes){
           const local = vignettes.get(carte.id);
           if(!local) continue;
+          if(languesLocales[`depot:${carte.id}`]?.langue === 'en' && /pokecardex/.test(carte.imageSecours ?? '')){
+            localesAnglaises++;
+            continue;
+          }
           // Ce qui venait d'ailleurs devient le secours — l'adresse
           // française qu'on servait jusqu'ici, pas l'anglaise plus ancienne :
           // si le fichier local manquait, mieux vaut retomber sur la bonne
@@ -1308,7 +1321,8 @@ async function principal(){
         }
       }
     }
-    console.log(`Visuels servis depuis le dépôt : ${poses} cartes, dont ${posesHd} avec une haute définition`);
+    console.log(`Visuels servis depuis le dépôt : ${poses} cartes, dont ${posesHd} avec une haute définition` +
+      ` (${localesAnglaises} copies lues en anglais laissées pour un scan français)`);
   }
 
   // Le bandeau « visuels des cartes en anglais » se déduit de l'état final,

@@ -123,7 +123,11 @@ const depotEnAnglais = id => langues[`depot:${id}`]?.langue === 'en';
 let faites = 0;
 const verdicts = await parPaquets(toutes, largeur, async carte => {
   let etat;
-  if(aDejaUnFichier(carte.id)) etat = depotEnAnglais(carte.id) ? 'secoursAnglais' : 'depot';
+  // Un fichier du dépôt lu en anglais n'est servi que faute de mieux :
+  // l'instantané le laisse quand un scan français existe, et la carte
+  // désigne alors une adresse distante — c'est elle qu'on vérifie.
+  const servieDuDepot = aDejaUnFichier(carte.id) && (!depotEnAnglais(carte.id) || !/^https?:/.test(carte.image ?? ''));
+  if(servieDuDepot) etat = depotEnAnglais(carte.id) ? 'secoursAnglais' : 'depot';
   else {
     const principal = await repond(carte.image);
     if(principal === true) etat = 'principal';
