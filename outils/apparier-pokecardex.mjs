@@ -288,6 +288,14 @@ const RATTRAPAGES = [
   { notre: 'swsh4.5sv', code: 'SWSH45', regle: 'code'   },
   { notre: 'exu',       code: 'UF',     regle: 'lettre' },
   { notre: 'dp4',       code: 'GE',     regle: 'numero' },
+  // TCGdex ne connaît de ces extensions que les noms anglais — c'est ce qui
+  // empêchait l'appariement d'ensemble —, et son adresse « /fr/ » y sert
+  // l'image anglaise. Pokécardex en a la numérotation exacte, noms
+  // français ; la lecture de la langue dira, scan par scan, lesquels sont
+  // vraiment en français.
+  { notre: 'pl4',       code: 'AR',     regle: 'code'   },
+  { notre: 'ex7',       code: 'TRR',    regle: 'numero' },
+  { notre: 'base4',     code: 'BS2',    regle: 'numero' },
   { notre: 'lc',        code: 'LC',     regle: 'numero' },
   { notre: 'sve',       code: 'SVE',    regle: 'numero' },
   { notre: 'mee',       code: 'MEE',    regle: 'numero' },

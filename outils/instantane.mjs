@@ -1127,6 +1127,28 @@ async function brancherPokecardex(physique){
     }
   }
 
+  // L'adresse « /fr/ » de TCGdex sert parfois l'image ANGLAISE (Skyridge,
+  // Arceus, Team Rocket Returns : lu sur l'image). Quand un scan français a
+  // été trouvé ailleurs, il passe devant ; l'image de TCGdex devient le
+  // secours, une image anglaise valant mieux qu'aucune si le scan manquait.
+  const versHaute = a => String(a ?? '').replace('/low.webp', '/high.webp');
+  let permutees = 0;
+  for(const cartes of physique.cartesParSet.values()){
+    for(const carte of cartes){
+      const lu = langues[carte.image]?.langue ?? langues[versHaute(carte.image)]?.langue;
+      if(lu !== 'en') continue;
+      const secours = carte.imageSecours ?? '';
+      if(!/^https?:/.test(secours) || /\/en\//.test(secours) || langues[secours]?.langue === 'en') continue;
+      const { image, imageHaute } = carte;
+      carte.image = secours;
+      carte.imageHaute = carte.imageHauteSecours ?? secours;
+      carte.imageSecours = image;
+      carte.imageHauteSecours = imageHaute;
+      permutees++;
+    }
+  }
+  console.log(`Images TCGdex lues en anglais, remplacées par un scan français : ${permutees}`);
+
   console.log(`Secours français depuis Pokécardex : ${poses} cartes` +
     ` sur ${parExtension.size} extensions` +
     ` (dont ${remplaceDeLAnglais} qui étaient en anglais ;` +
