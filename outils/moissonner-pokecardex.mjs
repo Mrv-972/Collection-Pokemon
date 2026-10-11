@@ -78,6 +78,7 @@ const DECOUPE = /pokecardex-scans\.b-cdn\.net\/sets\/([^/]+)\/FR\/([^/?.]+)\.(jp
 
 const series = {};
 let totalCartes = 0, sansCarte = [];
+let totalTrous = 0; const seriesATrous = [];
 const retenues = codes.slice(0, maxSeries === Infinity ? undefined : maxSeries);
 
 for(const [i, code] of retenues.entries()){
@@ -85,15 +86,29 @@ for(const [i, code] of retenues.entries()){
     await page.goto(`${RACINE}/series/${code}`, { waitUntil: 'networkidle', timeout: 60000 });
     await page.waitForTimeout(1800);
 
-    // Descendre jusqu'à ce que le nombre d'images cesse de croître : c'est
-    // la seule façon de savoir qu'on a tout vu, plutôt que d'espérer.
-    let avant = -1, tours = 0;
-    while(tours < 25){
-      const n = await page.evaluate(() => document.querySelectorAll('img').length);
-      if(n === avant) break;
-      avant = n;
-      await page.evaluate(() => window.scrollBy(0, window.innerHeight * 2));
-      await page.waitForTimeout(700);
+    // Descendre par pas PLUS COURTS que l'écran, jusqu'en bas de la page.
+    //
+    // Leur page ne pose le vrai visuel d'une carte qu'au moment où elle
+    // passe à l'écran. On descendait par bonds de deux écrans : une rangée
+    // de huit cartes sur neuf n'était jamais à l'écran à l'arrêt, et
+    // manquait au relevé — les positions 33 à 40, puis 105 à 112, dans
+    // presque chaque série. 2 393 cartes, et autant de visuels français
+    // qu'on croyait inexistants. Avec un pas de 60 % de l'écran, chaque
+    // rangée y passe au moins une fois.
+    let tours = 0, enBas = 0, avant = -1;
+    while(tours < 400 && enBas < 3){
+      const etat = await page.evaluate(() => {
+        window.scrollBy(0, Math.round(window.innerHeight * 0.6));
+        return {
+          n: document.querySelectorAll('img').length,
+          bas: window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4,
+        };
+      });
+      await page.waitForTimeout(350);
+      // En bas ET plus rien de nouveau, trois fois de suite : la page a tout
+      // donné, y compris ce qu'un chargement tardif ajoute à la fin.
+      enBas = etat.bas && etat.n === avant ? enBas + 1 : 0;
+      avant = etat.n;
       tours++;
     }
 
@@ -127,6 +142,18 @@ for(const [i, code] of retenues.entries()){
 
     const combien = Object.keys(parNumero).length;
     totalCartes += combien;
+    // Les numéros absents entre 1 et le plus grand : le symptôme exact du
+    // défaut de défilement corrigé plus haut. On les compte pour qu'un
+    // retour du problème se voie au journal, au lieu de se découvrir des
+    // semaines plus tard en cherchant pourquoi des cartes manquent.
+    const entiers = Object.keys(parNumero).map(Number).filter(Number.isInteger);
+    if(entiers.length){
+      const presents = new Set(entiers);
+      let trous = 0;
+      for(let k = 1; k <= Math.max(...entiers); k++) if(!presents.has(k)) trous++;
+      if(trous) seriesATrous.push(`${code} (${trous})`);
+      totalTrous += trous;
+    }
     if(combien) series[code] = { nom: lu.nom, cartes: parNumero };
     else{
       sansCarte.push(code);
@@ -154,6 +181,11 @@ console.log(`séries parcourues : ${retenues.length}`);
 console.log(`séries avec cartes: ${Object.keys(series).length}`);
 console.log(`séries sans carte : ${sansCarte.length}${sansCarte.length ? '  (' + sansCarte.slice(0, 12).join(', ') + (sansCarte.length > 12 ? '…' : '') + ')' : ''}`);
 console.log(`cartes relevées   : ${totalCartes}`);
+// Un trou n'est pas forcément une faute : certaines séries sautent
+// réellement des numéros. Mais s'il en revient des milliers, c'est le
+// relevé qui flanche, pas Pokécardex.
+console.log(`numéros sautés   : ${totalTrous} sur ${seriesATrous.length} séries` +
+  (seriesATrous.length ? `  (${seriesATrous.slice(0, 15).join(', ')}${seriesATrous.length > 15 ? '…' : ''})` : ''));
 console.log('\nles plus fournies :');
 for(const [code, s] of Object.entries(series)
     .sort((a, b) => Object.keys(b[1].cartes).length - Object.keys(a[1].cartes).length).slice(0, 15))
@@ -175,6 +207,7 @@ if(essai){
     seriesParcourues: retenues.length,
     complet: maxSeries === Infinity,
     cartes: totalCartes,
+    numerosSautes: totalTrous,
     series,
   }, null, 1) + '\n');
   console.log(`\nécrit dans ${fichier}`);
