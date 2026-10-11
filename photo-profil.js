@@ -139,7 +139,7 @@ async function afficherPhotoProfil(conteneur, apresChangement = () => {}){
   if(statut === 'en_attente') etat = `<p class="etat attente"><b>Photo en attente de validation.</b> Elle sera visible des autres membres dès qu'elle aura été vérifiée. En attendant, ils voient ${profil.photo_url ? 'ta photo précédente' : profil.avatar ? 'ton Pokémon' : 'ton initiale'}.</p>`;
   else if(statut === 'refusee') etat = `<p class="etat refus"><b>Ta dernière photo a été refusée</b>${profil.photo_motif ? ` : ${echapperTexteProfil(profil.photo_motif)}` : '.'} Tu peux en proposer une autre, ou choisir un Pokémon.</p>`;
   else if(statut === 'validee') etat = `<p class="etat">Ta photo est visible des autres membres.</p>`;
-  else etat = `<p class="etat">${profil.avatar ? 'Ton Pokémon est visible des autres membres. Clique dessus pour en changer.' : 'Clique sur l\'image pour choisir un Pokémon, ou envoie une photo de toi.'}</p>`;
+  else etat = `<p class="etat">${profil.avatar ? 'Ton Pokémon est visible des autres membres. Clique dessus pour en changer.' : 'Clique sur l\'image pour choisir un Pokémon, ou ajoute une photo de toi.'}</p>`;
 
   // Une photo (validée ou en attente) ou un Pokémon : un seul bouton retire
   // l'image, quelle qu'elle soit, et le membre retrouve son initiale.
@@ -156,7 +156,7 @@ async function afficherPhotoProfil(conteneur, apresChangement = () => {}){
         ${etat}
         <div class="actions">
           <button type="button" id="btn-galerie" aria-controls="galerie-avatars" aria-expanded="false">Choisir un Pokémon</button>
-          <label class="principal-photo" for="champ-photo">Envoyer une photo<input type="file" id="champ-photo" accept="image/jpeg,image/png,image/webp"></label>
+          <label class="principal-photo" for="champ-photo">Choisir une photo<input type="file" id="champ-photo" accept="image/jpeg,image/png,image/webp"></label>
           ${aUneImage ? '<button type="button" id="btn-retirer-photo">Retirer ma photo</button>' : ''}
         </div>
       </div>
