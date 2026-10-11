@@ -76,6 +76,15 @@ const STYLE_PHOTO_PROFIL = `
   .photo-profil{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;margin:26px 0 8px;
     padding:20px;border-radius:12px;background:rgba(var(--trait-rgb),0.04);border:1px solid rgba(var(--trait-rgb),0.10)}
   .photo-profil .apercu{position:relative}
+  /* La photo elle-même ouvre la liste des Pokémon : un crayon le signale. */
+  .photo-profil button.apercu{display:block;width:auto;min-height:0;margin:0;padding:0;border:0;border-radius:50%;
+    background:none;cursor:pointer;color:inherit;font:inherit}
+  .photo-profil button.apercu:hover .avatar-membre,.photo-profil button.apercu:focus-visible .avatar-membre{
+    box-shadow:0 0 0 3px rgba(var(--gold-rgb),0.55)}
+  .photo-profil button.apercu:focus-visible{outline:none}
+  .photo-profil .crayon{position:absolute;right:-2px;bottom:-2px;width:28px;height:28px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;
+    background:var(--ink-soft,#20232A);border:1px solid rgba(var(--trait-rgb),0.22);box-shadow:0 2px 6px rgba(0,0,0,0.25)}
   .photo-profil .etat{font-size:13px;line-height:1.55;color:var(--text-on-ink-dim);margin:6px 0 12px}
   .photo-profil .etat b{color:var(--text-on-ink)}
   .photo-profil .etat.attente b{color:var(--accent-clair)}
@@ -94,6 +103,9 @@ const STYLE_PHOTO_PROFIL = `
   .photo-profil .travail{grid-column:1 / -1;font-size:13px;color:var(--text-on-ink-dim);margin:0}
   .photo-profil .travail.err{color:var(--alerte)}
   .galerie-avatars{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px;margin-top:4px}
+  /* Sans cette règle, « display:grid » l'emportait sur l'attribut hidden :
+     la liste restait ouverte en permanence. */
+  .galerie-avatars[hidden]{display:none}
   .galerie-avatars button{width:auto;margin:0;min-height:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 6px;border-radius:10px;cursor:pointer;
     border:1px solid rgba(var(--trait-rgb),0.10);background:rgba(var(--trait-rgb),0.03);color:var(--text-on-ink-dim);font:inherit;font-size:10.5px}
   .galerie-avatars button:hover{border-color:rgba(var(--gold-rgb),0.5)}
@@ -127,19 +139,25 @@ async function afficherPhotoProfil(conteneur, apresChangement = () => {}){
   if(statut === 'en_attente') etat = `<p class="etat attente"><b>Photo en attente de validation.</b> Elle sera visible des autres membres dès qu'elle aura été vérifiée. En attendant, ils voient ${profil.photo_url ? 'ta photo précédente' : profil.avatar ? 'ton Pokémon' : 'ton initiale'}.</p>`;
   else if(statut === 'refusee') etat = `<p class="etat refus"><b>Ta dernière photo a été refusée</b>${profil.photo_motif ? ` : ${echapperTexteProfil(profil.photo_motif)}` : '.'} Tu peux en proposer une autre, ou choisir un Pokémon.</p>`;
   else if(statut === 'validee') etat = `<p class="etat">Ta photo est visible des autres membres.</p>`;
-  else etat = `<p class="etat">${profil.avatar ? 'Ton Pokémon est visible des autres membres.' : 'Choisis un Pokémon, ou envoie une photo de toi.'}</p>`;
+  else etat = `<p class="etat">${profil.avatar ? 'Ton Pokémon est visible des autres membres. Clique dessus pour en changer.' : 'Clique sur l\'image pour choisir un Pokémon, ou envoie une photo de toi.'}</p>`;
+
+  // Une photo (validée ou en attente) ou un Pokémon : un seul bouton retire
+  // l'image, quelle qu'elle soit, et le membre retrouve son initiale.
+  const aPhoto = !!(profil.photo_url || profil.photo_en_attente);
+  const aUneImage = aPhoto || !!profil.avatar;
 
   conteneur.innerHTML = `
     <section class="photo-profil" aria-labelledby="titre-photo">
-      <div class="apercu" id="apercu-photo">${avatarHtml(profil, 84)}</div>
+      <button type="button" class="apercu" id="apercu-photo" aria-controls="galerie-avatars" aria-expanded="false"
+              title="Choisir un Pokémon" aria-label="Changer d'image : choisir un Pokémon">
+        <span id="image-photo">${avatarHtml(profil, 84)}</span><span class="crayon" aria-hidden="true">✏️</span></button>
       <div>
         <h2 id="titre-photo" style="font-size:20px">Photo de profil</h2>
         ${etat}
         <div class="actions">
-          <button type="button" id="btn-galerie" aria-expanded="false">Choisir un Pokémon</button>
+          <button type="button" id="btn-galerie" aria-controls="galerie-avatars" aria-expanded="false">Choisir un Pokémon</button>
           <label class="principal-photo" for="champ-photo">Envoyer une photo<input type="file" id="champ-photo" accept="image/jpeg,image/png,image/webp"></label>
-          ${profil.photo_url || profil.photo_en_attente ? '<button type="button" id="btn-retirer-photo">Retirer ma photo</button>' : ''}
-          ${profil.avatar && !profil.photo_url ? '<button type="button" id="btn-retirer-avatar">Retirer le Pokémon</button>' : ''}
+          ${aUneImage ? '<button type="button" id="btn-retirer-photo">Retirer ma photo</button>' : ''}
         </div>
       </div>
       <p class="travail" id="travail-photo" role="status" hidden></p>
@@ -156,7 +174,7 @@ async function afficherPhotoProfil(conteneur, apresChangement = () => {}){
   // Ma photo en attente : je suis le seul à pouvoir la voir.
   if(statut === 'en_attente'){
     lienPhotoEnAttente().then(lien => {
-      if(lien) document.getElementById('apercu-photo').innerHTML =
+      if(lien) document.getElementById('image-photo').innerHTML =
         avatarHtml({ ...profil, photo_url: lien }, 84);
     }).catch(() => {});
   }
@@ -169,24 +187,42 @@ async function afficherPhotoProfil(conteneur, apresChangement = () => {}){
   };
   const redessiner = async () => { await afficherPhotoProfil(conteneur, apresChangement); apresChangement(); };
 
+  // La liste des Pokémon s'ouvre d'un clic sur la photo ou sur le bouton.
   const galerie = document.getElementById('galerie-avatars');
-  document.getElementById('btn-galerie').addEventListener('click', e => {
+  const ouvreurs = [document.getElementById('apercu-photo'), document.getElementById('btn-galerie')];
+  const basculerGalerie = () => {
     galerie.hidden = !galerie.hidden;
-    e.currentTarget.setAttribute('aria-expanded', String(!galerie.hidden));
-  });
+    ouvreurs.forEach(b => b.setAttribute('aria-expanded', String(!galerie.hidden)));
+    if(!galerie.hidden) galerie.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  };
+  ouvreurs.forEach(b => b.addEventListener('click', basculerGalerie));
+
+  // Choisir un Pokémon, c'est en faire son image : une photo en place
+  // l'emporterait sinon à l'affichage, et le choix semblerait sans effet.
   galerie.addEventListener('click', async e => {
     const b = e.target.closest('[data-avatar]');
     if(!b) return;
-    try{ await choisirAvatar(b.dataset.avatar); await redessiner(); }
-    catch(err){ dire(`L'avatar n'a pas pu être enregistré : ${err.message}`, true); }
+    if(aPhoto){
+      const nom = AVATARS.find(a => a.cle === b.dataset.avatar)?.nom ?? 'ce Pokémon';
+      const ok = typeof demanderConfirmation === 'function'
+        ? await demanderConfirmation({ titre: `Remplacer ta photo par ${nom} ?`,
+            message: 'Ta photo sera retirée. Tu pourras en envoyer une autre plus tard.', action: 'Remplacer' })
+        : confirm(`Remplacer ta photo par ${nom} ?`);
+      if(!ok) return;
+    }
+    try{
+      if(aPhoto) await retirerPhoto();
+      await choisirAvatar(b.dataset.avatar);
+      await redessiner();
+    }catch(err){ dire(`L'avatar n'a pas pu être enregistré : ${err.message}`, true); }
   });
-  document.getElementById('btn-retirer-avatar')?.addEventListener('click', async () => {
-    try{ await choisirAvatar(null); await redessiner(); }
-    catch(err){ dire(`L'avatar n'a pas pu être retiré : ${err.message}`, true); }
-  });
+
   document.getElementById('btn-retirer-photo')?.addEventListener('click', async () => {
-    try{ await retirerPhoto(); await redessiner(); }
-    catch(err){ dire(`La photo n'a pas pu être retirée : ${err.message}`, true); }
+    try{
+      if(aPhoto) await retirerPhoto();
+      if(profil.avatar) await choisirAvatar(null);
+      await redessiner();
+    }catch(err){ dire(`L'image n'a pas pu être retirée : ${err.message}`, true); }
   });
 
   document.getElementById('champ-photo').addEventListener('change', async e => {
