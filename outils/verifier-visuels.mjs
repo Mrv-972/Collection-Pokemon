@@ -115,7 +115,7 @@ console.log(`${toutes.length} cartes physiques à vérifier, ${extensions.length
 // La langue lue sur les images, quand elle l'a été.
 let langues = {};
 try{ langues = JSON.parse(await readFile('donnees/langue-visuels.json', 'utf8')).verdicts ?? {}; }catch{}
-const langueLue = adresse => langues[adresse]?.langue
+const langueLue = adresse => !adresse ? undefined : langues[adresse]?.langue
   ?? langues[/[?&]class=/.test(adresse) ? adresse : `${adresse}${adresse.includes('?') ? '&' : '?'}class=md`]?.langue;
 // Et pour les fichiers copiés dans le dépôt, sous leur identifiant.
 const depotEnAnglais = id => langues[`depot:${id}`]?.langue === 'en';
@@ -130,7 +130,11 @@ const verdicts = await parPaquets(toutes, largeur, async carte => {
   if(servieDuDepot) etat = depotEnAnglais(carte.id) ? 'secoursAnglais' : 'depot';
   else {
     const principal = await repond(carte.image);
-    if(principal === true) etat = 'principal';
+    // Même l'adresse française de TCGdex peut servir une image anglaise
+    // (Skyridge, vu sur planche) : quand son texte a été lu, la lecture
+    // tranche. La version lue est la haute définition de la même image.
+    const principalLu = langueLue(carte.image) ?? langueLue(String(carte.image ?? '').replace('/low.webp', '/high.webp'));
+    if(principal === true) etat = principalLu === 'en' ? 'secoursAnglais' : 'principal';
     else {
       const secours = await repond(carte.imageSecours);
       // D'où vient ce secours ? PkmCards est français ; une adresse

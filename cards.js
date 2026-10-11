@@ -185,19 +185,36 @@ function classeObtention(carteId){
 // (« Ho-Oh "brillant" ») fermerait l'attribut et casserait la vignette.
 const attrCarte = v => String(v ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
+// Les cartes sans visuel français portent un bandeau qui dit pourquoi
+// (classement : outils/sans-edition-francaise.mjs). La vue agrandie en
+// donne l'explication complète.
+const LANGUE_CARTE = {
+  'sans-edition':   { bandeau: 'N\'existe pas en français', classe: '',
+    explication: 'Cette carte n\'existe pas en français : le visuel est celui de la version anglaise.' },
+  'visuel-anglais': { bandeau: 'Visuel en anglais', classe: ' bandeau-langue-visuel',
+    explication: 'Cette carte existe en français, mais seule son image anglaise a été trouvée pour l\'instant.' },
+};
+const langueDeLaCarte = c => c.sansEditionFr ? 'sans-edition' : c.visuelAnglais ? 'visuel-anglais' : null;
+
 function cardTile(c, subtitle){
   // Les données de la carte voyagent avec sa vignette. L'environnement
   // d'administration s'en sert pour préremplir sa fenêtre de modification
   // sans qu'on ait à taper un identifiant. Rien de secret : tout cela est
   // déjà affiché sur la vignette.
+  const langue = langueDeLaCarte(c);
+  const attrLangue = langue ? ` data-langue="${langue}"` : '';
+  const bandeau = langue
+    ? `<span class="bandeau-langue${LANGUE_CARTE[langue].classe}" title="${attrCarte(LANGUE_CARTE[langue].explication)}">${LANGUE_CARTE[langue].bandeau}</span>`
+    : '';
   return `
     <div class="card-tile" data-carte="${attrCarte(c.id)}" data-local="${attrCarte(c.localId)}"
          data-nom="${attrCarte(c.name)}" data-rarete="${attrCarte(c.rarity)}"
          data-dex="${attrCarte(c.dexId)}">
       <div class="card-img-wrap">
         ${c.image
-          ? `<img class="${classeObtention(c.id)}" src="${c.image}" alt="${c.name}" loading="lazy" data-card-id="${c.id}" data-haute="${c.imageHaute ?? c.image}" data-fallback="${c.imageSecours ?? `images/cards/${c.id}.png`}"${c.imageHauteSecours ? ` data-fallback-haute="${c.imageHauteSecours}"` : ''} onerror="cardImgFallback(this)">`
-          : `<img class="${classeObtention(c.id)}" src="images/cards/${c.id}.png" alt="${c.name}" loading="lazy" data-card-id="${c.id}" onerror="cardImgFallback(this)">`}
+          ? `<img class="${classeObtention(c.id)}" src="${c.image}" alt="${c.name}" loading="lazy" data-card-id="${c.id}"${attrLangue} data-haute="${c.imageHaute ?? c.image}" data-fallback="${c.imageSecours ?? `images/cards/${c.id}.png`}"${c.imageHauteSecours ? ` data-fallback-haute="${c.imageHauteSecours}"` : ''} onerror="cardImgFallback(this)">`
+          : `<img class="${classeObtention(c.id)}" src="images/cards/${c.id}.png" alt="${c.name}" loading="lazy" data-card-id="${c.id}"${attrLangue} onerror="cardImgFallback(this)">`}
+        ${bandeau}
       </div>
       <div class="card-num"><span>${subtitle ?? '#' + c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${rarityIcon(c.rarity)}</span></div>
       <div class="card-name">${c.name}</div>
@@ -317,6 +334,13 @@ if(typeof poserInterrupteurGrisaille === 'function'){
 
 document.head.appendChild(Object.assign(document.createElement('style'), { textContent: `
   .card-img-wrap img{cursor:zoom-in}
+  /* Le bandeau de langue, en bas de l'image : lisible sans masquer la
+     carte, et transparent aux clics pour que le zoom reste accessible. */
+  .bandeau-langue{position:absolute;left:0;right:0;bottom:0;z-index:2;pointer-events:none;
+    padding:4px 6px 5px;text-align:center;font:600 10.5px/1.25 'IBM Plex Sans',sans-serif;letter-spacing:.2px;
+    color:#15171A;background:rgba(227,199,102,0.95);box-shadow:0 -1px 0 rgba(0,0,0,0.25)}
+  .bandeau-langue-visuel{background:rgba(185,188,185,0.95)}
+  .card-zoom .note-langue{display:block;margin:0 auto 6px;max-width:420px;font-size:12.5px;color:#E3C766}
   /* Une carte agrandie se regarde en couleur, meme si sa vignette est grise. */
   .card-zoom img{filter:none !important;opacity:1 !important}
   /* Au-dessus du rail des univers (z-index 60) : une vue agrandie doit
@@ -430,12 +454,14 @@ function openCardZoom(img){
       return;
     }
 
-    if(typeof prixCarte !== 'function') return;
+    const langue = LANGUE_CARTE[source.dataset.langue];
+    const noteLangue = langue ? `<span class="note-langue">${langue.explication}</span>` : '';
+    if(typeof prixCarte !== 'function'){ elValeur.innerHTML = noteLangue; return; }
     const prix = await prixCarte(carteId).catch(() => null);
     if(monJeton !== jeton) return;
-    elValeur.innerHTML = prix
+    elValeur.innerHTML = noteLangue + (prix
       ? `≈ ${prixLisible(prix)}<small>Cote indicative pour une carte en bon état${prix.devise === 'USD' ? ', marché nord-américain faute de cote européenne' : ''}${prix.variantes ? ' — d\'autres éditions de cette carte se négocient à des prix très différents' : ''}</small>`
-      : `<small>Pas de cote connue pour cette carte</small>`;
+      : `<small>Pas de cote connue pour cette carte</small>`);
   }
 
   const aller = pas => {

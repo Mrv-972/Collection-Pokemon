@@ -1337,6 +1337,26 @@ async function principal(){
     else delete ext.visuelsAnglais;
   }
 
+  // Les cartes sans visuel français, classées par la dernière vérification
+  // (outils/sans-edition-francaise.mjs). Le site leur pose un bandeau :
+  // « N'existe pas en français » quand aucune édition française n'est
+  // connue, « Visuel en anglais » quand la carte existe en français mais
+  // que seule son image anglaise a été trouvée.
+  try{
+    const classement = JSON.parse(await readFile('donnees/sans-edition-francaise.json', 'utf8'));
+    const sansEdition = new Set(classement.sansEdition ?? []);
+    const visuelAnglais = new Set(classement.visuelAnglais ?? []);
+    let marquees = 0;
+    for(const cartes of physique.cartesParSet.values()){
+      for(const carte of cartes){
+        if(sansEdition.has(carte.id)){ carte.sansEditionFr = true; marquees++; }
+        else if(visuelAnglais.has(carte.id)){ carte.visuelAnglais = true; marquees++; }
+      }
+    }
+    console.log(`Bandeaux de langue : ${sansEdition.size} cartes sans édition française, ` +
+      `${visuelAnglais.size} au visuel anglais (${marquees} posés)`);
+  }catch{ console.log('Pas de classement des cartes sans visuel français : aucun bandeau de langue.'); }
+
   const bilanPhysique = await publier('physique', physique, SORTIE);
   const bilanPocket = await publier('pocket', pocket, SORTIE);
 

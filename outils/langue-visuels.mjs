@@ -22,7 +22,7 @@
 //
 //   node outils/langue-visuels.mjs --pokecardex            les scans Pokécardex en service
 //   node outils/langue-visuels.mjs --adresses "url url …"  une liste, pour éprouver l'outil
-//        [--depot-pokepedia] [--echantillon-pkmcards 300] [--echantillon-depot 200] [--essai]
+//        [--tcgdex-suspectes] [--depot-pokepedia] [--echantillon-pkmcards 300] [--echantillon-depot 200] [--essai]
 
 import { readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -154,6 +154,30 @@ if(nPk) for(const c of auHasard(cartes.filter(c => /pkmcards/.test(c.imageSecour
 const nDepot = Number(args['echantillon-depot'] ?? 0);
 if(nDepot) for(const c of auHasard(cartes.filter(c => existsSync(`images/cards/${c.id}.webp`)), nDepot))
   sources.set(`depot:${c.id}`, 'depot');
+
+// Les images PRINCIPALES de TCGdex, dans les extensions où il ne connaît
+// que des noms anglais : son adresse « /fr/ » sert alors parfois l'image
+// anglaise. Vu sur planche : Skyridge en « /fr/ » est en anglais, Aquapolis
+// en « /fr/ » est bien en français. Toute l'extension est lue, pas
+// seulement les cartes au nom anglais : dans une série anglaise,
+// « Alakazam » s'écrit pareil dans les deux langues et ne prouve rien.
+if(args['tcgdex-suspectes']){
+  const POKEDEX_FR = new Function((await readFile('pokedex-fr.js', 'utf8')) + '\nreturn POKEDEX_FR;')();
+  const plat = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/œ/gi, 'oe').toLowerCase();
+  const MOTS_ANGLAIS = /\b(the|of|with|at|and|friends|energy|trainer)\b|['’]s\b|^lt\.|special delivery|on the ball/i;
+  const nomAnglais = c => MOTS_ANGLAIS.test(c.name ?? '') ||
+    (c.dexId && !plat(c.name).includes(plat(POKEDEX_FR[c.dexId - 1])));
+  const parExtension = new Map();
+  for(const c of cartes){
+    if(!/^https:\/\/assets\.tcgdex\.net\/fr\//.test(c.image ?? '')) continue;
+    const ext = c.id.slice(0, c.id.lastIndexOf('-'));
+    if(!parExtension.has(ext)) parExtension.set(ext, []);
+    parExtension.get(ext).push(c);
+  }
+  for(const liste of parExtension.values())
+    if(liste.filter(nomAnglais).length >= 3)
+      for(const c of liste) sources.set(c.image.replace('/low.webp', '/high.webp'), 'tcgdex');
+}
 
 // Toutes les images copiées depuis Poképédia : un wiki français héberge
 // aussi le scan anglais d'une carte jamais éditée en France.
