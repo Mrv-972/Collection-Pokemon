@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-11-bxah"></script>
+<script src="theme.js?v=2026-10-11-0q1y"></script>
 <title>Profil — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -147,35 +147,10 @@
   .actions-profil .signaler:hover{color:var(--alerte)}
   .avertissement-blocage{margin:14px 0 0;font-size:13px;color:var(--alerte)}
 
-  .chiffres{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 0}
-  .chiffre{padding:16px;border-radius:12px;background:rgba(var(--trait-rgb),0.04);border:1px solid rgba(var(--trait-rgb),0.08)}
-  .chiffre b{display:block;font-family:'Newsreader',serif;font-weight:500;font-size:30px;line-height:1.1}
-  .chiffre span{font-size:12.5px;color:var(--text-on-ink-dim)}
-
-  .bloc-profil{margin-top:38px}
-  .bloc-profil h2{font-size:23px;margin-bottom:4px;display:flex;align-items:baseline;gap:10px}
-  .bloc-profil h2 small{font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--text-on-ink-dim);font-weight:400}
-  .bloc-profil > p{font-size:13.5px;color:var(--text-on-ink-dim);margin:0 0 14px}
-  .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:12px}
-  .badge-collection{display:flex;gap:11px;align-items:flex-start;padding:13px;border-radius:12px;
-    border:1px solid rgba(var(--gold-rgb),0.35);background:rgba(var(--gold-rgb),0.08)}
-  .badge-collection .icone{font-size:26px;line-height:1;flex:none}
-  .badge-collection b{display:block;font-size:13.5px;font-weight:600}
-  .badge-collection small{display:block;font-size:11.5px;line-height:1.45;color:var(--text-on-ink-dim);margin-top:2px}
-  .badge-collection.verrouille{border-color:rgba(var(--trait-rgb),0.10);background:transparent}
-  .badge-collection.verrouille .icone{filter:grayscale(1);opacity:.4}
-  .badge-collection.verrouille b{color:var(--text-on-ink-dim)}
-
-  .liste-avis{list-style:none;margin:12px 0 0;padding:0}
-  .un-avis{display:flex;gap:12px;padding:14px 0;border-top:1px solid rgba(var(--trait-rgb),0.08)}
-  .un-avis .tete-avis{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px}
-  .un-avis .tete-avis b{font-weight:600}
-  .un-avis .date{font-size:12px;color:var(--text-on-ink-dim)}
-  .un-avis p{margin:5px 0 0;font-size:14px;line-height:1.55;overflow-wrap:anywhere}
-  .un-avis .signaler-avis{margin-left:auto;font:inherit;font-size:12px;background:none;border:0;cursor:pointer;
-    color:var(--text-on-ink-dim);text-decoration:underline;text-underline-offset:2px;padding:4px}
-  .un-avis .signaler-avis:hover{color:var(--alerte)}
-  .vide-doux{font-size:14px;color:var(--text-on-ink-dim);padding:6px 0}
+  .bandeau-apercu{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    margin:0 0 16px;padding:12px 16px;border-radius:12px;font-size:14px;
+    background:rgba(var(--gold-rgb),0.08);border:1px solid rgba(var(--gold-rgb),0.30)}
+  .bandeau-apercu a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
 
   @media(max-width:640px){
     .profil{margin:28px auto 60px}
@@ -183,7 +158,6 @@
     .carte-profil h1{font-size:28px}
     .actions-profil{justify-content:center}
     .actions-profil a,.actions-profil button{min-height:44px}
-    .chiffres{grid-template-columns:repeat(2,1fr)}
   }
 </style>
 </head>
@@ -211,53 +185,19 @@
   <footer data-note="Un profil ne montre que des nombres et des badges : la liste de tes cartes, ta commune et ta date de naissance restent privées."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-bxah"></script>
-<script src="supabase-config.js?v=2026-10-11-bxah"></script>
-<script src="pied.js?v=2026-10-11-bxah"></script>
-<script src="admin.js?v=2026-10-11-bxah"></script>
-<script src="admin-site.js?v=2026-10-11-bxah"></script>
-<script src="compte.js?v=2026-10-11-bxah"></script>
-<script src="communaute.js?v=2026-10-11-bxah"></script>
+<script src="univers.js?v=2026-10-11-0q1y"></script>
+<script src="supabase-config.js?v=2026-10-11-0q1y"></script>
+<script src="pied.js?v=2026-10-11-0q1y"></script>
+<script src="admin.js?v=2026-10-11-0q1y"></script>
+<script src="admin-site.js?v=2026-10-11-0q1y"></script>
+<script src="compte.js?v=2026-10-11-0q1y"></script>
+<script src="communaute.js?v=2026-10-11-0q1y"></script>
 <script>
 const zone = document.getElementById('profil');
 const idDemande = new URLSearchParams(location.search).get('membre');
 const FORMAT_MOIS = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' });
-const FORMAT_JOUR = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-const pluriel = (n, un, plusieurs) => `${n} ${n > 1 ? plusieurs : un}`;
 
 function etat(html){ zone.innerHTML = `<p class="etat">${html}</p>`; }
-
-function badgesHtml(obtenus, moi){
-  // Sur son propre profil, on voit aussi ceux qui restent à gagner : de
-  // quoi donner envie. Chez les autres, seulement ce qu'ils ont obtenu.
-  const montres = moi ? BADGES : BADGES.filter(b => obtenus.has(b.cle));
-  if(!montres.length) return '<p class="vide-doux">Pas encore de badge.</p>';
-  return `<div class="badges">${montres.map(b => `
-    <div class="badge-collection ${obtenus.has(b.cle) ? '' : 'verrouille'}"
-         ${obtenus.has(b.cle) ? '' : 'aria-label="Badge à obtenir"'}>
-      <span class="icone" aria-hidden="true">${b.icone}</span>
-      <span><b>${b.nom}</b><small>${b.texte}</small></span>
-    </div>`).join('')}</div>`;
-}
-
-function avisHtml(liste, moi){
-  if(!liste.length) return `<p class="vide-doux">${moi
-    ? "Aucun avis pour l'instant. Après un échange, ton partenaire pourra en laisser un depuis votre discussion ou ton profil."
-    : "Aucun avis pour l'instant."}</p>`;
-  return `<ul class="liste-avis">${liste.map((a, i) => `
-    <li class="un-avis">
-      <a class="lien-profil" href="${lienProfil(a.auteur_id)}">${avatarHtml(a, 34)}</a>
-      <div style="flex:1;min-width:0">
-        <div class="tete-avis">
-          <a class="lien-profil" href="${lienProfil(a.auteur_id)}"><b class="nom-lien">${echapperCommun(a.pseudo)}</b></a>
-          <span>${a.note === 'positif' ? '👍 Bien passé' : '👎 Mal passé'}</span>
-          <span class="date">${FORMAT_JOUR.format(new Date(a.maj_le))}</span>
-          ${a.auteur_id !== membre.id ? `<button type="button" class="signaler-avis" data-avis="${i}">Signaler</button>` : ''}
-        </div>
-        ${a.commentaire ? `<p>${echapperCommun(a.commentaire)}</p>` : ''}
-      </div>
-    </li>`).join('')}</ul>`;
-}
 
 async function afficher(){
   if(CONFIG_MANQUANTE) return etat("La base n'est pas encore configurée.");
@@ -277,43 +217,30 @@ async function afficher(){
 
   document.title = `${p.pseudo} — PokéClasseur`;
   const lieu = !estPocket() && p.departement ? `Département ${echapperCommun(p.departement)} · ` : '';
-  const actions = moi ? `
-      <a href="connexion.html">✏️ Modifier mon profil</a>
-      <a href="parametres.html#partage">🔗 Partager ma liste de souhaits</a>`
+  // Sa propre page, ici, est un aperçu : ce que voient les autres. Les
+  // badges à gagner et la modification sont dans « Mon profil ».
+  const actions = moi ? ''
     : `
       ${p.bloque ? '' : `<a class="principal" href="discussions.html?membre=${encodeURIComponent(id)}">💬 Lui écrire</a>`}
       ${peutAvis ? `<button type="button" id="donner-avis">${monAvis ? '✏️ Modifier mon avis' : '⭐ Donner un avis'}</button>` : ''}
       <button type="button" class="signaler" id="signaler-profil">Signaler</button>`;
 
   zone.innerHTML = `
+    ${moi ? `<p class="bandeau-apercu"><span>Voici ton profil tel que le voient les autres membres.</span>
+      <a href="connexion.html">← Retour à Mon profil</a></p>` : ''}
     <header class="carte-profil">
       ${avatarHtml(p, 104)}
       <div>
         <h1>${echapperCommun(p.pseudo)}</h1>
         <p class="meta">${lieu}Membre depuis ${FORMAT_MOIS.format(new Date(p.cree_le))}</p>
-        <div class="actions-profil">${actions}</div>
+        ${actions ? `<div class="actions-profil">${actions}</div>` : ''}
         ${!moi && !peutAvis && !p.bloque ? '<p class="meta" style="font-size:12.5px;margin-top:10px">Tu pourras donner un avis après avoir échangé des messages avec ce membre.</p>' : ''}
         ${p.bloque ? '<p class="avertissement-blocage">Vous vous êtes bloqués : vous ne pouvez plus vous écrire.</p>' : ''}
       </div>
     </header>
 
-    <section class="chiffres" aria-label="En chiffres">
-      <div class="chiffre"><b>${p.nb_proposees}</b><span>${p.nb_proposees > 1 ? 'cartes proposées' : 'carte proposée'} à l'échange</span></div>
-      <div class="chiffre"><b>${p.nb_recherchees}</b><span>${p.nb_recherchees > 1 ? 'cartes recherchées' : 'carte recherchée'}</span></div>
-      <div class="chiffre"><b>${p.avis_positifs}</b><span>👍 ${p.avis_positifs > 1 ? 'avis positifs' : 'avis positif'}</span></div>
-      <div class="chiffre"><b>${p.avis_negatifs}</b><span>👎 ${p.avis_negatifs > 1 ? 'avis négatifs' : 'avis négatif'}</span></div>
-    </section>
-
-    <section class="bloc-profil" aria-labelledby="titre-badges">
-      <h2 id="titre-badges">Badges <small>${obtenus.size} sur ${BADGES.length}</small></h2>
-      ${badgesHtml(obtenus, moi)}
-    </section>
-
-    <section class="bloc-profil" aria-labelledby="titre-avis">
-      <h2 id="titre-avis">Avis reçus <small>${pluriel(avis.length, 'avis', 'avis')}</small></h2>
-      <p>Laissés par des membres qui ont échangé avec ${moi ? 'toi' : echapperCommun(p.pseudo)}.</p>
-      ${avisHtml(avis, moi)}
-    </section>`;
+    ${vitrineHtml(p, obtenus, avis)}`;
+  brancherVitrine(zone, p, avis);
 
   document.getElementById('donner-avis')?.addEventListener('click', async () => {
     const reponse = await demanderAvis(p.pseudo, monAvis);
@@ -333,17 +260,6 @@ async function afficher(){
       annoncer("Signalement envoyé. Merci : l'administrateur va l'examiner.");
     }catch(err){ annoncer(`Le signalement n'est pas parti : ${err.message}`, 'ko'); }
   });
-
-  zone.querySelectorAll('.signaler-avis').forEach(b => b.addEventListener('click', async () => {
-    const a = avis[Number(b.dataset.avis)];
-    const reponse = await demanderSignalement(a.pseudo, { objet: 'avis' });
-    if(!reponse) return;
-    try{
-      await signalerContenu({ membreId: a.auteur_id, objet: 'avis',
-        motif: `Avis laissé à ${p.pseudo} : « ${a.commentaire ?? (a.note === 'positif' ? '👍' : '👎')} » — ${reponse.motif}` });
-      annoncer("Signalement envoyé. Merci : l'administrateur va l'examiner.");
-    }catch(err){ annoncer(`Le signalement n'est pas parti : ${err.message}`, 'ko'); }
-  }));
 }
 
 (async () => {

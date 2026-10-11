@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-11-bxah"></script>
+<script src="theme.js?v=2026-10-11-0q1y"></script>
 <title>Mon compte — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,6 +27,8 @@
   .navlinks a:hover{color:var(--text-on-ink)}
 
   .panel{max-width:440px;margin:56px auto 80px;}
+  .panel.panel-profil{max-width:680px}
+  .panel .titre-infos{font-size:21px;margin:36px 0 0}
   .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
   .panel h1{font-size:32px;margin-bottom:10px;}
   .panel p.intro{color:var(--text-on-ink-dim);font-size:15px;margin:0 0 28px;}
@@ -153,17 +155,18 @@
   <footer data-note="Ton compte sert à retrouver ta collection sur tous tes appareils et à te mettre en relation avec d'autres collectionneurs."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-bxah"></script>
-<script src="supabase-config.js?v=2026-10-11-bxah"></script>
-<script src="pied.js?v=2026-10-11-bxah"></script>
-<script src="admin.js?v=2026-10-11-bxah"></script>
-<script src="admin-site.js?v=2026-10-11-bxah"></script>
-<script src="tags.js?v=2026-10-11-bxah"></script>
-<script src="localisation.js?v=2026-10-11-bxah"></script>
-<script src="confirmation.js?v=2026-10-11-bxah"></script>
-<script src="photo-profil.js?v=2026-10-11-bxah"></script>
-<script src="compte.js?v=2026-10-11-bxah"></script>
-<script src="messagerie.js?v=2026-10-11-bxah"></script>
+<script src="univers.js?v=2026-10-11-0q1y"></script>
+<script src="supabase-config.js?v=2026-10-11-0q1y"></script>
+<script src="pied.js?v=2026-10-11-0q1y"></script>
+<script src="admin.js?v=2026-10-11-0q1y"></script>
+<script src="admin-site.js?v=2026-10-11-0q1y"></script>
+<script src="tags.js?v=2026-10-11-0q1y"></script>
+<script src="localisation.js?v=2026-10-11-0q1y"></script>
+<script src="confirmation.js?v=2026-10-11-0q1y"></script>
+<script src="photo-profil.js?v=2026-10-11-0q1y"></script>
+<script src="compte.js?v=2026-10-11-0q1y"></script>
+<script src="messagerie.js?v=2026-10-11-0q1y"></script>
+<script src="communaute.js?v=2026-10-11-0q1y"></script>
 <script>
 let ongletActif = 'connexion';
 let motDePasseOublie = false;
@@ -236,6 +239,7 @@ function rendre(){
     return;
   }
 
+  panel.classList.toggle('panel-profil', estConnecte());
   if(estConnecte()){
     panel.innerHTML = `
       <div class="kicker">Profil</div>
@@ -244,11 +248,14 @@ function rendre(){
         <div class="pseudo">${profil?.pseudo ?? 'Membre'}</div>
         <div class="detail">${membre.email}</div>
         <div class="detail">${profil?.contact ? 'Contact partagé : ' + profil.contact : 'Aucun moyen de contact renseigné'}</div>
-        <a class="voir-profil-public" href="profil.html">Voir mon profil public, mes badges et mes avis →</a>
+        <a class="voir-profil-public" href="profil.html">Voir mon profil tel que le voient les autres membres →</a>
       </div>
+
+      <div id="vitrine-profil"></div>
 
       <div id="photo-profil"></div>
 
+      <h2 class="titre-infos">Mes informations</h2>
       <label for="pseudo">Pseudo</label>
       <input id="pseudo" type="text" value="${profil?.pseudo ?? ''}">
 
@@ -280,6 +287,7 @@ function rendre(){
     `;
     afficherZone();
     afficherBloques();
+    afficherVitrine();
     afficherPhotoProfil(document.getElementById('photo-profil'), afficherEtatCompte);
     document.getElementById('btn-maj').addEventListener('click', enregistrerProfil);
     document.getElementById('btn-deconnexion').addEventListener('click', deconnexion);
@@ -519,6 +527,22 @@ document.addEventListener('click', async (e) => {
     messageZone("L'enregistrement a échoué : " + (err.message ?? err), 'err');
   }
 });
+
+// Ce que les autres voient de toi — chiffres, badges, avis reçus —, avec,
+// en plus, les badges qui restent à gagner. Tant que la base n'a pas reçu
+// supabase/communaute.sql, la page s'en passe sans rien dire.
+async function afficherVitrine(){
+  const zone = document.getElementById('vitrine-profil');
+  if(!zone || typeof vitrineHtml !== 'function') return;
+  try{
+    const [p, obtenus, avis] = await Promise.all([profilPublic(membre.id), badgesDe(membre.id), avisRecus(membre.id)]);
+    if(!p || !document.body.contains(zone)) return;
+    zone.innerHTML = vitrineHtml(p, obtenus, avis, { moi: true, complet: true });
+    brancherVitrine(zone, p, avis);
+  }catch(err){
+    if(!fonctionAbsente(err)) console.warn('Badges et avis indisponibles', err);
+  }
+}
 
 // Membres bloqués : la fenêtre de blocage annonce que c'est réversible, il
 // faut donc que ça le soit réellement.

@@ -101,6 +101,83 @@ async function signalerContenu({ membreId, objet, motif, messageId = null }){
   if(error) throw error;
 }
 
+// --------------------------------------------------- vitrine d'un profil --
+//
+// Chiffres, badges et avis reçus : ce que les autres voient d'un membre.
+// Affichée sur le profil d'un membre (profil.html) et, pour soi, dans
+// « Mon profil » (connexion.html).
+
+const FORMAT_JOUR_AVIS = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+// « complet » : tous les badges, ceux qui restent à gagner en gris — de
+// quoi donner envie. Sinon, seulement ceux obtenus, comme les voient les
+// autres.
+function badgesHtml(obtenus, complet){
+  const montres = complet ? BADGES : BADGES.filter(b => obtenus.has(b.cle));
+  if(!montres.length) return '<p class="vide-doux">Pas encore de badge.</p>';
+  return `<div class="badges">${montres.map(b => `
+    <div class="badge-collection ${obtenus.has(b.cle) ? '' : 'verrouille'}"
+         ${obtenus.has(b.cle) ? '' : 'aria-label="Badge à obtenir"'}>
+      <span class="icone" aria-hidden="true">${b.icone}</span>
+      <span><b>${b.nom}</b><small>${b.texte}</small></span>
+    </div>`).join('')}</div>`;
+}
+
+function avisHtml(liste, moi){
+  if(!liste.length) return `<p class="vide-doux">${moi
+    ? "Aucun avis pour l'instant. Après un échange, ton partenaire pourra en laisser un depuis votre discussion ou ton profil."
+    : "Aucun avis pour l'instant."}</p>`;
+  return `<ul class="liste-avis">${liste.map((a, i) => `
+    <li class="un-avis">
+      <a class="lien-profil" href="${lienProfil(a.auteur_id)}">${avatarHtml(a, 34)}</a>
+      <div style="flex:1;min-width:0">
+        <div class="tete-avis">
+          <a class="lien-profil" href="${lienProfil(a.auteur_id)}"><b class="nom-lien">${echapperCommun(a.pseudo)}</b></a>
+          <span>${a.note === 'positif' ? '👍 Bien passé' : '👎 Mal passé'}</span>
+          <span class="date">${FORMAT_JOUR_AVIS.format(new Date(a.maj_le))}</span>
+          ${a.auteur_id !== membre?.id ? `<button type="button" class="signaler-avis" data-avis="${i}">Signaler</button>` : ''}
+        </div>
+        ${a.commentaire ? `<p>${echapperCommun(a.commentaire)}</p>` : ''}
+      </div>
+    </li>`).join('')}</ul>`;
+}
+
+function vitrineHtml(p, obtenus, avis, { moi = false, complet = false } = {}){
+  const n = (nombre, un, plusieurs) => `${nombre > 1 ? plusieurs : un}`;
+  return `
+    <section class="chiffres" aria-label="En chiffres">
+      <div class="chiffre"><b>${p.nb_proposees}</b><span>${n(p.nb_proposees, 'carte proposée', 'cartes proposées')} à l'échange</span></div>
+      <div class="chiffre"><b>${p.nb_recherchees}</b><span>${n(p.nb_recherchees, 'carte recherchée', 'cartes recherchées')}</span></div>
+      <div class="chiffre"><b>${p.avis_positifs}</b><span>👍 ${n(p.avis_positifs, 'avis positif', 'avis positifs')}</span></div>
+      <div class="chiffre"><b>${p.avis_negatifs}</b><span>👎 ${n(p.avis_negatifs, 'avis négatif', 'avis négatifs')}</span></div>
+    </section>
+
+    <section class="bloc-profil" aria-labelledby="titre-badges">
+      <h2 id="titre-badges">${moi ? 'Mes badges' : 'Badges'} <small>${obtenus.size} sur ${BADGES.length}</small></h2>
+      ${badgesHtml(obtenus, complet)}
+    </section>
+
+    <section class="bloc-profil" aria-labelledby="titre-avis">
+      <h2 id="titre-avis">Avis reçus <small>${avis.length} avis</small></h2>
+      <p>Laissés par des membres qui ont échangé avec ${moi ? 'toi' : echapperCommun(p.pseudo)}.</p>
+      ${avisHtml(avis, moi)}
+    </section>`;
+}
+
+// Le bouton « Signaler » de chaque avis.
+function brancherVitrine(zone, p, avis){
+  zone.querySelectorAll('.signaler-avis').forEach(b => b.addEventListener('click', async () => {
+    const a = avis[Number(b.dataset.avis)];
+    const reponse = await demanderSignalement(a.pseudo, { objet: 'avis' });
+    if(!reponse) return;
+    try{
+      await signalerContenu({ membreId: a.auteur_id, objet: 'avis',
+        motif: `Avis laissé à ${p.pseudo} : « ${a.commentaire ?? (a.note === 'positif' ? '👍' : '👎')} » — ${reponse.motif}` });
+      annoncer("Signalement envoyé. Merci : l'administrateur va l'examiner.");
+    }catch(err){ annoncer(`Le signalement n'est pas parti : ${err.message}`, 'ko'); }
+  }));
+}
+
 // --------------------------------------------------------- fenêtres ------
 //
 // Une fenêtre au-dessus de la page, fermée par Échap, par le bouton
@@ -216,6 +293,37 @@ function annoncer(texte, type = 'ok'){
 }
 
 const STYLE_COMMUNAUTE = `
+  .chiffres{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 0}
+  .chiffre{padding:16px;border-radius:12px;background:rgba(var(--trait-rgb,237,234,224),0.04);border:1px solid rgba(var(--trait-rgb,237,234,224),0.08)}
+  .chiffre b{display:block;font-family:'Newsreader',serif;font-weight:500;font-size:30px;line-height:1.1}
+  .chiffre span{font-size:12.5px;color:var(--text-on-ink-dim,#9B9E9C)}
+  .bloc-profil{margin-top:38px}
+  .bloc-profil h2{font-family:'Newsreader',serif;font-weight:500;font-size:23px;margin:0 0 4px;display:flex;align-items:baseline;gap:10px}
+  .bloc-profil h2 small{font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--text-on-ink-dim,#9B9E9C);font-weight:400}
+  .bloc-profil > p{font-size:13.5px;color:var(--text-on-ink-dim,#9B9E9C);margin:0 0 14px}
+  .badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:12px}
+  .badge-collection{display:flex;gap:11px;align-items:flex-start;padding:13px;border-radius:12px;
+    border:1px solid rgba(var(--gold-rgb,201,162,39),0.35);background:rgba(var(--gold-rgb,201,162,39),0.08)}
+  .badge-collection .icone{font-size:26px;line-height:1;flex:none}
+  .badge-collection b{display:block;font-size:13.5px;font-weight:600}
+  .badge-collection small{display:block;font-size:11.5px;line-height:1.45;color:var(--text-on-ink-dim,#9B9E9C);margin-top:2px}
+  .badge-collection.verrouille{border-color:rgba(var(--trait-rgb,237,234,224),0.10);background:transparent}
+  .badge-collection.verrouille .icone{filter:grayscale(1);opacity:.4}
+  .badge-collection.verrouille b{color:var(--text-on-ink-dim,#9B9E9C)}
+  .liste-avis{list-style:none;margin:12px 0 0;padding:0}
+  .un-avis{display:flex;gap:12px;padding:14px 0;border-top:1px solid rgba(var(--trait-rgb,237,234,224),0.08)}
+  .un-avis .tete-avis{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px}
+  .un-avis .tete-avis b{font-weight:600}
+  .un-avis .date{font-size:12px;color:var(--text-on-ink-dim,#9B9E9C)}
+  .un-avis p{margin:5px 0 0;font-size:14px;line-height:1.55;overflow-wrap:anywhere}
+  .un-avis .signaler-avis{margin-left:auto;font:inherit;font-size:12px;background:none;border:0;cursor:pointer;
+    color:var(--text-on-ink-dim,#9B9E9C);text-decoration:underline;text-underline-offset:2px;padding:4px}
+  .un-avis .signaler-avis:hover{color:var(--alerte,#E08862)}
+  .vide-doux{font-size:14px;color:var(--text-on-ink-dim,#9B9E9C);padding:6px 0;margin:0}
+  @media(max-width:640px){ .chiffres{grid-template-columns:repeat(2,1fr)} }
+
+  .fenetre-communaute label{display:block;margin:0;font-size:inherit;color:inherit}
+  .fenetre-communaute input[type="radio"]{width:auto;min-height:0;padding:0;margin:0}
   .fenetre-communaute{border:0;padding:0;background:transparent;max-width:min(480px,calc(100vw - 32px));width:100%}
   .fenetre-communaute::backdrop{background:rgba(0,0,0,.55)}
   .fenetre-communaute .boite{background:var(--ink-soft,#20232A);color:var(--text-on-ink,#EDEAE0);border-radius:14px;
@@ -265,3 +373,7 @@ function poserStyleCommunaute(){
   document.head.appendChild(Object.assign(document.createElement('style'),
     { id: 'style-communaute', textContent: STYLE_COMMUNAUTE }));
 }
+
+// Posés dès le chargement : les noms cliquables et le résumé des avis des
+// listes (échanges, discussions) en ont besoin aussi.
+poserStyleCommunaute();
