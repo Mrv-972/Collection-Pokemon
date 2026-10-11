@@ -22,12 +22,21 @@ const LARGEUR = 220, HAUTEUR = 307, PAR_LIGNE = 4, LEGENDE = 22;
 const demandes = process.argv.slice(2).flatMap(a => a.split(/\s+/)).filter(Boolean)
   .map(a => { const i = a.indexOf('='); return { etiquette: a.slice(0, i), adresse: a.slice(i + 1) }; });
 
+// « --brut » : chaque image telle quelle, en pleine résolution, pour
+// l'étudier ailleurs (régler une lecture de texte, par exemple).
+const brut = process.env.BRUT === '1';
+
 const cases = [];
 for(const d of demandes){
   let image;
   try{
     const r = await fetch(d.adresse, { headers: IDENTITE });
     console.log(`${d.etiquette} : ${r.status} ${r.headers.get('content-type') ?? ''} ${d.adresse}`);
+    if(r.ok && brut){
+      const octets = Buffer.from(await r.arrayBuffer()).toString('base64');
+      octets.match(/.{1,6000}/g).forEach((m, i) => console.log(`IMAGE ${d.etiquette} ${String(i).padStart(3, '0')} ${m}`));
+      continue;
+    }
     if(r.ok) image = await sharp(Buffer.from(await r.arrayBuffer()))
       .resize(LARGEUR, HAUTEUR, { fit: 'contain', background: '#222' }).toBuffer();
   }catch(err){ console.log(`${d.etiquette} : ÉCHEC ${err.message}`); }
@@ -37,6 +46,7 @@ for(const d of demandes){
   cases.push(image, legende);
 }
 
+if(brut) process.exit(0);
 const lignes = Math.ceil(demandes.length / PAR_LIGNE);
 const composition = [];
 demandes.forEach((_, i) => {

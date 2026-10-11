@@ -9,6 +9,10 @@ on:
       adresses:
         description: "Liste « étiquette=adresse », séparées par des espaces"
         required: true
+      brut:
+        description: "Images brutes, en pleine résolution, au lieu d'une planche"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -29,4 +33,5 @@ jobs:
       - name: Assembler
         env:
           ADRESSES: ${{ inputs.adresses }}
+          BRUT: ${{ inputs.brut && '1' || '0' }}
         run: node outils/planche-visuels.mjs "$ADRESSES"
