@@ -81,7 +81,7 @@ const STYLE_THEME = `
     --dim:#5D6168;
     --trait-rgb:30,33,39;
     --trait:rgba(30,33,39,0.16);
-    --gold:#8A6A0C; --gold-rgb:138,106,12; --accent-clair:#77590A;
+    --gold:#6B5005; --gold-rgb:107,80,5; --accent-clair:#5E4604;
     --teal:#1F6F63; --teal-deep:#123F38;
     --rust:#A8431C;
     --alerte:#A8431C;
@@ -90,7 +90,7 @@ const STYLE_THEME = `
     --rouge-doux:#A8431C;
   }
   html[data-theme="clair"][data-univers="pocket"]{
-    --gold:#22609E; --gold-rgb:34,96,158; --accent-clair:#1B528A;
+    --gold:#1A5389; --gold-rgb:26,83,137; --accent-clair:#16497A;
   }
   html[data-theme="clair"] body{background:var(--ink);color:var(--text-on-ink)}
   html[data-theme="clair"] ::placeholder{color:#7C8087}

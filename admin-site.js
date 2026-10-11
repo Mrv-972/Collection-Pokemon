@@ -538,6 +538,11 @@ function poserStyle(){
     min-height:220px;border:2px dashed rgba(201,162,39,.5);border-radius:12px;background:rgba(201,162,39,.05);
     color:#E3C766;font-size:14px}
   .admin-ajout-carte span:first-child{font-size:34px;line-height:1}
+  /* Posés sur la page, ces boutons suivent son thème : l'or clair du
+     sombre, sur fond crème, n'avait plus qu'un contraste de 1,5 pour 1. */
+  html[data-theme="clair"] .admin-sur-extension,html[data-theme="clair"] .admin-sur-serie,
+  html[data-theme="clair"] .admin-ajout-extension{color:#5E4604;border-color:rgba(107,80,5,.55);background:rgba(107,80,5,.08)}
+  html[data-theme="clair"] .admin-ajout-carte{color:#5E4604;border-color:rgba(107,80,5,.45);background:rgba(107,80,5,.05)}
 
   .admin-fenetre{border:1px solid rgba(201,162,39,.45);border-radius:14px;padding:0;
     background:#1B1E24;color:#EDEAE0;width:min(620px,calc(100vw - 32px));max-height:calc(100vh - 48px)}

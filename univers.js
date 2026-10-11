@@ -304,6 +304,27 @@ const STYLE_RAIL = `
     .rail-logo{display:none}
     .rail:hover .rail-badge-a-venir,.rail:focus-within .rail-badge-a-venir{margin-top:0;font-size:10px;padding:5px 8px}
   }
+  /* ===================== Mode clair =====================
+     Le rail était dessiné pour le sombre : sur fond crème, le jaune du
+     physique tombait à un contraste de 2 pour 1, et les onglets inactifs,
+     à 42 % d'opacité, s'effaçaient presque. En clair, le rail prend un fond
+     légèrement plus soutenu que la page et une vraie bordure ; les teintes
+     sont assombries jusqu'à un contraste lisible, et l'onglet inactif ne
+     descend plus qu'à 80 %. */
+  html[data-theme="clair"] .rail{background:#E7E0D0;border-right:1px solid rgba(30,33,39,0.16)}
+  html[data-theme="clair"] .rail-item[data-cible="physique"]{--teinte:#6B5005;--teinte-rgb:107,80,5;}
+  html[data-theme="clair"] .rail-item[data-cible="pocket"]  {--teinte:#1A5389;--teinte-rgb:26,83,137;}
+  html[data-theme="clair"] .rail-item{opacity:.8}
+  html[data-theme="clair"] .rail-item.on{opacity:1;background:rgba(var(--teinte-rgb),0.13)}
+  html[data-theme="clair"] .rail-item + .rail-item{border-top-color:rgba(30,33,39,0.14)}
+  html[data-theme="clair"] .rail-nom{font-weight:600}
+  html[data-theme="clair"] .a-venir-onglet svg,html[data-theme="clair"] .a-venir-onglet .rail-nom{opacity:.85}
+  html[data-theme="clair"] .rail:hover .rail-item,html[data-theme="clair"] .rail:focus-within .rail-item{opacity:.9}
+  html[data-theme="clair"] .rail:hover .rail-item.on,html[data-theme="clair"] .rail:focus-within .rail-item.on{opacity:1}
+  @media(max-width:720px){
+    html[data-theme="clair"] .rail{border-right:none;border-bottom:1px solid rgba(30,33,39,0.16)}
+    html[data-theme="clair"] .rail-item + .rail-item{border-left-color:rgba(30,33,39,0.14)}
+  }
 `;
 
 function ongletDUnivers(u){
