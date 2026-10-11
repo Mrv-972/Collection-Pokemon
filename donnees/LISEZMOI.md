@@ -13,7 +13,12 @@ une API pendant que le visiteur attend. Il est reconstruit chaque nuit par
     physique/extensions.json  le catalogue du jeu de cartes physique
     physique/sets/<id>.json   les cartes d'une extension
     physique/dex/<n>.json     les cartes d'un Pokémon, par numéro de Pokédex
+    physique/autres.json      les cartes qui ne sont pas des Pokémon (Supporters,
+                              Objets, Outils, Stades, Énergies), une ligne par nom
+    physique/autres/<clé>.json  les cartes d'un de ces noms
     pocket/…                  les mêmes, pour l'application mobile
+    noms-pocket-fr.json       le dernier nom français connu de chaque carte de
+                              l'application, repris quand la source n'en a plus
 
 ## D'où viennent ces données
 

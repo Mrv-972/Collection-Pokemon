@@ -601,6 +601,26 @@ async function cartesDuPokemon(dexId){
   return corrigerCartes(await cartesDuPokemonBrutes(dexId));
 }
 
+// Les cartes qui ne sont pas des Pokémon — Supporters, Objets, Outils,
+// Stades, Énergies — sont rangées par nom dans l'instantané, comme celles
+// d'un Pokémon le sont par son numéro : un index, puis un fichier par nom.
+// Sans instantané, pas de rangement : la liste est simplement vide.
+async function listerAutresCartes(){
+  try{
+    return await lireInstantane(`${universActuel().cle}/autres.json`);
+  }catch(err){
+    return [];
+  }
+}
+
+async function cartesDuNom(cle){
+  try{
+    return corrigerCartes(await lireInstantane(`${universActuel().cle}/autres/${encodeURIComponent(cle)}.json`));
+  }catch(err){
+    return [];
+  }
+}
+
 // Une extension ajoutée à la main n'existe dans aucun instantané : la
 // chercher dans la liste corrigée est le seul moyen de lui donner une page.
 async function lireExtension(setId){

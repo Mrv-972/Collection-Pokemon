@@ -125,6 +125,26 @@ function premierDexId(source){
   return Number.isFinite(n) ? n : null;
 }
 
+// La catégorie d'une carte, d'après TCGdex. Rien pour un Pokémon — neuf
+// cartes sur dix, inutile d'alourdir chaque fichier d'un champ évident —,
+// sinon « dresseur » ou « energie », et la famille : supporter, objet,
+// outil, stade ; énergie de base ou spéciale. La page « Par Pokémon » s'en
+// sert pour chercher aussi les dresseurs, les objets et les énergies.
+const FAMILLES_DRESSEUR = {
+  'Supporter': 'supporter', 'Item': 'objet', 'Tool': 'outil', 'Stadium': 'stade',
+  'Technical Machine': 'objet', "Rocket's Secret Machine": 'objet',
+};
+function categorieDeCarte(source){
+  const categorie = champTexte(source, 'category');
+  if(categorie === 'Trainer'){
+    const famille = FAMILLES_DRESSEUR[champTexte(source, 'trainerType')];
+    return famille ? { categorie: 'dresseur', famille } : { categorie: 'dresseur' };
+  }
+  if(categorie === 'Energy')
+    return { categorie: 'energie', famille: champTexte(source, 'energyType') === 'Special' ? 'speciale' : 'base' };
+  return {};
+}
+
 // ------------------------------------------------------------ physique ---
 
 async function lireTraductionsRaretes(){
@@ -145,6 +165,10 @@ async function construirePhysique(){
   const traductions = new Map();
   // Les extensions de l'application dont TCGdex a les visuels français.
   const pocketChezTcgdex = new Set();
+  // Et la catégorie de leurs cartes, que l'autre source ne donne pas, ainsi
+  // que leurs noms officiels dans les deux langues.
+  const categoriesPocket = new Map();
+  const nomsPocket = new Map();
 
   for(const serie of entrees.filter(e => e.isDirectory())){
     const ficheSerie = path.join(racine, `${serie.name}.ts`);
@@ -167,6 +191,19 @@ async function construirePhysique(){
       // en français, là où l'autre source n'héberge que l'anglais.
       if(/^[A-Z]\d/.test(setId) || /^P-[A-Z]$/.test(setId)){
         pocketChezTcgdex.add(setId);
+        const dossier = path.join(racine, serie.name, ext.name);
+        if(existsSync(dossier)){
+          for(const fichier of (await readdir(dossier)).filter(f => f.endsWith('.ts'))){
+            const numero = parseInt(fichier, 10);
+            if(!Number.isFinite(numero)) continue;
+            const source = await readFile(path.join(dossier, fichier), 'utf8');
+            const id = `${setId}-${String(numero).padStart(3, '0')}`;
+            const categorie = categorieDeCarte(source);
+            if(categorie.categorie) categoriesPocket.set(id, categorie);
+            const nom = nomTraduit(source);
+            if(nom.fr && nom.en) nomsPocket.set(id, nom);
+          }
+        }
         continue;
       }
       const nomSet = nomTraduit(sourceSet);
@@ -202,6 +239,7 @@ async function construirePhysique(){
           name: nom.fr || nom.en || localId,
           rarity: rarete ? (raretesFr[rarete] ?? rarete) : null,
           dexId: premierDexId(source),
+          ...categorieDeCarte(source),
           image: `${base('fr')}/${localId}/low.webp`,
           imageHaute: `${base('fr')}/${localId}/high.webp`,
           // Toutes les cartes n'ont pas de visuel français : l'anglais prend
@@ -215,7 +253,7 @@ async function construirePhysique(){
   }
 
   extensions.sort((a, b) => String(a.dateSortie ?? '').localeCompare(String(b.dateSortie ?? '')));
-  return { extensions, cartesParSet, traductions, pocketChezTcgdex };
+  return { extensions, cartesParSet, traductions, pocketChezTcgdex, categoriesPocket, nomsPocket };
 }
 
 // -------------------------------------------------------------- Pocket ---
@@ -279,6 +317,38 @@ async function telecharger(adresse){
 
 const aplatir = donnees => Array.isArray(donnees) ? donnees : Object.values(donnees).flat();
 
+// Le 5 octobre 2026, la source a publié ses fichiers « français » remplis de
+// noms anglais : Bulbizarre est devenu Bulbasaur, et les trois quarts des
+// cartes ont perdu leur Pokémon. Le site ne doit plus dépendre d'un tel faux
+// pas. On retient donc le dernier nom français connu de chaque carte, avec
+// son nom anglais pour contrôle (si la source renumérotait une extension,
+// le nom anglais ne correspondrait plus et le souvenir serait écarté).
+//
+// Pour chaque carte, dans l'ordre :
+//   1. le nom officiel de TCGdex, quand il connaît l'extension ;
+//   2. celui du fichier français de la source, s'il est vraiment français ;
+//   3. le souvenir ;
+//   4. à défaut, la traduction automatique — signalée au visiteur.
+const MEMOIRE_NOMS_POCKET = 'noms-pocket-fr.json';
+const apostrophes = nom => String(nom ?? '').replace(/[\u2018\u2019]/g, "'").trim();
+
+async function lireMemoireNoms(){
+  try{
+    const { noms } = JSON.parse(await readFile(path.join('donnees', MEMOIRE_NOMS_POCKET), 'utf8'));
+    return new Map(Object.entries(noms ?? {}));
+  }catch{ return new Map(); }
+}
+
+async function ecrireMemoireNoms(memoire){
+  const noms = Object.fromEntries([...memoire].sort(([a], [b]) => a.localeCompare(b)));
+  await ecrire(SORTIE, MEMOIRE_NOMS_POCKET, {
+    note: "Le dernier nom français connu de chaque carte de l'application, avec son nom anglais pour contrôle. "
+      + "La source des cartes Pocket a perdu ses traductions le 5 octobre 2026 ; outils/instantane.mjs s'en sert "
+      + "quand elle en manque, et la tient à jour à chaque passage.",
+    noms,
+  });
+}
+
 // La source de l'application traduit ses fichiers avec un temps de retard :
 // la dernière extension parue n'existe qu'en anglais. Plutôt que de l'afficher
 // telle quelle sur un site français, on traduit ce qu'on peut grâce au
@@ -295,6 +365,15 @@ function traduireNom(nom, traductions, nomsFrancais){
 
   const connu = traductions.get(base) ?? (nomsFrancais.has(base) ? base : null);
   if(connu) return recoller(connu);
+
+  // « Mega Sceptile ex » se dit « Méga-Jungko-ex », convention des cartes
+  // de l'application déjà traduites ; « Mega Charizard X ex » donne
+  // « Méga-Dracaufeu-X-ex ».
+  const mega = base.match(/^Mega\s+(.+?)(?:\s+([XY]))?$/);
+  if(mega){
+    const pokemon = traductions.get(mega[1]) ?? (nomsFrancais.has(mega[1]) ? mega[1] : null);
+    if(pokemon) return recoller(`Méga-${pokemon}${mega[2] ? `-${mega[2]}` : ''}`);
+  }
 
   // « Team Rocket's Persian ex » se dit « Persian-ex de la Team Rocket » —
   // convention relevée sur les cartes physiques, pas inventée ici. On ne
@@ -332,8 +411,19 @@ function trierExtensionsPocket(extensions){
   return extensions;
 }
 
-async function construirePocket(traductions = new Map(), nomsFrancais = new Set(), chezTcgdex = new Set()){
+async function construirePocket(traductions = new Map(), nomsFrancais = new Set(), chezTcgdex = new Set(),
+                                categories = new Map(), nomsTcgdex = new Map()){
   const parSerie = await telecharger(`${POCKET_BASE}/sets.json`);
+  const memoire = await lireMemoireNoms();
+  // Les noms des cartes de l'application que TCGdex connaît enrichissent le
+  // dictionnaire : « Copycat » s'y dit « Copieuse », ce que les cartes
+  // physiques n'apprennent pas.
+  // La mémoire aussi : une extension de réimpressions, comme les boosters
+  // de luxe, reprend des cartes dont on connaît déjà le nom français.
+  const nomsDeLApplication = new Map();
+  for(const [en, fr] of memoire.values()) nomsDeLApplication.set(apostrophes(en), fr);
+  for(const { en, fr } of nomsTcgdex.values()) nomsDeLApplication.set(apostrophes(en), fr);
+  const dictionnaire = new Map([...traductions, ...nomsDeLApplication]);
 
   const extensions = [];
   for(const [lettre, liste] of Object.entries(parSerie)){
@@ -355,45 +445,62 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
 
   const cartesParSet = new Map();
   for(const ext of extensions){
-    // On lit les fichiers par extension, et non le fichier français agrégé :
-    // celui-ci contient aujourd'hui des noms anglais, alors que les fichiers
-    // par extension sont bien traduits. C'est le contrôle de fin de script
-    // qui l'a révélé, en refusant de publier un instantané où les trois
-    // quarts des cartes ne trouvaient plus leur Pokémon.
-    const chemins = [
-      `${POCKET_BASE}/cards/fr/${encodeURIComponent(ext.codeDistant)}.min.json`,
-      `${POCKET_BASE}/cards/${encodeURIComponent(ext.codeDistant)}.min.json`,
-    ];
+    // Le fichier anglais fait foi pour la liste des cartes et sert de
+    // contrôle ; le fichier français, quand il existe, n'apporte que les
+    // noms — et seulement s'il est vraiment en français : celui d'octobre
+    // 2026 répétait l'anglais mot pour mot.
+    const code = encodeURIComponent(ext.codeDistant);
     let brutes = [];
-    let francaisTrouve = false;
-    for(const chemin of chemins){
-      try{
-        brutes = aplatir(await telecharger(chemin));
-        if(brutes.length){ francaisTrouve = chemin.includes('/cards/fr/'); break; }
-      }catch(err){ /* on tente le suivant */ }
-    }
+    try{ brutes = aplatir(await telecharger(`${POCKET_BASE}/cards/${code}.min.json`)); }catch(err){ /* vide */ }
+    const anglaisLu = brutes.length > 0;
+    let enFrancaisSource = new Map();
+    try{
+      const fr = aplatir(await telecharger(`${POCKET_BASE}/cards/fr/${code}.min.json`));
+      const anglais = new Map(brutes.map(c => [c.number, c.name]));
+      const identiques = fr.filter(c => anglais.get(c.number) === c.name).length;
+      if(fr.length && identiques <= fr.length * 0.6) enFrancaisSource = new Map(fr.map(c => [c.number, c.name]));
+      else if(fr.length) console.log(`  ${ext.id} : le fichier français de la source est en anglais, on s'en passe`);
+      if(!brutes.length) brutes = fr;
+    }catch(err){ /* pas de fichier français */ }
     if(brutes.length === 0) console.warn(`  ! aucune carte pour ${ext.id}`);
-    // Le fichier français de cette extension manquait : on est tombé sur
-    // l'anglais, qu'on traduit au mieux.
-    const aTraduire = !francaisTrouve;
-    let traduites = 0;
+    let traduites = 0, officiels = 0, deLaSource = 0, souvenirs = 0, reprises = 0;
     const enFrancais = chezTcgdex.has(ext.id);
     // Le site le dira : pour ces extensions, aucune source ne propose le
     // visuel français, donc le texte imprimé sur la carte reste en anglais.
     if(!enFrancais) ext.visuelsAnglais = true;
     const cartes = brutes.slice().sort((a, b) => a.number - b.number).map(c => {
       const numero = String(c.number).padStart(3, '0');
-      let nom = c.name;
-      if(aTraduire){
-        const essai = traduireNom(nom, traductions, nomsFrancais);
-        if(essai !== nom){ nom = essai; traduites++; }
+      const id = `${ext.id}-${numero}`;
+      const anglais = c.name;
+      const tcgdex = nomsTcgdex.get(id);
+      const souvenir = memoire.get(id);
+      let nom;
+      if(tcgdex && apostrophes(tcgdex.en) === apostrophes(anglais)){ nom = tcgdex.fr; officiels++; }
+      else if(enFrancaisSource.has(c.number)){ nom = enFrancaisSource.get(c.number); deLaSource++; }
+      else if(souvenir && apostrophes(souvenir[0]) === apostrophes(anglais)){ nom = souvenir[1]; souvenirs++; }
+      // Une réimpression : une carte de l'application portait déjà ce nom
+      // anglais, son nom français est connu.
+      else if(nomsDeLApplication.has(apostrophes(anglais))){ nom = nomsDeLApplication.get(apostrophes(anglais)); reprises++; }
+      else{
+        nom = traduireNom(anglais, dictionnaire, nomsFrancais);
+        if(nom === anglais) nom = traduireNom(apostrophes(anglais), dictionnaire, nomsFrancais);
+        if(nom !== anglais) traduites++;
       }
+      // Un nom sûr rejoint la mémoire ; une traduction automatique, jamais —
+      // ni un nom dont on n'a pas lu la version anglaise pour contrôle.
+      if(anglaisLu && ((tcgdex && nom === tcgdex.fr) || enFrancaisSource.has(c.number))) memoire.set(id, [anglais, nom]);
+      // La catégorie vient de TCGdex quand il connaît l'extension ; sinon, le
+      // nom du fichier image dit au moins si c'est une carte Dresseur
+      // (« cTR_… ») — sa famille se déduira des cartes du même nom.
+      const categorie = categories.get(id)
+        ?? (/^cTR_/.test(String(c.image ?? '')) ? { categorie: 'dresseur' } : {});
       return {
-      id: `${ext.id}-${String(c.number).padStart(3, '0')}`,
+      id,
       localId: String(c.number),
       name: nom,
       rarity: RARETES_POCKET[c.rarity] ?? null,
       dexId: null,                     // absent de cette source, déduit ensuite
+      ...categorie,
       image: enFrancais
         ? `${TCGDEX_POCKET}/${ext.id}/${numero}/low.webp`
         : `${POCKET_IMAGES}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
@@ -405,15 +512,18 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
       imageSecours: `${POCKET_IMAGES}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
       };
     });
-    if(aTraduire){
-      console.log(`  ${ext.id} : source anglaise, ${traduites}/${cartes.length} noms traduits`);
-      // Le site le dira au visiteur : ces noms sont une reconstruction, pas
-      // les noms officiels.
+    // Les cartes qui n'ont reçu ni nom sûr ni souvenir : le site le dira au
+    // visiteur, ces noms-là sont une reconstruction, pas les noms officiels.
+    const sansNomSur = cartes.length - officiels - deLaSource - souvenirs - reprises;
+    if(sansNomSur > 0){
+      console.log(`  ${ext.id} : ${officiels} noms TCGdex, ${souvenirs} retrouvés en mémoire, ` +
+        `${reprises} réimpressions, ${traduites}/${sansNomSur} traduits automatiquement`);
       ext.traductionAutomatique = { traduits: traduites, total: cartes.length };
     }
     cartesParSet.set(ext.id, cartes);
     delete ext.codeDistant;
   }
+  await ecrireMemoireNoms(memoire);
   return { extensions, cartesParSet };
 }
 
@@ -1222,7 +1332,76 @@ async function ecrire(dossier, nom, donnees){
   await writeFile(path.join(dossier, nom), JSON.stringify(donnees), 'utf8');
 }
 
-async function publier(univers, { extensions, cartesParSet }, sortie){
+// La clé d'un nom de carte, pour un nom de fichier : « Poké Ball » et
+// « Poke Ball » se retrouvent ensemble.
+const cleDeNom = nom => String(nom ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/œ/gi, 'oe').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80);
+
+// Une Énergie de base porte, selon l'extension, « Énergie Obscurité »,
+// « Énergie Darkness de base » ou « Darkness Energy » : c'est la même carte
+// pour qui la cherche. Son type se lit toujours dans le nom ; on les range
+// donc sous un seul nom par type.
+const TYPES_ENERGIE = [
+  [/\bfeu\b|\bfire\b/i, 'Feu'], [/\beau\b|\bwater\b/i, 'Eau'], [/plante|\bgrass\b/i, 'Plante'],
+  [/[ée]lectri|electrik|lightning/i, 'Électrique'], [/\bpsy|psychic/i, 'Psy'], [/combat|fighting/i, 'Combat'],
+  [/obscurit|darkness|\bdark\b/i, 'Obscurité'], [/m[ée]tal/i, 'Métal'], [/\bf[ée]e\b|fairy/i, 'Fée'],
+];
+function nomDeRangement(carte){
+  if(carte.categorie !== 'energie' || carte.famille !== 'base') return null;
+  const type = TYPES_ENERGIE.find(([motif]) => motif.test(carte.name));
+  return type ? `Énergie ${type[1]}` : null;
+}
+
+// Les cartes qui ne sont pas des Pokémon — dresseurs, objets, stades,
+// énergies —, rangées par nom, comme les cartes d'un Pokémon le sont par son
+// numéro. Une carte sans famille connue (les plus anciennes, les toutes
+// dernières de l'application) prend celle des cartes du même nom.
+function rangerAutresCartes(extensions, cartesParSet, famillesConnues = new Map()){
+  const rang = new Map(extensions.map((e, i) => [e.id, i]));
+  const parNom = new Map();
+  for(const [setId, cartes] of cartesParSet){
+    for(const carte of cartes){
+      if(!carte.categorie) continue;
+      const cle = cleDeNom(nomDeRangement(carte) ?? carte.name);
+      if(!cle) continue;
+      if(!parNom.has(cle)) parNom.set(cle, []);
+      parNom.get(cle).push({ carte, rang: rang.get(setId) ?? -1 });
+    }
+  }
+  // Une carte sans catégorie ni Pokémon (saisie à la main, image au nom
+  // inattendu) qui porte le nom d'une carte Dresseur connue en est une.
+  for(const [setId, cartes] of cartesParSet){
+    for(const carte of cartes){
+      if(carte.categorie || carte.dexId) continue;
+      const lot = parNom.get(cleDeNom(carte.name));
+      if(!lot) continue;
+      carte.categorie = lot[0].carte.categorie;
+      lot.push({ carte, rang: rang.get(setId) ?? -1 });
+    }
+  }
+  const index = [];
+  for(const [cle, lot] of parNom){
+    const majoritaire = champ => {
+      const compte = new Map();
+      for(const { carte } of lot) if(carte[champ]) compte.set(carte[champ], (compte.get(carte[champ]) ?? 0) + 1);
+      return [...compte].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
+    };
+    const categorie = majoritaire('categorie');
+    // À défaut, la famille d'une carte du même nom dans l'autre univers :
+    // « Cornélia » est une Supporter dans les deux jeux.
+    const famille = majoritaire('famille') ?? famillesConnues.get(cle) ?? null;
+    for(const { carte } of lot) if(!carte.famille && famille && carte.categorie === categorie) carte.famille = famille;
+    lot.sort((a, b) => b.rang - a.rang);
+    index.push({
+      cle, nom: nomDeRangement(lot[0].carte) ?? majoritaire('name'), categorie, famille, nb: lot.length,
+      image: lot[0].carte.image, imageSecours: lot[0].carte.imageSecours ?? null,
+      cartes: lot.map(x => x.carte),
+    });
+  }
+  return index.sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
+}
+
+async function publier(univers, { extensions, cartesParSet }, sortie, autres = []){
   const base = path.join(sortie, univers);
   await rm(base, { recursive: true, force: true });
 
@@ -1252,7 +1431,9 @@ async function publier(univers, { extensions, cartesParSet }, sortie){
   for(const [dexId, cartes] of parDex){
     await ecrire(path.join(base, 'dex'), `${dexId}.json`, cartes);
   }
-  return { extensions: extensions.length, cartes: total, pokemon: parDex.size };
+  for(const entree of autres) await ecrire(path.join(base, 'autres'), `${entree.cle}.json`, entree.cartes);
+  await ecrire(base, 'autres.json', autres.map(({ cartes, ...entree }) => entree));
+  return { extensions: extensions.length, cartes: total, pokemon: parDex.size, autres: autres.length };
 }
 
 // ------------------------------------------------------------ contrôle ---
@@ -1282,7 +1463,8 @@ async function principal(){
   const { dexDuNomDeCarte, POKEDEX_FR } = await chargerRegleDuPokedex();
 
   console.log("Application — téléchargement du jeu de données…");
-  const pocket = await construirePocket(physique.traductions, new Set(POKEDEX_FR), physique.pocketChezTcgdex);
+  const pocket = await construirePocket(physique.traductions, new Set(POKEDEX_FR), physique.pocketChezTcgdex,
+    physique.categoriesPocket, physique.nomsPocket);
 
   await fusionnerExtensionsManuelles(pocket, dexDuNomDeCarte);
 
@@ -1290,7 +1472,9 @@ async function principal(){
   let rattachees = 0, orphelines = 0;
   for(const cartes of pocket.cartesParSet.values()){
     for(const carte of cartes){
-      carte.dexId = dexDuNomDeCarte(carte.name);
+      // Une carte Dresseur ne représente pas le Pokémon qu'elle nomme :
+      // « Carapuce à O » est un Objet, pas une carte de Carapuce.
+      carte.dexId = carte.categorie ? null : dexDuNomDeCarte(carte.name);
       carte.dexId ? rattachees++ : orphelines++;
     }
   }
@@ -1379,11 +1563,18 @@ async function principal(){
       `${visuelAnglais.size} au visuel anglais (${marquees} posés)`);
   }catch{ console.log('Pas de classement des cartes sans visuel français : aucun bandeau de langue.'); }
 
-  const bilanPhysique = await publier('physique', physique, SORTIE);
-  const bilanPocket = await publier('pocket', pocket, SORTIE);
+  // Le rangement des cartes Dresseur et Énergie passe avant l'écriture des
+  // extensions : il complète la famille des cartes qui n'en avaient pas.
+  const autresPhysique = rangerAutresCartes(physique.extensions, physique.cartesParSet);
+  const autresPocket = rangerAutresCartes(pocket.extensions, pocket.cartesParSet,
+    new Map(autresPhysique.filter(e => e.famille).map(e => [e.cle, e.famille])));
+  const bilanPhysique = await publier('physique', physique, SORTIE, autresPhysique);
+  const bilanPocket = await publier('pocket', pocket, SORTIE, autresPocket);
 
-  verifier('physique', bilanPhysique, { extensions: 150, cartes: 15000, pokemon: 700 });
-  verifier('pocket', bilanPocket, { extensions: 20, cartes: 3000, pokemon: 300 });
+  verifier('physique', bilanPhysique, { extensions: 150, cartes: 15000, pokemon: 700, autres: 500 });
+  // 986 Pokémon rattachés en septembre 2026, 343 lors du faux pas de la
+  // source en octobre : le seuil passe à 800 pour qu'un tel recul bloque.
+  verifier('pocket', bilanPocket, { extensions: 20, cartes: 3000, pokemon: 800, autres: 50 });
 
   await ecrire(SORTIE, 'version.json', {
     genere_le: new Date().toISOString(),
@@ -1396,8 +1587,8 @@ async function principal(){
   });
 
   console.log('\nInstantané publié :');
-  console.log(`  physique  ${bilanPhysique.extensions} extensions · ${bilanPhysique.cartes} cartes · ${bilanPhysique.pokemon} Pokémon`);
-  console.log(`  pocket    ${bilanPocket.extensions} extensions · ${bilanPocket.cartes} cartes · ${bilanPocket.pokemon} Pokémon`);
+  console.log(`  physique  ${bilanPhysique.extensions} extensions · ${bilanPhysique.cartes} cartes · ${bilanPhysique.pokemon} Pokémon · ${bilanPhysique.autres} autres noms`);
+  console.log(`  pocket    ${bilanPocket.extensions} extensions · ${bilanPocket.cartes} cartes · ${bilanPocket.pokemon} Pokémon · ${bilanPocket.autres} autres noms`);
 }
 
 principal().catch(err => { console.error('Échec :', err.message); process.exit(1); });

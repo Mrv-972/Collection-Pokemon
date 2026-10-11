@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-11-w37z"></script>
+<script src="theme.js?v=2026-10-11-vw8f"></script>
 <title>Pokémon — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,6 +40,10 @@
   .page-head .sprite img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;}
   .page-head h1{font-size:30px;}
   .page-head .meta{color:var(--text-on-ink-dim);font-size:14px;margin-top:6px;}
+  /* Une carte Dresseur ou Énergie n'a pas de sprite : sa vignette la plus
+     récente en tient lieu. */
+  .page-head .sprite.vignette{width:60px;height:84px;border-radius:4px;overflow:hidden}
+  .page-head .sprite.vignette img{object-fit:cover;image-rendering:auto}
 
   .toolbar{display:flex;gap:10px;padding-bottom:30px;flex-wrap:wrap;align-items:center;}
   .toolbar input{flex:1;min-width:180px;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
@@ -182,7 +186,7 @@
     <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
   </nav>
 
-  <div class="breadcrumb"><a href="pokemon.html">← Tous les Pokémon</a></div>
+  <div class="breadcrumb"><a href="pokemon.html" id="retour">← Tous les Pokémon</a></div>
 
   <div class="page-head" id="page-head">
     <h1>Chargement…</h1>
@@ -224,26 +228,43 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-w37z"></script>
-<script src="catalogue.js?v=2026-10-11-w37z"></script>
-<script src="pokedex-fr.js?v=2026-10-11-w37z"></script>
-<script src="sets.js?v=2026-10-11-w37z"></script>
-<script src="supabase-config.js?v=2026-10-11-w37z"></script>
-<script src="pied.js?v=2026-10-11-w37z"></script>
-<script src="admin.js?v=2026-10-11-w37z"></script>
-<script src="admin-site.js?v=2026-10-11-w37z"></script>
-<script src="confirmation.js?v=2026-10-11-w37z"></script>
-<script src="tags.js?v=2026-10-11-w37z"></script>
-<script src="raretes.js?v=2026-10-11-w37z"></script>
-<script src="progression.js?v=2026-10-11-w37z"></script>
-<script src="cards.js?v=2026-10-11-w37z"></script>
-<script src="prix.js?v=2026-10-11-w37z"></script>
-<script src="compte.js?v=2026-10-11-w37z"></script>
+<script src="univers.js?v=2026-10-11-vw8f"></script>
+<script src="catalogue.js?v=2026-10-11-vw8f"></script>
+<script src="pokedex-fr.js?v=2026-10-11-vw8f"></script>
+<script src="sets.js?v=2026-10-11-vw8f"></script>
+<script src="supabase-config.js?v=2026-10-11-vw8f"></script>
+<script src="pied.js?v=2026-10-11-vw8f"></script>
+<script src="admin.js?v=2026-10-11-vw8f"></script>
+<script src="admin-site.js?v=2026-10-11-vw8f"></script>
+<script src="confirmation.js?v=2026-10-11-vw8f"></script>
+<script src="tags.js?v=2026-10-11-vw8f"></script>
+<script src="raretes.js?v=2026-10-11-vw8f"></script>
+<script src="progression.js?v=2026-10-11-vw8f"></script>
+<script src="cards.js?v=2026-10-11-vw8f"></script>
+<script src="prix.js?v=2026-10-11-vw8f"></script>
+<script src="compte.js?v=2026-10-11-vw8f"></script>
 <script>
 // Toutes les cartes d'un Pokémon, toutes extensions confondues, à partir de
-// son numéro du Pokédex national passé dans l'URL (?dex=25).
+// son numéro du Pokédex national passé dans l'URL (?dex=25) — ou toutes les
+// cartes d'un même nom quand ce n'est pas un Pokémon : un Supporter, un
+// Objet, un Stade, une Énergie (?carte=poke-ball, la clé de son nom dans
+// l'instantané).
 const params = new URLSearchParams(window.location.search);
+const cleCarte = (params.get('carte') || '').trim();
 const dexId = Number(params.get('dex')) || 25; // Pikachu par défaut
+let ficheNom = null; // l'entrée de l'index des noms, en mode ?carte=
+
+// Le genre d'une carte qui n'est pas un Pokémon, tel que l'affiche la page
+// « Par Pokémon » : il sert à l'en-tête et au lien de retour.
+const GENRES = {
+  supporter: { libelle: 'Supporter', onglet: 'Supporters' },
+  objet:     { libelle: 'Objet',     onglet: 'Objets' },
+  outil:     { libelle: 'Outil',     onglet: 'Outils' },
+  stade:     { libelle: 'Stade',     onglet: 'Stades' },
+  energie:   { libelle: 'Énergie',   onglet: 'Énergies' },
+  aclasser:  { libelle: 'Dresseur',  onglet: 'Autres Dresseurs' },
+};
+const genreDe = f => f?.categorie === 'energie' ? 'energie' : (f?.famille || 'aclasser');
 
 let allCards = [];
 let activeFilter = null; // un des FILTERS, ou null
@@ -271,9 +292,39 @@ function generationOf(dexId){
   return GENERATIONS.find(g => dexId >= g.from && dexId <= g.to);
 }
 
+function renderHeadNom(cardCount){
+  const nom = ficheNom?.nom || allCards[0]?.name || 'Carte';
+  const genre = GENRES[genreDe(ficheNom)];
+  document.title = `${nom} — PokéClasseur`;
+  const famille = ficheNom?.categorie === 'energie'
+    ? (ficheNom.famille === 'speciale' ? 'Énergie spéciale' : 'Énergie de base')
+    : `Carte Dresseur${genre.libelle !== 'Dresseur' ? ` · ${genre.libelle}` : ''}`;
+  const meta = [famille, cardCount === null ? '' : `${cardCount} carte${cardCount > 1 ? 's' : ''}`]
+    .filter(Boolean).join(' · ');
+  const image = ficheNom?.image || allCards[0]?.image;
+  const secours = ficheNom?.imageSecours || allCards[0]?.imageSecours;
+  document.getElementById('page-head').innerHTML = `
+    ${image ? `<div class="sprite vignette"><img src="${attrCarte(image)}" alt=""${secours ? ` data-fallback="${attrCarte(secours)}"` : ''}
+      onerror="if(this.dataset.fallback){const s=this.dataset.fallback;this.removeAttribute('data-fallback');this.src=s}else{this.parentNode.remove()}"></div>` : ''}
+    <div>
+      <h1>${echapperTexte(nom)}</h1>
+      <div class="meta">${echapperTexte(meta)}</div>
+    </div>
+  `;
+  const retour = document.getElementById('retour');
+  if(retour && ficheNom){
+    retour.textContent = `← Tous les ${genre.onglet}`;
+    retour.href = `pokemon.html?onglet=${genreDe(ficheNom)}`;
+  }
+}
+
 function renderHead(cardCount){
+  if(cleCarte) return renderHeadNom(cardCount);
   const name = POKEDEX_FR[dexId - 1] || `Pokémon n°${dexId}`;
   const generation = generationOf(dexId);
+  // Le retour ramène à la génération de ce Pokémon, pas à la première.
+  const retour = document.getElementById('retour');
+  if(retour && generation && generation.gen > 1) retour.href = `pokemon.html?gen=${generation.gen}`;
   document.title = `${name} — PokéClasseur`;
   const meta = [
     `N°${String(dexId).padStart(4, '0')}`,
@@ -384,10 +435,12 @@ async function init(){
   });
 
   try{
-    const [allResults] = await Promise.all([
-      cartesDuPokemon(dexId),
+    const [allResults, index] = await Promise.all([
+      cleCarte ? cartesDuNom(cleCarte) : cartesDuPokemon(dexId),
+      cleCarte ? listerAutresCartes() : Promise.resolve(null),
       loadSetNames(),
     ]);
+    if(cleCarte) ficheNom = (index || []).find(e => e.cle === cleCarte) || null;
     // La recherche par numéro de Pokédex ramène les cartes des deux jeux
     // mêlées : on ne garde que celles de l'univers où l'on se trouve.
     const cards = allResults.filter(c => appartientAUnivers(setIdOfCard(c.id)));
@@ -403,11 +456,11 @@ async function init(){
     // elle manque, on la sonde après coup, cartes déjà affichées.
     // On ne sonde que si les cartes sont arrivées sans rareté :
       // l'instantané la porte, certaines sources en direct non.
-      if(!allCards.some(c => c.rarity)){
+      if(!cleCarte && !allCards.some(c => c.rarity)){
       loadRarities().catch(err => console.warn('Impossible de charger les raretés', err));
     }
   }catch(err){
-    console.warn('Impossible de charger les cartes de ce Pokémon', err);
+    console.warn(cleCarte ? 'Impossible de charger les cartes de ce nom' : 'Impossible de charger les cartes de ce Pokémon', err);
     document.getElementById('content').innerHTML = `<p class="status-msg err">Impossible de charger les cartes pour le moment.<br><span style="font-size:12px;opacity:.7">${err.message}</span><br><br><button onclick="init()" class="filter-btn" style="margin-top:8px">Réessayer</button></p>`;
   }
 }
