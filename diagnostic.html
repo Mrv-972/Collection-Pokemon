@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js?v=2026-10-11-afrf"></script>
 <title>Diagnostic — PokéClasseur</title>
 <style>
   :root{--ink:#15171B;--ink-soft:#20232A;--gold:#C9A227;--accent-clair:#E3C766;
@@ -14,11 +15,11 @@
   h1{font-family:Georgia,serif;font-weight:500;font-size:25px;margin:0 0 6px}
   p.intro{color:var(--dim);margin:0 0 20px;font-size:13px}
   .onglets{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-  button{background:var(--ink-soft);border:1px solid rgba(237,234,224,.15);color:var(--text);
+  button{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),.15);color:var(--text);
          padding:10px 16px;border-radius:4px;font-size:13px;font-family:inherit;cursor:pointer}
   button.on{background:var(--teal);border-color:var(--teal);color:#EDF5F3}
   button.copier{background:var(--teal);border:none;color:#EDF5F3}
-  pre{background:var(--ink-soft);border:1px solid rgba(237,234,224,.1);border-radius:5px;
+  pre{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),.1);border-radius:5px;
       padding:16px;white-space:pre-wrap;word-break:break-word;margin:0}
 </style>
 </head>
@@ -35,9 +36,9 @@
   <pre id="sortie">…</pre>
 </div>
 
-<script src="sets.js?v=2026-10-11-2jlm"></script>
-<script src="univers.js?v=2026-10-11-2jlm"></script>
-<script src="catalogue.js?v=2026-10-11-2jlm"></script>
+<script src="sets.js?v=2026-10-11-afrf"></script>
+<script src="univers.js?v=2026-10-11-afrf"></script>
+<script src="catalogue.js?v=2026-10-11-afrf"></script>
 <script>
 const sortie = document.getElementById('sortie');
 let lignes = [];

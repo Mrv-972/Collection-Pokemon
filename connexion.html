@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js?v=2026-10-11-afrf"></script>
 <title>Mon compte — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,7 +20,7 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
   @media(max-width:640px){.wrap{padding:0 20px}}
 
-  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
   .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
   .brand span{color:var(--gold)}
   .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
@@ -31,11 +32,11 @@
   .panel p.intro{color:var(--text-on-ink-dim);font-size:15px;margin:0 0 28px;}
 
   .tabs{display:flex;gap:8px;margin-bottom:24px;}
-  .tab{flex:1;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .tab{flex:1;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink-dim);padding:10px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
   .tab.on{color:var(--text-on-ink);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
 
   label{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:16px 0 6px;}
-  input{width:100%;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  input{width:100%;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   input:focus{outline:none;border-color:rgba(var(--gold-rgb),0.5)}
   /* La case n'est jamais pré-cochée : un consentement pré-coché n'en est
      pas un, et ne prouve rien. Les liens s'ouvrent dans un nouvel onglet
@@ -44,10 +45,10 @@
      bouton en visant « Enregistrer ». */
   .danger-zone{margin-top:40px;padding-top:24px;border-top:1px solid rgba(192,57,43,0.35)}
   .danger-zone h2{font-family:'Newsreader',serif;font-size:18px;font-weight:500;
-                  color:#E08862;margin:0 0 8px;}
+                  color:var(--alerte);margin:0 0 8px;}
   .danger-zone p{font-size:13px;line-height:1.6;color:var(--text-on-ink-dim);margin:0 0 14px}
   .destructeur{font-family:inherit;font-size:13.5px;padding:10px 18px;border-radius:5px;
-               cursor:pointer;background:transparent;color:#E08862;
+               cursor:pointer;background:transparent;color:var(--alerte);
                border:1px solid rgba(192,57,43,0.5);transition:.12s;}
   .destructeur:hover{background:rgba(192,57,43,0.14);color:#F0A088}
 
@@ -61,41 +62,41 @@
   button.principal{width:100%;margin-top:26px;background:var(--teal);border:none;color:#EDF5F3;padding:12px;border-radius:3px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}
   button.principal:hover{background:var(--teal-deep)}
   button.principal:disabled{opacity:.5;cursor:default}
-  button.discret{margin-top:14px;width:100%;background:transparent;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);padding:10px;border-radius:3px;font-size:13px;cursor:pointer;font-family:inherit;}
-  button.discret:hover{border-color:rgba(237,234,224,0.3)}
+  button.discret{margin-top:14px;width:100%;background:transparent;border:1px solid rgba(var(--trait-rgb),0.14);color:var(--text-on-ink-dim);padding:10px;border-radius:3px;font-size:13px;cursor:pointer;font-family:inherit;}
+  button.discret:hover{border-color:rgba(var(--trait-rgb),0.3)}
 
   .message{margin-top:20px;font-size:13.5px;padding:12px 14px;border-radius:4px;}
-  .message.err{color:#E08862;background:rgba(168,67,28,0.1);border:1px solid rgba(168,67,28,0.35)}
-  .message.ok{color:#5FBAAA;background:rgba(31,111,99,0.12);border:1px solid rgba(31,111,99,0.35)}
+  .message.err{color:var(--alerte);background:rgba(168,67,28,0.1);border:1px solid rgba(168,67,28,0.35)}
+  .message.ok{color:var(--succes);background:rgba(31,111,99,0.12);border:1px solid rgba(31,111,99,0.35)}
 
-  .compte-actuel{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:22px;}
+  .compte-actuel{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:22px;}
   .compte-actuel .pseudo{font-family:'Newsreader',serif;font-size:24px;}
   .compte-actuel .detail{color:var(--text-on-ink-dim);font-size:13.5px;margin-top:4px;}
-  .bloques{margin-top:30px;border-top:1px solid rgba(237,234,224,0.08);padding-top:22px;}
+  .bloques{margin-top:30px;border-top:1px solid rgba(var(--trait-rgb),0.08);padding-top:22px;}
   .bloques h2{font-size:19px;margin-bottom:4px;}
   .bloques p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
-  .bloque{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid rgba(237,234,224,0.06);font-size:14px;}
-  .bloque button{background:transparent;border:1px solid rgba(237,234,224,0.14);color:var(--text-on-ink-dim);padding:5px 12px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit;}
-  .bloque button:hover{border-color:rgba(237,234,224,0.35);color:var(--text-on-ink)}
+  .bloque{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid rgba(var(--trait-rgb),0.06);font-size:14px;}
+  .bloque button{background:transparent;border:1px solid rgba(var(--trait-rgb),0.14);color:var(--text-on-ink-dim);padding:5px 12px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit;}
+  .bloque button:hover{border-color:rgba(var(--trait-rgb),0.35);color:var(--text-on-ink)}
 
-  .zone{margin-top:30px;border-top:1px solid rgba(237,234,224,0.08);padding-top:22px;}
+  .zone{margin-top:30px;border-top:1px solid rgba(var(--trait-rgb),0.08);padding-top:22px;}
   .zone h2{font-size:19px;margin-bottom:4px;}
   .zone > p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
-  .zone-actuelle{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:12px 14px;font-size:14px;}
+  .zone-actuelle{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:12px 14px;font-size:14px;}
   .zone-actuelle.vide{color:var(--text-on-ink-dim);font-size:13.5px;}
   .recherche{display:flex;gap:8px;align-items:stretch;}
   .recherche input{flex:1}
-  .recherche button{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:0 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .recherche button{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:0 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
   .recherche button:hover{border-color:rgba(var(--gold-rgb),0.5)}
   .recherche button:disabled{opacity:.5;cursor:default}
   .communes{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;}
-  .commune{text-align:left;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:9px 12px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .commune{text-align:left;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:9px 12px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
   .commune:hover{border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.06)}
   .commune small{display:block;color:var(--text-on-ink-dim);font-size:11.5px;margin-top:1px;}
   .zone-msg{font-size:12.5px;margin-top:10px;}
-  .zone-msg.err{color:#E08862}
-  .zone-msg.ok{color:#5FBAAA}
-  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+  .zone-msg.err{color:var(--alerte)}
+  .zone-msg.ok{color:var(--succes)}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
   /* ========================= Téléphone =========================
      Les liens de navigation passaient en display:none sous 720 px : depuis
@@ -151,16 +152,17 @@
   <footer data-note="Ton compte sert à retrouver ta collection sur tous tes appareils et à te mettre en relation avec d'autres collectionneurs."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-2jlm"></script>
-<script src="supabase-config.js?v=2026-10-11-2jlm"></script>
-<script src="pied.js?v=2026-10-11-2jlm"></script>
-<script src="admin.js?v=2026-10-11-2jlm"></script>
-<script src="admin-site.js?v=2026-10-11-2jlm"></script>
-<script src="tags.js?v=2026-10-11-2jlm"></script>
-<script src="localisation.js?v=2026-10-11-2jlm"></script>
-<script src="confirmation.js?v=2026-10-11-2jlm"></script>
-<script src="compte.js?v=2026-10-11-2jlm"></script>
-<script src="messagerie.js?v=2026-10-11-2jlm"></script>
+<script src="univers.js?v=2026-10-11-afrf"></script>
+<script src="supabase-config.js?v=2026-10-11-afrf"></script>
+<script src="pied.js?v=2026-10-11-afrf"></script>
+<script src="admin.js?v=2026-10-11-afrf"></script>
+<script src="admin-site.js?v=2026-10-11-afrf"></script>
+<script src="tags.js?v=2026-10-11-afrf"></script>
+<script src="localisation.js?v=2026-10-11-afrf"></script>
+<script src="confirmation.js?v=2026-10-11-afrf"></script>
+<script src="photo-profil.js?v=2026-10-11-afrf"></script>
+<script src="compte.js?v=2026-10-11-afrf"></script>
+<script src="messagerie.js?v=2026-10-11-afrf"></script>
 <script>
 let ongletActif = 'connexion';
 let motDePasseOublie = false;
@@ -235,13 +237,15 @@ function rendre(){
 
   if(estConnecte()){
     panel.innerHTML = `
-      <div class="kicker">Compte</div>
-      <h1>Mon compte</h1>
+      <div class="kicker">Profil</div>
+      <h1>Mon profil</h1>
       <div class="compte-actuel">
         <div class="pseudo">${profil?.pseudo ?? 'Membre'}</div>
         <div class="detail">${membre.email}</div>
         <div class="detail">${profil?.contact ? 'Contact partagé : ' + profil.contact : 'Aucun moyen de contact renseigné'}</div>
       </div>
+
+      <div id="photo-profil"></div>
 
       <label for="pseudo">Pseudo</label>
       <input id="pseudo" type="text" value="${profil?.pseudo ?? ''}">
@@ -258,6 +262,9 @@ function rendre(){
       <button class="discret" id="btn-deconnexion">Se déconnecter</button>
       <div id="message"></div>
 
+      <p class="aide" style="margin-top:14px">Thème clair ou sombre, notifications des messages :
+        <a href="parametres.html" style="color:var(--accent-clair);text-decoration:underline">Paramètres →</a></p>
+
       <div class="zone" id="zone"></div>
       <div class="bloques" id="bloques"></div>
 
@@ -271,6 +278,7 @@ function rendre(){
     `;
     afficherZone();
     afficherBloques();
+    afficherPhotoProfil(document.getElementById('photo-profil'), afficherEtatCompte);
     document.getElementById('btn-maj').addEventListener('click', enregistrerProfil);
     document.getElementById('btn-deconnexion').addEventListener('click', deconnexion);
     document.getElementById('btn-supprimer-compte').addEventListener('click', supprimerCompte);

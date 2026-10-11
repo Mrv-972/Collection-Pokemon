@@ -81,6 +81,8 @@ function dessiner(){
                 aria-selected="${ongletActif === 'corrections'}">Corrections en cours</button>
         <button type="button" role="tab" data-onglet="comptes"
                 aria-selected="${ongletActif === 'comptes'}">Comptes</button>
+        <button type="button" role="tab" data-onglet="photos"
+                aria-selected="${ongletActif === 'photos'}">Photos à valider</button>
       </div>
       <button type="button" class="tiroir-fermer" aria-label="Fermer">×</button>
     </div>
@@ -89,6 +91,8 @@ function dessiner(){
       ? `<input id="filtre-comptes" type="search" placeholder="Filtrer par pseudo, e-mail ou ville…"
                 aria-label="Filtrer les comptes">
          <div id="zone-comptes"><p class="intro">Chargement…</p></div>`
+      : ongletActif === 'photos'
+      ? `<div id="zone-photos"><p class="intro">Chargement…</p></div>`
       : `<div id="zone-liste"><p class="intro">Chargement…</p></div>`}`;
 
   tiroir.querySelector('.tiroir-fermer').onclick = () => tiroir.close();
@@ -97,7 +101,103 @@ function dessiner(){
     dessiner();
   });
   if(ongletActif === 'comptes') afficherComptes();
+  else if(ongletActif === 'photos') afficherPhotos();
   else afficherListe();
+}
+
+// ------------------------------------------------ les photos de profil ---
+//
+// Une photo proposée attend dans un dépôt privé. La valider, c'est la
+// recopier dans le dépôt public, sous le dossier du membre, puis la
+// déclarer sienne — la base vérifie que l'adresse est bien celle de ce
+// dossier. La refuser, c'est la retirer, avec un motif que le membre lira.
+
+async function afficherPhotos(){
+  const zone = tiroir.querySelector('#zone-photos');
+  try{
+    const db = await clientSupabase();
+    const { data, error } = await db.rpc('photos_en_attente');
+    if(error) throw error;
+    if(!data?.length){
+      zone.innerHTML = '<p class="intro">Aucune photo en attente de validation.</p>';
+      return;
+    }
+    const liens = await Promise.all(data.map(async p => {
+      const { data: l } = await db.storage.from('avatars-attente').createSignedUrl(p.photo_en_attente, 600);
+      return l?.signedUrl ?? '';
+    }));
+    zone.innerHTML = `
+      <p class="aide">À refuser : nudité ou tenue suggestive, contenu choquant ou violent,
+        photo visiblement d'une autre personne (célébrité, enfant…), coordonnées ou texte
+        insultant. Dans le doute, refuse : le membre peut toujours choisir un Pokémon.</p>
+      ${data.map((p, i) => `
+        <div class="photo-a-valider" data-index="${i}">
+          <img src="${echapper(liens[i])}" alt="Photo proposée par ${echapper(p.pseudo)}">
+          <div>
+            <b>${echapper(p.pseudo)}</b>
+            <div class="detail">${p.photo_url ? 'Remplacerait sa photo actuelle' : 'Première photo'}</div>
+            <div class="actions-photo">
+              <button type="button" class="valider-photo">Valider</button>
+              <button type="button" class="discret-admin refuser-photo">Refuser…</button>
+            </div>
+          </div>
+        </div>`).join('')}`;
+    zone.querySelectorAll('.photo-a-valider').forEach(bloc => {
+      const p = data[Number(bloc.dataset.index)];
+      bloc.querySelector('.valider-photo').onclick = () => traiterPhoto(bloc, () => validerPhoto(p), `Photo de ${p.pseudo} validée.`);
+      bloc.querySelector('.refuser-photo').onclick = async () => {
+        const motif = await demanderMotif({
+          titre: `Refuser la photo de ${p.pseudo} ?`,
+          texte: 'Le membre verra ce motif sur sa page de profil. Reste factuel et bref.',
+          libelle: 'Motif du refus',
+          exemple: 'Photo inappropriée',
+          action: 'Refuser la photo',
+          minimum: 3,
+        });
+        if(motif) traiterPhoto(bloc, () => refuserPhoto(p, motif), `Photo de ${p.pseudo} refusée.`);
+      };
+    });
+  }catch(err){
+    zone.innerHTML = `<p class="msg ko">Lecture impossible : ${echapper(err.message)}</p>
+      <p class="aide">Si le message parle d'une fonction introuvable, le fichier
+         <b>supabase/profil-photo-parametres.sql</b> n'a pas encore été exécuté.</p>`;
+  }
+}
+
+async function traiterPhoto(bloc, action, reussite){
+  bloc.querySelectorAll('button').forEach(b => { b.disabled = true; });
+  try{
+    await action();
+    message(reussite, 'ok');
+    afficherPhotos();
+  }catch(err){
+    message(`Échec : ${err.message}`, 'ko');
+    bloc.querySelectorAll('button').forEach(b => { b.disabled = false; });
+  }
+}
+
+async function validerPhoto(p){
+  const db = await clientSupabase();
+  const { data: fichier, error: e1 } = await db.storage.from('avatars-attente').download(p.photo_en_attente);
+  if(e1) throw e1;
+  const chemin = `${p.id}/${p.photo_en_attente.split('/').pop()}`;
+  const { error: e2 } = await db.storage.from('avatars').upload(chemin, fichier, { contentType: 'image/webp', upsert: false });
+  if(e2) throw e2;
+  const { data: publique } = db.storage.from('avatars').getPublicUrl(chemin);
+  const { error: e3 } = await db.rpc('valider_photo', { membre: p.id, adresse: publique.publicUrl });
+  if(e3) throw e3;
+  // L'attente et l'éventuelle photo précédente n'ont plus d'objet.
+  await db.storage.from('avatars-attente').remove([p.photo_en_attente]).catch(() => {});
+  const ancienne = /\/avatars\/([^?]+)/.exec(p.photo_url ?? '');
+  if(ancienne && decodeURIComponent(ancienne[1]) !== chemin)
+    await db.storage.from('avatars').remove([decodeURIComponent(ancienne[1])]).catch(() => {});
+}
+
+async function refuserPhoto(p, motif){
+  const db = await clientSupabase();
+  const { error } = await db.rpc('refuser_photo', { membre: p.id, motif });
+  if(error) throw error;
+  await db.storage.from('avatars-attente').remove([p.photo_en_attente]).catch(() => {});
 }
 
 // -------------------------------------------- les corrections en cours ---
@@ -354,7 +454,18 @@ async function lireLaDiscussion(idConversation, idMembre){
 // Le motif se saisit dans une petite fenêtre. Dix caractères au moins : la
 // base refuse en dessous, autant le dire ici plutôt que de laisser partir
 // un appel voué à l'échec.
-async function demanderMotif(){
+// Par défaut, le motif d'ouverture d'une discussion ; le refus d'une photo
+// réutilise la même fenêtre avec ses propres mots.
+async function demanderMotif({
+  titre = 'Pourquoi ouvrir cette discussion ?',
+  texte = `Cet accès est réservé au traitement d'un signalement, d'une plainte ou
+           d'une demande de l'autorité judiciaire. Le motif sera inscrit au
+           journal, avec la date et ton pseudo, et ne pourra pas être effacé.`,
+  libelle = 'Motif (dix caractères au moins)',
+  exemple = 'Signalement du 22/09 pour menaces',
+  action = 'Ouvrir et consigner',
+  minimum = 10,
+} = {}){
   await preparerConfirmation();
   return new Promise(resolve => {
     poserStyleConfirmation();
@@ -362,22 +473,20 @@ async function demanderMotif(){
     voile.className = 'confirmation';
     voile.innerHTML = `
       <div class="boite">
-        <h2>Pourquoi ouvrir cette discussion ?</h2>
-        <p>Cet accès est réservé au traitement d'un signalement, d'une plainte ou
-           d'une demande de l'autorité judiciaire. Le motif sera inscrit au
-           journal, avec la date et ton pseudo, et ne pourra pas être effacé.</p>
-        <label class="recopie" for="motif-lecture">Motif (dix caractères au moins)</label>
-        <input id="motif-lecture" type="text" placeholder="Signalement du 22/09 pour menaces">
+        <h2>${echapper(titre)}</h2>
+        <p>${texte}</p>
+        <label class="recopie" for="motif-lecture">${echapper(libelle)}</label>
+        <input id="motif-lecture" type="text" placeholder="${echapper(exemple)}">
         <div class="boutons">
           <button class="annuler" type="button">Annuler</button>
-          <button class="principal" type="button" disabled>Ouvrir et consigner</button>
+          <button class="principal" type="button" disabled>${echapper(action)}</button>
         </div>
       </div>`;
 
     const champ = voile.querySelector('#motif-lecture');
     const valider = voile.querySelector('.principal');
     champ.addEventListener('input', () => {
-      valider.disabled = champ.value.trim().length < 10;
+      valider.disabled = champ.value.trim().length < minimum;
     });
 
     function fermer(reponse){
@@ -440,6 +549,11 @@ function poserStyle(){
   #admin-tiroir .quoi{flex:1;min-width:200px}
   #admin-tiroir .cible{font-weight:600}
   #admin-tiroir .detail{font-size:13px;color:#9B9E9C}
+  #admin-tiroir .photo-a-valider{display:flex;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(237,234,224,.08)}
+  #admin-tiroir .photo-a-valider img{width:112px;height:112px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,.05);flex:none}
+  #admin-tiroir .actions-photo{display:flex;gap:8px;margin-top:10px}
+  #admin-tiroir .valider-photo{font:inherit;font-size:13px;padding:7px 14px;border-radius:6px;cursor:pointer;
+    border:0;background:#1F6F63;color:#EDF5F3}
   #admin-tiroir .etiquette{font-size:12px;padding:3px 9px;border-radius:999px;white-space:nowrap}
   #admin-tiroir .etiquette.attente{background:rgba(201,162,39,.16);color:#E8D89A}
   #admin-tiroir .etiquette.absorbee{background:rgba(31,111,99,.22);color:#9FD9CE}

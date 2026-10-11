@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js?v=2026-10-11-afrf"></script>
 <title>Par Pokémon — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +22,7 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
   @media(max-width:640px){.wrap{padding:0 20px}}
 
-  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
   .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
   .brand span{color:var(--gold)}
   .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
@@ -34,12 +35,12 @@
   .page-head p{color:var(--text-on-ink-dim);margin-top:14px;font-size:16px;max-width:60ch;}
 
   .toolbar{display:flex;gap:10px;padding-bottom:22px;flex-wrap:wrap;align-items:center;}
-  .toolbar input{flex:1;min-width:200px;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  .toolbar input{flex:1;min-width:200px;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   .toolbar input::placeholder{color:var(--text-on-ink-dim)}
 
   .gen-tabs{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:34px;}
-  .gen-tab{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:9px 14px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;transition:.12s;}
-  .gen-tab:hover{border-color:rgba(237,234,224,0.3)}
+  .gen-tab{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink-dim);padding:9px 14px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;transition:.12s;}
+  .gen-tab:hover{border-color:rgba(var(--trait-rgb),0.3)}
   .gen-tab.on{color:var(--text-on-ink);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
   .gen-tab .region{color:var(--text-on-ink-dim);font-size:11.5px;display:block;}
   .gen-tab.on .region{color:var(--accent-clair)}
@@ -52,15 +53,15 @@
   @media(max-width:900px){.dex-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
   @media(max-width:560px){.dex-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
-  .dex-card{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color .15s;}
-  .dex-card:hover{border-color:rgba(237,234,224,0.28)}
+  .dex-card{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color .15s;}
+  .dex-card:hover{border-color:rgba(var(--trait-rgb),0.28)}
   .dex-sprite{width:72px;height:72px;display:flex;align-items:center;justify-content:center;}
   .dex-sprite img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;}
   .dex-num{font-size:11px;color:var(--text-on-ink-dim);}
   .dex-name{font-size:13px;font-weight:500;text-align:center;line-height:1.25;}
 
   .status-msg{color:var(--text-on-ink-dim);font-size:14px;padding:20px 0;}
-  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
   /* ========================= Téléphone =========================
      Les liens de navigation passaient en display:none sous 720 px : depuis
@@ -123,13 +124,13 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-2jlm"></script>
-<script src="supabase-config.js?v=2026-10-11-2jlm"></script>
-<script src="pied.js?v=2026-10-11-2jlm"></script>
-<script src="admin.js?v=2026-10-11-2jlm"></script>
-<script src="admin-site.js?v=2026-10-11-2jlm"></script>
-<script src="compte.js?v=2026-10-11-2jlm"></script>
-<script src="pokedex-fr.js?v=2026-10-11-2jlm"></script>
+<script src="univers.js?v=2026-10-11-afrf"></script>
+<script src="supabase-config.js?v=2026-10-11-afrf"></script>
+<script src="pied.js?v=2026-10-11-afrf"></script>
+<script src="admin.js?v=2026-10-11-afrf"></script>
+<script src="admin-site.js?v=2026-10-11-afrf"></script>
+<script src="compte.js?v=2026-10-11-afrf"></script>
+<script src="pokedex-fr.js?v=2026-10-11-afrf"></script>
 <script>
 // Bornes officielles du Pokédex national pour chaque génération.
 const GENERATIONS = [

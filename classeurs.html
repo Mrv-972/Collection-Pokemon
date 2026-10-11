@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js?v=2026-10-11-afrf"></script>
 <title>Mes classeurs — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +19,7 @@
     --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
     /* Ces trois-là manquaient : faute de valeur, « var() » retombait sur la
        couleur héritée, et un texte voulu discret sortait en pleine clarté. */
-    --text-soft:#9B9E9C; --trait:rgba(237,234,224,0.16); --rouge-doux:#D98A7A;
+    --text-soft:#9B9E9C; --trait:rgba(var(--trait-rgb),0.16); --rouge-doux:#D98A7A;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
@@ -27,7 +28,7 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
   @media(max-width:640px){.wrap{padding:0 20px}}
 
-  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
   .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
   .brand span{color:var(--gold)}
   .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
@@ -40,10 +41,10 @@
   .page-head p{color:var(--text-on-ink-dim);margin-top:14px;font-size:16px;max-width:60ch;}
 
   .search-row{display:flex;gap:10px;padding-bottom:40px;}
-  .search-row input{flex:1;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  .search-row input{flex:1;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   .search-row input::placeholder{color:var(--text-on-ink-dim)}
 
-  .series-block{padding:34px 0;border-top:1px solid rgba(237,234,224,0.08);}
+  .series-block{padding:34px 0;border-top:1px solid rgba(var(--trait-rgb),0.08);}
   .series-title{display:flex;align-items:baseline;gap:12px;margin-bottom:20px;}
   .series-title h2{font-size:22px;}
   .series-title .count{font-size:13px;color:var(--text-on-ink-dim);}
@@ -52,8 +53,8 @@
   @media(max-width:900px){.set-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
   @media(max-width:640px){.set-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-  .set-card{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s;}
-  .set-card:hover{border-color:rgba(237,234,224,0.25)}
+  .set-card{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s;}
+  .set-card:hover{border-color:rgba(var(--trait-rgb),0.25)}
   .set-logo{height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
   .set-logo .logo{min-width:0;max-width:100%;max-height:100%;object-fit:contain;object-position:left center;}
   .set-logo .symbol{height:20px;width:20px;flex-shrink:0;object-fit:contain;opacity:.85;}
@@ -62,14 +63,14 @@
   .set-meta{font-size:12px;color:var(--text-on-ink-dim);display:flex;justify-content:space-between;margin-top:auto;}
   .set-meta .tag-count{color:var(--teal);font-weight:500}
 
-  .skeleton{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;height:118px;position:relative;overflow:hidden;}
-  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(237,234,224,0.06),transparent);animation:shine 1.4s infinite;}
+  .skeleton{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;height:118px;position:relative;overflow:hidden;}
+  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(var(--trait-rgb),0.06),transparent);animation:shine 1.4s infinite;}
   @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 
   .status-msg{color:var(--text-on-ink-dim);font-size:14px;padding:20px 0;}
-  .status-msg.err{color:#E08862}
+  .status-msg.err{color:var(--alerte)}
 
-  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
   /* ========================= Téléphone =========================
      Les liens de navigation passaient en display:none sous 720 px : depuis
@@ -101,10 +102,10 @@
   /* ------------------------------------------------ Mes classeurs ------- */
   .barre-classeurs{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 26px}
   .puce-classeur{display:flex;align-items:center;gap:9px;padding:9px 14px;border-radius:6px;
-                 background:var(--ink-soft);border:1px solid rgba(237,234,224,0.10);
+                 background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.10);
                  cursor:pointer;font-family:inherit;font-size:14px;color:var(--text-on-ink-dim);
                  transition:border-color .12s,color .12s;}
-  .puce-classeur:hover{border-color:rgba(237,234,224,0.28);color:var(--text-on-ink)}
+  .puce-classeur:hover{border-color:rgba(var(--trait-rgb),0.28);color:var(--text-on-ink)}
   .puce-classeur[aria-selected="true"]{color:var(--text-on-ink);
                                        border-color:rgba(var(--gold-rgb),0.45);
                                        background:rgba(var(--gold-rgb),0.07);}
@@ -118,7 +119,7 @@
   .entete-classeur{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 18px}
   .entete-classeur input[type="text"]{flex:1;min-width:200px;font-family:'Newsreader',serif;
                                       font-size:24px;background:transparent;color:var(--text-on-ink);
-                                      border:0;border-bottom:1px solid rgba(237,234,224,0.14);
+                                      border:0;border-bottom:1px solid rgba(var(--trait-rgb),0.14);
                                       padding:4px 0;}
   .entete-classeur input[type="text"]:focus{outline:0;border-bottom-color:var(--gold)}
   /* Un réglage par ligne : deux rangées de pastilles côte à côte ne se
@@ -130,11 +131,11 @@
   .couleurs .suit-la-couverture{border-radius:12px}
   .reglage input[type="text"]{font-family:inherit;font-size:13px;padding:7px 10px;
     border-radius:5px;min-width:200px;background:var(--ink-soft);color:var(--text-on-ink);
-    border:1px solid rgba(237,234,224,0.14)}
+    border:1px solid rgba(var(--trait-rgb),0.14)}
   .reglage input[type="text"]:focus{outline:0;border-color:rgba(var(--gold-rgb),0.5)}
   .reglages select{font-family:inherit;font-size:13px;padding:7px 10px;border-radius:5px;
                    background:var(--ink-soft);color:var(--text-on-ink);
-                   border:1px solid rgba(237,234,224,0.14);}
+                   border:1px solid rgba(var(--trait-rgb),0.14);}
   .couleurs{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
   .couleurs button{width:24px;height:24px;border-radius:50%;cursor:pointer;
                    border:2px solid transparent;padding:0;transition:.12s}
@@ -159,7 +160,7 @@
   .bouton-dossier.discret{border:0;color:var(--text-soft)}
   #nom-dossier{font-family:inherit;font-size:13px;padding:8px 10px;border-radius:5px;
     min-width:200px;background:var(--ink-soft);color:var(--text-on-ink);
-    border:1px solid rgba(237,234,224,0.14)}
+    border:1px solid rgba(var(--trait-rgb),0.14)}
   #nom-dossier:focus{outline:0;border-color:rgba(var(--gold-rgb),0.5)}
   .retirer-dossier{font-family:inherit;font-size:12px;background:none;border:0;padding:0;
     color:var(--text-soft);cursor:pointer;text-decoration:underline}
@@ -168,12 +169,12 @@
 
   /* Un dossier se replie, comme une extension dans les missions secrètes :
      avec dix dossiers, tout dérouler d'un coup ne se lit plus. */
-  .dossier-bloc{border-top:1px solid rgba(237,234,224,0.08)}
+  .dossier-bloc{border-top:1px solid rgba(var(--trait-rgb),0.08)}
   .dossier-bloc:first-of-type{border-top:0}
   .dossier-tete{display:flex;align-items:center;gap:13px;flex-wrap:wrap;
     padding:18px 4px;cursor:pointer;list-style:none;transition:background .12s}
   .dossier-tete::-webkit-details-marker{display:none}
-  .dossier-tete:hover{background:rgba(237,234,224,0.03)}
+  .dossier-tete:hover{background:rgba(var(--trait-rgb),0.03)}
   .dossier-tete h2{font-size:20px;font-family:'Newsreader',serif;font-weight:500}
   .dossier-tete .compte{font-size:13px;color:var(--text-soft)}
   /* Le chevron dit dans quel sens ça va s'ouvrir, sans texte à traduire. */
@@ -244,14 +245,14 @@
   .pochettes button[aria-pressed="true"]{color:var(--text-on-ink);
     border-color:rgba(var(--gold-rgb),0.55);background:rgba(var(--gold-rgb),0.11)}
   .danger-leger{font-family:inherit;font-size:13px;padding:7px 13px;border-radius:5px;cursor:pointer;
-                background:transparent;color:#E08862;border:1px solid rgba(192,57,43,0.42);}
+                background:transparent;color:var(--alerte);border:1px solid rgba(192,57,43,0.42);}
   .danger-leger:hover{background:rgba(192,57,43,0.13)}
 
   .navigation-pages{display:flex;align-items:center;gap:12px;margin:0 0 14px;flex-wrap:wrap;
                     font-size:13.5px;color:var(--text-on-ink-dim)}
   .navigation-pages button{font-family:inherit;font-size:15px;width:34px;height:34px;
                            border-radius:5px;cursor:pointer;background:transparent;
-                           color:var(--text-on-ink);border:1px solid rgba(237,234,224,0.16);}
+                           color:var(--text-on-ink);border:1px solid rgba(var(--trait-rgb),0.16);}
   .navigation-pages button:disabled{opacity:.3;cursor:default}
   .navigation-pages .ajouter{width:auto;padding:0 13px;font-size:13px}
 
@@ -324,21 +325,21 @@
   .faces button{font-family:inherit;font-size:12.5px;width:auto;height:34px;
     padding:0 14px;white-space:nowrap;border-radius:5px;
                 cursor:pointer;background:transparent;color:var(--text-on-ink-dim);
-                border:1px solid rgba(237,234,224,0.16);transition:.12s;}
+                border:1px solid rgba(var(--trait-rgb),0.16);transition:.12s;}
   .faces button[aria-selected="true"]{color:var(--text-on-ink);
                                       border-color:rgba(var(--gold-rgb),0.45);
                                       background:rgba(var(--gold-rgb),0.09);}
   .mot-du-verso{font-size:12.5px;line-height:1.6;color:var(--text-on-ink-dim);
                 margin:0 0 12px;padding:9px 13px;border-radius:5px;
-                background:rgba(237,234,224,0.04);
+                background:rgba(var(--trait-rgb),0.04);
                 border-left:2px solid rgba(var(--gold-rgb),0.4);}
 
   /* Les trois façons de remplir une pochette de verso. */
   .choix-verso{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0 0}
   .choix-verso button{display:flex;flex-direction:column;align-items:center;gap:8px;
                       padding:14px 10px;border-radius:7px;cursor:pointer;
-                      background:rgba(237,234,224,0.04);color:var(--text-on-ink);
-                      border:1px solid rgba(237,234,224,0.14);font-family:inherit;
+                      background:rgba(var(--trait-rgb),0.04);color:var(--text-on-ink);
+                      border:1px solid rgba(var(--trait-rgb),0.14);font-family:inherit;
                       font-size:12.5px;line-height:1.35;text-align:center;transition:.12s;}
   .choix-verso button:hover{border-color:rgba(var(--gold-rgb),0.55);
                             background:rgba(var(--gold-rgb),0.08)}
@@ -366,12 +367,12 @@
   .livre-tete{position:fixed;top:0;left:0;right:0;display:flex;align-items:center;
               justify-content:space-between;gap:16px;padding:16px 24px;
               background:rgba(10,11,13,0.97);
-              border-bottom:1px solid rgba(237,234,224,0.08);}
+              border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
   .livre-tete .titre{font-family:'Newsreader',serif;font-size:20px;color:var(--text-on-ink)}
   .livre-tete .fermer{font-family:inherit;font-size:13.5px;padding:8px 16px;border-radius:5px;
                       cursor:pointer;background:transparent;color:var(--text-on-ink);
-                      border:1px solid rgba(237,234,224,0.22);}
-  .livre-tete .fermer:hover{background:rgba(237,234,224,0.08)}
+                      border:1px solid rgba(var(--trait-rgb),0.22);}
+  .livre-tete .fermer:hover{background:rgba(var(--trait-rgb),0.08)}
 
   /* Les deux pages se touchent : c'est la pliure du classeur, et c'est ce
      qui fait qu'on lit une double page et non deux pages côte à côte. */
@@ -414,9 +415,9 @@
   .case.dos{border-color:rgba(0,0,0,0.22);overflow:hidden}
   .case.dos img{width:100%;height:100%;object-fit:cover;border-radius:5px;display:block}
   .livre .feuillet{width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;flex-shrink:0;
-                   background:rgba(237,234,224,0.10);color:#EDEAE0;font-size:26px;line-height:1;
+                   background:rgba(var(--trait-rgb),0.10);color:var(--text-on-ink);font-size:26px;line-height:1;
                    display:flex;align-items:center;justify-content:center;transition:.12s;}
-  .livre .feuillet:hover{background:rgba(237,234,224,0.20)}
+  .livre .feuillet:hover{background:rgba(var(--trait-rgb),0.20)}
   .livre .feuillet:disabled{opacity:.22;cursor:default}
   .livre-pied{position:fixed;bottom:0;left:0;right:0;text-align:center;padding:14px 24px;
               font-size:12.5px;color:var(--text-on-ink-dim);
@@ -433,26 +434,26 @@
     .livre-pied .aide{display:block;margin-top:4px}
   }
 
-  .tiroir{border-top:1px solid rgba(237,234,224,0.08);padding-top:26px}
+  .tiroir{border-top:1px solid rgba(var(--trait-rgb),0.08);padding-top:26px}
   .tiroir h2{font-size:20px;margin:0 0 6px}
   .tiroir .choix{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0 18px;
                  font-size:13px;color:var(--text-on-ink-dim)}
   .tiroir select,.tiroir input[type="text"]{font-family:inherit;font-size:13.5px;padding:9px 11px;
         border-radius:5px;background:var(--ink-soft);color:var(--text-on-ink);
-        border:1px solid rgba(237,234,224,0.14);}
+        border:1px solid rgba(var(--trait-rgb),0.14);}
   .tiroir input[type="text"]{flex:1;min-width:160px}
   .tiroir label.filtre{display:flex;align-items:center;gap:7px;cursor:pointer}
   .modes-tiroir{display:flex;gap:6px;margin:14px 0 0}
   .modes-tiroir button{font-family:inherit;font-size:13px;padding:7px 14px;border-radius:5px;
                        cursor:pointer;background:transparent;color:var(--text-on-ink-dim);
-                       border:1px solid rgba(237,234,224,0.14);transition:.12s;}
+                       border:1px solid rgba(var(--trait-rgb),0.14);transition:.12s;}
   .modes-tiroir button[aria-selected="true"]{color:var(--text-on-ink);
                                              border-color:rgba(var(--gold-rgb),0.45);
                                              background:rgba(var(--gold-rgb),0.08);}
   #suggestions-pokemon{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 16px}
   #suggestions-pokemon button{font-family:inherit;font-size:13px;padding:7px 12px;border-radius:5px;
                               cursor:pointer;background:var(--ink-soft);color:var(--text-on-ink);
-                              border:1px solid rgba(237,234,224,0.12);transition:.12s;}
+                              border:1px solid rgba(var(--trait-rgb),0.12);transition:.12s;}
   #suggestions-pokemon button:hover{border-color:rgba(var(--gold-rgb),0.5)}
   #suggestions-pokemon .numero{color:var(--text-on-ink-dim);font-size:11.5px;margin-left:5px}
   #recherche-pokemon{flex:1;min-width:190px}
@@ -462,7 +463,7 @@
                          border:1px dashed rgba(var(--gold-rgb),0.45);transition:.12s;}
   .tiroir label.importer:hover{background:rgba(var(--gold-rgb),0.09)}
   .grille-choix{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px}
-  .grille-choix button{padding:0;border:1px solid rgba(237,234,224,0.10);border-radius:5px;
+  .grille-choix button{padding:0;border:1px solid rgba(var(--trait-rgb),0.10);border-radius:5px;
                        background:var(--ink-soft);cursor:pointer;overflow:hidden;
                        transition:border-color .12s;}
   .grille-choix button:hover{border-color:rgba(var(--gold-rgb),0.5)}
@@ -509,21 +510,21 @@
   <footer data-note="Tes classeurs sont enregistrés dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-2jlm"></script>
-<script src="catalogue.js?v=2026-10-11-2jlm"></script>
-<script src="supabase-config.js?v=2026-10-11-2jlm"></script>
-<script src="pied.js?v=2026-10-11-2jlm"></script>
-<script src="admin.js?v=2026-10-11-2jlm"></script>
-<script src="admin-site.js?v=2026-10-11-2jlm"></script>
-<script src="compte.js?v=2026-10-11-2jlm"></script>
-<script src="confirmation.js?v=2026-10-11-2jlm"></script>
-<script src="progression.js?v=2026-10-11-2jlm"></script>
-<script src="raretes.js?v=2026-10-11-2jlm"></script>
-<script src="pokedex-fr.js?v=2026-10-11-2jlm"></script>
-<script src="sets.js?v=2026-10-11-2jlm"></script>
-<script src="classeurs.js?v=2026-10-11-2jlm"></script>
-<script src="classeurs-page.js?v=2026-10-11-2jlm"></script>
-<script src="classeurs-partage.js?v=2026-10-11-2jlm"></script>
+<script src="univers.js?v=2026-10-11-afrf"></script>
+<script src="catalogue.js?v=2026-10-11-afrf"></script>
+<script src="supabase-config.js?v=2026-10-11-afrf"></script>
+<script src="pied.js?v=2026-10-11-afrf"></script>
+<script src="admin.js?v=2026-10-11-afrf"></script>
+<script src="admin-site.js?v=2026-10-11-afrf"></script>
+<script src="compte.js?v=2026-10-11-afrf"></script>
+<script src="confirmation.js?v=2026-10-11-afrf"></script>
+<script src="progression.js?v=2026-10-11-afrf"></script>
+<script src="raretes.js?v=2026-10-11-afrf"></script>
+<script src="pokedex-fr.js?v=2026-10-11-afrf"></script>
+<script src="sets.js?v=2026-10-11-afrf"></script>
+<script src="classeurs.js?v=2026-10-11-afrf"></script>
+<script src="classeurs-page.js?v=2026-10-11-afrf"></script>
+<script src="classeurs-partage.js?v=2026-10-11-afrf"></script>
 
 </body>
 </html>

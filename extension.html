@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js?v=2026-10-11-afrf"></script>
 <title>Extension — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +25,7 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
   @media(max-width:640px){.wrap{padding:0 20px}}
 
-  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
   .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
   .brand span{color:var(--gold)}
   .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
@@ -40,26 +41,26 @@
   .page-head .meta{color:var(--text-on-ink-dim);font-size:14px;margin-top:6px;}
 
   .toolbar{display:flex;gap:10px;padding-bottom:30px;flex-wrap:wrap;align-items:center;}
-  .toolbar input{flex:1;min-width:180px;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  .toolbar input{flex:1;min-width:180px;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   .toolbar input::placeholder{color:var(--text-on-ink-dim)}
-  .toolbar select{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:10px 14px;border-radius:4px;font-size:13px;font-family:inherit;}
-  .filter-btn{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
+  .toolbar select{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:10px 14px;border-radius:4px;font-size:13px;font-family:inherit;}
+  .filter-btn{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
   .filter-btn.on.obt{color:var(--accent-clair);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
   .filter-btn.on.manq{color:#B9C2CE;border-color:rgba(185,194,206,0.45);background:rgba(185,194,206,0.08)}
-  .filter-btn.on.rech{color:#E08862;border-color:rgba(168,67,28,0.5);background:rgba(168,67,28,0.1)}
-  .filter-btn.on.ech{color:#5FBAAA;border-color:rgba(31,111,99,0.5);background:rgba(31,111,99,0.12)}
+  .filter-btn.on.rech{color:var(--alerte);border-color:rgba(168,67,28,0.5);background:rgba(168,67,28,0.1)}
+  .filter-btn.on.ech{color:var(--succes);border-color:rgba(31,111,99,0.5);background:rgba(31,111,99,0.12)}
 
   .tri-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:-18px;padding-bottom:14px;font-size:12.5px;color:var(--text-on-ink-dim);}
-  .tri-row select{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:6px 10px;border-radius:4px;font-size:12.5px;font-family:inherit;}
-  .tri-row button{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:5px 11px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;line-height:1.3;}
-  .tri-row button:hover{border-color:rgba(237,234,224,0.35)}
+  .tri-row select{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:6px 10px;border-radius:4px;font-size:12.5px;font-family:inherit;}
+  .tri-row button{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:5px 11px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;line-height:1.3;}
+  .tri-row button:hover{border-color:rgba(var(--trait-rgb),0.35)}
   .tri-row select:disabled, .tri-row button:disabled{opacity:.5;cursor:default}
   .tri-row #tri-etat{color:var(--accent-clair);}
   .card-cote{font-size:11.5px;color:var(--accent-clair);margin-top:-3px;}
 
   .bulk-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:-14px;padding-bottom:28px;font-size:12.5px;color:var(--text-on-ink-dim);}
-  .bulk-btn{font-size:14px;line-height:1.2;padding:4px 12px;border-radius:3px;cursor:pointer;border:1px solid rgba(237,234,224,0.14);background:transparent;font-family:inherit;transition:.12s;}
-  .bulk-btn:hover{border-color:rgba(237,234,224,0.35);background:rgba(237,234,224,0.04)}
+  .bulk-btn{font-size:14px;line-height:1.2;padding:4px 12px;border-radius:3px;cursor:pointer;border:1px solid rgba(var(--trait-rgb),0.14);background:transparent;font-family:inherit;transition:.12s;}
+  .bulk-btn:hover{border-color:rgba(var(--trait-rgb),0.35);background:rgba(var(--trait-rgb),0.04)}
 
   /* Cinq cartes par ligne, comme l'application TCG Pocket : retrouver une
      carte au même endroit d'une grille à l'autre compte plus que d'en voir
@@ -81,7 +82,7 @@
   /* flex:none empêche la boîte d'être comprimée par un nom sur trois
      lignes ou par une ligne de cote ; margin-top:auto pousse les tags
      en bas, pour qu'ils s'alignent d'une vignette à l'autre. */
-  .card-img-wrap{flex:none;position:relative;aspect-ratio:2.5/3.5;border-radius:6px;overflow:hidden;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);display:flex;align-items:center;justify-content:center;}
+  .card-img-wrap{flex:none;position:relative;aspect-ratio:2.5/3.5;border-radius:6px;overflow:hidden;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);display:flex;align-items:center;justify-content:center;}
   /* La carte est montrée entière, jamais rognée. Les visuels fournis par
      TCGdex n'ont pas tous exactement la même proportion — scans d'anciennes
      séries, promos hors format — et « cover » les agrandissait jusqu'à
@@ -104,26 +105,26 @@
   .tag-row{margin-top:auto;display:flex;gap:5px;}
   /* Les symboles sont des emojis : leur couleur ne se pilote pas en CSS.
      L'état inactif est donc signalé en les désaturant. */
-  .tag-toggle{flex:1;font-size:14px;line-height:1.2;padding:5px 0;border-radius:3px;text-align:center;cursor:pointer;border:1px solid rgba(237,234,224,0.14);background:transparent;font-family:inherit;transition:.12s;}
+  .tag-toggle{flex:1;font-size:14px;line-height:1.2;padding:5px 0;border-radius:3px;text-align:center;cursor:pointer;border:1px solid rgba(var(--trait-rgb),0.14);background:transparent;font-family:inherit;transition:.12s;}
   .tag-toggle:not(.active){filter:grayscale(1);opacity:.45}
   .tag-toggle.obt.active{background:rgba(var(--gold-rgb),0.16);border-color:rgba(var(--gold-rgb),0.5)}
   .tag-toggle.rech.active{background:rgba(168,67,28,0.16);border-color:rgba(168,67,28,0.5)}
   .tag-toggle.ech.active{background:rgba(31,111,99,0.18);border-color:rgba(31,111,99,0.5)}
-  .tag-toggle:hover{border-color:rgba(237,234,224,0.35);opacity:1}
+  .tag-toggle:hover{border-color:rgba(var(--trait-rgb),0.35);opacity:1}
   /* Le bouton « échangeable » bloqué vit dans une enveloppe qui reçoit le
      clic à sa place : elle doit donc reprendre la largeur qu'il occupait. */
   .ech-bloque{flex:1;display:flex;cursor:help}
   .ech-bloque .tag-toggle{flex:1;cursor:help}
   .tag-toggle.bloque,.tag-toggle.bloque:hover{opacity:.28;filter:grayscale(1);
-    border-style:dashed;border-color:rgba(237,234,224,0.14)}
+    border-style:dashed;border-color:rgba(var(--trait-rgb),0.14)}
 
-  .skeleton{aspect-ratio:2.5/3.5;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;position:relative;overflow:hidden;}
-  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(237,234,224,0.06),transparent);animation:shine 1.4s infinite;}
+  .skeleton{aspect-ratio:2.5/3.5;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:6px;position:relative;overflow:hidden;}
+  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(var(--trait-rgb),0.06),transparent);animation:shine 1.4s infinite;}
   @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 
   .status-msg{color:var(--text-on-ink-dim);font-size:14px;padding:20px 0;}
-  .status-msg.err{color:#E08862}
-  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+  .status-msg.err{color:var(--alerte)}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
   /* ========================= Téléphone =========================
      Les liens de navigation passaient en display:none sous 720 px : depuis
@@ -225,20 +226,20 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="sets.js?v=2026-10-11-2jlm"></script>
-<script src="univers.js?v=2026-10-11-2jlm"></script>
-<script src="catalogue.js?v=2026-10-11-2jlm"></script>
-<script src="supabase-config.js?v=2026-10-11-2jlm"></script>
-<script src="pied.js?v=2026-10-11-2jlm"></script>
-<script src="admin.js?v=2026-10-11-2jlm"></script>
-<script src="admin-site.js?v=2026-10-11-2jlm"></script>
-<script src="progression.js?v=2026-10-11-2jlm"></script>
-<script src="confirmation.js?v=2026-10-11-2jlm"></script>
-<script src="tags.js?v=2026-10-11-2jlm"></script>
-<script src="raretes.js?v=2026-10-11-2jlm"></script>
-<script src="cards.js?v=2026-10-11-2jlm"></script>
-<script src="prix.js?v=2026-10-11-2jlm"></script>
-<script src="compte.js?v=2026-10-11-2jlm"></script>
+<script src="sets.js?v=2026-10-11-afrf"></script>
+<script src="univers.js?v=2026-10-11-afrf"></script>
+<script src="catalogue.js?v=2026-10-11-afrf"></script>
+<script src="supabase-config.js?v=2026-10-11-afrf"></script>
+<script src="pied.js?v=2026-10-11-afrf"></script>
+<script src="admin.js?v=2026-10-11-afrf"></script>
+<script src="admin-site.js?v=2026-10-11-afrf"></script>
+<script src="progression.js?v=2026-10-11-afrf"></script>
+<script src="confirmation.js?v=2026-10-11-afrf"></script>
+<script src="tags.js?v=2026-10-11-afrf"></script>
+<script src="raretes.js?v=2026-10-11-afrf"></script>
+<script src="cards.js?v=2026-10-11-afrf"></script>
+<script src="prix.js?v=2026-10-11-afrf"></script>
+<script src="compte.js?v=2026-10-11-afrf"></script>
 <script>
 // Récupère les cartes d'une extension depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).

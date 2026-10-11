@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js?v=2026-10-11-afrf"></script>
+<title>Paramètres — PokéClasseur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15171B; --ink-soft:#20232A; --teal:#1F6F63; --teal-deep:#123F38;
+    --rust:#A8431C; --gold:#C9A227; --gold-rgb:201,162,39; --accent-clair:#E3C766; --text-on-ink:#EDEAE0; --text-on-ink-dim:#9B9E9C;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
+  h1,h2{font-family:'Newsreader',serif;font-weight:500;margin:0;}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 20px}}
+
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
+  .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
+  .brand span{color:var(--gold)}
+  .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
+  .navlinks a:hover{color:var(--text-on-ink)}
+
+  .panel{max-width:440px;margin:56px auto 80px;}
+  .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
+  .panel h1{font-size:32px;margin-bottom:10px;}
+  .panel p.intro{color:var(--text-on-ink-dim);font-size:15px;margin:0 0 28px;}
+
+  .tabs{display:flex;gap:8px;margin-bottom:24px;}
+  .tab{flex:1;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink-dim);padding:10px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .tab.on{color:var(--text-on-ink);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
+
+  label{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:16px 0 6px;}
+  input{width:100%;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  input:focus{outline:none;border-color:rgba(var(--gold-rgb),0.5)}
+  /* La case n'est jamais pré-cochée : un consentement pré-coché n'en est
+     pas un, et ne prouve rien. Les liens s'ouvrent dans un nouvel onglet
+     pour qu'on ne perde pas ce qu'on vient de saisir. */
+  /* Séparée du reste par un trait et par sa couleur : on ne tombe pas sur ce
+     bouton en visant « Enregistrer ». */
+  .danger-zone{margin-top:40px;padding-top:24px;border-top:1px solid rgba(192,57,43,0.35)}
+  .danger-zone h2{font-family:'Newsreader',serif;font-size:18px;font-weight:500;
+                  color:var(--alerte);margin:0 0 8px;}
+  .danger-zone p{font-size:13px;line-height:1.6;color:var(--text-on-ink-dim);margin:0 0 14px}
+  .destructeur{font-family:inherit;font-size:13.5px;padding:10px 18px;border-radius:5px;
+               cursor:pointer;background:transparent;color:var(--alerte);
+               border:1px solid rgba(192,57,43,0.5);transition:.12s;}
+  .destructeur:hover{background:rgba(192,57,43,0.14);color:#F0A088}
+
+  .consentement{display:flex;align-items:flex-start;gap:10px;margin:20px 0 4px;
+                font-size:13.5px;line-height:1.55;color:var(--text-on-ink-dim);cursor:pointer;}
+  .consentement input{width:19px;height:19px;flex-shrink:0;margin:1px 0 0;accent-color:var(--gold);cursor:pointer}
+  .consentement a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:2px}
+
+  .aide{font-size:12px;color:var(--text-on-ink-dim);margin-top:6px;}
+
+  button.principal{width:100%;margin-top:26px;background:var(--teal);border:none;color:#EDF5F3;padding:12px;border-radius:3px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}
+  button.principal:hover{background:var(--teal-deep)}
+  button.principal:disabled{opacity:.5;cursor:default}
+  button.discret{margin-top:14px;width:100%;background:transparent;border:1px solid rgba(var(--trait-rgb),0.14);color:var(--text-on-ink-dim);padding:10px;border-radius:3px;font-size:13px;cursor:pointer;font-family:inherit;}
+  button.discret:hover{border-color:rgba(var(--trait-rgb),0.3)}
+
+  .message{margin-top:20px;font-size:13.5px;padding:12px 14px;border-radius:4px;}
+  .message.err{color:var(--alerte);background:rgba(168,67,28,0.1);border:1px solid rgba(168,67,28,0.35)}
+  .message.ok{color:var(--succes);background:rgba(31,111,99,0.12);border:1px solid rgba(31,111,99,0.35)}
+
+  .compte-actuel{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:22px;}
+  .compte-actuel .pseudo{font-family:'Newsreader',serif;font-size:24px;}
+  .compte-actuel .detail{color:var(--text-on-ink-dim);font-size:13.5px;margin-top:4px;}
+  .bloques{margin-top:30px;border-top:1px solid rgba(var(--trait-rgb),0.08);padding-top:22px;}
+  .bloques h2{font-size:19px;margin-bottom:4px;}
+  .bloques p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
+  .bloque{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid rgba(var(--trait-rgb),0.06);font-size:14px;}
+  .bloque button{background:transparent;border:1px solid rgba(var(--trait-rgb),0.14);color:var(--text-on-ink-dim);padding:5px 12px;border-radius:3px;font-size:12px;cursor:pointer;font-family:inherit;}
+  .bloque button:hover{border-color:rgba(var(--trait-rgb),0.35);color:var(--text-on-ink)}
+
+  .zone{margin-top:30px;border-top:1px solid rgba(var(--trait-rgb),0.08);padding-top:22px;}
+  .zone h2{font-size:19px;margin-bottom:4px;}
+  .zone > p{font-size:12.5px;color:var(--text-on-ink-dim);margin:0 0 14px;}
+  .zone-actuelle{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:12px 14px;font-size:14px;}
+  .zone-actuelle.vide{color:var(--text-on-ink-dim);font-size:13.5px;}
+  .recherche{display:flex;gap:8px;align-items:stretch;}
+  .recherche input{flex:1}
+  .recherche button{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:0 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+  .recherche button:hover{border-color:rgba(var(--gold-rgb),0.5)}
+  .recherche button:disabled{opacity:.5;cursor:default}
+  .communes{margin-top:10px;display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto;}
+  .commune{text-align:left;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:9px 12px;border-radius:4px;font-size:13.5px;cursor:pointer;font-family:inherit;}
+  .commune:hover{border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.06)}
+  .commune small{display:block;color:var(--text-on-ink-dim);font-size:11.5px;margin-top:1px;}
+  .zone-msg{font-size:12.5px;margin-top:10px;}
+  .zone-msg.err{color:var(--alerte)}
+  .zone-msg.ok{color:var(--succes)}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
+
+  /* ========================= Téléphone =========================
+     Les liens de navigation passaient en display:none sous 720 px : depuis
+     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
+     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
+     visibles, et assez hauts pour être touchés sans viser. La règle de
+     débordement horizontal n'est là que pour les très petits écrans, où
+     quatre libellés ne tiennent plus côte à côte.
+
+     Le reste resserre des marges verticales taillées pour un grand écran,
+     et porte les commandes à une hauteur tactile confortable — en bas de
+     42 px, un doigt touche la voisine une fois sur trois. */
+  @media(max-width:720px){
+    nav{flex-wrap:wrap;padding:18px 0 0;}
+    .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
+              justify-content:space-between;overflow-x:auto;scrollbar-width:none;}
+    .navlinks::-webkit-scrollbar{display:none}
+    .navlinks a{white-space:nowrap;padding:12px 6px;border-bottom:2px solid transparent;}
+    .navlinks a.active{border-bottom-color:currentColor;}
+    .brand{font-size:19px;padding:6px 0}
+    .compte-lien{padding:11px 0 11px 12px}
+
+    .panel{margin:30px auto 60px}
+    .panel h1{font-size:26px}
+    .tab{min-height:44px}
+    input{min-height:44px}
+    button.discret{min-height:44px}
+    .recherche button{min-height:44px}
+    .commune{min-height:44px}
+  }
+</style>
+<style>
+  .reglages{max-width:620px;margin:56px auto 80px}
+  .reglages .kicker{font-size:13px;color:var(--accent-clair);margin-bottom:10px}
+  .reglages h1{font-size:34px;margin-bottom:8px}
+  .reglages .intro{color:var(--text-on-ink-dim);margin:0 0 30px}
+  .reglage{padding:22px;border-radius:12px;background:rgba(var(--trait-rgb),0.04);
+    border:1px solid rgba(var(--trait-rgb),0.10);margin-bottom:18px}
+  .reglage h2{font-size:21px;margin-bottom:6px}
+  .reglage p{font-size:13.5px;line-height:1.6;color:var(--text-on-ink-dim);margin:0 0 14px}
+  .themes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .theme-choix{position:relative;display:flex;flex-direction:column;gap:9px;padding:10px;border-radius:10px;cursor:pointer;
+    border:1px solid rgba(var(--trait-rgb),0.14);background:transparent;color:var(--text-on-ink);font:inherit;font-size:13.5px;text-align:left}
+  .theme-choix:hover{border-color:rgba(var(--gold-rgb),0.5)}
+  .theme-choix[aria-checked="true"]{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+  .theme-choix small{display:block;color:var(--text-on-ink-dim);font-size:11.5px;margin-top:2px}
+  .vignette-theme{height:58px;border-radius:7px;overflow:hidden;display:grid;grid-template-columns:1fr;border:1px solid rgba(var(--trait-rgb),0.12)}
+  .vignette-theme.sombre{background:#15171B}
+  .vignette-theme.clair{background:#F4F0E6}
+  .vignette-theme.auto{background:linear-gradient(115deg,#F4F0E6 0 50%,#15171B 50% 100%)}
+  .vignette-theme i{display:block;margin:10px 10px 0;height:7px;border-radius:4px;width:55%}
+  .vignette-theme.sombre i{background:#EDEAE0}.vignette-theme.clair i{background:#1E2127}
+  .vignette-theme.auto i{background:linear-gradient(90deg,#1E2127 0 50%,#EDEAE0 50%)}
+  .vignette-theme b{display:block;margin:7px 10px;height:16px;border-radius:4px;width:35%;background:#1F6F63}
+  .bascule{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .bascule label{font-size:15px;color:var(--text-on-ink);cursor:pointer}
+  .interrupteur{position:relative;flex:none;width:48px;height:28px;border-radius:999px;border:0;cursor:pointer;
+    background:rgba(var(--trait-rgb),0.22);transition:background .15s}
+  .interrupteur::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.3);transition:transform .15s}
+  .interrupteur[aria-checked="true"]{background:var(--teal)}
+  .interrupteur[aria-checked="true"]::after{transform:translateX(20px)}
+  .interrupteur:disabled{opacity:.45;cursor:not-allowed}
+  .reglage .etat-notif{font-size:12.5px;margin:12px 0 0;color:var(--text-on-ink-dim)}
+  .reglage .etat-notif.err{color:var(--alerte)}
+  .reglage .etat-notif.ok{color:var(--succes)}
+  .essai-notif{margin-top:12px;font:inherit;font-size:13px;padding:7px 13px;border-radius:999px;cursor:pointer;
+    border:1px solid rgba(var(--trait-rgb),0.18);background:transparent;color:var(--text-on-ink)}
+  .essai-notif:hover{background:rgba(var(--trait-rgb),0.07)}
+  @media(max-width:560px){ .themes{grid-template-columns:1fr} .reglages{margin:30px auto 60px} }
+  @media(prefers-reduced-motion:reduce){ .interrupteur,.interrupteur::after{transition:none} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <a class="brand" href="index.html">Poké<span>Classeur</span></a>
+    <div class="navlinks">
+      <a href="series.html">Par extension</a>
+      <a href="pokemon.html">Par Pokémon</a>
+      <a href="missions.html" class="lien-pocket">Missions secrètes</a>
+      <a href="classeurs.html" class="lien-physique">Mes classeurs</a>
+      <a href="echanges.html">Échanges</a>
+      <a href="discussions.html">Discussions</a>
+    </div>
+    <a class="brand compte-lien" style="font-size:14px;font-style:normal" href="connexion.html">Se connecter →</a>
+  </nav>
+
+  <div class="reglages">
+    <div class="kicker">Préférences</div>
+    <h1>Paramètres</h1>
+    <p class="intro" id="intro-reglages">Ces réglages valent pour cet appareil.</p>
+
+    <section class="reglage" aria-labelledby="titre-apparence">
+      <h2 id="titre-apparence">Apparence</h2>
+      <p>Le site en clair ou en sombre. « Automatique » suit le réglage de ton appareil, y compris
+         s'il passe en sombre le soir.</p>
+      <div class="themes" role="radiogroup" aria-labelledby="titre-apparence">
+        <button type="button" class="theme-choix" role="radio" data-theme-choix="auto">
+          <span class="vignette-theme auto"><i></i><b></b></span>
+          <span>Automatique<small>Comme ton appareil</small></span>
+        </button>
+        <button type="button" class="theme-choix" role="radio" data-theme-choix="clair">
+          <span class="vignette-theme clair"><i></i><b></b></span>
+          <span>Clair<small>Fond crème</small></span>
+        </button>
+        <button type="button" class="theme-choix" role="radio" data-theme-choix="sombre">
+          <span class="vignette-theme sombre"><i></i><b></b></span>
+          <span>Sombre<small>Fond encre</small></span>
+        </button>
+      </div>
+    </section>
+
+    <section class="reglage" aria-labelledby="titre-notif">
+      <h2 id="titre-notif">Notifications</h2>
+      <p>Une notification s'affiche quand un nouveau message arrive alors que PokéClasseur est
+         ouvert dans un onglet que tu ne regardes pas. La pastille rouge sur « Discussions »,
+         elle, reste toujours affichée.</p>
+      <div class="bascule">
+        <label for="notif-messages" id="libelle-notif">Être prévenu des nouveaux messages</label>
+        <button type="button" class="interrupteur" id="notif-messages" role="switch" aria-checked="false" aria-labelledby="libelle-notif"></button>
+      </div>
+      <p class="etat-notif" id="etat-notif" role="status"></p>
+      <button type="button" class="essai-notif" id="essai-notif" hidden>Essayer une notification</button>
+    </section>
+  </div>
+
+  <footer data-note="Ton compte sert à retrouver ta collection sur tous tes appareils et à te mettre en relation avec d'autres collectionneurs."></footer>
+</div>
+
+<script src="univers.js?v=2026-10-11-afrf"></script>
+<script src="supabase-config.js?v=2026-10-11-afrf"></script>
+<script src="pied.js?v=2026-10-11-afrf"></script>
+<script src="admin.js?v=2026-10-11-afrf"></script>
+<script src="admin-site.js?v=2026-10-11-afrf"></script>
+<script src="compte.js?v=2026-10-11-afrf"></script>
+<script>
+// --- Apparence --------------------------------------------------------
+function marquerTheme(){
+  const choix = themeChoisi();
+  document.querySelectorAll('[data-theme-choix]').forEach(b =>
+    b.setAttribute('aria-checked', String(b.dataset.themeChoix === choix)));
+}
+
+document.querySelectorAll('[data-theme-choix]').forEach(b => b.addEventListener('click', async () => {
+  choisirTheme(b.dataset.themeChoix);
+  marquerTheme();
+  try{ await enregistrerPreferences({ pref_theme: b.dataset.themeChoix }); }
+  catch(err){ console.warn('Thème non enregistré sur le compte', err); }
+}));
+
+// --- Notifications ----------------------------------------------------
+const interrupteur = document.getElementById('notif-messages');
+const etatNotif = document.getElementById('etat-notif');
+const essai = document.getElementById('essai-notif');
+const dire = (texte, type = '') => { etatNotif.textContent = texte; etatNotif.className = `etat-notif ${type}`; };
+
+function afficherNotifications(){
+  const voulu = notificationsVoulues();
+  interrupteur.setAttribute('aria-checked', String(voulu));
+  essai.hidden = true;
+  if(!estConnecte()){
+    interrupteur.disabled = true;
+    return dire('Connecte-toi pour être prévenu de tes nouveaux messages.');
+  }
+  interrupteur.disabled = false;
+  if(!('Notification' in window)) return dire("Ce navigateur ne sait pas afficher de notifications.", 'err');
+  if(!voulu) return dire('Les notifications de messages sont coupées.');
+  if(Notification.permission === 'denied')
+    return dire("Ton navigateur bloque les notifications de PokéClasseur. Pour les recevoir, autorise-les dans les réglages du navigateur (le cadenas à gauche de l'adresse du site).", 'err');
+  if(Notification.permission === 'default')
+    return dire("Il reste à autoriser les notifications : clique sur l'interrupteur, puis accepte la demande du navigateur.");
+  essai.hidden = false;
+  dire('Activées sur cet appareil.', 'ok');
+}
+
+interrupteur.addEventListener('click', async () => {
+  const voulu = interrupteur.getAttribute('aria-checked') !== 'true'
+    || ('Notification' in window && Notification.permission === 'default');
+  if(voulu && 'Notification' in window && Notification.permission === 'default'){
+    try{ await Notification.requestPermission(); }catch(err){ /* refus silencieux de certains navigateurs */ }
+  }
+  try{ await enregistrerNotifications(voulu); }
+  catch(err){ return dire(`Le réglage n'a pas pu être enregistré : ${err.message}`, 'err'); }
+  afficherNotifications();
+});
+
+essai.addEventListener('click', () => {
+  try{
+    new Notification('PokéClasseur', { body: 'Voilà à quoi ressemblera l\'annonce d\'un nouveau message.',
+      icon: 'images/jeux/tcg-pocket.png', tag: 'pokeclasseur-essai' });
+  }catch(err){ dire("Ce navigateur n'a pas pu afficher la notification.", 'err'); }
+});
+
+(async () => {
+  marquerTheme();
+  document.addEventListener('pokeclasseur:theme', marquerTheme);
+  await initCompte();
+  afficherEtatCompte();
+  marquerTheme();   // le thème du compte a pu remplacer celui de l'appareil
+  if(estConnecte()) document.getElementById('intro-reglages').textContent =
+    'Ces réglages suivent ton compte : tu les retrouveras sur tous tes appareils.';
+  afficherNotifications();
+})();
+</script>
+
+</body>
+</html>

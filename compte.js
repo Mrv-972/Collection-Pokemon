@@ -40,7 +40,7 @@ async function initCompte(){
     });
     const { data } = await db.auth.getSession();
     membre = data.session?.user ?? null;
-    if(membre) await chargerProfil();
+    if(membre){ await chargerProfil(); synchroniserTheme(); }
   }catch(err){
     console.warn('Compte indisponible', err);
   }
@@ -355,21 +355,274 @@ async function fusionnerCollection(){
 
 // -------------------------------------------------------- navigation -----
 
+// ------------------------------------------------ avatar et photo -------
+//
+// L'image d'un membre, par ordre de préférence : sa photo VALIDÉE par
+// l'administrateur, sinon le Pokémon choisi dans la galerie, sinon
+// l'initiale de son pseudo. La galerie est la nôtre : un avatar ne
+// demande aucune validation.
+const AVATARS = [
+  ['pikachu', 25, 'Pikachu'], ['evoli', 133, 'Évoli'], ['bulbizarre', 1, 'Bulbizarre'],
+  ['salameche', 4, 'Salamèche'], ['carapuce', 7, 'Carapuce'], ['dracaufeu', 6, 'Dracaufeu'],
+  ['mew', 151, 'Mew'], ['mewtwo', 150, 'Mewtwo'], ['ectoplasma', 94, 'Ectoplasma'],
+  ['ronflex', 143, 'Ronflex'], ['lokhlass', 131, 'Lokhlass'], ['rondoudou', 39, 'Rondoudou'],
+  ['psykokwak', 54, 'Psykokwak'], ['pyroli', 136, 'Pyroli'], ['togepi', 175, 'Togepi'],
+  ['germignon', 152, 'Germignon'], ['hericendre', 155, 'Héricendre'], ['kaiminus', 158, 'Kaiminus'],
+  ['gardevoir', 282, 'Gardevoir'], ['rayquaza', 384, 'Rayquaza'], ['tiplouf', 393, 'Tiplouf'],
+  ['lucario', 448, 'Lucario'], ['amphinobi', 658, 'Amphinobi'], ['mimiqui', 778, 'Mimiqui'],
+  ['morpeko', 877, 'Morpeko'], ['poussacha', 906, 'Poussacha'],
+].map(([cle, dex, nom]) => ({ cle, dex, nom }));
+
+const urlAvatar = cle => {
+  const a = AVATARS.find(x => x.cle === cle);
+  return a ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${a.dex}.png` : null;
+};
+
+const echapperAttr = v => String(v ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+// « p » porte pseudo, avatar et photo_url. Une image qui ne se charge pas
+// laisse place à l'initiale, plutôt qu'à une icône d'image cassée.
+function avatarHtml(p, taille = 32, classe = ''){
+  const initiale = String(p?.pseudo ?? '?').trim().charAt(0).toUpperCase() || '?';
+  const src = p?.photo_url || urlAvatar(p?.avatar);
+  const style = `width:${taille}px;height:${taille}px;font-size:${Math.round(taille * 0.45)}px`;
+  return `<span class="avatar-membre ${classe}" style="${style}" aria-hidden="true">${src
+    ? `<img src="${echapperAttr(src)}" alt="" loading="lazy" ${p?.photo_url ? '' : 'class="avatar-pokemon"'}
+         onerror="this.parentNode.textContent='${echapperAttr(initiale).replace(/'/g, '')}'">`
+    : echapperAttr(initiale)}</span>`;
+}
+
+const STYLE_PROFIL = `
+  .avatar-membre{display:inline-flex;align-items:center;justify-content:center;flex:none;
+    border-radius:50%;overflow:hidden;background:rgba(var(--gold-rgb,201,162,39),0.18);
+    color:var(--accent-clair,#E3C766);font-weight:600;font-family:'IBM Plex Sans',sans-serif;
+    box-shadow:inset 0 0 0 1px rgba(var(--trait-rgb,237,234,224),0.16);vertical-align:middle}
+  .avatar-membre img{width:100%;height:100%;object-fit:cover;display:block}
+  .avatar-membre img.avatar-pokemon{object-fit:contain;padding:8%;box-sizing:border-box}
+
+  /* Le menu du profil, dans la barre du haut : il s'ouvre au survol, au
+     clic (un écran tactile n'a pas de survol) et au clavier. */
+  .menu-profil{position:relative;margin-left:12px}
+  .menu-profil-bouton{display:inline-flex;align-items:center;gap:9px;background:none;border:0;cursor:pointer;
+    color:var(--text-on-ink,#EDEAE0);font:inherit;font-size:14px;padding:6px 4px;border-radius:999px}
+  .menu-profil-bouton .chevron{font-size:10px;opacity:.6;transition:transform .15s}
+  .menu-profil-bouton .nom{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .menu-profil-liste{position:absolute;right:0;top:calc(100% + 6px);z-index:65;min-width:200px;
+    padding:6px;border-radius:10px;background:var(--ink-soft,#20232A);
+    border:1px solid rgba(var(--trait-rgb,237,234,224),0.14);box-shadow:0 14px 34px rgba(0,0,0,0.28);
+    opacity:0;visibility:hidden;transform:translateY(-4px);transition:opacity .12s,transform .12s,visibility .12s}
+  /* Un pont invisible entre le bouton et la liste : sans lui, la souris
+     qui descend vers la liste traverse un vide et la referme. */
+  .menu-profil-liste::before{content:'';position:absolute;left:0;right:0;top:-8px;height:8px}
+  .menu-profil:hover .menu-profil-liste,.menu-profil:focus-within .menu-profil-liste,
+  .menu-profil.ouvert .menu-profil-liste{opacity:1;visibility:visible;transform:none}
+  .menu-profil:hover .chevron,.menu-profil.ouvert .chevron{transform:rotate(180deg)}
+  .menu-profil-liste a,.menu-profil-liste button{display:flex;align-items:center;gap:10px;width:100%;
+    box-sizing:border-box;padding:10px 12px;border-radius:7px;border:0;background:none;cursor:pointer;
+    color:var(--text-on-ink,#EDEAE0);font:inherit;font-size:14px;text-align:left;text-decoration:none}
+  .menu-profil-liste a:hover,.menu-profil-liste button:hover,
+  .menu-profil-liste a:focus-visible,.menu-profil-liste button:focus-visible{background:rgba(var(--trait-rgb,237,234,224),0.08);outline:none}
+  .menu-profil-liste .icone{width:18px;text-align:center;opacity:.75}
+  .menu-profil-liste hr{border:0;border-top:1px solid rgba(var(--trait-rgb,237,234,224),0.10);margin:5px 4px}
+  .menu-profil-liste .deconnexion{color:var(--text-on-ink-dim,#9B9E9C)}
+  @media(max-width:720px){ .menu-profil-bouton .nom,.menu-profil-bouton .chevron{display:none} }
+  @media(prefers-reduced-motion:reduce){ .menu-profil-liste,.menu-profil-bouton .chevron{transition:none} }
+`;
+
+function poserStyleProfil(){
+  if(document.getElementById('style-profil')) return;
+  document.head.appendChild(Object.assign(document.createElement('style'),
+    { id: 'style-profil', textContent: STYLE_PROFIL }));
+}
+
+// Le menu du profil remplace, pour un membre connecté, le lien du compte.
+function poserMenuProfil(lien){
+  poserStyleProfil();
+  const menu = document.createElement('div');
+  menu.className = 'menu-profil';
+  menu.innerHTML = `
+    <button type="button" class="menu-profil-bouton" aria-haspopup="true" aria-expanded="false">
+      ${avatarHtml(profil, 30)}<span class="nom">${echapperAttr(profil?.pseudo ?? 'Mon compte')}</span>
+      <span class="chevron" aria-hidden="true">▼</span>
+    </button>
+    <div class="menu-profil-liste" role="menu">
+      <a role="menuitem" href="connexion.html"><span class="icone" aria-hidden="true">👤</span>Mon profil</a>
+      <a role="menuitem" href="parametres.html"><span class="icone" aria-hidden="true">⚙️</span>Paramètres</a>
+      <hr>
+      <button role="menuitem" type="button" class="deconnexion"><span class="icone" aria-hidden="true">↪</span>Se déconnecter</button>
+    </div>`;
+  const bouton = menu.querySelector('.menu-profil-bouton');
+  const basculer = ouvrir => {
+    menu.classList.toggle('ouvert', ouvrir);
+    bouton.setAttribute('aria-expanded', String(ouvrir));
+  };
+  bouton.addEventListener('click', e => { e.stopPropagation(); basculer(!menu.classList.contains('ouvert')); });
+  document.addEventListener('click', e => { if(!menu.contains(e.target)) basculer(false); });
+  menu.addEventListener('keydown', e => {
+    if(e.key === 'Escape'){ basculer(false); bouton.focus(); bouton.blur(); }
+  });
+  menu.querySelector('.deconnexion').addEventListener('click', async () => {
+    try{ await seDeconnecter(); }catch(err){ console.warn('Déconnexion', err); }
+    window.location.href = 'index.html';
+  });
+  lien.replaceWith(menu);
+}
+
 // Remplace le lien "Mon classeur" de l'en-tête par l'état réel du compte.
+let modeleLienCompte = null;
 function afficherEtatCompte(){
+  // La page du compte redessine l'en-tête après chaque action : le menu
+  // déjà posé redevient le lien d'origine, puis l'état est réappliqué.
+  const menuPose = document.querySelector('nav .menu-profil');
+  if(menuPose && modeleLienCompte){
+    const gabarit = document.createElement('template');
+    gabarit.innerHTML = modeleLienCompte;
+    menuPose.replaceWith(gabarit.content.firstElementChild);
+  }
   const lien = document.querySelector('nav .compte-lien');
   if(!lien) return;
+  modeleLienCompte ??= lien.outerHTML;
   if(CONFIG_MANQUANTE){
     lien.textContent = 'Compte à configurer';
     lien.href = 'connexion.html';
     return;
   }
-  lien.textContent = estConnecte() ? `${profil?.pseudo ?? 'Mon compte'} →` : 'Se connecter →';
-  lien.href = 'connexion.html';
+  // Une session sans profil (inscription inachevée) garde le lien : il
+  // mène là où l'on choisit son pseudo.
+  if(estConnecte() && profil){
+    poserMenuProfil(lien);
+  }else{
+    lien.textContent = estConnecte() ? 'Mon compte →' : 'Se connecter →';
+    lien.href = 'connexion.html';
+  }
   if(estConnecte()){
     afficherNonLus();
     suivreLesNonLus();
   }
+}
+
+// Les avatars et photos de plusieurs membres d'un coup, pour les listes
+// (discussions, échanges). Les fonctions qui fournissent ces listes ne
+// renvoient que le pseudo : on complète par une lecture à part. Tant que la
+// base n'a pas reçu les colonnes, la lecture échoue et la liste garde ses
+// initiales — rien ne casse.
+const avatarsConnus = new Map();
+async function avatarsDe(ids){
+  const manquants = [...new Set(ids)].filter(id => id && !avatarsConnus.has(id));
+  if(manquants.length && estConnecte()){
+    try{
+      const db = await clientSupabase();
+      const { data, error } = await db.from('profils').select('id, avatar, photo_url').in('id', manquants);
+      if(!error) for(const p of data ?? []) avatarsConnus.set(p.id, p);
+    }catch{ /* initiales */ }
+  }
+  return avatarsConnus;
+}
+
+// --------------------------------------------- préférences du membre -----
+//
+// Thème et notifications sont retenus sur le compte, pour suivre le membre
+// d'un appareil à l'autre. Tant que la base n'a pas reçu les colonnes
+// (supabase/profil-photo-parametres.sql), le profil ne les porte pas : on
+// s'en tient alors à ce que l'appareil a retenu.
+const profilAPreferences = () => profil && 'pref_theme' in profil;
+
+function synchroniserTheme(){
+  if(!profilAPreferences() || typeof choisirTheme !== 'function') return;
+  if(profil.pref_theme && profil.pref_theme !== themeChoisi()) choisirTheme(profil.pref_theme);
+}
+
+async function enregistrerPreferences(changements){
+  if(!estConnecte() || !profilAPreferences()) return false;
+  const db = await clientSupabase();
+  const { error } = await db.from('profils').update(changements).eq('id', membre.id);
+  if(error) throw error;
+  Object.assign(profil, changements);
+  return true;
+}
+
+// ------------------------------------------------ photo de profil -------
+//
+// Une photo proposée part dans un dépôt PRIVÉ (« avatars-attente ») : seuls
+// son auteur et l'administrateur la voient. Les autres membres ne la
+// verront qu'une fois validée et recopiée dans le dépôt public.
+const DEPOT_PHOTOS_ATTENTE = 'avatars-attente';
+const DEPOT_PHOTOS = 'avatars';
+const profilAPhoto = () => profil && 'photo_statut' in profil;
+
+async function choisirAvatar(cle){
+  if(cle !== null && !AVATARS.some(a => a.cle === cle)) throw new Error('Avatar inconnu.');
+  return enregistrerPreferences({ avatar: cle });
+}
+
+async function proposerPhoto(blob){
+  if(!estConnecte() || !profilAPhoto()) throw new Error("La photo de profil n'est pas encore disponible.");
+  const db = await clientSupabase();
+  const chemin = `${membre.id}/${Date.now()}.webp`;
+  const { error } = await db.storage.from(DEPOT_PHOTOS_ATTENTE)
+    .upload(chemin, blob, { contentType: 'image/webp', upsert: false });
+  if(error) throw error;
+  const ancienne = profil.photo_en_attente;
+  await enregistrerPreferences({ photo_en_attente: chemin });
+  // L'ancienne proposition n'a plus d'objet : on la retire du dépôt.
+  if(ancienne) db.storage.from(DEPOT_PHOTOS_ATTENTE).remove([ancienne]).catch(() => {});
+  await chargerProfil();   // le statut est recalculé par la base
+}
+
+// Le membre voit sa propre photo en attente, par un lien temporaire : le
+// dépôt est privé, aucune adresse permanente n'existe.
+async function lienPhotoEnAttente(){
+  if(!profil?.photo_en_attente) return null;
+  const db = await clientSupabase();
+  const { data } = await db.storage.from(DEPOT_PHOTOS_ATTENTE).createSignedUrl(profil.photo_en_attente, 3600);
+  return data?.signedUrl ?? null;
+}
+
+async function retirerPhoto(){
+  if(!estConnecte() || !profilAPhoto()) return;
+  const db = await clientSupabase();
+  if(profil.photo_en_attente) await db.storage.from(DEPOT_PHOTOS_ATTENTE).remove([profil.photo_en_attente]).catch(() => {});
+  const publique = /\/avatars\/([^?]+)/.exec(profil.photo_url ?? '');
+  if(publique) await db.storage.from(DEPOT_PHOTOS).remove([decodeURIComponent(publique[1])]).catch(() => {});
+  const { error } = await db.rpc('retirer_ma_photo');
+  if(error) throw error;
+  await chargerProfil();
+}
+
+// Le choix est retenu sur le compte ; à défaut — base pas encore mise à
+// jour —, sur l'appareil. Par défaut : activé.
+const CLE_NOTIF_MESSAGES = 'pokeclasseur-notif-messages';
+function notificationsVoulues(){
+  if(profilAPreferences()) return profil.pref_notif_messages !== false;
+  try{ return localStorage.getItem(CLE_NOTIF_MESSAGES) !== 'non'; }catch{ return true; }
+}
+
+async function enregistrerNotifications(voulu){
+  try{ localStorage.setItem(CLE_NOTIF_MESSAGES, voulu ? 'oui' : 'non'); }catch{}
+  return enregistrerPreferences({ pref_notif_messages: voulu });
+}
+
+// Une notification du navigateur quand le nombre de messages non lus
+// augmente. Le dernier nombre annoncé est gardé : changer de page ne
+// renotifie pas les mêmes messages. L'étiquette commune fait que deux
+// onglets ouverts ne montrent qu'une seule notification.
+const CLE_NON_LUS_ANNONCES = 'pokeclasseur-non-lus-annonces';
+function prevenirNouveauxMessages(nombre){
+  let annonces = 0;
+  try{ annonces = Number(localStorage.getItem(CLE_NON_LUS_ANNONCES) ?? 0); }catch{}
+  try{ localStorage.setItem(CLE_NON_LUS_ANNONCES, String(nombre)); }catch{}
+  if(nombre <= annonces) return;
+  if(!notificationsVoulues() || !('Notification' in window) || Notification.permission !== 'granted') return;
+  // L'onglet regardé affiche déjà la pastille : inutile d'y ajouter une
+  // fenêtre. On ne prévient que si personne ne regarde la page.
+  if(document.visibilityState === 'visible') return;
+  try{
+    const n = new Notification('PokéClasseur', {
+      body: nombre === 1 ? 'Tu as un nouveau message.' : `Tu as ${nombre} messages non lus.`,
+      icon: 'images/jeux/tcg-pocket.png', tag: 'pokeclasseur-messages',
+    });
+    n.onclick = () => { window.focus(); window.location.href = 'discussions.html'; n.close(); };
+  }catch(err){ console.warn('Notification refusée', err); }
 }
 
 // La pastille se tient à jour d'elle-même, sans qu'on ait à changer de page.
@@ -435,6 +688,7 @@ async function afficherNonLus(){
   poserStylePastille();
   try{
     const nombre = await totalNonLus();
+    prevenirNouveauxMessages(nombre);
     lien.querySelector('.pastille')?.remove();
     if(nombre > 0){
       lien.insertAdjacentHTML('beforeend',

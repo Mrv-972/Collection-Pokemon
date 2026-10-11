@@ -11,7 +11,7 @@ const STYLE_CONFIRMATION = `
                 justify-content:center;padding:24px;background:rgba(10,11,13,0.72);
                 opacity:0;transition:opacity .15s;}
   .confirmation.vue{opacity:1}
-  .confirmation .boite{background:#15171B;border:1px solid rgba(237,234,224,0.14);
+  .confirmation .boite{background:var(--ink,#15171B);border:1px solid rgba(var(--trait-rgb,237,234,224),0.14);
                        border-radius:10px;padding:22px 24px;max-width:420px;width:100%;
                        box-shadow:0 24px 60px rgba(0,0,0,0.55);
                        font-family:'IBM Plex Sans',sans-serif;}
@@ -21,9 +21,9 @@ const STYLE_CONFIRMATION = `
   .confirmation p b{color:var(--text-on-ink,#EDEAE0);font-weight:600}
   .confirmation .boutons{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
   .confirmation button{font-family:inherit;font-size:13.5px;padding:9px 18px;border-radius:5px;
-                       cursor:pointer;border:1px solid rgba(237,234,224,0.16);
+                       cursor:pointer;border:1px solid rgba(var(--trait-rgb,237,234,224),0.16);
                        background:transparent;color:var(--text-on-ink,#EDEAE0);transition:.12s;}
-  .confirmation button:hover{background:rgba(237,234,224,0.07)}
+  .confirmation button:hover{background:rgba(var(--trait-rgb,237,234,224),0.07)}
   .confirmation button.principal{background:var(--gold,#C9A227);border-color:transparent;
                                  color:var(--ink,#15171B);font-weight:600;}
   .confirmation button.principal:hover{filter:brightness(1.1);background:var(--gold,#C9A227)}
@@ -36,8 +36,8 @@ const STYLE_CONFIRMATION = `
   .confirmation .recopie b{color:var(--text-on-ink,#EDEAE0);font-weight:600;
                            font-family:'IBM Plex Mono',monospace;letter-spacing:.5px;}
   .confirmation input{width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;
-                      padding:10px 12px;border-radius:5px;background:rgba(237,234,224,0.05);
-                      border:1px solid rgba(237,234,224,0.16);color:var(--text-on-ink,#EDEAE0);}
+                      padding:10px 12px;border-radius:5px;background:rgba(var(--trait-rgb,237,234,224),0.05);
+                      border:1px solid rgba(var(--trait-rgb,237,234,224),0.16);color:var(--text-on-ink,#EDEAE0);}
   @media(max-width:520px){
     .confirmation .boutons{flex-direction:column-reverse}
     .confirmation button{width:100%;min-height:44px}

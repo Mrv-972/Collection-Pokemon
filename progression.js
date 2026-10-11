@@ -55,7 +55,7 @@ const pourcentage = ({ obtenues, total }) =>
 const STYLE_PROGRESSION = `
   .progression{margin-top:10px}
   .progression .piste{height:5px;border-radius:999px;overflow:hidden;
-                      background:rgba(237,234,224,0.10);}
+                      background:rgba(var(--trait-rgb,237,234,224),0.10);}
   .progression .part{height:100%;border-radius:999px;
                      background:var(--gold,#C9A227);
                      transition:width .35s ease;}
@@ -150,7 +150,7 @@ function poserStyleNonObtenue(){
 const STYLE_INTERRUPTEUR = `
   .bouton-grisaille{font-family:inherit;font-size:13px;padding:7px 13px;border-radius:5px;
     cursor:pointer;color:var(--text-on-ink-dim);background:transparent;
-    border:1px solid rgba(237,234,224,0.14);white-space:nowrap}
+    border:1px solid rgba(var(--trait-rgb,237,234,224),0.14);white-space:nowrap}
   .bouton-grisaille:hover{color:var(--text-on-ink)}
   .bouton-grisaille[aria-pressed="true"]{color:var(--text-on-ink);
     border-color:rgba(var(--gold-rgb),0.45);background:rgba(var(--gold-rgb),0.10)}

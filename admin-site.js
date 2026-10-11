@@ -89,6 +89,7 @@ function poserBarre(){
     <span class="admin-libelle">Mode administrateur</span>
     <button type="button" class="admin-outil" data-tiroir="corrections">Corrections</button>
     <button type="button" class="admin-outil" data-tiroir="comptes">Comptes</button>
+    <button type="button" class="admin-outil" data-tiroir="photos">Photos</button>
     <button type="button" id="admin-bascule" class="admin-outil admin-bascule" aria-pressed="false">
       Voir comme un visiteur</button>`;
   document.body.appendChild(barre);

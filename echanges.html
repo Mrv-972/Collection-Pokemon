@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js?v=2026-10-11-afrf"></script>
 <title>Échanges — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +24,7 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
   @media(max-width:640px){.wrap{padding:0 20px}}
 
-  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
   .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
   .brand span{color:var(--gold)}
   .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
@@ -36,11 +37,11 @@
   .page-head p{color:var(--text-on-ink-dim);margin-top:14px;font-size:16px;max-width:62ch;}
 
   .filtres{display:flex;gap:10px;padding-bottom:30px;flex-wrap:wrap;align-items:center;}
-  .filter-btn{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
+  .filter-btn{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink-dim);padding:10px 16px;border-radius:4px;font-size:13px;cursor:pointer;font-family:inherit;}
   .filter-btn.on{color:var(--accent-clair);border-color:rgba(var(--gold-rgb),0.5);background:rgba(var(--gold-rgb),0.1)}
   .lien-zone{font-size:13px;color:var(--accent-clair);text-decoration:underline;text-underline-offset:3px;}
 
-  .distance-filtre{display:flex;align-items:center;gap:14px;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);border-radius:4px;padding:9px 16px;}
+  .distance-filtre{display:flex;align-items:center;gap:14px;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);border-radius:4px;padding:9px 16px;}
   .distance-filtre input[type=range]{-webkit-appearance:none;appearance:none;width:190px;height:4px;border-radius:2px;outline:none;cursor:pointer;margin:0;}
   .distance-filtre input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);border:none;cursor:grab;}
   .distance-filtre input[type=range]::-webkit-slider-thumb:active{cursor:grabbing;transform:scale(1.15)}
@@ -52,15 +53,16 @@
     .distance-filtre input[type=range]{flex:1;width:auto}
   }
 
-  .membre{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;padding:24px;margin-bottom:18px;}
+  .membre{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:6px;padding:24px;margin-bottom:18px;}
   .membre.equilibre{border-color:rgba(var(--gold-rgb),0.35)}
   .membre-tete{display:flex;align-items:baseline;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:4px;}
   .membre-tete h2{font-size:22px;}
+  .membre-nom{display:inline-flex;align-items:center;gap:10px}
   .lieu{font-size:12.5px;color:var(--text-on-ink-dim);margin-bottom:14px;}
-  .lieu .proche{color:#5FBAAA}
+  .lieu .proche{color:var(--succes)}
   .badge{font-size:11.5px;padding:3px 10px;border-radius:20px;font-weight:500;}
   .badge.equilibre{background:rgba(var(--gold-rgb),0.16);color:var(--accent-clair)}
-  .badge.simple{background:rgba(237,234,224,0.06);color:var(--text-on-ink-dim)}
+  .badge.simple{background:rgba(var(--trait-rgb),0.06);color:var(--text-on-ink-dim)}
   .contact{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;}
   .contact .discuter{background:var(--teal);color:#EDF5F3;padding:8px 16px;border-radius:3px;font-size:13px;font-weight:500;}
   .contact .discuter:hover{background:var(--teal-deep)}
@@ -72,21 +74,21 @@
   .colonne h3{font-size:13px;font-family:'IBM Plex Sans',sans-serif;font-weight:600;letter-spacing:.3px;margin-bottom:4px;}
   .colonne .total{font-size:12.5px;color:var(--text-on-ink-dim);margin-bottom:12px;}
   .colonne .total strong{color:var(--accent-clair);font-weight:600;}
-  .balance{margin-top:18px;padding:12px 14px;border-radius:5px;font-size:13px;background:rgba(237,234,224,0.04);border:1px solid rgba(237,234,224,0.08);}
+  .balance{margin-top:18px;padding:12px 14px;border-radius:5px;font-size:13px;background:rgba(var(--trait-rgb),0.04);border:1px solid rgba(var(--trait-rgb),0.08);}
   .balance .ecart{font-weight:600;}
   .balance.equitable{border-color:rgba(31,111,99,0.4);background:rgba(31,111,99,0.1)}
-  .balance.equitable .ecart{color:#5FBAAA}
+  .balance.equitable .ecart{color:var(--succes)}
   .balance.desequilibre{border-color:rgba(var(--gold-rgb),0.35);background:rgba(var(--gold-rgb),0.08)}
   .balance.desequilibre .ecart{color:var(--accent-clair)}
   .balance small{display:block;margin-top:5px;font-size:11.5px;color:var(--text-on-ink-dim);}
-  .colonne.recoit h3{color:#5FBAAA}
-  .colonne.donne h3{color:#E08862}
+  .colonne.recoit h3{color:var(--succes)}
+  .colonne.donne h3{color:var(--alerte)}
   .colonne .vide{color:var(--text-on-ink-dim);font-size:13px;}
 
   .mini-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
   @media(max-width:900px){.mini-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
   .mini{display:flex;flex-direction:column;gap:5px;}
-  .mini .img{aspect-ratio:2.5/3.5;border-radius:5px;overflow:hidden;background:rgba(237,234,224,0.04);border:1px solid rgba(237,234,224,0.08);display:flex;align-items:center;justify-content:center;}
+  .mini .img{aspect-ratio:2.5/3.5;border-radius:5px;overflow:hidden;background:rgba(var(--trait-rgb),0.04);border:1px solid rgba(var(--trait-rgb),0.08);display:flex;align-items:center;justify-content:center;}
   .mini .img img{width:100%;height:100%;object-fit:contain;}
   .mini .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:26px;}
   .mini .nom{font-size:11.5px;line-height:1.25;}
@@ -94,16 +96,19 @@
   .mini .ext{font-size:10.5px;color:var(--text-on-ink-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
   .status-msg{color:var(--text-on-ink-dim);font-size:15px;padding:28px 0;}
-  .status-msg.err{color:#E08862}
+  .status-msg.err{color:var(--alerte)}
   .status-msg a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:3px;}
   .cta-btn{display:inline-block;margin-top:16px;background:var(--teal);color:#EDF5F3;padding:11px 20px;border-radius:3px;font-size:14px;font-weight:500;}
   .cta-btn:hover{background:var(--teal-deep)}
+  /* Un bouton dans un message d'état reste un bouton : la règle des liens
+     de ces messages (couleur d'accent, soulignés) ne doit pas le repeindre. */
+  .status-msg a.cta-btn,a.cta-btn{color:#EDF5F3;text-decoration:none}
 
-  .skeleton{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:6px;height:150px;margin-bottom:18px;position:relative;overflow:hidden;}
-  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(237,234,224,0.06),transparent);animation:shine 1.4s infinite;}
+  .skeleton{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:6px;height:150px;margin-bottom:18px;position:relative;overflow:hidden;}
+  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(var(--trait-rgb),0.06),transparent);animation:shine 1.4s infinite;}
   @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 
-  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
   /* ========================= Téléphone =========================
      Les liens de navigation passaient en display:none sous 720 px : depuis
@@ -168,21 +173,21 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-2jlm"></script>
-<script src="catalogue.js?v=2026-10-11-2jlm"></script>
-<script src="supabase-config.js?v=2026-10-11-2jlm"></script>
-<script src="pied.js?v=2026-10-11-2jlm"></script>
-<script src="admin.js?v=2026-10-11-2jlm"></script>
-<script src="admin-site.js?v=2026-10-11-2jlm"></script>
-<script src="sets.js?v=2026-10-11-2jlm"></script>
-<script src="confirmation.js?v=2026-10-11-2jlm"></script>
-<script src="tags.js?v=2026-10-11-2jlm"></script>
-<script src="raretes.js?v=2026-10-11-2jlm"></script>
-<script src="cards.js?v=2026-10-11-2jlm"></script>
-<script src="prix.js?v=2026-10-11-2jlm"></script>
-<script src="localisation.js?v=2026-10-11-2jlm"></script>
-<script src="compte.js?v=2026-10-11-2jlm"></script>
-<script src="messagerie.js?v=2026-10-11-2jlm"></script>
+<script src="univers.js?v=2026-10-11-afrf"></script>
+<script src="catalogue.js?v=2026-10-11-afrf"></script>
+<script src="supabase-config.js?v=2026-10-11-afrf"></script>
+<script src="pied.js?v=2026-10-11-afrf"></script>
+<script src="admin.js?v=2026-10-11-afrf"></script>
+<script src="admin-site.js?v=2026-10-11-afrf"></script>
+<script src="sets.js?v=2026-10-11-afrf"></script>
+<script src="confirmation.js?v=2026-10-11-afrf"></script>
+<script src="tags.js?v=2026-10-11-afrf"></script>
+<script src="raretes.js?v=2026-10-11-afrf"></script>
+<script src="cards.js?v=2026-10-11-afrf"></script>
+<script src="prix.js?v=2026-10-11-afrf"></script>
+<script src="localisation.js?v=2026-10-11-afrf"></script>
+<script src="compte.js?v=2026-10-11-afrf"></script>
+<script src="messagerie.js?v=2026-10-11-afrf"></script>
 <script>
 let correspondances = [];
 let equilibresSeulement = false;
@@ -277,7 +282,7 @@ function rendreFiltreDistance(){
 // sur l'échelle, ce qu'un curseur nu ne montrerait pas.
 function majJauge(jauge){
   const part = (Number(jauge.value) / Number(jauge.max)) * 100;
-  jauge.style.background = `linear-gradient(90deg, var(--gold) ${part}%, rgba(237,234,224,0.15) ${part}%)`;
+  jauge.style.background = `linear-gradient(90deg, var(--gold) ${part}%, rgba(var(--trait-rgb),0.15) ${part}%)`;
   const texte = texteDistance(distanceMax);
   jauge.setAttribute('aria-valuetext', texte);
   document.getElementById('distance-valeur').textContent = texte;
@@ -391,7 +396,7 @@ function rendre(){
   content.innerHTML = liste.map(m => `
     <div class="membre ${estEquilibre(m) ? 'equilibre' : ''}">
       <div class="membre-tete">
-        <h2>${texteEchappe(m.pseudo)}</h2>
+        <h2 class="membre-nom">${avatarHtml({ pseudo: m.pseudo, ...avatarsConnus.get(m.membre_id) }, 34)}${texteEchappe(m.pseudo)}</h2>
         <span class="badge ${estEquilibre(m) ? 'equilibre' : 'simple'}">
           ${estEquilibre(m) ? 'Échange équilibré' : 'Échange à sens unique'}
         </span>
@@ -533,7 +538,7 @@ async function chargerCorrespondances(){
       || (b.il_me_donne.length + b.je_lui_donne.length) - (a.il_me_donne.length + a.je_lui_donne.length));
 
     const ids = [...new Set(correspondances.flatMap(m => [...m.il_me_donne, ...m.je_lui_donne]))];
-    await chargerInfosCartes(ids);
+    await Promise.all([chargerInfosCartes(ids), avatarsDe(correspondances.map(m => m.membre_id))]);
     majResume();
     rendre();
     afficherPrix().catch(err => console.warn('Cotes indisponibles', err));

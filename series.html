@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js?v=2026-10-11-afrf"></script>
 <title>Par extension — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +25,7 @@
   .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
   @media(max-width:640px){.wrap{padding:0 20px}}
 
-  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(237,234,224,0.08);}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
   .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;}
   .brand span{color:var(--gold)}
   .navlinks{display:flex;gap:32px;font-size:14px;color:var(--text-on-ink-dim)}
@@ -37,14 +38,14 @@
   .page-head p{color:var(--text-on-ink-dim);margin-top:14px;font-size:16px;max-width:60ch;}
 
   .search-row{display:flex;gap:10px;padding-bottom:40px;}
-  .search-row input{flex:1;background:var(--ink-soft);border:1px solid rgba(237,234,224,0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
+  .search-row input{flex:1;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   .search-row input::placeholder{color:var(--text-on-ink-dim)}
 
-  .series-block{border-top:1px solid rgba(237,234,224,0.08);}
+  .series-block{border-top:1px solid rgba(var(--trait-rgb),0.08);}
   .series-title{display:flex;align-items:center;gap:12px;padding:28px 4px 20px;
                 cursor:pointer;list-style:none;transition:background .12s;}
   .series-title::-webkit-details-marker{display:none}
-  .series-title:hover{background:rgba(237,234,224,0.03)}
+  .series-title:hover{background:rgba(var(--trait-rgb),0.03)}
   .series-title h2{font-size:22px;}
   /* Le logo de la série, à la place du titre quand il existe. Une hauteur
      fixe : les logos vont du carré au bandeau très large, et sans elle la
@@ -65,8 +66,8 @@
   @media(max-width:900px){.set-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
   @media(max-width:640px){.set-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-  .set-card{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s;}
-  .set-card:hover{border-color:rgba(237,234,224,0.25)}
+  .set-card{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .15s;}
+  .set-card:hover{border-color:rgba(var(--trait-rgb),0.25)}
   .set-logo{height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
   .set-logo .logo{min-width:0;max-width:100%;max-height:100%;object-fit:contain;object-position:left center;}
   .set-logo .symbol{height:20px;width:20px;flex-shrink:0;object-fit:contain;opacity:.85;}
@@ -75,14 +76,14 @@
   .set-meta{font-size:12px;color:var(--text-on-ink-dim);display:flex;justify-content:space-between;margin-top:auto;}
   .set-meta .tag-count{color:var(--teal);font-weight:500}
 
-  .skeleton{background:var(--ink-soft);border:1px solid rgba(237,234,224,0.08);border-radius:5px;height:118px;position:relative;overflow:hidden;}
-  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(237,234,224,0.06),transparent);animation:shine 1.4s infinite;}
+  .skeleton{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;height:118px;position:relative;overflow:hidden;}
+  .skeleton::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(var(--trait-rgb),0.06),transparent);animation:shine 1.4s infinite;}
   @keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 
   .status-msg{color:var(--text-on-ink-dim);font-size:14px;padding:20px 0;}
-  .status-msg.err{color:#E08862}
+  .status-msg.err{color:var(--alerte)}
 
-  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(237,234,224,0.08);}
+  footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
   /* ========================= Téléphone =========================
      Les liens de navigation passaient en display:none sous 720 px : depuis
@@ -148,15 +149,15 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-2jlm"></script>
-<script src="catalogue.js?v=2026-10-11-2jlm"></script>
-<script src="supabase-config.js?v=2026-10-11-2jlm"></script>
-<script src="pied.js?v=2026-10-11-2jlm"></script>
-<script src="admin.js?v=2026-10-11-2jlm"></script>
-<script src="admin-site.js?v=2026-10-11-2jlm"></script>
-<script src="compte.js?v=2026-10-11-2jlm"></script>
-<script src="progression.js?v=2026-10-11-2jlm"></script>
-<script src="sets.js?v=2026-10-11-2jlm"></script>
+<script src="univers.js?v=2026-10-11-afrf"></script>
+<script src="catalogue.js?v=2026-10-11-afrf"></script>
+<script src="supabase-config.js?v=2026-10-11-afrf"></script>
+<script src="pied.js?v=2026-10-11-afrf"></script>
+<script src="admin.js?v=2026-10-11-afrf"></script>
+<script src="admin-site.js?v=2026-10-11-afrf"></script>
+<script src="compte.js?v=2026-10-11-afrf"></script>
+<script src="progression.js?v=2026-10-11-afrf"></script>
+<script src="sets.js?v=2026-10-11-afrf"></script>
 <script>
 // Récupère la liste complète des extensions depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), puis les regroupe par série (Écarlate et

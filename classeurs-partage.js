@@ -263,7 +263,7 @@ async function partagerDesImages(classeur, images){
 const STYLE_PARTAGE = `
   .voile-partage{position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:120;
     display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto}
-  .boite-partage{background:var(--ink-soft,#20232A);border:1px solid rgba(237,234,224,0.14);
+  .boite-partage{background:var(--ink-soft,#20232A);border:1px solid rgba(var(--trait-rgb,237,234,224),0.14);
     border-radius:10px;max-width:520px;width:100%;padding:24px;
     color:var(--text-on-ink,#EDEAE0);font-family:inherit}
   .boite-partage h2{font-family:'Newsreader',serif;font-weight:500;font-size:21px;margin:0 0 6px}
@@ -280,11 +280,11 @@ const STYLE_PARTAGE = `
     text-align:center;margin-top:6px}
   .boite-partage .reseaux{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
   .boite-partage .reseaux a{font-size:13px;padding:9px 14px;border-radius:5px;
-    border:1px solid rgba(237,234,224,0.16);color:var(--text-on-ink,#EDEAE0);text-decoration:none}
+    border:1px solid rgba(var(--trait-rgb,237,234,224),0.16);color:var(--text-on-ink,#EDEAE0);text-decoration:none}
   .boite-partage .reseaux a:hover{border-color:rgba(var(--gold-rgb,201,162,39),0.5)}
   .boite-partage .boutons{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
   .boite-partage button{font-family:inherit;font-size:13.5px;padding:10px 16px;border-radius:5px;
-    cursor:pointer;border:1px solid rgba(237,234,224,0.16);background:transparent;
+    cursor:pointer;border:1px solid rgba(var(--trait-rgb,237,234,224),0.16);background:transparent;
     color:var(--text-on-ink,#EDEAE0)}
   .boite-partage button.principal{border-color:rgba(var(--gold-rgb,201,162,39),0.55);
     background:rgba(var(--gold-rgb,201,162,39),0.14)}

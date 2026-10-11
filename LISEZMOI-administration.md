@@ -75,6 +75,31 @@ copie l'en empêcherait. Et une nouvelle correction **s'ajoute** à
 l'ancienne au lieu de l'effacer : corriger la rareté d'une carte dont tu
 avais déjà corrigé le nom garde les deux.
 
+## Valider les photos de profil
+
+Un membre peut choisir un **Pokémon** dans une galerie (immédiat, sans
+validation) ou envoyer **sa photo**. Une photo passe d'abord un filtre
+automatique dans son navigateur, qui écarte l'essentiel des images
+pornographiques ou suggestives ; elle reste ensuite **invisible des autres
+membres** tant que tu ne l'as pas validée.
+
+Le bouton **« Photos »** de la barre d'administration ouvre la liste des
+photos en attente :
+
+- **Valider** : la photo devient celle du membre, visible de tous ;
+- **Refuser…** : tu écris un motif court ; le membre le lit sur sa page de
+  profil et peut en proposer une autre.
+
+À refuser : nudité ou tenue suggestive, contenu choquant ou violent, photo
+visiblement d'une autre personne (célébrité, enfant…), coordonnées ou texte
+insultant. Dans le doute, refuse : le membre peut toujours choisir un
+Pokémon.
+
+Avant la première utilisation, le fichier
+**`supabase/profil-photo-parametres.sql`** doit avoir été exécuté une fois
+dans l'éditeur SQL de Supabase (il crée les colonnes, le stockage des photos
+et les règles de validation).
+
 ## Ce qui protège vraiment
 
 Pas le fait que les boutons soient cachés. Un site statique livre tout son
@@ -86,6 +111,9 @@ Ce qui protège, ce sont les règles de la base :
   visuels et la gestion des comptes à qui n'est pas administrateur ;
 - `securite-profils.sql` empêche un membre de **se déclarer**
   administrateur ;
+- `profil-photo-parametres.sql` empêche un membre de **publier sa photo
+  lui-même** : elle attend dans un dépôt privé, que seuls lui et toi pouvez
+  lire, et seule ta validation la rend publique ;
 - la colonne `est_admin` n'est lisible par personne, pas même par toi : le
   site passe par une fonction qui ne répond que pour le compte qui la pose.
 
