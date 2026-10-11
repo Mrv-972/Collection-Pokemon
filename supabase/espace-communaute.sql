@@ -446,13 +446,102 @@ as $$
 $$;
 grant execute on function badges_communaute(uuid) to authenticated;
 
+-- --- 8. les nouvelles réponses ------------------------------------------------
+-- Un membre suit les sujets qu'il a ouverts et ceux où il a répondu. Une
+-- réponse y est « nouvelle » si elle vient d'un autre et qu'elle est arrivée
+-- après sa dernière visite du sujet — ou après sa propre dernière réponse :
+-- ce qui précède, il l'a forcément lu pour répondre. C'est ce que compte la
+-- pastille de l'onglet Communauté.
+create table if not exists vues_sujets (
+  membre_id            uuid not null references auth.users on delete cascade,
+  sujet_id             bigint not null references sujets on delete cascade,
+  derniere_reponse_vue bigint not null default 0,
+  primary key (membre_id, sujet_id)
+);
+alter table vues_sujets enable row level security;
+-- Personne n'y écrit directement : seulement par marquer_sujet_lu().
+revoke all on vues_sujets from anon, authenticated;
+
+drop function if exists sujets_suivis();
+create function sujets_suivis()
+returns table (sujet_id bigint, espace text, categorie text, titre text,
+               non_lues integer, derniere_reponse timestamptz, dernier_auteur text)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  with suivis as (
+    select s.id,
+           greatest(coalesce(v.derniere_reponse_vue, 0),
+                    coalesce((select max(r.id) from reponses r where r.sujet_id = s.id and r.auteur_id = auth.uid()), 0)) as lu_jusqua
+    from sujets s
+    left join vues_sujets v on v.sujet_id = s.id and v.membre_id = auth.uid()
+    where auth.uid() is not null
+      and (s.auteur_id = auth.uid()
+           or exists (select 1 from reponses r where r.sujet_id = s.id and r.auteur_id = auth.uid()))
+  )
+  select s.id, s.espace, s.categorie, s.titre, count(r.id)::int, max(r.cree_le),
+         (select p.pseudo from reponses r2 join profils p on p.id = r2.auteur_id
+           where r2.sujet_id = s.id and r2.auteur_id <> auth.uid() order by r2.id desc limit 1)
+  from suivis f
+  join sujets s on s.id = f.id
+  join reponses r on r.sujet_id = s.id and r.auteur_id <> auth.uid() and r.id > f.lu_jusqua
+  group by s.id
+  order by max(r.cree_le) desc;
+$$;
+grant execute on function sujets_suivis() to authenticated;
+
+drop function if exists reponses_non_lues();
+create function reponses_non_lues()
+returns integer
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select coalesce(sum(non_lues), 0)::int from sujets_suivis();
+$$;
+grant execute on function reponses_non_lues() to authenticated;
+
+-- Le membre ouvre un sujet qu'il suit : tout y est lu. La fonction renvoie
+-- où il en était avant, pour que la page signale les réponses nouvelles ;
+-- rien (null) pour un sujet qu'il ne suit pas.
+drop function if exists marquer_sujet_lu(bigint);
+create function marquer_sujet_lu(p_sujet bigint)
+returns bigint
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  avant bigint;
+begin
+  if auth.uid() is null or not exists (
+       select 1 from sujets s where s.id = p_sujet and (s.auteur_id = auth.uid()
+         or exists (select 1 from reponses r where r.sujet_id = s.id and r.auteur_id = auth.uid()))) then
+    return null;
+  end if;
+  select greatest(coalesce((select derniere_reponse_vue from vues_sujets where membre_id = auth.uid() and sujet_id = p_sujet), 0),
+                  coalesce((select max(id) from reponses where sujet_id = p_sujet and auteur_id = auth.uid()), 0))
+    into avant;
+  insert into vues_sujets (membre_id, sujet_id, derniere_reponse_vue)
+  values (auth.uid(), p_sujet, coalesce((select max(id) from reponses where sujet_id = p_sujet), 0))
+  on conflict (membre_id, sujet_id) do update
+    set derniere_reponse_vue = greatest(vues_sujets.derniere_reponse_vue, excluded.derniere_reponse_vue);
+  return avant;
+end;
+$$;
+grant execute on function marquer_sujet_lu(bigint) to authenticated;
+
 notify pgrst, 'reload schema';
 
 -- --- vérification ------------------------------------------------------------
 -- En dernier, seule commande affichée par l'éditeur SQL. Attendu :
--- true, true, false, false, true.
+-- true, true, false, false, true, true.
 select has_table_privilege('anon', 'sujets', 'SELECT')                          as visiteurs_lisent,
        has_column_privilege('authenticated', 'sujets', 'titre', 'INSERT')       as membres_publient,
        has_column_privilege('authenticated', 'sujets', 'epingle', 'UPDATE')     as membres_epinglent,
        has_column_privilege('authenticated', 'sujets', 'nb_votes', 'UPDATE')    as membres_faussent_les_votes,
-       has_function_privilege('authenticated', 'badges_communaute(uuid)', 'EXECUTE') as badges_de_la_communaute;
+       has_function_privilege('authenticated', 'badges_communaute(uuid)', 'EXECUTE') as badges_de_la_communaute,
+       has_function_privilege('authenticated', 'reponses_non_lues()', 'EXECUTE')     as pastille_des_reponses;

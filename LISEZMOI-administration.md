@@ -136,6 +136,12 @@ aussi **supprimer** n'importe quel sujet ou réponse. Les messages signalés
 arrivent dans le tiroir, onglet **Signalements**, avec un lien vers le sujet
 et un bouton pour supprimer le contenu.
 
+**La pastille des réponses.** Un membre suit les sujets qu'il a ouverts et
+ceux où il a répondu. Quand quelqu'un d'autre y répond, une pastille rouge
+apparaît sur l'onglet « Communauté », l'accueil de la Communauté liste ces
+sujets, et les réponses arrivées depuis sa dernière visite sont marquées
+« Nouveau ». Ouvrir le sujet remet le compteur à zéro.
+
 **Les badges de la communauté**, calculés par la base comme ceux de la
 collection, s'affichent sur les profils : Premier message, Bonne réponse
 (une réponse choisie comme la meilleure), Serviable (avoir répondu aux

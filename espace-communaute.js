@@ -77,6 +77,14 @@ const artwork = n => `https://raw.githubusercontent.com/PokeAPI/sprites/master/s
 const zone = document.getElementById('communaute');
 const esc = v => echapperCommun(v);
 let jeSuisAdmin = false;
+// Les sujets que le membre suit (ouverts par lui, ou auxquels il a répondu)
+// et qui ont reçu des réponses depuis sa dernière visite.
+let suivis = new Map();
+async function chargerSuivis(){
+  if(!estConnecte()){ suivis = new Map(); return; }
+  try{ suivis = new Map((await rpc('sujets_suivis') ?? []).map(x => [x.sujet_id, x])); }
+  catch{ suivis = new Map(); }
+}
 let tour = 0;            // chaque affichage a son numéro : une réponse tardive d'un affichage abandonné est ignorée
 
 // ------------------------------------------------------------- adresse --
@@ -173,7 +181,7 @@ const exigerMembre = action => {
 
 // ------------------------------------------------------- squelette ------
 
-function afficher(){
+async function afficher(){
   const p = parametres();
   const rubrique = p.sujet ? (p.depuis ?? 'accueil') : (RUBRIQUES.some(r => r.cle === p.r) ? p.r : 'accueil');
   document.querySelectorAll('.sous-onglets a').forEach(a =>
@@ -182,6 +190,8 @@ function afficher(){
   const numero = ++tour;
   const encore = () => numero === tour;
   vue.innerHTML = '<p class="etat">Chargement…</p>';
+  await chargerSuivis();
+  if(!encore()) return;
   const titre = RUBRIQUES.find(r => r.cle === rubrique)?.nom;
   document.title = `${rubrique === 'accueil' ? 'Communauté' : titre + ' — Communauté'} — PokéClasseur`;
   if(p.sujet) return afficherFil(vue, Number(p.sujet), encore);
@@ -219,6 +229,7 @@ function ligneSujet(s, { categorieVisible = false } = {}){
           ${s.statut ? `<span class="etiquette statut ${STATUTS[s.statut]?.classe}">${STATUTS[s.statut]?.nom}</span>` : ''}
           ${s.verrouille ? '<span class="etiquette" title="Verrouillé">🔒</span>' : ''}
           ${cat ? `<span class="etiquette">${cat.icone} ${cat.nom}</span>` : ''}
+          ${suivis.get(s.id)?.non_lues ? `<span class="etiquette nouveau">● ${nb(suivis.get(s.id).non_lues, 'nouvelle réponse', 'nouvelles réponses')}</span>` : ''}
         </span>
         <p class="extrait">${esc(s.extrait)}${s.extrait?.length >= 220 ? '…' : ''}</p>
         <div class="meta">${auteur(s, 20)} · ${depuis(s.cree_le)}${s.nb_reponses ? ` · dernière activité ${depuis(s.activite_le)}` : ''}</div>
@@ -423,6 +434,26 @@ async function afficherFil(vue, id, encore){
              <button type="button" class="bouton-principal" id="publier-reponse" disabled>Publier ma réponse</button></div>`}
     </section>`;
   brancherFil(vue, s, reponses, def);
+  marquerLu(vue, s);
+}
+
+// Ouvrir un sujet suivi le marque comme lu : les réponses arrivées depuis la
+// dernière visite sont signalées « Nouveau », et la pastille de l'onglet se
+// met à jour.
+async function marquerLu(vue, s){
+  if(!estConnecte()) return;
+  let avant;
+  try{ avant = await rpc('marquer_sujet_lu', { p_sujet: s.id }); }catch{ return; }
+  if(avant === null || avant === undefined) return;
+  vue.querySelectorAll('.reponse[data-reponse]').forEach(el => {
+    const id = Number(el.dataset.reponse);
+    if(id > avant && el.dataset.auteur !== membre.id){
+      el.classList.add('nouvelle');
+      el.querySelector('.meta')?.insertAdjacentHTML('afterbegin', '<span class="etiquette nouveau">Nouveau</span>');
+    }
+  });
+  suivis.delete(s.id);
+  if(typeof afficherNonLus === 'function') afficherNonLus();
 }
 
 function reponseHtml(r, s){
@@ -430,7 +461,7 @@ function reponseHtml(r, s){
   const auteurQuestion = estConnecte() && membre.id === s.auteur_id && s.espace === 'question';
   const acceptee = r.id === s.reponse_acceptee;
   return `
-    <article class="reponse ${acceptee ? 'acceptee' : ''}" data-reponse="${r.id}">
+    <article class="reponse ${acceptee ? 'acceptee' : ''}" data-reponse="${r.id}" data-auteur="${esc(r.auteur_id ?? '')}">
       ${acceptee ? '<p class="mention-acceptee">✓ Meilleure réponse, choisie par l\'auteur de la question</p>' : ''}
       <div class="meta">${auteur(r, 24)} · ${depuis(r.cree_le)}${r.modifie_le ? ' · modifiée' : ''}</div>
       <div class="texte">${texteRiche(r.corps)}</div>
@@ -577,6 +608,14 @@ async function afficherAccueil(vue, encore){
          affichés sur ton profil.${estConnecte() ? ' <a href="connexion.html">Voir mes badges →</a>' : ''}</p>
       ${estConnecte() ? '' : '<a class="bouton-principal" href="connexion.html">Rejoindre la communauté</a>'}
     </section>
+    ${suivis.size ? `
+    <section class="nouvelles-reponses" aria-labelledby="titre-nouvelles">
+      <h2 id="titre-nouvelles">🔔 Nouvelles réponses à tes sujets</h2>
+      <ul class="liste-mini">${[...suivis.values()].slice(0, 8).map(x => `
+        <li><a href="${lien({ sujet: x.sujet_id })}" data-interne>${esc(x.titre)}</a>
+          <small><span class="etiquette nouveau">${nb(x.non_lues, 'nouvelle réponse', 'nouvelles réponses')}</span>
+            ${x.dernier_auteur ? `· dernière de ${esc(x.dernier_auteur)}` : ''} · ${depuis(x.derniere_reponse)}</small></li>`).join('')}</ul>
+    </section>` : ''}
     <div id="savoir-du-jour"></div>
     <div class="accueil-grille">
       ${['questions', 'ameliorations', 'forums'].map(r => `

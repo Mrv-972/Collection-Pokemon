@@ -705,20 +705,57 @@ function poserStylePastille(){
     { id: 'style-pastille', textContent: STYLE_PASTILLE }));
 }
 
+// univers.js réécrit les liens de la barre (« /discussions.html?u=pocket »)
+// pour qu'ils retiennent l'univers choisi : un lien se reconnaît donc à sa
+// page, pas à son adresse exacte. Chercher « a[href="discussions.html"] »
+// ne trouvait plus rien, et la pastille des messages ne s'affichait plus.
+function lienDeNav(page){
+  return [...document.querySelectorAll('nav .navlinks a')].find(a => {
+    try{ return new URL(a.getAttribute('href'), location.href).pathname.endsWith('/' + page); }
+    catch{ return false; }
+  }) ?? null;
+}
+
+function poserPastille(lien, nombre, titre){
+  lien.querySelector('.pastille')?.remove();
+  if(nombre > 0){
+    lien.insertAdjacentHTML('beforeend',
+      ` <span class="pastille" title="${titre}">${nombre > 99 ? '99+' : nombre}</span>`);
+  }
+}
+
 async function afficherNonLus(){
-  const lien = document.querySelector('nav a[href="discussions.html"]');
-  if(!lien) return;
   poserStylePastille();
-  try{
-    const nombre = await totalNonLus();
-    prevenirNouveauxMessages(nombre);
-    lien.querySelector('.pastille')?.remove();
-    if(nombre > 0){
-      lien.insertAdjacentHTML('beforeend',
-        ` <span class="pastille">${nombre > 99 ? '99+' : nombre}</span>`);
+  const lien = lienDeNav('discussions.html');
+  if(lien){
+    try{
+      const nombre = await totalNonLus();
+      prevenirNouveauxMessages(nombre);
+      poserPastille(lien, nombre, nombre > 1 ? `${nombre} messages non lus` : 'Un message non lu');
+    }catch(err){
+      console.warn('Compte des non-lus indisponible', err);
     }
+  }
+  afficherReponsesNonLues();
+}
+
+// La pastille de l'onglet Communauté : les réponses arrivées dans les sujets
+// que le membre a ouverts ou auxquels il a répondu (sujets_suivis, dans
+// supabase/espace-communaute.sql). Tant que la base n'a pas la fonction, on
+// cesse de la demander.
+let reponsesIndisponibles = false;
+async function afficherReponsesNonLues(){
+  const lien = lienDeNav('communaute.html');
+  if(!lien || reponsesIndisponibles || !estConnecte()) return;
+  try{
+    const db = await clientSupabase();
+    const { data, error } = await db.rpc('reponses_non_lues');
+    if(error) throw error;
+    const nombre = Number(data) || 0;
+    poserPastille(lien, nombre, nombre > 1 ? `${nombre} nouvelles réponses à tes sujets` : 'Une nouvelle réponse à tes sujets');
   }catch(err){
-    console.warn('Compte des non-lus indisponible', err);
+    if(['PGRST202', '42883'].includes(err?.code)) reponsesIndisponibles = true;
+    else console.warn('Compte des réponses indisponible', err);
   }
 }
 
