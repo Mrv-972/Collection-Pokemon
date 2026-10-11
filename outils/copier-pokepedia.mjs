@@ -63,6 +63,16 @@ const extensions = JSON.parse(await readFile('donnees/physique/extensions.json',
 // des formes aplaties, sans accents ni ponctuation.
 const leurs = new Map(Object.keys(releve.series).map(nom => [aplatir(nom), nom]));
 
+// Quand les noms diffèrent vraiment, le rattachement est écrit ici plutôt
+// que deviné. Seules y figurent des séries que Pokécardex n'a pas : pour
+// les autres, son rattrapage suffit et rien n'est copié.
+const ALIAS = {
+  '2018sm-fr': "Collection McDonald's 2018 (France)",
+  '2019sm-fr': "Collection McDonald's 2019 (France)",
+};
+const serieDe = ext => ALIAS[ext.id] && releve.series[ALIAS[ext.id]]
+  ? ALIAS[ext.id] : leurs.get(aplatir(ext.name));
+
 // ------------------------------------------------- ce qu'il faut prendre --
 const aDeja = id => ['.webp', '.png', '.jpg', '.jpeg']
   .some(ext => existsSync(path.join(DOSSIER, id + ext)));
@@ -76,13 +86,31 @@ const aDeja = id => ['.webp', '.png', '.jpg', '.jpeg']
 //
 // La liste des extensions à viser vient de la mesure, pas d'un jugement :
 // celles où il manque du français, et celles où il n'y a rien du tout.
+//
+// La vérification carte par carte, quand elle existe, est la mesure la plus
+// fine : elle dit quelles extensions ont encore des cartes sans visuel
+// français. L'ancien bilan ne sert qu'à défaut.
 const bilan = JSON.parse(await readFile('donnees/bilan-visuels.json', 'utf8'));
-const aViser = new Set([
-  ...bilan.aTrousSansSource.map(x => x.id),
-  ...bilan.muettes.restantes.map(x => x.id),
-]);
+let aViser, mesureDu, cartesVisees = null;
+try{
+  const v = JSON.parse(await readFile('donnees/verification-visuels.json', 'utf8'));
+  aViser = new Set(Object.entries(v.extensions)
+    .filter(([, e]) => (e.manquant ?? 0) + (e.secoursAnglais ?? 0) + (e.indecis ?? 0) > 0)
+    .map(([id]) => id));
+  // Et, dans ces extensions, les seules cartes concernées : inutile
+  // d'interroger leur serveur pour les autres.
+  cartesVisees = new Set(Object.values(v.extensions).flatMap(e =>
+    [...(e.cartesManquantes ?? []), ...(e.cartesAnglaises ?? []), ...(e.cartesIndecises ?? [])].map(c => c.id)));
+  mesureDu = v.verifieLe;
+}catch{
+  aViser = new Set([
+    ...bilan.aTrousSansSource.map(x => x.id),
+    ...bilan.muettes.restantes.map(x => x.id),
+  ]);
+  mesureDu = bilan.mesureDu;
+}
 console.log(`${aViser.size} extensions à viser, d'après la mesure du ` +
-  `${String(bilan.mesureDu ?? '?').slice(0, 10)}.`);
+  `${String(mesureDu ?? '?').slice(0, 10)}.`);
 
 // Et dans ces extensions, carte par carte : l'adresse française de TCGdex
 // répond-elle ? Une extension « à trous » en a par définition qui vont
@@ -107,7 +135,7 @@ let sansSerie = [], horsCible = 0, dejaBon = 0;
 const bonnesParExtension = new Map();
 for(const ext of extensions){
   if(!aViser.has(ext.id)){ horsCible++; continue; }
-  const leurNom = leurs.get(aplatir(ext.name));
+  const leurNom = serieDe(ext);
   if(!leurNom){ sansSerie.push(ext.name); continue; }
   let cartes;
   try{ cartes = JSON.parse(await readFile(`donnees/physique/sets/${ext.id}.json`, 'utf8')); }
@@ -117,6 +145,7 @@ for(const ext of extensions){
     // Déjà chez nous : on ne redemande rien. C'est ce qui rend l'outil
     // relançable sans repayer les mêmes téléchargements.
     if(aDeja(carte.id)) continue;
+    if(cartesVisees && !cartesVisees.has(carte.id)) continue;
     const adresse = chezEux[sansZeros(carte.localId)];
     if(!adresse) continue;
     if(!(await visuelFrancaisManque(carte))){

@@ -258,9 +258,18 @@ for(const [id, x] of Object.entries(sousSeries))
 //   lettre — la lettre des Zarbi : « Zarbi A », « Zarbi ? » ;
 //   nom    — le nom seul, dans un sous-ensemble de leur série ; deux
 //            cartes de même nom se répartissent dans l'ordre.
+//
+// Chaque série d'ici a été regardée sur une planche de vignettes
+// (outils/planche-visuels.mjs) : un nom français chez Pokécardex ne
+// garantit pas une carte imprimée en français. Leurs scans des « Special
+// Delivery » et du Futsal sont en anglais — ces cartes n'ont jamais été
+// éditées en France —, ils sont donc écartés : les compter comme français
+// serait mentir sur la couverture. Ceux des McDonald's « USA » sont bien
+// en français (« Pika Dessin », « Lancez une pièce ») : l'édition
+// canadienne, vraisemblablement.
 const RATTRAPAGES = [
   { notre: 'hgssp',     code: 'PRHS',   regle: 'code'   },
-  { notre: 'swshp',     code: 'PRSWSH', regle: 'code'   },
+  { notre: 'swshp',     code: 'PRSWSH', regle: 'code', sauf: ['SWSH074', 'SWSH075', 'SWSH177'] },
   { notre: 'bwp',       code: 'PRBW',   regle: 'code'   },
   { notre: 'svp',       code: 'SVP',    regle: 'code'   },
   { notre: 'mep',       code: 'MEP',    regle: 'code'   },
@@ -281,10 +290,14 @@ const RATTRAPAGES = [
   { notre: 'lc',        code: 'LC',     regle: 'numero' },
   { notre: 'sve',       code: 'SVE',    regle: 'numero' },
   { notre: 'mee',       code: 'MEE',    regle: 'numero' },
-  { notre: 'fut2020',   code: 'FUTSAL', regle: 'numero' },
+  { notre: '2018sm',    code: 'MC8US',  regle: 'numero' },
+  { notre: '2019sm',    code: 'MC9US',  regle: 'numero' },
   { notre: 'cel25cc',   code: 'CEL',    regle: 'numero', decalage: 25 },
   { notre: '30th-c',    code: '30C',    regle: 'nom', de: 159, a: 188 },
-  { notre: 'mfb',       code: 'MFB23',  regle: 'nom'    },
+  // Notre fiche de Lapras porte le n° de Pokédex de Magicarpe (129 au lieu
+  // de 131) : aucun nom ne peut concorder. Épinglée à la main, vue sur la
+  // liste de leur série : « Lokhlass », n° 44.
+  { notre: 'mfb',       code: 'MFB23',  regle: 'nom', epingles: { '31': '44' } },
   { notre: 'miscp',     code: 'UPC',    regle: 'nom'    },
   // Les énergies de base de « Soleil et Lune » : celles de 2017 dans leur
   // série « Énergies », qui en range une pour chaque année d'édition.
@@ -385,12 +398,14 @@ for(const r of RATTRAPAGES){
   const retenir = (carte, leur) => { retenues[carte.localId] = leur.adresse; prises.add(leur.num); };
 
   for(const carte of cartes){
+    if(r.sauf?.includes(carte.localId)) continue;
     if(r.nos){
       const n = Number(carte.localId);
       if(!(n >= r.nos[0] && n <= r.nos[1])) continue;
     }
     let trouve = null;
-    if(r.regle === 'code'){
+    if(r.epingles?.[carte.localId]) trouve = leurs.find(c => c.num === r.epingles[carte.localId]);
+    else if(r.regle === 'code'){
       const notre = formeCode(carte.localId);
       trouve = leurs.find(c => formeCode(codeImprime(c.nom)) === notre && noteNom(carte, c.nom) >= 1);
     }else if(r.regle === 'numero'){
