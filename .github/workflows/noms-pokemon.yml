@@ -1,0 +1,42 @@
+# L'origine du nom de chaque Pokémon, et ses anecdotes, lues sur Poképédia
+# (licence CC BY-NC-SA 3.0) pour l'onglet Communauté. Une fois par mois, ou
+# à la demande depuis l'onglet Actions.
+name: Noms des Pokémon
+
+on:
+  schedule:
+    - cron: '41 3 2 * *'   # le 2 de chaque mois
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: depot-donnees
+  cancel-in-progress: false
+
+jobs:
+  recolter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Lire Poképédia
+        run: node outils/noms-pokemon.mjs --sortie donnees
+      - name: Publier s'ils ont changé
+        run: |
+          git config user.name  "Noms des Pokémon"
+          git config user.email "actions@users.noreply.github.com"
+          git add donnees/noms-pokemon.json donnees/anecdotes-pokemon.json
+          if git diff --cached --quiet; then echo "Rien de nouveau."; exit 0; fi
+          git commit -q -m "Met à jour l'origine des noms et les anecdotes (Poképédia)"
+          for essai in 1 2 3 4 5; do
+            if git pull --rebase --autostash -q origin "$GITHUB_REF_NAME" && git push -q origin HEAD:"$GITHUB_REF_NAME"; then
+              echo "déposé."; exit 0
+            fi
+            sleep $((essai * 5))
+          done
+          echo "::error::dépôt impossible après cinq tentatives."; exit 1

@@ -1,0 +1,10 @@
+[
+ { "nom": "Pokémon — site officiel", "url": "https://www.pokemon.com/fr", "texte": "Le site officiel de The Pokémon Company, en français : jeux, cartes, dessin animé." },
+ { "nom": "Actualités officielles", "url": "https://www.pokemon.com/fr/actus-pokemon", "texte": "Les annonces officielles : nouvelles extensions, événements, sorties." },
+ { "nom": "JCC Pokémon Pocket", "url": "https://tcgpocket.pokemon.com/fr-fr/", "texte": "Le site officiel de l'application Pokémon TCG Pocket." },
+ { "nom": "Poképédia", "url": "https://www.pokepedia.fr", "texte": "L'encyclopédie francophone de Pokémon, écrite par ses fans." },
+ { "nom": "Pokécardex", "url": "https://www.pokecardex.com", "texte": "La référence française des cartes Pokémon : extensions, raretés, scans." },
+ { "nom": "Pokébip", "url": "https://www.pokebip.com", "texte": "Actualités, guides et forums de la communauté francophone." },
+ { "nom": "Pokémon Trash", "url": "https://www.pokemontrash.com", "texte": "Actualités et dossiers sur les jeux et les cartes." },
+ { "nom": "Pokékalos", "url": "https://www.pokekalos.fr", "texte": "Actualités et soluces des jeux Pokémon." }
+]
