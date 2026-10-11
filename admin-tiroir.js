@@ -214,6 +214,7 @@ async function refuserPhoto(p, motif){
 const OBJETS_SIGNALES = {
   profil: 'Comportement', membre: 'Comportement', message: 'Message',
   photo: 'Photo de profil', pseudo: 'Pseudo', avis: 'Avis',
+  sujet: 'Sujet de la communauté', reponse: 'Réponse dans la communauté',
 };
 
 async function afficherSignalements(){
@@ -240,8 +241,11 @@ async function afficherSignalements(){
               <b>${echapper(s.signale ?? 'un compte supprimé')}</b>
               <span class="detail">· ${echapper(date.format(new Date(s.cree_le)))}</span></div>
             <p class="motif">${echapper(s.motif)}</p>
+            ${s.contenu_titre ? `<div class="detail">Dans « ${echapper(s.contenu_titre)} »</div>` : ''}
             ${s.message_texte ? `<blockquote class="message-signale">${echapper(s.message_texte)}</blockquote>` : ''}
             <div class="actions-photo">
+              ${s.sujet_id ? `<a class="discret-admin" href="communaute.html?sujet=${encodeURIComponent(s.sujet_id)}" target="_blank" rel="noopener">Voir le sujet</a>` : ''}
+              ${s.sujet_id ? `<button type="button" class="discret-admin supprimer-contenu">Supprimer ${s.reponse_id ? 'la réponse' : 'le sujet'}…</button>` : ''}
               ${s.signale ? `<a class="discret-admin" href="profil.html?membre=${encodeURIComponent(s.signale_id)}" target="_blank" rel="noopener">Voir son profil</a>` : ''}
               ${s.signale_photo ? '<button type="button" class="discret-admin retirer-sa-photo">Retirer sa photo…</button>' : ''}
               <button type="button" class="valider-photo classer">Classer</button>
@@ -254,6 +258,24 @@ async function afficherSignalements(){
         const { error } = await db.rpc('traiter_signalement', { signalement: s.id });
         if(error) throw error;
       }, 'Signalement classé.');
+      // Supprimer le contenu signalé emporte le signalement avec lui (la base
+      // l'efface en cascade).
+      const supprimer = bloc.querySelector('.supprimer-contenu');
+      if(supprimer) supprimer.onclick = async () => {
+        await preparerConfirmation();
+        const ok = await demanderConfirmation({
+          titre: s.reponse_id ? 'Supprimer cette réponse ?' : 'Supprimer ce sujet et ses réponses ?',
+          message: 'Le contenu disparaît de la communauté, définitivement.',
+          action: 'Supprimer', danger: true,
+        });
+        if(!ok) return;
+        traiterSignalement(bloc, async () => {
+          const { error } = s.reponse_id
+            ? await db.from('reponses').delete().eq('id', s.reponse_id)
+            : await db.from('sujets').delete().eq('id', s.sujet_id);
+          if(error) throw error;
+        }, 'Contenu supprimé.');
+      };
       const retirer = bloc.querySelector('.retirer-sa-photo');
       if(retirer) retirer.onclick = async () => {
         const motif = await demanderMotif({

@@ -49,15 +49,41 @@ function lien(contenu){
 }
 
 // Le gras et l'italique se basculent par des suites d'apostrophes : deux
-// pour l'italique, trois pour le gras, cinq pour les deux.
+// pour l'italique, trois pour le gras, cinq pour les deux. Le français
+// complique l'affaire : « d'''Archeus'' » est une apostrophe suivie
+// d'italique, pas du gras. On applique la règle même du logiciel des wikis
+// (MediaWiki, doQuotes) : quand gras et italique restent tous deux
+// orphelins sur une ligne, un « gras » collé à un mot d'une lettre redevient
+// apostrophe + italique.
 function apostrophes(ligne){
-  let gras = false, sortie = '';
-  for(const morceau of ligne.split(/('{2,5})/)){
-    if(!/^'{2,5}$/.test(morceau)){ sortie += morceau; continue; }
-    const n = morceau.length === 4 ? (sortie += "'", 3) : morceau.length;
-    if(n === 3 || n === 5){ sortie += '**'; gras = !gras; }
+  const t = ligne.split(/(''+)/);
+  let italiques = 0, gras = 0;
+  for(let k = 1; k < t.length; k += 2){
+    let n = t[k].length;
+    if(n === 4){ t[k - 1] += "'"; t[k] = "'''"; n = 3; }
+    else if(n > 5){ t[k - 1] += "'".repeat(n - 5); t[k] = "'''''"; n = 5; }
+    if(n === 2) italiques++;
+    else if(n === 3) gras++;
+    else { italiques++; gras++; }
   }
-  return gras ? sortie + '**' : sortie;
+  if(italiques % 2 === 1 && gras % 2 === 1){
+    let lettre = -1, mot = -1, espace = -1;
+    for(let k = 1; k < t.length; k += 2){
+      if(t[k].length !== 3) continue;
+      const x1 = t[k - 1].slice(-1), x2 = t[k - 1].slice(-2, -1);
+      if(x1 === ' '){ if(espace === -1) espace = k; }
+      else if(x2 === ' '){ lettre = k; break; }
+      else if(mot === -1) mot = k;
+    }
+    const k = lettre > -1 ? lettre : mot > -1 ? mot : espace;
+    if(k > -1){ t[k] = "''"; t[k - 1] += "'"; }
+  }
+  let ouvert = false, sortie = '';
+  t.forEach((morceau, k) => {
+    if(k % 2 === 0){ sortie += morceau; return; }
+    if(morceau.length !== 2){ sortie += '**'; ouvert = !ouvert; }
+  });
+  return ouvert ? sortie + '**' : sortie;
 }
 
 function texteBrut(wiki){
@@ -152,7 +178,7 @@ async function lirePages(titres){
   }
 }
 
-const noms = [], recits = [], manquants = [], avecModeles = [];
+const noms = [], recits = [], manquants = [], avecModeles = [], renvois = [];
 const PAQUET = 50;
 for(let debut = 0; debut < POKEDEX_FR.length; debut += PAQUET){
   const titres = POKEDEX_FR.slice(debut, debut + PAQUET);
@@ -164,6 +190,7 @@ for(let debut = 0; debut < POKEDEX_FR.length; debut += PAQUET){
     const numero = debut + k + 1;
     const t1 = normalise.get(nom) ?? nom;
     const titre = redirige.get(t1) ?? t1;
+    if(titre !== nom) renvois.push(`${numero} ${nom} → ${titre}`);
     const wiki = pages.get(titre)?.revisions?.[0]?.slots?.main?.content;
     if(!wiki){ manquants.push(`${numero} ${nom}`); return; }
     const e = etymologies(wiki);
@@ -196,6 +223,7 @@ for(const n of [1, 25, 143, 1025]){
   console.log(`  ${n} ${x?.nom} — ${x?.fr ?? '(rien)'}`);
 }
 if(manquants.length) console.log(`\nà revoir (${manquants.length}) :\n  ${manquants.join('\n  ')}`);
+if(renvois.length) console.log(`\nnoms écrits autrement sur Poképédia (${renvois.length}) :\n  ${renvois.join('\n  ')}`);
 if(avecModeles.length) console.log(`\nétymologies passées par des modèles (${avecModeles.length}), à relire :\n  ${avecModeles.slice(0, 60).join('\n  ')}`);
 // Moins de neuf sur dix : la page a changé de forme, on ne publie pas.
 if(avecFr < POKEDEX_FR.length * 0.9){

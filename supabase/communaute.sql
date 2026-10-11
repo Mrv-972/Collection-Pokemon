@@ -145,12 +145,28 @@ alter table signalements add column if not exists objet text not null default 'm
 alter table signalements add column if not exists traite_le timestamptz;
 alter table signalements drop constraint if exists signalements_objet_valeurs;
 alter table signalements add  constraint signalements_objet_valeurs
-  check (objet in ('membre', 'message', 'profil', 'photo', 'pseudo', 'avis'));
+  check (objet in ('membre', 'message', 'profil', 'photo', 'pseudo', 'avis', 'sujet', 'reponse'));
 -- Le membre écrit son signalement, pas la date de son traitement.
 revoke insert on signalements from anon, authenticated;
 grant  insert (signaleur_id, signale_id, message_id, motif, objet) on signalements to authenticated;
+-- Le « revoke » ci-dessus retire aussi les droits qu'espace-communaute.sql
+-- accorde pour signaler un sujet ou une réponse : on les rend.
+do $$
+begin
+  if exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'signalements' and column_name = 'sujet_id') then
+    grant insert (sujet_id, reponse_id) on signalements to authenticated;
+  end if;
+end;
+$$;
 
-drop function if exists signalements_a_traiter();
+-- espace-communaute.sql en installe une version plus complète (les sujets et
+-- réponses signalés) : relancer ce script-ci ne doit pas la remplacer.
+do $$
+begin
+  if to_regclass('public.sujets') is null then
+    drop function if exists signalements_a_traiter();
+    execute $sql$
 create function signalements_a_traiter()
 returns table (id bigint, objet text, motif text, cree_le timestamptz,
                signaleur text, signale_id uuid, signale text, signale_photo text,
@@ -159,7 +175,7 @@ language sql
 security definer
 stable
 set search_path = public
-as $$
+as $f$
   -- Le message signalé est montré tel quel : son destinataire l'a déjà lu
   -- et le soumet lui-même à l'administrateur. Le reste de la discussion
   -- ne s'ouvre que par le tiroir des comptes, motif consigné au journal.
@@ -170,8 +186,12 @@ as $$
   left join messages m on m.id = s.message_id
   where est_admin() and s.traite_le is null
   order by s.cree_le desc;
+$f$;
+$sql$;
+    grant execute on function signalements_a_traiter() to authenticated;
+  end if;
+end;
 $$;
-grant execute on function signalements_a_traiter() to authenticated;
 
 drop function if exists traiter_signalement(bigint);
 create function traiter_signalement(signalement bigint)

@@ -42,6 +42,11 @@ const PIED_LIENS = [
     ['Échanges', 'echanges.html'],
     ['Discussions', 'discussions.html'],
   ]],
+  ['Communauté', [
+    ['Questions et forums', 'communaute.html'],
+    ['Idées pour le site', 'communaute.html?r=ameliorations'],
+    ['Noms des Pokémon', 'communaute.html?r=noms'],
+  ]],
   ['Ton compte', [
     ['Mon profil', 'connexion.html'],
     ['Paramètres', 'parametres.html'],

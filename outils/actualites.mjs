@@ -26,10 +26,16 @@ const FLUX = [
   { url: google('"Pokémon TCG Pocket" OR "JCC Pokémon Pocket"'), sujet: 'pocket' },
   { url: google('"cartes Pokémon" OR "JCC Pokémon" OR "Pokémon TCG"'), sujet: 'cartes' },
   { url: google('Pokémon when:7d'), sujet: 'pokemon' },
-  { url: 'https://www.jeuxvideo.com/rss/rss.xml', source: 'jeuxvideo.com', filtre: true, sujet: 'pokemon' },
-  { url: 'https://www.dexerto.fr/feed/', source: 'Dexerto', filtre: true, sujet: 'pokemon' },
+  { url: 'https://www.jeuxvideo.com/rss/rss.xml', source: 'jeuxvideo.com', sujet: 'pokemon' },
+  { url: 'https://www.dexerto.fr/feed/', source: 'Dexerto', sujet: 'pokemon' },
 ];
-const POKEMON = /pok[ée]mon/i;
+const SUJET_POKEMON = /pok[ée]mon|\bjcc\b|\btcg\b/i;
+// Google Actualités ramasse tout ce qui contient « Pokémon », faits divers
+// et chroniques financières compris. La page s'adresse à des
+// collectionneurs, souvent jeunes : on ne garde que les sites de jeux
+// vidéo, de Pokémon ou de culture geek, et l'on écarte les faits divers.
+const SOURCES_SURES = /pok[ée]|nintendo|jeuxvideo|\bjv\b|game|gaming|dexerto|millenium|numerama|frandroid|geek|\bign\b|actugaming|clubic|01net|presse-citron|phonandroid|tom.?s guide|melty|konbini|esport|jeumobi|player ?one|gamekult|journal du gamer/i;
+const FAITS_DIVERS = /fétichi|agress|viol|pédo|condamn|tribunal|procès|garde à vue|interpell|police|gendarm|meurtr|mort[s ]|décès|cambriol|escroqu|drogue|suicide|sexuel|enquête|prison|plainte|victime|vol de|volé/i;
 const JOURS = 14, MAXIMUM = 60;
 
 const entites = s => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
@@ -45,7 +51,10 @@ function lire(xml, flux){
     if(!flux.source && titre.endsWith(` - ${source}`)) titre = titre.slice(0, -(source.length + 3));
     return { titre: titre.replace(/<[^>]+>/g, '').trim(), lien: balise(bloc, 'link'), source,
              date: new Date(balise(bloc, 'pubDate') ?? 0).toISOString(), sujet: flux.sujet };
-  }).filter(a => a.titre && /^https?:\/\//.test(a.lien ?? '') && (!flux.filtre || POKEMON.test(a.titre)));
+  // Le titre lui-même doit parler de Pokémon : Google retient aussi des
+  // articles qui ne le citent qu'en passant.
+  }).filter(a => a.titre && /^https?:\/\//.test(a.lien ?? '') && SUJET_POKEMON.test(a.titre)
+    && (flux.source || SOURCES_SURES.test(a.source)) && !FAITS_DIVERS.test(a.titre));
 }
 
 const cle = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();

@@ -92,12 +92,14 @@ function resumeAvisHtml(r){
   return `<span class="resume-avis" title="Avis reçus après des échanges">👍 ${r.positifs}${r.negatifs ? ` · 👎 ${r.negatifs}` : ''}</span>`;
 }
 
-async function signalerContenu({ membreId, objet, motif, messageId = null }){
+async function signalerContenu({ membreId, objet, motif, messageId = null, sujetId = null, reponseId = null }){
   const db = await clientSupabase();
-  const { error } = await db.from('signalements').insert({
-    signaleur_id: membre.id, signale_id: membreId, objet,
-    message_id: messageId, motif: motif.trim(),
-  });
+  const ligne = { signaleur_id: membre.id, signale_id: membreId, objet, message_id: messageId, motif: motif.trim() };
+  // Un sujet ou une réponse de l'onglet Communauté : la base en retrouve
+  // elle-même l'auteur (supabase/espace-communaute.sql).
+  if(sujetId) ligne.sujet_id = sujetId;
+  if(reponseId) ligne.reponse_id = reponseId;
+  const { error } = await db.from('signalements').insert(ligne);
   if(error) throw error;
 }
 
@@ -258,7 +260,10 @@ function demanderSignalement(pseudo, { photo = false, objet = null } = {}){
     ['pseudo', 'Son pseudo'],
   ];
   return ouvrirFenetre({
-    titre: objet === 'avis' ? `Signaler l'avis de ${pseudo}` : `Signaler ${pseudo}`,
+    titre: objet === 'avis' ? `Signaler l'avis de ${pseudo}`
+         : objet === 'sujet' ? `Signaler le sujet de ${pseudo}`
+         : objet === 'reponse' ? `Signaler la réponse de ${pseudo}`
+         : `Signaler ${pseudo}`,
     action: 'Envoyer le signalement',
     danger: true,
     corps: `
