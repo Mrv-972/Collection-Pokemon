@@ -269,7 +269,7 @@ const sourcePocket = {
 // ------------------ retrouver le Pokémon derrière une carte -------------
 //
 // TCGdex donne le numéro de Pokédex de chaque carte ; le jeu de données
-// Pocket, non. Sans lui, la page « Par Pokémon » n'a plus rien à filtrer.
+// Pocket, non. Sans lui, la page « Par Pokémon / Dresseur » n'a plus rien à filtrer.
 // On le retrouve donc par le nom, en retirant ce que le jeu de cartes
 // ajoute autour : « Dracaufeu ex » reste Dracaufeu, « Méga-Léviator ex »
 // reste Léviator.
@@ -480,6 +480,12 @@ function appliquerAUneCarte(carte, corrections){
     if(c.genre === 'carte'){
       for(const champ of CHAMPS_CARTE){
         if(c.donnees?.[champ] !== undefined && c.donnees[champ] !== null) carte[champ] = c.donnees[champ];
+      }
+      // La famille d'une carte Dresseur, choisie par l'administrateur : elle
+      // en fait du même coup une carte Dresseur.
+      if(['supporter', 'objet', 'outil', 'stade'].includes(c.donnees?.famille)){
+        carte.categorie = 'dresseur';
+        carte.famille = c.donnees.famille;
       }
     }
   }

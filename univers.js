@@ -158,6 +158,21 @@ function memoriserUnivers(){
 const STYLE_RAIL = `
   /* Un lien masqué le reste, quelle que soit la mise en page de la barre. */
   .navlinks a[hidden]{display:none !important}
+  /* « Par Pokémon / Dresseur » ne se coupe pas en deux lignes : sur un écran
+     moyen, ce sont les espaces entre les liens qui se resserrent. */
+  .navlinks a{white-space:nowrap}
+  @media(min-width:1081px) and (max-width:1240px){
+    .navlinks{gap:clamp(12px, calc(4vw - 18px), 32px) !important}
+  }
+  /* Sur une tablette, les liens ne tiennent plus à côté du logo : ils
+     passent sur une deuxième ligne, comme sur un téléphone. */
+  @media(min-width:721px) and (max-width:1080px){
+    nav:has(.navlinks){flex-wrap:wrap;row-gap:14px}
+    .navlinks{order:3;width:100%;justify-content:space-between;gap:10px !important}
+  }
+  @media(min-width:721px) and (max-width:860px){
+    .navlinks{font-size:13px !important}
+  }
   /* L'accent du site change avec l'univers : doré pour le carton, bleu pour
      l'application. C'est le signal le plus économique pour savoir d'un coup
      d'œil de quel côté on se trouve — plus sûr qu'un libellé qu'on finit par

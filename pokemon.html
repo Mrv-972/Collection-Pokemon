@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-11-vw8f"></script>
-<title>Par Pokémon — PokéClasseur</title>
+<script src="theme.js?v=2026-10-11-78or"></script>
+<title>Par Pokémon / Dresseur — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://raw.githubusercontent.com">
@@ -116,7 +116,7 @@
     <a class="brand" href="index.html">Poké<span>Classeur</span></a>
     <div class="navlinks">
       <a href="series.html">Par extension</a>
-      <a href="pokemon.html" class="active">Par Pokémon</a>
+      <a href="pokemon.html" class="active">Par Pokémon / Dresseur</a>
       <a href="missions.html" class="lien-pocket">Missions secrètes</a>
       <a href="classeurs.html" class="lien-physique">Mes classeurs</a>
       <a href="echanges.html">Échanges</a>
@@ -145,14 +145,14 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-11-vw8f"></script>
-<script src="supabase-config.js?v=2026-10-11-vw8f"></script>
-<script src="pied.js?v=2026-10-11-vw8f"></script>
-<script src="admin.js?v=2026-10-11-vw8f"></script>
-<script src="admin-site.js?v=2026-10-11-vw8f"></script>
-<script src="compte.js?v=2026-10-11-vw8f"></script>
-<script src="pokedex-fr.js?v=2026-10-11-vw8f"></script>
-<script src="catalogue.js?v=2026-10-11-vw8f"></script>
+<script src="univers.js?v=2026-10-11-78or"></script>
+<script src="supabase-config.js?v=2026-10-11-78or"></script>
+<script src="pied.js?v=2026-10-11-78or"></script>
+<script src="admin.js?v=2026-10-11-78or"></script>
+<script src="admin-site.js?v=2026-10-11-78or"></script>
+<script src="compte.js?v=2026-10-11-78or"></script>
+<script src="pokedex-fr.js?v=2026-10-11-78or"></script>
+<script src="catalogue.js?v=2026-10-11-78or"></script>
 <script>
 // Bornes officielles du Pokédex national pour chaque génération.
 const GENERATIONS = [
@@ -185,7 +185,7 @@ const TYPES = [
   { cle: 'energie',   libelle: 'Énergies',
     aide: "Les Énergies de base, qui alimentent les attaques, et les Énergies spéciales, qui y ajoutent un effet." },
   { cle: 'aclasser',  libelle: 'Autres Dresseurs',
-    aide: "Des cartes Dresseur dont nos sources ne donnent pas la famille : les plus anciennes, d'avant la distinction entre Objets, Supporters et Stades, et les toutes dernières parues. Elles rejoindront le bon onglet d'elles-mêmes dès que leur famille sera connue." },
+    aide: "Des cartes Dresseur parues trop récemment pour que leur famille soit déjà connue. Elles rejoindront le bon onglet dès qu'elle le sera." },
 ];
 const typeDe = entree => entree.categorie === 'energie' ? 'energie' : (entree.famille || 'aclasser');
 

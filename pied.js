@@ -36,7 +36,7 @@ const SOUTIEN = {
 const PIED_LIENS = [
   ['Explorer', [
     ['Par extension', 'series.html'],
-    ['Par Pokémon', 'pokemon.html'],
+    ['Par Pokémon / Dresseur', 'pokemon.html'],
   ]],
   ['Échanger', [
     ['Échanges', 'echanges.html'],

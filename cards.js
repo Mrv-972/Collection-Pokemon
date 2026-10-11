@@ -216,7 +216,7 @@ function cardTile(c, subtitle){
   return `
     <div class="card-tile" data-carte="${attrCarte(c.id)}" data-local="${attrCarte(c.localId)}"
          data-nom="${attrCarte(c.name)}" data-rarete="${attrCarte(c.rarity)}"
-         data-dex="${attrCarte(c.dexId)}">
+         data-dex="${attrCarte(c.dexId)}" data-categorie="${attrCarte(c.categorie)}" data-famille="${attrCarte(c.famille)}">
       <div class="card-img-wrap">
         ${c.image
           ? `<img class="${classeObtention(c.id)}" src="${c.image}" alt="${c.name}" loading="lazy" data-card-id="${c.id}"${attrLangue} data-haute="${c.imageHaute ?? c.image}" data-fallback="${c.imageSecours ?? `images/cards/${c.id}.png`}"${c.imageHauteSecours ? ` data-fallback-haute="${c.imageHauteSecours}"` : ''} onerror="cardImgFallback(this)">`

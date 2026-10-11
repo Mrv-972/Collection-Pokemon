@@ -362,7 +362,7 @@ function changementsEntre(avant, apres, nombres = []){
   return c;
 }
 
-const libelleGenre = g => ({ visuel: 'visuel', carte: 'nom, rareté ou Pokédex',
+const libelleGenre = g => ({ visuel: 'visuel', carte: 'nom, rareté, Pokédex ou famille',
   extension: 'informations', 'logo-extension': 'logo', 'logo-serie': 'logo' })[g] ?? g;
 
 function blocCorrectionsEnPlace(corrections){
@@ -382,9 +382,18 @@ const apercuImage = src => src
 
 // ------------------------------------------------------------- cartes ---
 
+// La famille d'une carte Dresseur, telle que la fenêtre la propose. Le
+// premier choix, vide, laisse la famille telle quelle.
+const FAMILLES_PROPOSEES = { '': '', 'Supporter': 'supporter', 'Objet': 'objet', 'Outil': 'outil', 'Stade': 'stade' };
+const libelleFamille = code => Object.keys(FAMILLES_PROPOSEES).find(l => FAMILLES_PROPOSEES[l] === code) ?? '';
+
 async function modifierUneCarte(tuile){
   const id = tuile.dataset.carte;
-  const avant = { name: tuile.dataset.nom, rarity: tuile.dataset.rarete, dexId: tuile.dataset.dex };
+  const avant = { name: tuile.dataset.nom, rarity: tuile.dataset.rarete, dexId: tuile.dataset.dex,
+    famille: libelleFamille(tuile.dataset.famille) };
+  // La famille ne se propose que pour une carte Dresseur, ou pour une carte
+  // qui n'est rattachée à aucun Pokémon et n'a pas encore de catégorie.
+  const dresseur = tuile.dataset.categorie === 'dresseur' || (!tuile.dataset.categorie && !tuile.dataset.dex);
   const enPlace = await correctionsDe(id, ['visuel', 'carte']).catch(() => []);
   await fenetre({
     titre: `Modifier ${echapper(avant.name || id)}`,
@@ -395,11 +404,15 @@ async function modifierUneCarte(tuile){
       { nom: 'rarity', etiquette: 'Rareté', valeur: avant.rarity, aide: 'Par exemple : Un Diamant, Deux Étoiles, Couronne.' },
       { nom: 'dexId', etiquette: 'Numéro du Pokémon', type: 'number', valeur: avant.dexId,
         aide: 'Numéro au Pokédex national : rattache la carte à sa page Pokémon.' },
+      ...(dresseur ? [{ nom: 'famille', etiquette: 'Famille (carte Dresseur)', options: Object.keys(FAMILLES_PROPOSEES),
+        valeur: avant.famille,
+        aide: 'Celle imprimée en haut à gauche de la carte. Le classement de la page « Par Pokémon / Dresseur » suit à la prochaine mise à jour du catalogue, chaque nuit.' }] : []),
       { nom: 'fichier', etiquette: 'Remplacer le visuel', type: 'file', aide: 'WebP, PNG ou JPEG, 5 Mo maximum.' },
     ],
     annexe: blocCorrectionsEnPlace(enPlace),
     enregistrer: async (v, fichier, dire) => {
       const changements = changementsEntre(avant, v, ['dexId']);
+      if(changements.famille !== undefined) changements.famille = FAMILLES_PROPOSEES[changements.famille];
       if(!fichier && !Object.keys(changements).length) return 'rien';
       if(fichier){
         dire('Envoi de l\'image…', true);

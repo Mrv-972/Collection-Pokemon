@@ -130,15 +130,40 @@ function premierDexId(source){
 // sinon « dresseur » ou « energie », et la famille : supporter, objet,
 // outil, stade ; énergie de base ou spéciale. La page « Par Pokémon » s'en
 // sert pour chercher aussi les dresseurs, les objets et les énergies.
+const FAMILLES_CHOISIES = ['supporter', 'objet', 'outil', 'stade'];
 const FAMILLES_DRESSEUR = {
   'Supporter': 'supporter', 'Item': 'objet', 'Tool': 'outil', 'Stadium': 'stade',
   'Technical Machine': 'objet', "Rocket's Secret Machine": 'objet',
 };
-function categorieDeCarte(source){
+// TCGdex ne donne pas la famille des cartes Dresseur les plus anciennes :
+// à l'époque, elles portaient toutes la seule mention « Dresseur ». Leur
+// texte la trahit pourtant : un Stade « reste en jeu », un Outil « s'attache »
+// à un Pokémon et le dit. Le reste compte officiellement comme un Objet —
+// c'est la règle depuis 2011, quand la mention « Objet » est apparue — mais
+// on ne l'applique qu'aux cartes d'avant cette date : sur une carte récente,
+// une famille absente est un oubli de la source, pas une ancienne carte.
+const ARRIVEE_DE_LA_MENTION_OBJET = '2011-04-25';
+function familleDuTexte(source, dateSortie){
+  const bloc = source.match(/effect:\s*\{([\s\S]*?)\n\t\}/);
+  const texte = bloc ? bloc[1] : '';
+  if(/Stadium card|carte Stade|stays in play when you play it|reste en jeu/i.test(texte)) return 'stade';
+  if(/Pokémon Tool|Outil Pokémon/i.test(texte) && /\battach/i.test(texte)) return 'outil';
+  if(/\bSupporter\b/i.test(texte)) return 'supporter';
+  if(texte && dateSortie && String(dateSortie) < ARRIVEE_DE_LA_MENTION_OBJET) return 'objet';
+  return null;
+}
+
+// Les cartes dont la famille a été déduite de leur texte : face à une carte
+// du même nom que TCGdex classe lui-même, c'est TCGdex qui l'emporte.
+const famillesDeduites = new WeakSet();
+
+function categorieDeCarte(source, dateSortie = null){
   const categorie = champTexte(source, 'category');
   if(categorie === 'Trainer'){
-    const famille = FAMILLES_DRESSEUR[champTexte(source, 'trainerType')];
-    return famille ? { categorie: 'dresseur', famille } : { categorie: 'dresseur' };
+    const donnee = FAMILLES_DRESSEUR[champTexte(source, 'trainerType')];
+    if(donnee) return { categorie: 'dresseur', famille: donnee };
+    const deduite = familleDuTexte(source, dateSortie);
+    return deduite ? { categorie: 'dresseur', famille: deduite, deduite: true } : { categorie: 'dresseur' };
   }
   if(categorie === 'Energy')
     return { categorie: 'energie', famille: champTexte(source, 'energyType') === 'Special' ? 'speciale' : 'base' };
@@ -233,19 +258,22 @@ async function construirePhysique(){
         const nom = nomTraduit(source);
         if(nom.en && nom.fr && nom.en !== nom.fr) traductions.set(nom.en, nom.fr);
         const rarete = champTexte(source, 'rarity');
-        cartes.push({
+        const { deduite, ...categorie } = categorieDeCarte(source, champTexte(sourceSet, 'releaseDate'));
+        const carte = {
           id: `${setId}-${localId}`,
           localId,
           name: nom.fr || nom.en || localId,
           rarity: rarete ? (raretesFr[rarete] ?? rarete) : null,
           dexId: premierDexId(source),
-          ...categorieDeCarte(source),
+          ...categorie,
           image: `${base('fr')}/${localId}/low.webp`,
           imageHaute: `${base('fr')}/${localId}/high.webp`,
           // Toutes les cartes n'ont pas de visuel français : l'anglais prend
           // le relais avant le point d'interrogation.
           imageSecours: `${base('en')}/${localId}/low.webp`,
-        });
+        };
+        if(deduite) famillesDeduites.add(carte);
+        cartes.push(carte);
       }
       cartes.sort((a, b) => a.localId.localeCompare(b.localId, undefined, { numeric: true }));
       cartesParSet.set(setId, cartes);
@@ -864,6 +892,13 @@ async function absorberCorrections(lots){
           champs++;
         }
       }
+      // La famille d'une carte Dresseur, choisie par l'administrateur pour
+      // une carte que les sources ne classent pas encore.
+      if(FAMILLES_CHOISIES.includes(c.donnees?.famille)){
+        carte.categorie = 'dresseur';
+        carte.famille = c.donnees.famille;
+        champs++;
+      }
     }
   }
 
@@ -1356,7 +1391,18 @@ function nomDeRangement(carte){
 // énergies —, rangées par nom, comme les cartes d'un Pokémon le sont par son
 // numéro. Une carte sans famille connue (les plus anciennes, les toutes
 // dernières de l'application) prend celle des cartes du même nom.
-function rangerAutresCartes(extensions, cartesParSet, famillesConnues = new Map()){
+// Les familles lues sur les cartes elles-mêmes, pour celles qu'aucune
+// source ne classe (outils/familles-dresseur.json) : la clé du nom, puis la
+// famille imprimée en haut à gauche de la carte.
+const FAMILLES_LUES = 'outils/familles-dresseur.json';
+async function lireFamillesLues(){
+  try{
+    const { familles } = JSON.parse(await readFile(FAMILLES_LUES, 'utf8'));
+    return new Map(Object.entries(familles ?? {}).filter(([, f]) => FAMILLES_CHOISIES.includes(f)));
+  }catch{ return new Map(); }
+}
+
+function rangerAutresCartes(extensions, cartesParSet, famillesConnues = new Map(), famillesLues = new Map()){
   const rang = new Map(extensions.map((e, i) => [e.id, i]));
   const parNom = new Map();
   for(const [setId, cartes] of cartesParSet){
@@ -1381,15 +1427,21 @@ function rangerAutresCartes(extensions, cartesParSet, famillesConnues = new Map(
   }
   const index = [];
   for(const [cle, lot] of parNom){
-    const majoritaire = champ => {
+    const majoritaire = (champ, parmi = lot) => {
       const compte = new Map();
-      for(const { carte } of lot) if(carte[champ]) compte.set(carte[champ], (compte.get(carte[champ]) ?? 0) + 1);
+      for(const { carte } of parmi) if(carte[champ]) compte.set(carte[champ], (compte.get(carte[champ]) ?? 0) + 1);
       return [...compte].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
     };
     const categorie = majoritaire('categorie');
-    // À défaut, la famille d'une carte du même nom dans l'autre univers :
-    // « Cornélia » est une Supporter dans les deux jeux.
-    const famille = majoritaire('famille') ?? famillesConnues.get(cle) ?? null;
+    // La famille donnée par la source passe avant celle déduite du texte :
+    // « Erika » est une Supporter en 2019, une simple carte Dresseur en 1999.
+    const explicites = lot.filter(({ carte }) => carte.famille && !famillesDeduites.has(carte));
+    const familleExplicite = explicites.length
+      ? majoritaire('famille', explicites) : null;
+    // À défaut, la famille lue sur la carte, puis celle d'une carte du même
+    // nom dans l'autre univers : « Cornélia » est une Supporter dans les deux.
+    const famille = familleExplicite ?? majoritaire('famille')
+      ?? (categorie === 'dresseur' ? famillesLues.get(cle) ?? famillesConnues.get(cle) : null) ?? null;
     for(const { carte } of lot) if(!carte.famille && famille && carte.categorie === categorie) carte.famille = famille;
     lot.sort((a, b) => b.rang - a.rang);
     index.push({
@@ -1565,9 +1617,15 @@ async function principal(){
 
   // Le rangement des cartes Dresseur et Énergie passe avant l'écriture des
   // extensions : il complète la famille des cartes qui n'en avaient pas.
-  const autresPhysique = rangerAutresCartes(physique.extensions, physique.cartesParSet);
+  const famillesLues = await lireFamillesLues();
+  const autresPhysique = rangerAutresCartes(physique.extensions, physique.cartesParSet, new Map(), famillesLues);
   const autresPocket = rangerAutresCartes(pocket.extensions, pocket.cartesParSet,
-    new Map(autresPhysique.filter(e => e.famille).map(e => [e.cle, e.famille])));
+    new Map(autresPhysique.filter(e => e.famille).map(e => [e.cle, e.famille])), famillesLues);
+  const nonClasses = [...autresPhysique, ...autresPocket].filter(e => e.categorie === 'dresseur' && !e.famille);
+  if(nonClasses.length){
+    console.log(`Cartes Dresseur sans famille connue (onglet « Autres Dresseurs ») : ${nonClasses.map(e => e.nom).join(', ')}`);
+    console.log(`  À classer depuis le site (bouton ✎ d'une carte, champ « Famille ») ou dans ${FAMILLES_LUES}.`);
+  }
   const bilanPhysique = await publier('physique', physique, SORTIE, autresPhysique);
   const bilanPocket = await publier('pocket', pocket, SORTIE, autresPocket);
 
