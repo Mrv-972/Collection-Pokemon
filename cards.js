@@ -159,6 +159,13 @@ function cardImgFallback(img){
   const fallback = img.dataset.fallback;
   if(fallback){
     img.removeAttribute('data-fallback');
+    // Le secours a parfois sa propre haute définition (Pokécardex : 444 px
+    // contre 214) : le zoom doit la prendre, plutôt que d'agrandir la
+    // vignette ou d'attendre une haute définition qui n'existe pas.
+    if(img.dataset.fallbackHaute){
+      img.dataset.haute = img.dataset.fallbackHaute;
+      img.removeAttribute('data-fallback-haute');
+    }
     img.src = fallback;
     return;
   }
@@ -189,7 +196,7 @@ function cardTile(c, subtitle){
          data-dex="${attrCarte(c.dexId)}">
       <div class="card-img-wrap">
         ${c.image
-          ? `<img class="${classeObtention(c.id)}" src="${c.image}" alt="${c.name}" loading="lazy" data-card-id="${c.id}" data-haute="${c.imageHaute ?? c.image}" data-fallback="${c.imageSecours ?? `images/cards/${c.id}.png`}" onerror="cardImgFallback(this)">`
+          ? `<img class="${classeObtention(c.id)}" src="${c.image}" alt="${c.name}" loading="lazy" data-card-id="${c.id}" data-haute="${c.imageHaute ?? c.image}" data-fallback="${c.imageSecours ?? `images/cards/${c.id}.png`}"${c.imageHauteSecours ? ` data-fallback-haute="${c.imageHauteSecours}"` : ''} onerror="cardImgFallback(this)">`
           : `<img class="${classeObtention(c.id)}" src="images/cards/${c.id}.png" alt="${c.name}" loading="lazy" data-card-id="${c.id}" onerror="cardImgFallback(this)">`}
       </div>
       <div class="card-num"><span>${subtitle ?? '#' + c.localId}</span><span class="rarity-symbol" title="${c.rarity || ''}">${rarityIcon(c.rarity)}</span></div>

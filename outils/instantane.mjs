@@ -1044,6 +1044,12 @@ async function brancherPokecardex(physique){
   // Pokécardex s'affichaient en point d'interrogation — y compris celles
   // qui avaient jusque-là un visuel anglais. Mesuré, pas supposé.
   const adresseServie = a => /[?&]class=/.test(a) ? a : `${a}${a.includes('?') ? '&' : '?'}class=md`;
+  // Leur même image existe aussi en « hd » (444 px au lieu de 214) : c'est
+  // elle que le zoom affiche quand ce secours est en service.
+  const poserSecours = (carte, adresse) => {
+    poserSecours(carte, adresse);
+    carte.imageHauteSecours = carte.imageSecours.replace(/([?&]class=)md\b/, '$1hd');
+  };
 
   // La langue lue sur l'image elle-même (outils/langue-visuels.mjs). Leur
   // site montre parfois le scan ANGLAIS d'une carte, faute du français :
@@ -1080,7 +1086,7 @@ async function brancherPokecardex(physique){
       const dejaFrancais = carte.imageSecours && !/\/en\//.test(carte.imageSecours);
       if(dejaFrancais) continue;
       if(carte.imageSecours && /\/en\//.test(carte.imageSecours)) remplaceDeLAnglais++;
-      carte.imageSecours = adresseServie(chez.adresse);
+      poserSecours(carte, chez.adresse);
       poses++;
       parExtension.set(setId, (parExtension.get(setId) ?? 0) + 1);
     }
@@ -1097,7 +1103,7 @@ async function brancherPokecardex(physique){
       const dejaFrancais = carte.imageSecours && !/\/en\//.test(carte.imageSecours);
       if(dejaFrancais) continue;
       if(carte.imageSecours && /\/en\//.test(carte.imageSecours)) remplaceDeLAnglais++;
-      carte.imageSecours = adresseServie(adresse);
+      poserSecours(carte, adresse);
       poses++;
       parExtension.set(setId, (parExtension.get(setId) ?? 0) + 1);
     }
@@ -1115,7 +1121,7 @@ async function brancherPokecardex(physique){
       const dejaFrancais = carte.imageSecours && !/\/en\//.test(carte.imageSecours);
       if(dejaFrancais) continue;
       if(carte.imageSecours && /\/en\//.test(carte.imageSecours)) remplaceDeLAnglais++;
-      carte.imageSecours = adresseServie(adresse);
+      poserSecours(carte, adresse);
       poses++;
       parExtension.set(setId, (parExtension.get(setId) ?? 0) + 1);
     }
