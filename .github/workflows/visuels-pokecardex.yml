@@ -14,6 +14,9 @@ on:
       series:
         description: "Séries à parcourir (0 = toutes, environ 249)"
         default: "0"
+      seule:
+        description: "Une seule série à examiner (code Pokécardex), avec l'essai"
+        default: ""
       essai:
         description: "Essai : relever et compter, sans rien écrire"
         type: boolean
@@ -43,6 +46,7 @@ jobs:
           node outils/moissonner-pokecardex.mjs \
             --sortie donnees \
             --series "${{ inputs.series }}" \
+            ${{ inputs.seule != '' && format('--seule {0}', inputs.seule) || '' }} \
             ${{ inputs.essai && '--essai' || '' }}
 
       - name: Apparier à nos extensions

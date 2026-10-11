@@ -1047,7 +1047,7 @@ async function brancherPokecardex(physique){
   // Leur même image existe aussi en « hd » (444 px au lieu de 214) : c'est
   // elle que le zoom affiche quand ce secours est en service.
   const poserSecours = (carte, adresse) => {
-    poserSecours(carte, adresse);
+    carte.imageSecours = adresseServie(adresse);
     carte.imageHauteSecours = carte.imageSecours.replace(/([?&]class=)md\b/, '$1hd');
   };
 

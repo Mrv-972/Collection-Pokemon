@@ -79,7 +79,9 @@ const DECOUPE = /pokecardex-scans\.b-cdn\.net\/sets\/([^/]+)\/FR\/([^/?.]+)\.(jp
 const series = {};
 let totalCartes = 0, sansCarte = [];
 let totalTrous = 0; const seriesATrous = [];
-const retenues = codes.slice(0, maxSeries === Infinity ? undefined : maxSeries);
+// « --seule SF » : une seule série, pour l'examiner (avec --essai).
+const retenues = args.seule ? [String(args.seule)]
+  : codes.slice(0, maxSeries === Infinity ? undefined : maxSeries);
 
 for(const [i, code] of retenues.entries()){
   try{
@@ -123,6 +125,14 @@ for(const [i, code] of retenues.entries()){
       })),
     }));
 
+    if(args.seule){
+      // Tout ce que la page montre pour chaque numéro : quelles images
+      // portent une adresse de carte, et avec quel texte.
+      for(const c of lu.cartes){
+        const m = DECOUPE.exec(c.src) ?? DECOUPE.exec(c.dataSrc);
+        if(m && Number(m[2]) >= 100) console.log(`  n° ${m[2]}  alt « ${c.alt} »  src ${c.src ? 'oui' : 'non'}  data-src ${c.dataSrc ? 'oui' : 'non'}`);
+      }
+    }
     const parNumero = {};
     for(const c of lu.cartes){
       const m = DECOUPE.exec(c.src) ?? DECOUPE.exec(c.dataSrc);
