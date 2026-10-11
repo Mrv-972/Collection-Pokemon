@@ -112,19 +112,30 @@ for(const ext of extensions){
 }
 console.log(`${toutes.length} cartes physiques à vérifier, ${extensions.length} extensions.\n`);
 
+// La langue lue sur les images, quand elle l'a été.
+let langues = {};
+try{ langues = JSON.parse(await readFile('donnees/langue-visuels.json', 'utf8')).verdicts ?? {}; }catch{}
+const langueLue = adresse => langues[adresse]?.langue
+  ?? langues[/[?&]class=/.test(adresse) ? adresse : `${adresse}${adresse.includes('?') ? '&' : '?'}class=md`]?.langue;
+// Et pour les fichiers copiés dans le dépôt, sous leur identifiant.
+const depotEnAnglais = id => langues[`depot:${id}`]?.langue === 'en';
+
 let faites = 0;
 const verdicts = await parPaquets(toutes, largeur, async carte => {
   let etat;
-  if(aDejaUnFichier(carte.id)) etat = 'depot';
+  if(aDejaUnFichier(carte.id)) etat = depotEnAnglais(carte.id) ? 'secoursAnglais' : 'depot';
   else {
     const principal = await repond(carte.image);
     if(principal === true) etat = 'principal';
     else {
       const secours = await repond(carte.imageSecours);
       // D'où vient ce secours ? PkmCards est français ; une adresse
-      // TCGdex portant « /en/ » est anglaise.
+      // TCGdex portant « /en/ » est anglaise. Et quand le texte de l'image
+      // a été lu (outils/langue-visuels.mjs), c'est la lecture qui tranche :
+      // un site français peut servir le scan anglais d'une carte.
       if(secours === true)
-        etat = /\/en\//.test(carte.imageSecours) ? 'secoursAnglais' : 'secoursFrancais';
+        etat = /\/en\//.test(carte.imageSecours) || langueLue(carte.imageSecours) === 'en'
+          ? 'secoursAnglais' : 'secoursFrancais';
       else if(principal === null || secours === null) etat = 'indecis';
       else etat = 'manquant';
     }

@@ -1045,6 +1045,20 @@ async function brancherPokecardex(physique){
   // qui avaient jusque-là un visuel anglais. Mesuré, pas supposé.
   const adresseServie = a => /[?&]class=/.test(a) ? a : `${a}${a.includes('?') ? '&' : '?'}class=md`;
 
+  // La langue lue sur l'image elle-même (outils/langue-visuels.mjs). Leur
+  // site montre parfois le scan ANGLAIS d'une carte, faute du français :
+  // s'en servir comme « secours français » serait mentir. Un scan lu en
+  // anglais est donc écarté, et la carte garde son secours anglais de
+  // TCGdex, qui dit honnêtement ce qu'il est.
+  let langues = {};
+  try{ langues = JSON.parse(await readFile('donnees/langue-visuels.json', 'utf8')).verdicts ?? {}; }catch{}
+  let ecartesAnglais = 0;
+  const lueEnAnglais = adresse => {
+    if(langues[adresseServie(adresse)]?.langue !== 'en') return false;
+    ecartesAnglais++;
+    return true;
+  };
+
   // notre identifiant d'extension -> leur code
   const leurCode = new Map();
   for(const [code, a] of Object.entries(appariement.apparies ?? {})) leurCode.set(a.notre, code);
@@ -1060,7 +1074,7 @@ async function brancherPokecardex(physique){
     const parNumero = new Map(Object.entries(chezEux).map(([n, c]) => [sansZeros(n), c]));
     for(const carte of cartes){
       const chez = parNumero.get(sansZeros(carte.localId));
-      if(!chez) continue;
+      if(!chez || lueEnAnglais(chez.adresse)) continue;
       // On ne remplace jamais un secours DÉJÀ français : PkmCards a été
       // vérifié carte par carte, il n'y a rien à y gagner.
       const dejaFrancais = carte.imageSecours && !/\/en\//.test(carte.imageSecours);
@@ -1079,7 +1093,7 @@ async function brancherPokecardex(physique){
     if(!cartes) continue;
     for(const carte of cartes){
       const adresse = sous.cartes?.[carte.localId];
-      if(!adresse) continue;
+      if(!adresse || lueEnAnglais(adresse)) continue;
       const dejaFrancais = carte.imageSecours && !/\/en\//.test(carte.imageSecours);
       if(dejaFrancais) continue;
       if(carte.imageSecours && /\/en\//.test(carte.imageSecours)) remplaceDeLAnglais++;
@@ -1097,7 +1111,7 @@ async function brancherPokecardex(physique){
     if(!cartes) continue;
     for(const carte of cartes){
       const adresse = r.cartes?.[carte.localId];
-      if(!adresse) continue;
+      if(!adresse || lueEnAnglais(adresse)) continue;
       const dejaFrancais = carte.imageSecours && !/\/en\//.test(carte.imageSecours);
       if(dejaFrancais) continue;
       if(carte.imageSecours && /\/en\//.test(carte.imageSecours)) remplaceDeLAnglais++;
@@ -1109,7 +1123,8 @@ async function brancherPokecardex(physique){
 
   console.log(`Secours français depuis Pokécardex : ${poses} cartes` +
     ` sur ${parExtension.size} extensions` +
-    ` (dont ${remplaceDeLAnglais} qui étaient en anglais)` +
+    ` (dont ${remplaceDeLAnglais} qui étaient en anglais ;` +
+    ` ${ecartesAnglais} scans écartés, lus en anglais sur l'image)` +
     ` — relevé du ${String(releve.releveLe ?? '?').slice(0, 10)}` +
     `${releve.complet ? '' : ', PARTIEL'}`);
 }
