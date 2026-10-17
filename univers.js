@@ -248,6 +248,14 @@ const STYLE_RAIL = `
     body{transition:padding-left .2s ease}
     body:has(> .rail:hover),body:has(> .rail:focus-within){padding-left:196px}
   }
+  /* La colonne de contenu (1 080 px) n'est plus centrée : l'espace libre
+     se partage un quart à gauche, trois quarts à droite. La page se
+     rapproche ainsi du bandeau, sans s'y coller, et garde la même place
+     d'une page à l'autre. Sur téléphone, rien ne change : la colonne
+     occupe déjà toute la largeur. */
+  @media(min-width:721px){
+    .wrap{margin-left:calc((100% - min(100%, 1080px)) / 4) !important;margin-right:auto !important}
+  }
   .rail:hover .rail-compact,.rail:focus-within .rail-compact{opacity:0}
   .rail:hover .rail-logo,.rail:focus-within .rail-logo{opacity:1}
   /* Barre ouverte, on remonte l'univers qu'on ne lit pas de 42 % à 75 % :
