@@ -3,7 +3,7 @@
 // Sonde : les pages qui décrivent les missions secrètes récentes
 // ==============================================================
 //
-// Lit une liste de pages (guides francophones, guides anglophones, wiki) et
+// Lit une liste de pages (guides, wiki, archives du web) et
 // en dépose le texte dans donnees/missions-pages.json, pour relecture. Elle
 // ne décide de rien : c'est le recoupement à la main qui fait foi. Le
 // fichier est un brouillon de travail, retiré une fois les missions saisies.
@@ -19,34 +19,22 @@ const IDENTITE = {
   'Accept': 'text/html,application/xhtml+xml,application/json',
 };
 
-const BULBA = page => `https://bulbapedia.bulbagarden.net/w/api.php?action=parse&format=json&prop=wikitext&page=${encodeURIComponent(page)}`;
+// Bulbapedia et Pokémon Zone refusent les robots : on lit leur copie
+// publique dans les archives du web (Wayback Machine), sans contourner
+// leur refus.
+const ARCHIVE = adresse => `https://web.archive.org/web/2027id_/${adresse}`;
 
 const PAGES = [
-  // Guides francophones
-  'https://gamewave.fr/pokemon-pocket/pokemon-pocket-les-missions-secretes-de-domination-celeste-et-comment-les-valider/',
-  'https://gamewave.fr/pokemon-pocket/pokemon-pocket-les-missions-secretes-de-l-ambition-de-la-team-rocket-et-comment-les-valider/',
-  'https://gamewave.fr/pokemon-pocket/pokemon-pocket-tout-savoir-sur-l-extension-booster-de-luxe-mega/',
-  'https://gamewave.fr/pokemon-pocket/pokemon-pocket-les-missions-secretes-de-booster-de-luxe-mega-et-comment-les-valider/',
-  'https://gamewave.fr/pokemon-pocket/pokemon-pocket-les-missions-secretes-de-jours-heureux-et-comment-les-valider/',
-  'https://www.eternia.fr/dossier/pokemon-pocket-collections-par-theme-domination-celeste',
-  'https://www.eternia.fr/dossier/pokemon-pocket-collections-par-theme-lambition-de-la-team-rocket',
-  'https://www.eternia.fr/dossier/pokemon-pocket-collections-par-theme-booster-de-luxe-mega',
-  'https://www.eternia.fr/dossier/pokemon-pocket-collections-par-theme-jours-heureux',
-  // Guides anglophones
-  'https://pokemongohub.net/post/tcg-pocket/pokemon-tcg-pocket-ruler-of-the-skies-all-themed-collection-and-secret-missions/',
-  'https://pokemongohub.net/post/tcg-pocket/pokemon-tcg-pocket-team-rockets-ambition-all-themed-collection-and-secret-missions/',
-  'https://pokemongohub.net/post/tcg-pocket/pokemon-tcg-pocket-deluxe-pack-mega-all-themed-collection-and-secret-missions/',
-  'https://www.pokemon-zone.com/themed-collections/multiple-expansions/',
-  'https://www.pokemon-zone.com/themed-collections/b3b/',
-  'https://www.pokemon-zone.com/themed-collections/b4/',
-  'https://www.pokemon-zone.com/themed-collections/b4a/',
-  'https://www.pokemon-zone.com/themed-collections/b4b/',
-  // Wiki anglophone, texte source structuré
-  BULBA('Everyday Wonders (TCG Pocket)'),
-  BULBA('Ruler of the Skies (TCG Pocket)'),
-  BULBA("Team Rocket's Ambition (TCG Pocket)"),
-  BULBA('Deluxe Pack: Mega (TCG Pocket)'),
-  BULBA('Mission (TCG Pocket)'),
+  ARCHIVE('https://bulbapedia.bulbagarden.net/wiki/Mission_(TCG_Pocket)'),
+  ARCHIVE('https://www.pokemon-zone.com/themed-collections/multiple-expansions/b/'),
+  ARCHIVE('https://www.pokemon-zone.com/themed-collections/multiple-expansions/'),
+  ARCHIVE('https://bulbapedia.bulbagarden.net/wiki/Ruler_of_the_Skies_(TCG_Pocket)'),
+  ARCHIVE("https://bulbapedia.bulbagarden.net/wiki/Team_Rocket%27s_Ambition_(TCG_Pocket)"),
+  ARCHIVE('https://bulbapedia.bulbagarden.net/wiki/Deluxe_Pack:_Mega_(TCG_Pocket)'),
+  ARCHIVE('https://bulbapedia.bulbagarden.net/wiki/Everyday_Wonders_(TCG_Pocket)'),
+  ARCHIVE('https://www.pokemon-zone.com/themed-collections/b4/'),
+  ARCHIVE('https://www.pokemon-zone.com/themed-collections/b4a/'),
+  ARCHIVE('https://www.pokemon-zone.com/themed-collections/b4b/'),
 ];
 
 function enTexte(html){
@@ -81,12 +69,7 @@ async function principal(){
       const r = await fetch(adresse, { headers: IDENTITE, redirect: 'follow' });
       const corps = await r.text();
       let texte;
-      if(adresse.includes('api.php')){
-        try{ texte = JSON.parse(corps)?.parse?.wikitext?.['*'] ?? corps.slice(0, 2000); }
-        catch{ texte = corps.slice(0, 2000); }
-      }else{
-        texte = enTexte(corps);
-      }
+      texte = enTexte(corps);
       // Les données embarquées d'une page construite en JavaScript.
       const donnees = corps.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/)?.[1] ?? null;
       pages.push({ adresse, statut: r.status, final: r.url, texte: texte.slice(0, 120000),
