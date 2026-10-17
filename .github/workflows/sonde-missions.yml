@@ -1,0 +1,29 @@
+# Lit les pages qui décrivent les missions secrètes récentes et en dépose le
+# texte dans donnees/missions-pages.json, pour relecture. Lancée à la main ;
+# le fichier est un brouillon de travail, retiré une fois les missions saisies.
+name: Sonde des missions secrètes
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sonder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node outils/sonde-missions.mjs
+      - name: Déposer le relevé
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add donnees/missions-pages.json
+          git diff --cached --quiet || git commit -m "Sonde : pages des missions secrètes récentes"
+          for essai in 1 2 3; do git pull --rebase -q origin "$GITHUB_REF_NAME" && git push -q origin HEAD:"$GITHUB_REF_NAME" && exit 0; sleep 5; done
+          exit 1
