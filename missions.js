@@ -20,7 +20,12 @@ const CLE_MISSIONS_FAITES = 'pokeclasseur-missions-faites';
 // les marquages du site. Cocher reste donc à la main — mais la coche, elle,
 // est bien enregistrée.
 function missionsFaites(){
-  try{ return new Set(JSON.parse(localStorage.getItem(CLE_MISSIONS_FAITES)) || []); }
+  try{
+    // Les collections entre plusieurs extensions ont d'abord été rangées
+    // sous « B-plusieurs » : une coche posée alors reste valable.
+    return new Set((JSON.parse(localStorage.getItem(CLE_MISSIONS_FAITES)) || [])
+      .map(c => String(c).replace(/^B-plusieurs::/, 'plusieurs::')));
+  }
   catch{ return new Set(); }
 }
 

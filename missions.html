@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-xefq"></script>
+<script src="theme.js?v=2026-10-17-2k34"></script>
 <title>Missions secrètes — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -258,18 +258,18 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-17-xefq"></script>
-<script src="catalogue.js?v=2026-10-17-xefq"></script>
-<script src="supabase-config.js?v=2026-10-17-xefq"></script>
-<script src="pied.js?v=2026-10-17-xefq"></script>
-<script src="admin.js?v=2026-10-17-xefq"></script>
-<script src="admin-site.js?v=2026-10-17-xefq"></script>
-<script src="compte.js?v=2026-10-17-xefq"></script>
-<script src="progression.js?v=2026-10-17-xefq"></script>
-<script src="sets.js?v=2026-10-17-xefq"></script>
-<script src="raretes.js?v=2026-10-17-xefq"></script>
-<script src="glissement.js?v=2026-10-17-xefq"></script>
-<script src="missions.js?v=2026-10-17-xefq"></script>
+<script src="univers.js?v=2026-10-17-2k34"></script>
+<script src="catalogue.js?v=2026-10-17-2k34"></script>
+<script src="supabase-config.js?v=2026-10-17-2k34"></script>
+<script src="pied.js?v=2026-10-17-2k34"></script>
+<script src="admin.js?v=2026-10-17-2k34"></script>
+<script src="admin-site.js?v=2026-10-17-2k34"></script>
+<script src="compte.js?v=2026-10-17-2k34"></script>
+<script src="progression.js?v=2026-10-17-2k34"></script>
+<script src="sets.js?v=2026-10-17-2k34"></script>
+<script src="raretes.js?v=2026-10-17-2k34"></script>
+<script src="glissement.js?v=2026-10-17-2k34"></script>
+<script src="missions.js?v=2026-10-17-2k34"></script>
 <script>
 // Les missions secrètes n'existent que dans l'application mobile : du côté
 // du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
@@ -331,6 +331,8 @@ function echapper(t){
 // Le nom lisible de chaque extension, pour les missions qui en réunissent
 // plusieurs.
 const nomsExtensions = new Map();
+// Le lot du fichier qui regroupe les missions entre plusieurs extensions.
+const LOT_PLUSIEURS = 'plusieurs';
 const extensionDeLaCarte = id => String(id).replace(/-\d+$/, '');
 
 // Les extensions dont une mission réclame des cartes : celles que le
@@ -389,21 +391,25 @@ function parSerie(extensions){
 // les lecteurs d'écran l'annoncent déjà, et la recherche du navigateur
 // (Ctrl+F) y trouve le texte replié.
 function blocExtension(ext, faites, ouverte){
+  // Un bloc qui n'est pas une extension garde, pour ses coches, la clé du
+  // lot dont viennent ses missions : elles survivent à un changement de
+  // rangement.
+  const cle = ext.cle ?? ext.id;
   const total = ext.missions.length;
-  const accomplies = ext.missions.filter(m => faites.has(cleMission(ext.id, m.nom))).length;
+  const accomplies = ext.missions.filter(m => faites.has(cleMission(cle, m.nom))).length;
   return `
     <details class="ext-bloc" data-ext="${echapper(ext.id)}" ${ouverte ? 'open' : ''}>
       <summary class="ext-tete">
         <span class="chevron" aria-hidden="true"></span>
-        <img src="images/sets/${echapper(ext.id)}.png" alt="" loading="lazy"
-             onerror="this.remove()">
+        ${ext.virtuel ? '' : `<img src="images/sets/${echapper(ext.id)}.png" alt="" loading="lazy"
+             onerror="this.remove()">`}
         <h3>${echapper(ext.nom)}</h3>
         <span class="compte">${total} mission${total > 1 ? 's' : ''}</span>
         ${barreProgression({ obtenues: accomplies, total })}
       </summary>
       <div class="ext-corps">
         ${ext.note ? `<p class="note-bloc">${echapper(ext.note)}</p>` : ''}
-        ${ext.missions.map(m => blocMission(ext.id, m, faites)).join('')}
+        ${ext.missions.map(m => blocMission(cle, m, faites)).join('')}
       </div>
     </details>`;
 }
@@ -445,15 +451,49 @@ async function construire(){
   // mêmes partout sur le site.
   const parId = new Map(extensionsConnues.map(e => [e.id, e]));
   for(const e of extensionsConnues) nomsExtensions.set(e.id, e.name);
-  // Un bloc qui n'est pas une extension du catalogue — les missions qui
-  // réunissent plusieurs extensions — porte son nom et sa série lui-même.
+  const serieDe = id => parId.get(id)?.serieNom ?? guessSeriesName(id);
   const extensions = donnees.extensions
+    .filter(e => e.id !== LOT_PLUSIEURS)
     .map(e => ({
       ...e,
-      nom: parId.get(e.id)?.name ?? e.nom ?? e.id,
-      serieNom: parId.get(e.id)?.serieNom ?? e.serieNom ?? guessSeriesName(e.id),
+      nom: parId.get(e.id)?.name ?? e.id,
+      serieNom: serieDe(e.id),
     }))
     .reverse();   // les plus récentes d'abord, comme le catalogue
+
+  // Les missions qui réunissent plusieurs extensions se rangent d'après
+  // leurs cartes : toutes d'une même série, elles ouvrent la section de
+  // cette série ; de plusieurs séries, elles vont dans « Multi-Séries ».
+  // Une mission ajoutée au fichier trouve ainsi sa place toute seule.
+  const lot = donnees.extensions.find(e => e.id === LOT_PLUSIEURS);
+  const parSerieCommune = new Map(), multiSeries = [];
+  for(const mission of lot?.missions ?? []){
+    const series = new Set(extensionsDeLaMission(LOT_PLUSIEURS, mission).map(serieDe));
+    if(series.size === 1){
+      const serie = [...series][0];
+      if(!parSerieCommune.has(serie)) parSerieCommune.set(serie, []);
+      parSerieCommune.get(serie).push(mission);
+    }else{
+      multiSeries.push(mission);
+    }
+  }
+  const reserve = lot?.note ? ` ${lot.note}` : '';
+  for(const [serie, missions] of parSerieCommune){
+    const bloc = {
+      id: `plusieurs-${formeComparable(serie).replace(/ /g, '-')}`, cle: LOT_PLUSIEURS, virtuel: true,
+      nom: 'Entre plusieurs extensions', serieNom: serie, missions,
+      note: `Ces collections réunissent des cartes de plusieurs extensions de la ${serie.replace(/^Série/, 'série')} : aucun booster ne les contient toutes.${reserve}`,
+    };
+    const tete = extensions.findIndex(e => e.serieNom === serie);
+    extensions.splice(tete === -1 ? extensions.length : tete, 0, bloc);
+  }
+  if(multiSeries.length){
+    extensions.push({
+      id: 'plusieurs-series', cle: LOT_PLUSIEURS, virtuel: true,
+      nom: 'Entre plusieurs séries', serieNom: 'Multi-Séries', missions: multiSeries,
+      note: `Ces collections réunissent des cartes de séries différentes : il faut puiser dans les extensions de l'une et de l'autre.${reserve}`,
+    });
+  }
 
   const faites = missionsFaites();
   const ouvertes = extensionsOuvertes();
@@ -466,14 +506,23 @@ async function construire(){
   poserCreditDesSources(donnees);
 
   contenu.innerHTML = `
-    ${parSerie(extensions).map(([serie, liste]) => `
-      <div class="serie-bloc">
+    ${parSerie(extensions).map(([serie, liste]) => {
+      // Une section ne compte que ses vraies extensions ; « Multi-Séries »,
+      // qui n'en a pas, compte ses collections.
+      const vraies = liste.filter(e => !e.virtuel).length;
+      const collections = liste.reduce((n, e) => n + e.missions.length, 0);
+      const compte = vraies
+        ? `${vraies} extension${vraies > 1 ? 's' : ''}`
+        : `${collections} collection${collections > 1 ? 's' : ''}`;
+      return `
+      <div class="serie-bloc" data-serie="${echapper(serie)}">
         <div class="serie-tete">
           <h2>${echapper(serie)}</h2>
-          <span class="compte">${liste.length} extension${liste.length > 1 ? 's' : ''}</span>
+          <span class="compte">${compte}</span>
         </div>
         ${liste.map(e => blocExtension(e, faites, ouvertes.has(e.id))).join('')}
-      </div>`).join('')}
+      </div>`;
+    }).join('')}
     ${sansMissions.length ? `<p class="manquantes"><b>Pas encore répertoriées :</b>
       ${sansMissions.map(echapper).join(', ')}. Soit ces extensions n'ont pas de
       mission secrète, soit aucun guide ne les a encore décrites.</p>` : ''}`;
@@ -498,7 +547,7 @@ async function poserLesVisuels(bloc){
   // Les cartes de toutes les extensions que réclament les missions du bloc :
   // la sienne, et celles des missions qui en réunissent plusieurs.
   const missions = [...bloc.querySelectorAll('.mission')];
-  const voulues = new Set([bloc.dataset.ext]);
+  const voulues = new Set(nomsExtensions.has(bloc.dataset.ext) ? [bloc.dataset.ext] : []);
   for(const m of missions) for(const id of (m.dataset.extensions || '').split(',').filter(Boolean)) voulues.add(id);
   const cartesPar = new Map();
   await Promise.all([...voulues].map(async id => {
