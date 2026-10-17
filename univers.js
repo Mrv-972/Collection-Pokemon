@@ -236,12 +236,18 @@ const STYLE_RAIL = `
   .rail-item[data-cible="pocket"]  {--teinte:#4B96D8;--teinte-rgb:75,150,216;}
 
   /* Au survol, la barre s'élargit et montre les logos des deux jeux. Elle
-     passe PAR-DESSUS la page plutôt que de la pousser : « body » garde son
-     retrait de 56 px, donc rien ne se déplace sous le curseur.
+     POUSSE la page plutôt que de passer par-dessus : le retrait de « body »
+     suit sa largeur, au même rythme, si bien que la page glisse vers la
+     droite quand la barre s'ouvre et revient vers la gauche quand elle se
+     referme. Rien n'est caché derrière elle.
 
      « focus-within » accompagne « hover » : quelqu'un qui navigue au clavier
      arrive dans la barre sans souris, et doit voir la même chose. */
   .rail:hover,.rail:focus-within{width:196px}
+  @media(hover:hover) and (min-width:721px){
+    body{transition:padding-left .2s ease}
+    body:has(> .rail:hover),body:has(> .rail:focus-within){padding-left:196px}
+  }
   .rail:hover .rail-compact,.rail:focus-within .rail-compact{opacity:0}
   .rail:hover .rail-logo,.rail:focus-within .rail-logo{opacity:1}
   /* Barre ouverte, on remonte l'univers qu'on ne lit pas de 42 % à 75 % :
@@ -292,7 +298,7 @@ const STYLE_RAIL = `
     .rail:hover .rail-badge-a-venir,.rail:focus-within .rail-badge-a-venir{margin-top:0;font-size:10px;padding:5px 8px}
   }
   @media(prefers-reduced-motion:reduce){
-    .rail,.rail-compact,.rail-logo{transition:none}
+    .rail,.rail-compact,.rail-logo,body{transition:none}
     .rail-badge-a-venir{animation:none}
   }
 
