@@ -2,7 +2,7 @@
 // extensions et la page d'un Pokémon.
 //
 // La liste des extensions renvoyée par l'API ne précise pas leur série (Base,
-// XY, Écarlate et Violet...) — seule la fiche détaillée d'une extension le
+// XY, Écarlate et Violet...) : seule la fiche détaillée d'une extension le
 // fait. On la déduit donc du début de l'identifiant (ex : "swsh8" → Épée et
 // Bouclier), en se basant sur les codes utilisés par TCGdex pour chaque
 // grande période du jeu.
@@ -22,7 +22,7 @@ const ERA_PREFIXES = ['ecard', 'hgss', 'swsh', 'base', 'neo', 'bw', 'xy', 'sm', 
 // « P-B ».
 //
 // La lettre est lue plutôt qu'énumérée, pour deux raisons. La première est
-// qu'une liste figée laissait « P-B » dehors — et pas simplement absent :
+// qu'une liste figée laissait « P-B » dehors, et pas simplement absent :
 // faute de correspondre à quoi que ce soit, il atterrissait du côté des
 // cartes physiques, dans « Autres ». La seconde est qu'une série C sortira,
 // et qu'elle doit apparaître sans que j'aie à repasser derrière.

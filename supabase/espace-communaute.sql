@@ -115,11 +115,11 @@ create policy "je retire mon soutien" on votes for delete to authenticated using
 -- --- 3. garde-fous à l'écriture -----------------------------------------------
 -- Pour les seules écritures d'un membre (pas celles des fonctions de la base,
 -- qui tiennent les compteurs) :
---   — il faut avoir terminé son inscription (un pseudo) ;
---   — pas de rafale : trois sujets par dizaine de minutes, huit réponses par
+--   - il faut avoir terminé son inscription (un pseudo) ;
+--   - pas de rafale : trois sujets par dizaine de minutes, huit réponses par
 --     tranche de deux minutes, de quoi décourager un robot sans gêner
 --     personne ;
---   — un sujet verrouillé ne reçoit plus de réponse.
+--   - un sujet verrouillé ne reçoit plus de réponse.
 -- Ces fonctions s'exécutent avec les droits de l'appelant (pas de
 -- « security definer ») : c'est ce qui permet de reconnaître, par
 -- current_user, l'écriture d'un membre.
@@ -449,7 +449,7 @@ grant execute on function badges_communaute(uuid) to authenticated;
 -- --- 8. les nouvelles réponses ------------------------------------------------
 -- Un membre suit les sujets qu'il a ouverts et ceux où il a répondu. Une
 -- réponse y est « nouvelle » si elle vient d'un autre et qu'elle est arrivée
--- après sa dernière visite du sujet — ou après sa propre dernière réponse :
+-- après sa dernière visite du sujet, ou après sa propre dernière réponse :
 -- ce qui précède, il l'a forcément lu pour répondre. C'est ce que compte la
 -- pastille de l'onglet Communauté.
 create table if not exists vues_sujets (

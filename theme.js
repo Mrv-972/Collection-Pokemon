@@ -3,7 +3,7 @@
 //
 // Chargé en tête de chaque page, AVANT ses styles : le thème est posé sur
 // <html> avant le premier affichage. Plus tard, la page aurait d'abord
-// paru sombre, puis viré au clair d'un coup — un éclair désagréable à
+// paru sombre, puis viré au clair d'un coup : un éclair désagréable à
 // chaque changement de page.
 //
 // Trois choix : « auto » (celui de l'appareil), « clair », « sombre ». Le

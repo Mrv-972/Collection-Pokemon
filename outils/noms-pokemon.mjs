@@ -17,6 +17,7 @@
 //   node outils/noms-pokemon.mjs [--sortie donnees]
 
 import { readFile, writeFile } from 'node:fs/promises';
+import { sansTiretPartout } from './typographie.mjs';
 
 const i = process.argv.indexOf('--sortie');
 const SORTIE = i > 0 ? process.argv[i + 1] : 'donnees';
@@ -32,8 +33,8 @@ const POKEDEX_FR = new Function((await readFile('pokedex-fr.js', 'utf8')) + '\nr
 //
 // Le texte source d'une page de wiki est truffé de balises : liens
 // [[cible|texte]], modèles {{…}}, gras '''…''', notes <ref>…</ref>. On n'en
-// garde que le texte lu, et le gras — il montre la partie du mot reprise
-// dans le nom (« '''bulb'''e ») —, noté **…**.
+// garde que le texte lu, et le gras : il montre la partie du mot reprise
+// dans le nom (« '''bulb'''e »), noté **…**.
 
 function modele(contenu){
   const parties = contenu.split('|').map(s => s.trim());
@@ -195,7 +196,7 @@ for(let debut = 0; debut < POKEDEX_FR.length; debut += PAQUET){
     if(!wiki){ manquants.push(`${numero} ${nom}`); return; }
     const e = etymologies(wiki);
     const bloc = section(wiki, 'Étymologies?|Origine du nom', 3) ?? '';
-    if(/\{\{/.test(bloc.replace(/<ref[\s\S]*?(\/>|<\/ref>)/gi, ''))) avecModeles.push(`${numero} ${nom} — ${e.fr ?? ''}`);
+    if(/\{\{/.test(bloc.replace(/<ref[\s\S]*?(\/>|<\/ref>)/gi, ''))) avecModeles.push(`${numero} ${nom} : ${e.fr ?? ''}`);
     if(!e.fr) manquants.push(`${numero} ${nom} (sans étymologie française)`);
     noms.push({ n: numero, nom, page: titre, ...e });
     const a = anecdotes(wiki);
@@ -211,8 +212,8 @@ const LICENCE = {
   licenceUrl: 'https://creativecommons.org/licenses/by-nc-sa/3.0/deed.fr',
 };
 const majLe = new Date().toISOString();
-await writeFile(`${SORTIE}/noms-pokemon.json`, JSON.stringify({ majLe, ...LICENCE, pokemon: noms }) + '\n');
-await writeFile(`${SORTIE}/anecdotes-pokemon.json`, JSON.stringify({ majLe, ...LICENCE, anecdotes: recits }) + '\n');
+await writeFile(`${SORTIE}/noms-pokemon.json`, JSON.stringify(sansTiretPartout({ majLe, ...LICENCE, pokemon: noms })) + '\n');
+await writeFile(`${SORTIE}/anecdotes-pokemon.json`, JSON.stringify(sansTiretPartout({ majLe, ...LICENCE, anecdotes: recits })) + '\n');
 
 const avecFr = noms.filter(x => x.fr).length;
 console.log(`\nétymologie française : ${avecFr} / ${POKEDEX_FR.length}`);
@@ -220,7 +221,7 @@ console.log(`anecdotes : ${recits.reduce((s, x) => s + x.textes.length, 0)} pour
 console.log('exemples :');
 for(const n of [1, 25, 143, 1025]){
   const x = noms.find(y => y.n === n);
-  console.log(`  ${n} ${x?.nom} — ${x?.fr ?? '(rien)'}`);
+  console.log(`  ${n} ${x?.nom} : ${x?.fr ?? '(rien)'}`);
 }
 if(manquants.length) console.log(`\nà revoir (${manquants.length}) :\n  ${manquants.join('\n  ')}`);
 if(renvois.length) console.log(`\nnoms écrits autrement sur Poképédia (${renvois.length}) :\n  ${renvois.join('\n  ')}`);

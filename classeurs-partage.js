@@ -19,8 +19,8 @@ const PARTAGE = {
 
 // Une image venue d'un autre domaine « salit » la toile : le navigateur
 // refuse alors d'en extraire un fichier. Le réclamer en mode anonyme lève
-// l'interdiction quand le serveur l'autorise. Si le chargement échoue — pas
-// d'autorisation, visuel absent, hors ligne —, on rend « null » et la case
+// l'interdiction quand le serveur l'autorise. Si le chargement échoue, pas
+// d'autorisation, visuel absent, hors ligne, on rend « null » et la case
 // sera dessinée sans son image plutôt que de faire échouer tout le partage.
 function chargerPourLaToile(source){
   return new Promise(resoudre => {
@@ -179,8 +179,8 @@ const ADRESSE_DU_SITE = 'mrv-972.github.io/Collection-Pokemon';
 
 const texteDePartage = (classeur, nbPages = 1) => {
   const cartes = compterLesCartes(classeur);
-  const pages = nbPages > 1 ? ` — ${nbPages} pages` : '';
-  return `Mon classeur « ${classeur.nom} »${pages} — ${cartes} carte${cartes > 1 ? 's' : ''} `
+  const pages = nbPages > 1 ? ` · ${nbPages} pages` : '';
+  return `Mon classeur « ${classeur.nom} »${pages} · ${cartes} carte${cartes > 1 ? 's' : ''} `
        + `rangée${cartes > 1 ? 's' : ''} sur PokéClasseur.`;
 };
 
@@ -224,7 +224,7 @@ function peutPartagerUnFichier(fichiers){
 }
 
 // Une page, ou toutes : le reste du chemin est le même. « avancement » est
-// appelé à chaque page finie — fabriquer vingt pages prend plusieurs
+// appelé à chaque page finie : fabriquer vingt pages prend plusieurs
 // secondes, et un bouton muet pendant ce temps-là passe pour cassé.
 async function imagesDuClasseur(classeur, { pages, face = 'recto', avancement } = {}){
   const liste = [];
@@ -303,7 +303,7 @@ function poserStylePartage(){
 // Une page ou tout le classeur ? La question se pose avant de fabriquer la
 // moindre image, et non dans la fenêtre de repli : un navigateur qui sait
 // partager un fichier ne l'ouvre jamais, et le classeur entier y serait
-// resté hors d'atteinte — ce qui était le cas.
+// resté hors d'atteinte : ce qui était le cas.
 function demanderLEtendue(classeur){
   return new Promise(resoudre => {
     poserStylePartage();
@@ -321,7 +321,7 @@ function demanderLEtendue(classeur){
            demande donc un peu de patience.</p>
         <div class="boutons">
           <button class="principal" data-etendue="page">Cette page seulement</button>
-          <button data-etendue="tout">Tout le classeur — ${pages} pages</button>
+          <button data-etendue="tout">Tout le classeur (${pages} pages)</button>
         </div>
         <div class="boutons" style="justify-content:flex-end;margin-top:16px">
           <button data-fermer>Annuler</button>

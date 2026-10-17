@@ -2,7 +2,7 @@
 // ==================================================
 //
 // Dans leur page /cards, deux liens détonnaient parmi les adresses de
-// cartes : /cards/4 et /cards/576. Ce ne sont pas des cartes — ce sont
+// cartes : /cards/4 et /cards/576. Ce ne sont pas des cartes : ce sont
 // très probablement des numéros de page, et 576 la dernière. Si c'est
 // vrai, voilà la porte du catalogue entier, et elle était dans la page
 // depuis le début.
@@ -10,7 +10,7 @@
 // Cette sonde le vérifie plutôt que de le supposer : elle lit quelques
 // pages réparties du début à la fin et regarde quels codes d'extension
 // y apparaissent. Les dernières pages doivent porter les extensions les
-// plus anciennes — c'est ce qui dirait si nos extensions muettes y sont.
+// plus anciennes : c'est ce qui dirait si nos extensions muettes y sont.
 //
 //   node outils/sonde-pkmcards-pages.mjs
 

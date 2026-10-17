@@ -5,7 +5,7 @@
 // est un site français, mais quand il n'a pas le scan français d'une
 // carte, il lui arrive de montrer le scan anglais à la place. Vu sur
 // planche : Serperior RC3 de Trésors Légendaires, Alakazam H1 de
-// Skyridge, la promo Bulbasaur du concours d'illustration — noms
+// Skyridge, la promo Bulbasaur du concours d'illustration : noms
 // français dans leur liste, texte anglais sur la carte. Notre
 // vérification classait la langue d'après l'adresse : elle comptait ces
 // cartes comme françaises. C'est exactement ce que Mrv972 ne veut pas.
@@ -15,7 +15,7 @@
 // langue. « Faiblesse », « Retraite », « Lancez une pièce » d'un côté ;
 // « Weakness », « Retreat », « Flip a coin » de l'autre. Une carte n'est
 // déclarée française ou anglaise que si l'écart est net ; sinon elle
-// reste « ? » — une énergie de base n'a presque pas de texte.
+// reste « ? » : une énergie de base n'a presque pas de texte.
 //
 // Les verdicts sont gardés dans donnees/langue-visuels.json, par adresse :
 // une image déjà lue ne l'est pas deux fois.
@@ -87,7 +87,7 @@ function tesseract(png){
 
 // Pokécardex sert la même image en deux tailles : « md » (214 px de large,
 // celle que le site affiche) et « hd » (444 px). Le texte d'une carte en
-// 214 px fait quatre pixels de haut — illisible ; en 444 px, il se lit.
+// 214 px fait quatre pixels de haut : illisible ; en 444 px, il se lit.
 const versionLisible = a => /pokecardex/.test(a) ? a.replace(/([?&]class=)md\b/, '$1hd') : a;
 
 async function lire(source){
@@ -102,7 +102,7 @@ async function lire(source){
     if(!r.ok) return { langue: '?', erreur: `HTTP ${r.status}` };
     brut = Buffer.from(await r.arrayBuffer());
   }
-  // Le bas de la carte seulement — attaques, talents, faiblesse, retraite :
+  // Le bas de la carte seulement : attaques, talents, faiblesse, retraite :
   // c'est là qu'est presque tout le texte, et la lecture va deux fois plus
   // vite qu'avec l'illustration. Puis agrandie trois fois et en niveaux de
   // gris : même en 444 px, le texte est trop petit pour être lu tel quel.

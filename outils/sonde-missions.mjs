@@ -77,7 +77,7 @@ async function principal(){
         r = await fetch(adresse, { headers: IDENTITE, redirect: 'follow' });
         corps = await r.text();
         if(r.status !== 429) break;
-        console.log(`  429, nouvel essai — ${adresse}`);
+        console.log(`  429, nouvel essai : ${adresse}`);
       }
       let texte;
       texte = enTexte(corps);
@@ -85,10 +85,10 @@ async function principal(){
       const donnees = corps.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/)?.[1] ?? null;
       pages.push({ adresse, statut: r.status, final: r.url, texte: texte.slice(0, 120000),
         donnees: donnees ? donnees.slice(0, 300000) : null });
-      console.log(`${r.status} ${texte.length} car.${donnees ? ` + données ${donnees.length}` : ''} — ${adresse}`);
+      console.log(`${r.status} ${texte.length} car.${donnees ? ` + données ${donnees.length}` : ''} : ${adresse}`);
     }catch(err){
       pages.push({ adresse, erreur: err.message });
-      console.log(`ÉCHEC ${err.message} — ${adresse}`);
+      console.log(`ÉCHEC ${err.message} : ${adresse}`);
     }
   }
   mkdirSync('donnees', { recursive: true });

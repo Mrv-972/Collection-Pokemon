@@ -2,8 +2,8 @@
 // ===============================================
 //
 // Deux façons d'avoir une image :
-//   — un Pokémon de la galerie : immédiat, visible de tous ;
-//   — une photo à soi : recadrée, réduite, contrôlée par un filtre
+//   - un Pokémon de la galerie : immédiat, visible de tous ;
+//   - une photo à soi : recadrée, réduite, contrôlée par un filtre
 //     automatique dans le navigateur, puis mise en attente. Elle ne sera
 //     visible des autres qu'une fois validée par l'administrateur.
 //
@@ -15,7 +15,7 @@
 const COTE_PHOTO = 256;   // le profil s'affiche au plus en 96 px : 256 suffit, même sur écran dense
 
 // Seuils du filtre, volontairement sévères : le site accueille des membres
-// dès 15 ans. Une photo de plage refusée à tort a une solution simple —
+// dès 15 ans. Une photo de plage refusée à tort a une solution simple :
 // en choisir une autre, ou un Pokémon ; une image pornographique acceptée
 // n'en a pas.
 const SEUIL_EXPLICITE = 0.2;    // « Porn » + « Hentai »
@@ -45,7 +45,7 @@ function chargerFiltre(){
 
 // Recadre au centre, réduit à 256 × 256 et réencode en WebP. Le
 // réencodage a un second mérite : il efface les métadonnées de la photo
-// d'origine — dont, souvent, la position GPS de l'endroit où elle a été
+// d'origine : dont, souvent, la position GPS de l'endroit où elle a été
 // prise.
 async function preparerPhoto(fichier){
   if(!/^image\//.test(fichier.type)) throw new Error("Ce fichier n'est pas une image.");

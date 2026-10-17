@@ -60,7 +60,7 @@ async function corps(adresse){
 
 // Une image peut très bien différer de notre témoin tout en étant anglaise :
 // c'est le cas quand la source sert la MÊME illustration en petit format. Les
-// octets diffèrent, l'illustration non. Seule l'adresse le dit — et elle le
+// octets diffèrent, l'illustration non. Seule l'adresse le dit, et elle le
 // dit souvent : « B3_001_EN_SM.webp ».
 function marqueurDeLangue(adresse){
   const m = String(adresse).match(/[_\-\/](en|en_US|english|ja|jp|zh|ko|de|es|it|pt|fr|fr_FR|french)[_\-\.\/]/i);
@@ -156,10 +156,10 @@ async function sonderPage(candidat, ext, anglais){
   let texte;
   try{
     const r = await fetch(adressePage, { redirect: 'follow', headers: IDENTITE });
-    if(!r.ok) return [{ carte: '—', verdict: `page HTTP ${r.status}`, detail: adressePage }];
+    if(!r.ok) return [{ carte: '-', verdict: `page HTTP ${r.status}`, detail: adressePage }];
     texte = await r.text();
   }catch(err){
-    return [{ carte: '—', verdict: 'page injoignable', detail: err.message }];
+    return [{ carte: '-', verdict: 'page injoignable', detail: err.message }];
   }
 
   const motif = new RegExp(remplacer(candidat.motifImage, { set: ext.id, numero: 1 }), 'g');
@@ -176,7 +176,7 @@ async function sonderPage(candidat, ext, anglais){
 
     // Beaucoup de sites modernes ne mettent pas les images dans le HTML :
     // ils livrent un bloc de données que le navigateur dessine ensuite. Ce
-    // bloc est une bien meilleure source qu'une page — autant regarder s'il
+    // bloc est une bien meilleure source qu'une page : autant regarder s'il
     // est là avant de conclure que la piste est morte.
     const pistes = [];
     if(/__NEXT_DATA__/.test(texte))  pistes.push('bloc __NEXT_DATA__ présent (site Next.js)');
@@ -187,15 +187,15 @@ async function sonderPage(candidat, ext, anglais){
     )].slice(0, 6);
 
     return [
-      { carte: '—', verdict: 'page lue, aucune image repérée',
-        detail: `${texte.length} caractères — voici ce qu'elle contient :` },
+      { carte: '-', verdict: 'page lue, aucune image repérée',
+        detail: `${texte.length} caractères : voici ce qu'elle contient :` },
       ...images.map(a => ({ carte: '  img', verdict: '', detail: a })),
       ...jsons.map(a  => ({ carte: '  json', verdict: '', detail: a })),
       ...pistes.map(p => ({ carte: '  ind.', verdict: '', detail: p })),
     ];
   }
 
-  const lignes = [{ carte: '—', verdict: `${trouvees.size} images repérées sur la page`, detail: adressePage }];
+  const lignes = [{ carte: '-', verdict: `${trouvees.size} images repérées sur la page`, detail: adressePage }];
   for(const carte of ext.echantillon){
     const adresse = trouvees.get(String(carte.localId));
     if(!adresse){ lignes.push({ carte: carte.id, verdict: 'absente de la page' }); continue; }
@@ -247,7 +247,7 @@ async function principal(){
         : await sonderMotif(candidat, ext, anglais);
       console.log(`  ${ext.id}`);
       for(const l of lignes){
-        console.log(`    ${String(l.carte).padEnd(10)} ${l.verdict}${l.detail ? '  —  ' + l.detail : ''}`);
+        console.log(`    ${String(l.carte).padEnd(10)} ${l.verdict}${l.detail ? '  :  ' + l.detail : ''}`);
         if(l.verdict.startsWith('image distincte')) distinctes++;
       }
     }

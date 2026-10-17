@@ -2,8 +2,8 @@
 // =========================================================
 //
 // Chargé après compte.js par les pages qui montrent d'autres membres
-// (profil, échanges, discussions). Tout ce qui se calcule — badges,
-// nombre d'avis, droit de donner un avis — l'est par la base
+// (profil, échanges, discussions). Tout ce qui se calcule : badges,
+// nombre d'avis, droit de donner un avis : l'est par la base
 // (supabase/communaute.sql) : le navigateur affiche, il ne décide pas.
 
 // L'ordre est celui de l'affichage : du plus accessible au plus rare, par
@@ -132,7 +132,7 @@ async function signalerContenu({ membreId, objet, motif, messageId = null, sujet
 
 const FORMAT_JOUR_AVIS = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 
-// « complet » : tous les badges, ceux qui restent à gagner en gris — de
+// « complet » : tous les badges, ceux qui restent à gagner en gris : de
 // quoi donner envie. Sinon, seulement ceux obtenus, comme les voient les
 // autres.
 function badgesHtml(obtenus, complet){
@@ -203,7 +203,7 @@ function brancherVitrine(zone, p, avis){
     if(!reponse) return;
     try{
       await signalerContenu({ membreId: a.auteur_id, objet: 'avis',
-        motif: `Avis laissé à ${p.pseudo} : « ${a.commentaire ?? (a.note === 'positif' ? '👍' : '👎')} » — ${reponse.motif}` });
+        motif: `Avis laissé à ${p.pseudo} : « ${a.commentaire ?? (a.note === 'positif' ? '👍' : '👎')} » : ${reponse.motif}` });
       annoncer("Signalement envoyé. Merci : l'administrateur va l'examiner.");
     }catch(err){ annoncer(`Le signalement n'est pas parti : ${err.message}`, 'ko'); }
   }));

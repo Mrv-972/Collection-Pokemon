@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-33av"></script>
-<title>Par Pokémon / Dresseur — PokéClasseur</title>
+<script src="theme.js?v=2026-10-17-4gr7"></script>
+<title>Par Pokémon / Dresseur - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://raw.githubusercontent.com">
@@ -38,7 +38,7 @@
   .toolbar input{flex:1;min-width:200px;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   .toolbar input::placeholder{color:var(--text-on-ink-dim)}
 
-  /* Le genre de carte d'abord — Pokémon, Supporters, Objets… —, puis, pour
+  /* Le genre de carte d'abord (Pokémon, Supporters, Objets…), puis, pour
      les Pokémon seulement, la génération. */
   .type-tabs{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:14px;}
   .type-tab{background:transparent;border:1px solid rgba(var(--trait-rgb),0.14);color:var(--text-on-ink-dim);padding:9px 16px;border-radius:999px;font-size:14px;cursor:pointer;font-family:inherit;transition:.12s;}
@@ -91,7 +91,7 @@
      quatre libellés ne tiennent plus côte à côte.
 
      Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable — en bas de
+     et porte les commandes à une hauteur tactile confortable : en bas de
      42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
@@ -145,14 +145,14 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-17-33av"></script>
-<script src="supabase-config.js?v=2026-10-17-33av"></script>
-<script src="pied.js?v=2026-10-17-33av"></script>
-<script src="admin.js?v=2026-10-17-33av"></script>
-<script src="admin-site.js?v=2026-10-17-33av"></script>
-<script src="compte.js?v=2026-10-17-33av"></script>
-<script src="pokedex-fr.js?v=2026-10-17-33av"></script>
-<script src="catalogue.js?v=2026-10-17-33av"></script>
+<script src="univers.js?v=2026-10-17-4gr7"></script>
+<script src="supabase-config.js?v=2026-10-17-4gr7"></script>
+<script src="pied.js?v=2026-10-17-4gr7"></script>
+<script src="admin.js?v=2026-10-17-4gr7"></script>
+<script src="admin-site.js?v=2026-10-17-4gr7"></script>
+<script src="compte.js?v=2026-10-17-4gr7"></script>
+<script src="pokedex-fr.js?v=2026-10-17-4gr7"></script>
+<script src="catalogue.js?v=2026-10-17-4gr7"></script>
 <script>
 // Bornes officielles du Pokédex national pour chaque génération.
 const GENERATIONS = [
@@ -170,7 +170,7 @@ const GENERATIONS = [
 // Les genres de carte, dans l'ordre des onglets. Les Pokémon se parcourent
 // par génération ; les autres cartes, rangées par nom dans l'instantané
 // (donnees/<univers>/autres.json), par famille. Un onglet sans aucune carte
-// dans l'univers courant n'apparaît pas — il n'y a pas d'Énergie dans
+// dans l'univers courant n'apparaît pas : il n'y a pas d'Énergie dans
 // l'application, par exemple.
 const TYPES = [
   { cle: 'pokemon',   libelle: 'Pokémon' },
@@ -291,7 +291,7 @@ function showGeneration(gen){
   retenirOnglet();
   const generation = GENERATIONS.find(g => g.gen === gen);
   const list = pokemonIn(generation);
-  titre(`Génération ${gen} — ${generation.region}`, `${list.length} Pokémon · n°${generation.from} à ${generation.to}`);
+  titre(`Génération ${gen} · ${generation.region}`, `${list.length} Pokémon · n°${generation.from} à ${generation.to}`);
   document.getElementById('content').innerHTML = grille(list.map(pokemonTile));
 }
 

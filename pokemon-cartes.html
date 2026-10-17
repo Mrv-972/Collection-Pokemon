@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-33av"></script>
-<title>Pokémon — PokéClasseur</title>
+<script src="theme.js?v=2026-10-17-4gr7"></script>
+<title>Pokémon - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -89,8 +89,8 @@
      en bas, pour qu'ils s'alignent d'une vignette à l'autre. */
   .card-img-wrap{flex:none;position:relative;aspect-ratio:2.5/3.5;border-radius:6px;overflow:hidden;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);display:flex;align-items:center;justify-content:center;}
   /* La carte est montrée entière, jamais rognée. Les visuels fournis par
-     TCGdex n'ont pas tous exactement la même proportion — scans d'anciennes
-     séries, promos hors format — et « cover » les agrandissait jusqu'à
+     TCGdex n'ont pas tous exactement la même proportion : scans d'anciennes
+     séries, promos hors format, et « cover » les agrandissait jusqu'à
      remplir la boîte, si bien qu'une carte sur deux paraissait plus grosse
      que sa voisine. « contain » l'inscrit dans une boîte toujours identique,
      à la plus grande taille qui la laisse entière. */
@@ -140,7 +140,7 @@
      quatre libellés ne tiennent plus côte à côte.
 
      Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable — en bas de
+     et porte les commandes à une hauteur tactile confortable : en bas de
      42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
@@ -228,25 +228,25 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-17-33av"></script>
-<script src="catalogue.js?v=2026-10-17-33av"></script>
-<script src="pokedex-fr.js?v=2026-10-17-33av"></script>
-<script src="sets.js?v=2026-10-17-33av"></script>
-<script src="supabase-config.js?v=2026-10-17-33av"></script>
-<script src="pied.js?v=2026-10-17-33av"></script>
-<script src="admin.js?v=2026-10-17-33av"></script>
-<script src="admin-site.js?v=2026-10-17-33av"></script>
-<script src="confirmation.js?v=2026-10-17-33av"></script>
-<script src="tags.js?v=2026-10-17-33av"></script>
-<script src="raretes.js?v=2026-10-17-33av"></script>
-<script src="progression.js?v=2026-10-17-33av"></script>
-<script src="glissement.js?v=2026-10-17-33av"></script>
-<script src="cards.js?v=2026-10-17-33av"></script>
-<script src="prix.js?v=2026-10-17-33av"></script>
-<script src="compte.js?v=2026-10-17-33av"></script>
+<script src="univers.js?v=2026-10-17-4gr7"></script>
+<script src="catalogue.js?v=2026-10-17-4gr7"></script>
+<script src="pokedex-fr.js?v=2026-10-17-4gr7"></script>
+<script src="sets.js?v=2026-10-17-4gr7"></script>
+<script src="supabase-config.js?v=2026-10-17-4gr7"></script>
+<script src="pied.js?v=2026-10-17-4gr7"></script>
+<script src="admin.js?v=2026-10-17-4gr7"></script>
+<script src="admin-site.js?v=2026-10-17-4gr7"></script>
+<script src="confirmation.js?v=2026-10-17-4gr7"></script>
+<script src="tags.js?v=2026-10-17-4gr7"></script>
+<script src="raretes.js?v=2026-10-17-4gr7"></script>
+<script src="progression.js?v=2026-10-17-4gr7"></script>
+<script src="glissement.js?v=2026-10-17-4gr7"></script>
+<script src="cards.js?v=2026-10-17-4gr7"></script>
+<script src="prix.js?v=2026-10-17-4gr7"></script>
+<script src="compte.js?v=2026-10-17-4gr7"></script>
 <script>
 // Toutes les cartes d'un Pokémon, toutes extensions confondues, à partir de
-// son numéro du Pokédex national passé dans l'URL (?dex=25) — ou toutes les
+// son numéro du Pokédex national passé dans l'URL (?dex=25), ou toutes les
 // cartes d'un même nom quand ce n'est pas un Pokémon : un Supporter, un
 // Objet, un Stade, une Énergie (?carte=poke-ball, la clé de son nom dans
 // l'instantané).
@@ -296,7 +296,7 @@ function generationOf(dexId){
 function renderHeadNom(cardCount){
   const nom = ficheNom?.nom || allCards[0]?.name || 'Carte';
   const genre = GENRES[genreDe(ficheNom)];
-  document.title = `${nom} — PokéClasseur`;
+  document.title = `${nom} - PokéClasseur`;
   const famille = ficheNom?.categorie === 'energie'
     ? (ficheNom.famille === 'speciale' ? 'Énergie spéciale' : 'Énergie de base')
     : `Carte Dresseur${genre.libelle !== 'Dresseur' ? ` · ${genre.libelle}` : ''}`;
@@ -326,10 +326,10 @@ function renderHead(cardCount){
   // Le retour ramène à la génération de ce Pokémon, pas à la première.
   const retour = document.getElementById('retour');
   if(retour && generation && generation.gen > 1) retour.href = `pokemon.html?gen=${generation.gen}`;
-  document.title = `${name} — PokéClasseur`;
+  document.title = `${name} - PokéClasseur`;
   const meta = [
     `N°${String(dexId).padStart(4, '0')}`,
-    generation ? `Génération ${generation.gen} — ${generation.region}` : '',
+    generation ? `Génération ${generation.gen} · ${generation.region}` : '',
     cardCount === null ? '' : `${cardCount} carte${cardCount > 1 ? 's' : ''}`,
   ].filter(Boolean).join(' · ');
 

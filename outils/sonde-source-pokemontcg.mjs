@@ -54,7 +54,7 @@ tk-xy-sy 2014xy tk-xy-b tk-xy-w tk-xy-latia tk-xy-latio 2015xy tk-xy-p tk-xy-su
 sve 2023sv mfb 2024sv mee 30th-c`.split(/\s+/).filter(Boolean));
 
 // --- 1 et 2 : la source répond-elle, et autorise-t-elle la peinture ? ----
-console.log("Témoins — des visuels dont le dépôt affirme qu'ils existent :");
+console.log("Témoins : des visuels dont le dépôt affirme qu'ils existent :");
 let corsPartout = true, repondPartout = true;
 for(const set of ['base1', 'swsh1', 'sv1']){
   for(const quoi of [`${set}/logo.png`, `${set}/1.png`, `${set}/1_hires.png`]){
@@ -90,7 +90,7 @@ for(const ext of nos){
   const leurId = parId.has(ext.id) ? ext.id
     : (parId.has(sansZero(ext.id)) ? sansZero(ext.id) : null);
   if(!leurId){
-    hors.push(`${ext.id} (${nous.length} cartes) — ${ext.name}`);
+    hors.push(`${ext.id} (${nous.length} cartes) : ${ext.name}`);
     console.log(`non  ${ext.id.padEnd(12)} absente de la source        ${ext.name}`);
     continue;
   }

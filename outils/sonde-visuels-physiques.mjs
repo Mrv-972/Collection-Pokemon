@@ -14,7 +14,7 @@
 // la version française PUIS la version anglaise. Comparer les deux répond à
 // la seule question qui compte pour la suite :
 //
-//   — l'anglais suffirait-il à combler, ou faut-il une autre source ?
+//   - l'anglais suffirait-il à combler, ou faut-il une autre source ?
 //
 // À lancer depuis un exécuteur GitHub : le bac à sable de développement
 // n'atteint pas ce domaine.
@@ -128,13 +128,13 @@ console.log(`\n${aTrous.length} extensions ont au moins un trou en français.`);
 console.log('Les plus touchées :');
 for(const b of aTrous.slice(0, 25)){
   console.log(`  ${b.id.padEnd(12)} ${String(b.frOk + '/' + b.sondees).padEnd(8)} ` +
-    `anglais ${b.enOk}/${b.sondees}   ${b.serie} — ${b.nom}`);
+    `anglais ${b.enOk}/${b.sondees}   ${b.serie} : ${b.nom}`);
 }
 
 const sansRien = bilan.filter(b => b.sondees && b.frOk === 0 && b.enOk === 0);
 if(sansRien.length){
   console.log(`\n${sansRien.length} extensions n'ont RIEN, dans aucune langue :`);
-  for(const b of sansRien) console.log(`  ${b.id.padEnd(12)} ${b.serie} — ${b.nom}`);
+  for(const b of sansRien) console.log(`  ${b.id.padEnd(12)} ${b.serie} : ${b.nom}`);
 }
 
 // ------------------------------------------------- rapport durable --------

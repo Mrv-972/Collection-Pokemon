@@ -93,7 +93,7 @@ function cartesDeLaLigne(ligne){
   const apres = ligne.replace(/^[-•\s]*Cartes?\(?s?\)?\s*à obtenir\s*:\s*/i, '');
   const cartes = [];
   for(const m of apres.matchAll(/([^,()]+?)\s*\((\d+)\s*\/\s*(\d+)\)/g)){
-    const nom = m[1].replace(/^(et|ou)\s+/i, '').replace(/^[-–—\s]+/, '').trim();
+    const nom = m[1].replace(/^(et|ou)\s+/i, '').replace(/^[-\u2013\u2014\s]+/, '').trim();
     if(nom) cartes.push({ nom, numero: Number(m[2]), total: Number(m[3]) });
   }
   // Certaines missions ne listent pas des cartes nommées mais une condition
@@ -132,6 +132,7 @@ function analyser(texte){
 }
 
 import { writeFileSync, mkdirSync } from 'node:fs';
+import { sansTiretPartout } from './typographie.mjs';
 
 const SORTIE = 'donnees/missions-brutes.json';
 
@@ -142,7 +143,7 @@ async function principal(){
 
   const recolte = [];
   for(const [numero, adresse] of guides){
-    process.stdout.write(`Guide ${numero} — ${adresse}\n`);
+    process.stdout.write(`Guide ${numero} : ${adresse}\n`);
     try{
       const texte = partieUtile(enTexte(await lire(adresse)));
       const sections = analyser(texte);
@@ -162,11 +163,11 @@ async function principal(){
   }
 
   mkdirSync('donnees', { recursive: true });
-  writeFileSync(SORTIE, JSON.stringify({
+  writeFileSync(SORTIE, JSON.stringify(sansTiretPartout({
     releve: new Date().toISOString().slice(0, 10),
     avertissement: "Relevé brut de guides rédigés à la main. À relire avant usage : aucune de ces lignes n'a été vérifiée dans le jeu.",
     recolte,
-  }, null, 2) + '\n');
+  }), null, 2) + '\n');
   console.log(`\nÉcrit dans ${SORTIE}`);
 }
 

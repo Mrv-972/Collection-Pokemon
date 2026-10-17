@@ -1,5 +1,5 @@
 -- ==========================================================================
--- PokéClasseur — consentement et droit à l'effacement
+-- PokéClasseur : consentement et droit à l'effacement
 -- ==========================================================================
 --
 -- À exécuter une fois dans l'éditeur SQL de Supabase
@@ -20,7 +20,7 @@
 -- --------------------------------------------------------------------------
 --
 -- Le RGPD demande de pouvoir démontrer qu'une personne a accepté. On retient
--- donc la date et la version des conditions acceptées — la version sert le
+-- donc la date et la version des conditions acceptées : la version sert le
 -- jour où les conditions changent : on sait alors qui a vu quoi.
 
 alter table profils add column if not exists cgu_acceptees_le timestamptz;

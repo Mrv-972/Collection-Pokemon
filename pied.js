@@ -6,9 +6,9 @@
 // dans le dépôt. Un texte recopié dans neuf fichiers vieillit mal ; celui-ci
 // vit à un seul endroit.
 //
-// Chaque page peut ajouter sa précision propre — « tes tags sont enregistrés
+// Chaque page peut ajouter sa précision propre : « tes tags sont enregistrés
 // dans ce navigateur », « les discussions ne sont lisibles que par leurs deux
-// participants » — en la posant sur son <footer> :
+// participants » : en la posant sur son <footer> :
 //
 //     <footer data-note="…"></footer>
 
@@ -123,7 +123,7 @@ function poserPied(){
     <div class="pied-haut">
       <div class="pied-marque">
         <span class="nom">Poké<span>Classeur</span></span>
-        Ta collection de cartes Pokémon, retrouvée d'un appareil à l'autre — et
+        Ta collection de cartes Pokémon, retrouvée d'un appareil à l'autre, et
         des collectionneurs près de chez toi.
         ${boutonSoutien()}
       </div>
@@ -171,9 +171,9 @@ if(document.readyState === 'loading'){
 // petite bulle, elle, se pose dans le coin en bas à droite et reste visible.
 //
 // Trois règles de politesse, parce qu'une bulle qui insiste fait fuir :
-//   — elle attend cinq secondes avant d'apparaître, le temps qu'on lise ;
-//   — la croix la referme, et on ne la revoit pas avant un mois ;
-//   — qui a cliqué sur le lien de dons ne la revoit pas avant trois mois.
+//   - elle attend cinq secondes avant d'apparaître, le temps qu'on lise ;
+//   - la croix la referme, et on ne la revoit pas avant un mois ;
+//   - qui a cliqué sur le lien de dons ne la revoit pas avant trois mois.
 //
 // Le coin bas-droite est choisi exprès : le bandeau des univers occupe la
 // gauche, et la vue zoom (z-index 70) passe par-dessus la bulle (55).

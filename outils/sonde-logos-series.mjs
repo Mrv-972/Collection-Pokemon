@@ -4,7 +4,7 @@
 // sur un exécuteur GitHub et on lit son journal.
 //
 // Une première version interrogeait en HEAD et concluait « aucune série n'a
-// de logo ». Son témoin — un visuel dont on sait qu'il existe — était absent
+// de logo ». Son témoin (un visuel dont on sait qu'il existe) était absent
 // lui aussi : la sonde ne sondait rien. D'où cette version, qui demande en
 // GET, affiche le code de réponse, et se tait tant que ses témoins ne
 // répondent pas.
@@ -45,7 +45,7 @@ const extensions = JSON.parse(await readFile(`${dossier}/physique/extensions.jso
 // --- Les témoins ---------------------------------------------------------
 // Des visuels d'extension, dont le site se sert tous les jours. S'ils ne
 // répondent pas, rien de ce qui suit n'a de valeur.
-console.log('Témoins — des visuels dont on sait qu\'ils existent :');
+console.log('Témoins : des visuels dont on sait qu\'ils existent :');
 const temoins = [
   ['logo base1  ', 'https://assets.tcgdex.net/fr/base/base1/logo.png'],
   ['logo sv01   ', 'https://assets.tcgdex.net/fr/sv/sv01/logo.png'],
@@ -84,10 +84,10 @@ for(const [id, nom] of series){
     if(r.image){ trouve = { forme, adresse }; break; }
   }
   if(trouve){
-    avec.push(`${id} — ${nom} → ${trouve.adresse}`);
+    avec.push(`${id} : ${nom} → ${trouve.adresse}`);
     console.log(`oui  ${id.padEnd(8)} ${nom.padEnd(26)} ${trouve.adresse}`);
   }else{
-    sans.push(`${id} — ${nom}`);
+    sans.push(`${id} : ${nom}`);
     console.log(`non  ${id.padEnd(8)} ${nom}`);
   }
 }

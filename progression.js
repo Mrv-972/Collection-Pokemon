@@ -8,8 +8,8 @@ const CLE_TAGS_PROGRESSION = 'pokeclasseur_tags';
 
 // Les pages qui chargent tags.js tiennent déjà les marquages en mémoire, et
 // à jour : on les relit chez elles plutôt que dans le stockage, qui pourrait
-// avoir une case de retard. Les autres pages — le catalogue, qui ne marque
-// rien — lisent directement le navigateur.
+// avoir une case de retard. Les autres pages : le catalogue, qui ne marque
+// rien : lisent directement le navigateur.
 function marquages(){
   if(typeof tagState === 'object' && tagState) return tagState;
   try{ return JSON.parse(localStorage.getItem(CLE_TAGS_PROGRESSION)) || {}; }
@@ -29,7 +29,7 @@ function totalDeLExtension(ext){
 // « A1-045 ». Compter par préfixe suffirait presque, mais « 30th » est le
 // préfixe de « 30th-c » : les cartes de la seconde tomberaient dans la
 // première. On attribue donc chaque carte à l'extension dont le nom est le
-// plus long parmi celles qui collent — la seule qui puisse être la bonne.
+// plus long parmi celles qui collent : la seule qui puisse être la bonne.
 function compterObtenuesParExtension(identifiants){
   const connus = [...identifiants].sort((a, b) => b.length - a.length);
   const compte = new Map(connus.map(id => [id, 0]));

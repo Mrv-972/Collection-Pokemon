@@ -1,7 +1,7 @@
 // Icônes de rareté, partagées par les pages qui montrent des cartes.
 //
-// Pokémon TCG Pocket dit la rareté d'une carte en symboles — des losanges,
-// des étoiles, une couronne — et le jeu en publie les dessins. Ils valent
+// Pokémon TCG Pocket dit la rareté d'une carte en symboles : des losanges,
+// des étoiles, une couronne, et le jeu en publie les dessins. Ils valent
 // mieux que les caractères typographiques qui les approchaient.
 //
 // Cette table a été sortie de cards.js le jour où la page des missions en a

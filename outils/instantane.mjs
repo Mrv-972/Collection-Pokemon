@@ -7,7 +7,7 @@
 // en JSON dans le dépôt, et GitHub Pages les sert comme le reste du site.
 //
 // Il lit les dépôts plutôt que les API : ce sont les sources d'origine, et
-// elles donnent des choses que les API font payer cher — la rareté de chaque
+// elles donnent des choses que les API font payer cher : la rareté de chaque
 // carte, par exemple, qui coûtait une trentaine de requêtes par extension.
 //
 //   node outils/instantane.mjs --tcgdex <clone> --sortie donnees
@@ -29,7 +29,7 @@ const SORTIE = args.sortie ?? 'donnees';
 
 // ------------------------------------------- les visuels que tu déposes ---
 //
-// Certaines cartes n'ont de visuel français chez personne — les extensions
+// Certaines cartes n'ont de visuel français chez personne : les extensions
 // Pocket les plus récentes, par exemple. Plutôt que de subir cette limite,
 // on peut déposer l'image à la main dans images/cards/, nommée d'après
 // l'identifiant de la carte :
@@ -55,7 +55,7 @@ async function recenserVisuelsLocaux(){
   }catch(err){
     return parCarte;   // le dossier n'existe pas encore : rien à recenser
   }
-  // Une même carte peut avoir deux fichiers — un .webp récolté et un .png
+  // Une même carte peut avoir deux fichiers : un .webp récolté et un .png
   // téléversé depuis l'administration. Sans règle, celui qui l'emporte
   // dépendrait de l'ordre dans lequel le système rend les fichiers, qui n'est
   // pas garanti. On tranche par l'ordre d'EXTENSIONS_IMAGE, qui est écrit.
@@ -125,8 +125,8 @@ function premierDexId(source){
   return Number.isFinite(n) ? n : null;
 }
 
-// La catégorie d'une carte, d'après TCGdex. Rien pour un Pokémon — neuf
-// cartes sur dix, inutile d'alourdir chaque fichier d'un champ évident —,
+// La catégorie d'une carte, d'après TCGdex. Rien pour un Pokémon : neuf
+// cartes sur dix, inutile d'alourdir chaque fichier d'un champ évident,
 // sinon « dresseur » ou « energie », et la famille : supporter, objet,
 // outil, stade ; énergie de base ou spéciale. La page « Par Pokémon » s'en
 // sert pour chercher aussi les dresseurs, les objets et les énergies.
@@ -138,8 +138,8 @@ const FAMILLES_DRESSEUR = {
 // TCGdex ne donne pas la famille des cartes Dresseur les plus anciennes :
 // à l'époque, elles portaient toutes la seule mention « Dresseur ». Leur
 // texte la trahit pourtant : un Stade « reste en jeu », un Outil « s'attache »
-// à un Pokémon et le dit. Le reste compte officiellement comme un Objet —
-// c'est la règle depuis 2011, quand la mention « Objet » est apparue — mais
+// à un Pokémon et le dit. Le reste compte officiellement comme un Objet :
+// c'est la règle depuis 2011, quand la mention « Objet » est apparue, mais
 // on ne l'applique qu'aux cartes d'avant cette date : sur une carte récente,
 // une famille absente est un oubli de la source, pas une ancienne carte.
 const ARRIVEE_DE_LA_MENTION_OBJET = '2011-04-25';
@@ -210,9 +210,9 @@ async function construirePhysique(){
       const setId = champTexte(sourceSet, 'id');
       if(!setId) continue;
       // TCGdex héberge aussi les extensions de l'application, qu'on prend
-      // ailleurs et plus à jour. On ne garde pas leurs cartes — l'instantané
+      // ailleurs et plus à jour. On ne garde pas leurs cartes : l'instantané
       // physique en serait alourdi d'un millier que le site n'y montre
-      // jamais — mais on note lesquelles il connaît : ses visuels, eux, sont
+      // jamais, mais on note lesquelles il connaît : ses visuels, eux, sont
       // en français, là où l'autre source n'héberge que l'anglais.
       if(/^[A-Z]\d/.test(setId) || /^P-[A-Z]$/.test(setId)){
         pocketChezTcgdex.add(setId);
@@ -287,15 +287,15 @@ async function construirePhysique(){
 // -------------------------------------------------------------- Pocket ---
 //
 // Les données de l'application viennent du jeu de flibustier, sous licence
-// MIT. On garde la convention d'identifiants de TCGdex — trois chiffres,
-// « P-A » plutôt que « PROMO-A » — pour que les marquages déjà posés par les
+// MIT. On garde la convention d'identifiants de TCGdex : trois chiffres,
+// « P-A » plutôt que « PROMO-A » : pour que les marquages déjà posés par les
 // membres restent attachés à leurs cartes.
 
 const POCKET_BASE = 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-pocket-database/main/dist';
 const POCKET_IMAGES = 'https://cdn.jsdelivr.net/gh/flibustier/pokemon-tcg-exchange@main/public/images/cards-by-set';
 const POCKET_IMAGES_SECOURS = 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-exchange/main/public/images/cards-by-set';
 
-// Les logos d'extension, eux, existent par langue — contrairement aux
+// Les logos d'extension, eux, existent par langue : contrairement aux
 // visuels de cartes, dont il n'y a qu'une seule version. Le catalogue Pocket
 // affichait un point d'interrogation à leur place faute de les avoir
 // cherchés là.
@@ -356,7 +356,7 @@ const aplatir = donnees => Array.isArray(donnees) ? donnees : Object.values(donn
 //   1. le nom officiel de TCGdex, quand il connaît l'extension ;
 //   2. celui du fichier français de la source, s'il est vraiment français ;
 //   3. le souvenir ;
-//   4. à défaut, la traduction automatique — signalée au visiteur.
+//   4. à défaut, la traduction automatique : signalée au visiteur.
 const MEMOIRE_NOMS_POCKET = 'noms-pocket-fr.json';
 
 // Un nom français, d'où qu'il vienne, doit désigner le même Pokémon que le
@@ -426,7 +426,7 @@ async function ecrireMemoireNoms(memoire){
 // La source de l'application traduit ses fichiers avec un temps de retard :
 // la dernière extension parue n'existe qu'en anglais. Plutôt que de l'afficher
 // telle quelle sur un site français, on traduit ce qu'on peut grâce au
-// dictionnaire tiré des cartes physiques — le suffixe « ex » se recolle après
+// dictionnaire tiré des cartes physiques : le suffixe « ex » se recolle après
 // coup, puisqu'il ne se traduit pas.
 function traduireNom(nom, traductions, nomsFrancais){
   if(traductions.has(nom)) return traductions.get(nom);
@@ -449,7 +449,7 @@ function traduireNom(nom, traductions, nomsFrancais){
     if(pokemon) return recoller(`Méga-${pokemon}${mega[2] ? `-${mega[2]}` : ''}`);
   }
 
-  // « Team Rocket's Persian ex » se dit « Persian-ex de la Team Rocket » —
+  // « Team Rocket's Persian ex » se dit « Persian-ex de la Team Rocket » :
   // convention relevée sur les cartes physiques, pas inventée ici. On ne
   // l'applique que si le Pokémon lui-même a été reconnu : mieux vaut un nom
   // anglais honnête qu'un faux nom français.
@@ -523,7 +523,7 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
   for(const ext of extensions){
     // Le fichier anglais fait foi pour la liste des cartes et sert de
     // contrôle ; le fichier français, quand il existe, n'apporte que les
-    // noms — et seulement s'il est vraiment en français : celui d'octobre
+    // noms, et seulement s'il est vraiment en français : celui d'octobre
     // 2026 répétait l'anglais mot pour mot.
     const code = encodeURIComponent(ext.codeDistant);
     let brutes = [];
@@ -571,14 +571,14 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
         if(nom === anglais) nom = traduireNom(apostrophes(anglais), dictionnaire, nomsFrancais);
         if(nom !== anglais) traduites++;
       }
-      // Un nom sûr rejoint la mémoire ; une traduction automatique, jamais —
+      // Un nom sûr rejoint la mémoire ; une traduction automatique, jamais :
       // ni un nom dont on n'a pas lu la version anglaise pour contrôle. Un
       // souvenir démenti par le contrôle en sort.
       if(anglaisLu && sur) memoire.set(id, [anglais, nom]);
       else if(souvenir && !memePokemon(especes, souvenir[0], souvenir[1])) memoire.delete(id);
       // La catégorie vient de TCGdex quand il connaît l'extension ; sinon, le
       // nom du fichier image dit au moins si c'est une carte Dresseur
-      // (« cTR_… ») — sa famille se déduira des cartes du même nom.
+      // (« cTR_… ») : sa famille se déduira des cartes du même nom.
       const categorie = categories.get(id)
         ?? (/^cTR_/.test(String(c.image ?? '')) ? { categorie: 'dresseur' } : {});
       return {
@@ -621,7 +621,7 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
 // Huit extensions Pocket n'ont, chez les sources d'origine, que des visuels
 // anglais. Le navigateur qui affiche le site ne peut pas aller les chercher
 // ailleurs : un navigateur refuse par sécurité d'aller lire un autre site que
-// le sien. Cette construction-ci, elle, tourne sur un serveur — cette règle
+// le sien. Cette construction-ci, elle, tourne sur un serveur : cette règle
 // ne s'y applique pas, donc c'est ici, et seulement ici, que la récolte peut
 // se faire.
 //
@@ -658,7 +658,7 @@ function gabarit(texte, { set, numero }){
     .replaceAll('{NUM}', String(numero));
 }
 
-// Une adresse peut porter sa langue dans son nom — « B3_001_EN_SM.webp ».
+// Une adresse peut porter sa langue dans son nom : « B3_001_EN_SM.webp ».
 // Quand elle le fait et que ce n'est pas le français, inutile d'aller plus
 // loin : l'illustration sera la même qu'aujourd'hui, en plus petit.
 function marqueurDeLangue(adresse){
@@ -747,12 +747,12 @@ async function recolterVisuelsFrancais(pocket){
   if(!sources.length) return;
 
   await mkdir(DOSSIER_VISUELS, { recursive: true });
-  console.log(`Récolte des visuels français manquants — ${sources.length} source(s) allumée(s)…`);
+  console.log(`Récolte des visuels français manquants : ${sources.length} source(s) allumée(s)…`);
 
   for(const ext of pocket.extensions){
     // On ne se fie plus au drapeau « visuelsAnglais » pour savoir où chercher.
     // Il disait qu'une extension était présente chez TCGdex parce que leur
-    // dépôt de données la contient — ce qui ne garantit pas que leur serveur
+    // dépôt de données la contient : ce qui ne garantit pas que leur serveur
     // d'images héberge la version française. Six extensions étaient dans ce
     // cas : données là, visuels absents, et le site retombait sur l'anglais
     // sans que rien ne le signale.
@@ -771,14 +771,14 @@ async function recolterVisuelsFrancais(pocket){
       if(!adresses.size) continue;
 
       if(!await vraimentFrancais(adresses, cartes)){
-        console.log(`  ${ext.id} : ${source.nom} resert le visuel anglais — écartée`);
+        console.log(`  ${ext.id} : ${source.nom} resert le visuel anglais : écartée`);
         continue;
       }
 
       // On télécharge, on ne pointe pas. Pointer reviendrait à faire payer
       // le trafic de ce site à celui qui héberge la source, à chaque page
       // ouverte par un visiteur. Une fois copié chez nous, le fichier ne
-      // leur coûte plus rien — et le site ne dépend plus de leur serveur.
+      // leur coûte plus rien, et le site ne dépend plus de leur serveur.
       // Les fichiers déjà présents ne sont pas redemandés : la construction
       // de demain ne repassera pas la commande d'aujourd'hui.
       let pris = 0, deja = 0, manques = 0;
@@ -805,7 +805,7 @@ async function recolterVisuelsFrancais(pocket){
 //
 // L'espace d'administration enregistre ses corrections dans Supabase, d'où
 // le site les lit aussitôt : l'effet est immédiat. Mais Supabase n'est qu'une
-// zone de dépôt — laisser les corrections y vivre pour toujours rendrait le
+// zone de dépôt : laisser les corrections y vivre pour toujours rendrait le
 // site dépendant d'un service extérieur, ce qu'on a passé la journée à
 // défaire pour 3863 cartes.
 //
@@ -815,7 +815,7 @@ async function recolterVisuelsFrancais(pocket){
 //
 // On ne la supprime PAS ici. Effacer depuis la construction demanderait une
 // clé d'écriture, donc un secret dans le dépôt ; et surtout, une correction
-// effacée trop tôt — parce que la construction a échoué après l'avoir lue —
+// effacée trop tôt : parce que la construction a échoué après l'avoir lue :
 // disparaîtrait de l'écran sans prévenir. C'est à toi de retirer ce que la
 // page indique comme absorbé.
 
@@ -844,7 +844,7 @@ async function absorberCorrections(lots){
   }catch(err){
     // Une correction non absorbée reste affichée par le site, qui la lit
     // directement. Rien n'est perdu : on réessaiera demain.
-    console.log(`Corrections : lecture impossible (${err.message}) — on réessaiera`);
+    console.log(`Corrections : lecture impossible (${err.message}) : on réessaiera`);
     return;
   }
   const lignes = paquet.lignes ?? [];
@@ -962,7 +962,7 @@ async function absorberCorrections(lots){
     }
   }
 
-  console.log(`Corrections : ${lignes.length} lue(s) — ${visuels} visuel(s) copié(s), ${champs} champ(s) appliqué(s), ${ignorees} sans cible`);
+  console.log(`Corrections : ${lignes.length} lue(s) : ${visuels} visuel(s) copié(s), ${champs} champ(s) appliqué(s), ${ignorees} sans cible`);
   console.log('  Elles restent dans Supabase : leur suppression se fait depuis le tiroir d\'administration (bouton « Corrections »), une fois marquées « absorbée ».');
 }
 
@@ -976,7 +976,7 @@ async function absorberCorrections(lots){
 // Deux règles gouvernent cette fusion, et elles vont dans le même sens :
 //
 //   1. Les sources automatiques l'emportent. Une extension saisie ici
-//      disparaît d'elle-même dès qu'une source la publie — sinon une saisie
+//      disparaît d'elle-même dès qu'une source la publie, sinon une saisie
 //      d'aujourd'hui, forcément incomplète, figerait le catalogue et
 //      empêcherait la vraie donnée d'arriver demain.
 //
@@ -989,7 +989,7 @@ const EXTENSIONS_MANUELLES = 'extensions-manuelles.json';
 
 function refuser(quoi, pourquoi){
   throw new Error(
-    `${EXTENSIONS_MANUELLES} — ${quoi} : ${pourquoi}\n` +
+    `${EXTENSIONS_MANUELLES} : ${quoi} : ${pourquoi}\n` +
     `  Rien n'a été publié ; l'instantané de la veille reste en place.`
   );
 }
@@ -1097,7 +1097,7 @@ const LOGOS_WIKI = 'https://ptcgp-wiki.metainnovation.site/storage/v1/object/pub
 
 // Chez le wiki, la promo de la série A s'appelle « PROMO » et celle de la
 // série B « PROMOB ». La règle se lit : « PROMO » suivi de la lettre, sauf
-// pour la première qui n'en porte pas. Une série C donnera « PROMOC » — ce
+// pour la première qui n'en porte pas. Une série C donnera « PROMOC » : ce
 // n'est pas vérifié, mais ce n'est pas un risque : une adresse fausse est
 // simplement écartée, et la carte garde le visuel qu'elle avait.
 
@@ -1148,7 +1148,7 @@ async function recolterLogosFrancais(pocket){
 //
 // On copie donc les deux définitions : la vignette des grilles et la haute
 // définition du zoom. Les deux, parce que n'en prendre qu'une dégraderait
-// visiblement le zoom — mesuré à 310 Mo pour l'ensemble, ce qui reste très
+// visiblement le zoom : mesuré à 310 Mo pour l'ensemble, ce qui reste très
 // en deçà de ce que GitHub Pages accepte.
 //
 // Comme ailleurs : rien n'est redemandé deux fois, et rien n'écrase un
@@ -1162,8 +1162,8 @@ async function recolterLogosFrancais(pocket){
 // d'interrogation. PkmCards, lui, a ces visuels en français. On s'en sert
 // de secours à la place de l'anglais : Mrv972 ne veut que du français.
 //
-// Le rapprochement n'est pas devinable — leurs codes d'extension ne sont
-// pas les nôtres (« fst » pour Poing de Fusion) — il a été établi à part,
+// Le rapprochement n'est pas devinable : leurs codes d'extension ne sont
+// pas les nôtres (« fst » pour Poing de Fusion) : il a été établi à part,
 // en vérifiant que les mêmes noms de cartes tombent aux mêmes numéros, et
 // vit dans donnees/appariement-pkmcards.json. Les appariements douteux en
 // sont écartés : servir une image venue d'une autre extension serait pire
@@ -1217,7 +1217,7 @@ async function brancherPkmcards(physique){
 //
 // Troisième source, pour ce que ni TCGdex ni PkmCards n'ont : les
 // coffrets, galeries de dresseurs, kits du dresseur, promos et
-// collections McDonald's — mesuré à 1 297 cartes pas en français, dont
+// collections McDonald's : mesuré à 1 297 cartes pas en français, dont
 // 936 sans aucun visuel et 361 affichées en anglais.
 //
 // On POINTE vers leurs images au lieu de les copier, parce que leur CDN
@@ -1246,7 +1246,7 @@ async function brancherPokecardex(physique){
   // qu'avec un paramètre de taille : « …/FR/63.jpg » échoue, « …/FR/63.jpg
   // ?class=md » répond, en WebP, avec l'autorisation d'affichage. Le
   // moissonneur retirait ce paramètre, et toutes les cartes branchées sur
-  // Pokécardex s'affichaient en point d'interrogation — y compris celles
+  // Pokécardex s'affichaient en point d'interrogation, y compris celles
   // qui avaient jusque-là un visuel anglais. Mesuré, pas supposé.
   const adresseServie = a => /[?&]class=/.test(a) ? a : `${a}${a.includes('?') ? '&' : '?'}class=md`;
   // Leur même image existe aussi en « hd » (444 px au lieu de 214) : c'est
@@ -1296,7 +1296,7 @@ async function brancherPokecardex(physique){
       parExtension.set(setId, (parExtension.get(setId) ?? 0) + 1);
     }
   }
-  // Les séries à préfixe — promos, coffres, galeries — rattachées carte par
+  // Les séries à préfixe (promos, coffres, galeries) rattachées carte par
   // carte par l'appariement, numéro ET nom vérifiés. On les prend telles
   // quelles : rien à recalculer ici, donc rien à mal recalculer.
   for(const [setId, sous] of Object.entries(appariement.sousSeries ?? {})){
@@ -1358,7 +1358,7 @@ async function brancherPokecardex(physique){
     ` sur ${parExtension.size} extensions` +
     ` (dont ${remplaceDeLAnglais} qui étaient en anglais ;` +
     ` ${ecartesAnglais} scans écartés, lus en anglais sur l'image)` +
-    ` — relevé du ${String(releve.releveLe ?? '?').slice(0, 10)}` +
+    ` : relevé du ${String(releve.releveLe ?? '?').slice(0, 10)}` +
     `${releve.complet ? '' : ', PARTIEL'}`);
 }
 
@@ -1373,7 +1373,7 @@ async function copierLeResteDuCatalogue(pocket){
       // La haute définition ne se demande que si on prend AUSSI la vignette,
       // c'est-à-dire si la carte n'a pas déjà son visuel chez nous. Sinon on
       // redemandait chaque nuit la haute définition de cartes servies par une
-      // autre source — 1028 requêtes vouées au 404, puisque le serveur qui
+      // autre source : 1028 requêtes vouées au 404, puisque le serveur qui
       // n'avait pas la vignette française n'a pas davantage la grande.
       if(/^https?:/.test(carte.imageHaute ?? '') && carte.imageHaute !== carte.image
          && !aDejaUnVisuel(carte.id)
@@ -1384,7 +1384,7 @@ async function copierLeResteDuCatalogue(pocket){
   }
   if(!aFaire.length){ console.log('Reste du catalogue Pocket : tout est déjà dans le dépôt.'); return; }
 
-  console.log(`Copie du reste du catalogue Pocket — ${aFaire.length} fichiers à prendre…`);
+  console.log(`Copie du reste du catalogue Pocket : ${aFaire.length} fichiers à prendre…`);
   let pris = 0, echecs = 0, octets = 0;
   await parPaquets(aFaire, 8, async ({ adresse, fichier }) => {
     try{
@@ -1402,7 +1402,7 @@ async function copierLeResteDuCatalogue(pocket){
 // ------------------------------- retrouver le Pokémon d'une carte Pocket --
 //
 // Le jeu de données de l'application ne porte pas le numéro de Pokédex, dont
-// la page « Par Pokémon » a besoin. Il se déduit du nom — et plutôt que de
+// la page « Par Pokémon » a besoin. Il se déduit du nom, et plutôt que de
 // recopier ici la règle qui vit déjà dans catalogue.js, on la charge depuis
 // ce fichier. Une seule règle, un seul endroit : elles ne peuvent pas
 // diverger sans qu'on s'en aperçoive.
@@ -1447,8 +1447,8 @@ function nomDeRangement(carte){
   return type ? `Énergie ${type[1]}` : null;
 }
 
-// Les cartes qui ne sont pas des Pokémon — dresseurs, objets, stades,
-// énergies —, rangées par nom, comme les cartes d'un Pokémon le sont par son
+// Les cartes qui ne sont pas des Pokémon : dresseurs, objets, stades,
+// énergies, rangées par nom, comme les cartes d'un Pokémon le sont par son
 // numéro. Une carte sans famille connue (les plus anciennes, les toutes
 // dernières de l'application) prend celle des cartes du même nom.
 // Les familles lues sur les cartes elles-mêmes, pour celles qu'aucune
@@ -1559,7 +1559,7 @@ function verifier(nom, bilan, minima){
   for(const [champ, mini] of Object.entries(minima)){
     if(bilan[champ] < mini) soucis.push(`${champ} : ${bilan[champ]} (moins de ${mini} attendus)`);
   }
-  if(soucis.length) throw new Error(`Instantané ${nom} suspect — ${soucis.join(' ; ')}`);
+  if(soucis.length) throw new Error(`Instantané ${nom} suspect : ${soucis.join(' ; ')}`);
 }
 
 // ------------------------------------------------------------- départ ----
@@ -1567,14 +1567,14 @@ function verifier(nom, bilan, minima){
 async function principal(){
   if(!CHEMIN_TCGDEX) throw new Error('Il manque --tcgdex <chemin du clone de tcgdex/cards-database>');
 
-  console.log('Jeu physique — lecture du dépôt TCGdex…');
+  console.log('Jeu physique : lecture du dépôt TCGdex…');
   const physique = await construirePhysique();
 
   console.log(`  ${physique.traductions.size} correspondances anglais → français récoltées`);
   console.log(`  ${physique.pocketChezTcgdex.size} extensions Pocket avec visuels français chez TCGdex`);
   const { dexDuNomDeCarte, POKEDEX_FR } = await chargerRegleDuPokedex();
 
-  console.log("Application — téléchargement du jeu de données…");
+  console.log("Application : téléchargement du jeu de données…");
   const pocket = await construirePocket(physique.traductions, new Set(POKEDEX_FR), physique.pocketChezTcgdex,
     physique.categoriesPocket, physique.nomsPocket);
 
@@ -1605,9 +1605,9 @@ async function principal(){
   const { vignettes, hautes } = trierVisuels(await recenserVisuelsLocaux());
   // Un fichier copié qu'on a lu EN ANGLAIS (outils/langue-visuels.mjs) ne
   // passe plus devant un scan français : Poképédia héberge aussi les scans
-  // anglais des cartes jamais éditées en France — Gym Heroes, par exemple.
+  // anglais des cartes jamais éditées en France : Gym Heroes, par exemple.
   // On ne l'écarte que si Pokécardex a fourni, pour cette carte, un scan
-  // non lu en anglais ; sinon il reste — une image anglaise vaut mieux
+  // non lu en anglais ; sinon il reste : une image anglaise vaut mieux
   // qu'un point d'interrogation.
   let languesLocales = {};
   try{ languesLocales = JSON.parse(await readFile('donnees/langue-visuels.json', 'utf8')).verdicts ?? {}; }catch{}
@@ -1623,7 +1623,7 @@ async function principal(){
             localesAnglaises++;
             continue;
           }
-          // Ce qui venait d'ailleurs devient le secours — l'adresse
+          // Ce qui venait d'ailleurs devient le secours : l'adresse
           // française qu'on servait jusqu'ici, pas l'anglaise plus ancienne :
           // si le fichier local manquait, mieux vaut retomber sur la bonne
           // langue.
@@ -1645,7 +1645,7 @@ async function principal(){
 
   // Le bandeau « visuels des cartes en anglais » se déduit de l'état final,
   // jamais d'une intention prise en cours de route. Une extension dont
-  // chaque carte a son visuel chez nous est en français, point — et si
+  // chaque carte a son visuel chez nous est en français, point, et si
   // demain une extension paraît sans visuel français, le bandeau
   // réapparaîtra de lui-même.
   for(const ext of pocket.extensions){

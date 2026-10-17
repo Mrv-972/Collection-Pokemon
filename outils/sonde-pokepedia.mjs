@@ -2,8 +2,8 @@
 // ========================================================================
 //
 // Les deux autres pistes sont closes : Bulbapedia et Cardmarket répondent
-// 403 à tout, robots.txt compris. Poképédia, elle, nous laisse entrer —
-// son robots.txt ne bloque que ses pages techniques — et nomme ses
+// 403 à tout, robots.txt compris. Poképédia, elle, nous laisse entrer :
+// son robots.txt ne bloque que ses pages techniques, et nomme ses
 // fichiers selon une convention régulière, vue sur une vraie page :
 //
 //     Fichier:Carte Set de Base 4.png      (Dracaufeu, Set de Base n° 4)
@@ -92,9 +92,9 @@ for(let i = 0; i < combien; i++){
     // On exige un numéro final : sans lui, ce n'est pas une carte mais une
     // image d'habillage, et la compter gonflerait le bilan pour rien.
     // Deux pièges, tous deux vus dans les noms bruts plutôt que supposés :
-    // le séparateur est un tiret BAS, pas une espace — la page affiche
+    // le séparateur est un tiret BAS, pas une espace : la page affiche
     // « Carte Set de Base 4 » mais le fichier s'appelle
-    // « Carte_Set_de_Base_4.png » — et un numéro de carte n'est pas
+    // « Carte_Set_de_Base_4.png », et un numéro de carte n'est pas
     // forcément un nombre : « H1 » (Aquapolis), « TG01 » (galeries).
     const m = /^Carte_(.+)_([A-Za-z]{0,3}[0-9]+[a-z]?)\.(png|jpe?g|webp|gif)$/i.exec(img.name);
     if(!m) continue;
@@ -105,7 +105,7 @@ for(let i = 0; i < combien; i++){
   }
   suite = d.continue?.aicontinue;
   console.log(`  page ${i+1} : ${images.length} fichiers (total ${total})` +
-    `${suite ? '' : '  — fin de la liste'}`);
+    `${suite ? '' : '  : fin de la liste'}`);
   if(!suite) break;
   await dormir(1200);
 }
@@ -139,8 +139,8 @@ try{
   const aplatir = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '');
   const leurs = new Map([...parSerie].map(([s, x]) => [aplatir(s), { nom: s, n: x.n }]));
-  // Les deux listes se recoupent — une extension muette est aussi une
-  // extension à trous — et les additionner comptait certaines deux fois.
+  // Les deux listes se recoupent : une extension muette est aussi une
+  // extension à trous, et les additionner comptait certaines deux fois.
   // On déduplique par identifiant, en gardant le plus grand manque.
   const parId = new Map();
   for(const m of [...bilan.aTrousSansSource,
@@ -160,7 +160,7 @@ try{
   }
   console.log(`\n  ${trouves} de nos extensions manquantes portent un nom que Poképédia connaît`);
   console.log(`  soit ${cartesTrouvees} cartes à combler`);
-  console.log(`  ${absents.length} sans correspondance de nom — à revoir à la main,` +
+  console.log(`  ${absents.length} sans correspondance de nom : à revoir à la main,` +
     ` car un nom\n  peut différer sans que la série manque (nous : « Fossile »).`);
 }catch(err){
   console.log(`  (bilan illisible : ${err.message})`);

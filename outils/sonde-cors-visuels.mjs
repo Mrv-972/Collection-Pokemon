@@ -5,7 +5,7 @@
 // refuse d'extraire une toile où l'on a peint une image venue d'un autre
 // domaine, sauf si ce domaine l'autorise explicitement par l'en-tête
 // « Access-Control-Allow-Origin ». Sans cette autorisation, l'export est
-// impossible — et cela ne se voit qu'à l'exécution, par une erreur.
+// impossible, et cela ne se voit qu'à l'exécution, par une erreur.
 //
 // Le bac à sable de développement n'atteint pas ce domaine : la sonde tourne
 // sur un exécuteur GitHub et on lit son journal.

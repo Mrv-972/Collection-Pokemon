@@ -9,7 +9,7 @@
 // règles de la base.
 //
 // Ce fichier ne protège rien. Il masque des boutons à qui n'est pas
-// administrateur, ce qui rend la page compréhensible — mais un site statique
+// administrateur, ce qui rend la page compréhensible, mais un site statique
 // livre tout son code au navigateur, donc quiconque le veut peut appeler ces
 // fonctions. La seule protection réelle est dans supabase/schema.sql : la
 // base refuse l'écriture à tout compte dont le profil ne porte pas le
@@ -106,7 +106,7 @@ async function supprimerCorrection(id){
 // Une correction absorbée par la construction nocturne s'applique désormais
 // sur une donnée déjà identique : elle ne change plus rien et peut être
 // retirée. On le vérifie en comparant avec l'instantané publié, plutôt qu'en
-// se fiant à une date — la construction peut échouer, et une correction
+// se fiant à une date : la construction peut échouer, et une correction
 // qu'on croirait absorbée disparaîtrait alors de l'écran.
 async function correctionAbsorbee(c){
   try{

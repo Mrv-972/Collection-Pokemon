@@ -5,8 +5,8 @@
 // quelle que soit la page demandée : c'est une vitrine, pas un catalogue.
 // Cette sonde regarde, sans rien télécharger d'autre que du texte :
 //
-//   1. robots.txt   — ce qu'ils autorisent, et où est leur plan de site ;
-//   2. le plan de site — la voie prévue pour les machines, si elle existe ;
+//   1. robots.txt   : ce qu'ils autorisent, et où est leur plan de site ;
+//   2. le plan de site : la voie prévue pour les machines, si elle existe ;
 //   3. les formes de pagination courantes, pour voir si l'une répond ;
 //   4. les traces d'une interface de données (Next.js, API) dans leur page.
 //
@@ -42,7 +42,7 @@ for(const adresse of candidats){
   await dormir(1200);
   const r = await lire(adresse);
   const liens = [...new Set([...(r.corps.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi))].map(m => m[1]))];
-  console.log(`\n${adresse}\n  code ${r.code} — ${r.corps.length} octets — ${liens.length} adresses`);
+  console.log(`\n${adresse}\n  code ${r.code} (${r.corps.length} octets) ${liens.length} adresses`);
   // Un plan d'index renvoie vers d'autres plans ; on montre de quoi il parle.
   const parGenre = {};
   for(const l of liens){
@@ -62,7 +62,7 @@ const reference = await lire(base);
 const empreinte = corps => {
   const m = [...new Set(corps.match(
     /static\.pkmcards\.fr\/cards\/fr\/[^"'\s)\\]+/gi) ?? [])];
-  return { n: m.length, premiere: m[0] ?? '—' };
+  return { n: m.length, premiere: m[0] ?? '-' };
 };
 const temoin = empreinte(reference.corps);
 console.log(`référence : ${temoin.n} visuels, 1re = ${temoin.premiere.slice(-40)}`);

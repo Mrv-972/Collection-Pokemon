@@ -124,7 +124,7 @@ $$;
 grant execute on function mon_profil() to authenticated;
 
 -- Retirer sa photo validée : le membre ne peut pas écrire photo_url
--- lui-même, cette fonction le fait pour lui — et seulement pour lui.
+-- lui-même, cette fonction le fait pour lui, et seulement pour lui.
 drop function if exists retirer_ma_photo();
 create function retirer_ma_photo()
 returns void

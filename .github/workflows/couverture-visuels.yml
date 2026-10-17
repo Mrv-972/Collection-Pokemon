@@ -57,7 +57,7 @@ jobs:
               echo "déposé."
               exit 0
             fi
-            echo "dépôt refusé (tentative $essai) — on reprend la branche et on réessaie."
+            echo "dépôt refusé (tentative $essai) : on reprend la branche et on réessaie."
             sleep $((essai * 5))
           done
           echo "::error::dépôt impossible après cinq tentatives."

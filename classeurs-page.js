@@ -1,6 +1,6 @@
 // L'écran des classeurs : ce qu'on voit et ce qu'on manipule.
 //
-// La logique — formats, pages, déplacements — vit dans classeurs.js et ne
+// La logique (formats, pages, déplacements) vit dans classeurs.js et ne
 // touche jamais au document. Ce fichier-ci ne fait que l'afficher et
 // enregistrer ce qui change.
 
@@ -304,7 +304,7 @@ function pageDuClasseur(c){
               aria-label="Partager sur les réseaux sociaux">${ICONE_PARTAGE}</button>
     </div>
     ${auVerso ? `<p class="mot-du-verso">Le dos de la page ${pageActive + 1}, vu en
-       retournant la feuille — les cases sont donc inversées de gauche à droite.
+       retournant la feuille : les cases sont donc inversées de gauche à droite.
        ${estTransparent(c)
          ? "Les pochettes étant transparentes, chaque case montre le dos de la carte d'en face"
          : 'Les pochettes étant opaques, on ne voit rien au travers'} ;
@@ -316,7 +316,7 @@ function pageDuClasseur(c){
 
 // Deux façons de chercher une carte. Par extension, quand on range une
 // extension. Par Pokémon, quand on veut réunir tous ses Pikachu sur une
-// page — et là, passer les extensions une à une serait intenable.
+// page, et là, passer les extensions une à une serait intenable.
 let modeTiroir = 'extension';
 let pokemonChoisi = null;
 
@@ -326,7 +326,7 @@ function tiroirDesCartes(){
     <div class="tiroir">
       <h2>Ajouter des cartes</h2>
       <p class="vide" style="padding:0;font-size:13.5px" id="mot-du-tiroir">Clique une carte
-         pour la poser dans la première case libre — ou clique d'abord une case vide
+         pour la poser dans la première case libre, ou clique d'abord une case vide
          du classeur pour choisir où elle ira. Tu peux aussi glisser ta propre image
          dans une pochette : une illustration, une photo, un intercalaire.</p>
 
@@ -386,8 +386,8 @@ const classeurDeLAdresse = () =>
   decodeURIComponent((location.hash.match(/^#classeur=(.+)$/) ?? [])[1] ?? '');
 
 // Le bouton « page précédente » du navigateur, et « page suivante » aussi.
-// L'état empilé dit d'ordinaire où aller ; à défaut — une adresse saisie à
-// la main, un saut d'ancre — c'est l'adresse qui tranche.
+// L'état empilé dit d'ordinaire où aller ; à défaut : une adresse saisie à
+// la main, un saut d'ancre : c'est l'adresse qui tranche.
 window.addEventListener('popstate', e => {
   etapesEmpilees = Math.max(0, etapesEmpilees - 1);
   const id = e.state?.vue === 'classeur' ? e.state.id : classeurDeLAdresse();
@@ -632,7 +632,7 @@ function brancherLesGestes(){
     const index = Number(b.dataset.retirer);
     if(faceActive === 'verso'){
       // Au verso, vider veut dire « plus rien du tout », et non « revenir au
-      // dos automatique » — sinon la case se remplirait à nouveau aussitôt.
+      // dos automatique », sinon la case se remplirait à nouveau aussitôt.
       modifier(c => oublierLesImagesInutiles(poserAuVerso(c, pageActive, index, VERSO_VIDE)));
       return;
     }
@@ -654,9 +654,9 @@ function brancherLesGestes(){
 }
 
 // Déplacer une carte, par trois chemins qui mènent au même échange :
-//   — le glisser-déposer, à la souris ;
-//   — un clic sur la case de départ, puis sur celle d'arrivée ;
-//   — la touche Entrée, deux fois, pour qui navigue au clavier.
+//   - le glisser-déposer, à la souris ;
+//   - un clic sur la case de départ, puis sur celle d'arrivée ;
+//   - la touche Entrée, deux fois, pour qui navigue au clavier.
 //
 // Le deuxième n'est pas un doublon du premier : le glisser-déposer du web
 // n'existe pas sur un écran tactile. Sans lui, ranger son classeur depuis un
@@ -665,7 +665,7 @@ let caseChoisie = null;
 
 // La case vide qu'on vient de désigner : la prochaine carte choisie dans le
 // tiroir s'y posera. Sans cela, il fallait poser la carte à la suite puis la
-// déplacer — deux gestes pour un.
+// déplacer : deux gestes pour un.
 let caseVisee = null;
 
 function choisirOuEchanger(index, el){
@@ -713,7 +713,7 @@ function brancherLeGlisser(zone){
       }catch(err){ /* déposé depuis ailleurs : on ignore */ }
     });
 
-    // Au clic — donc aussi au doigt — et à la touche Entrée. Au verso, le
+    // Au clic (donc aussi au doigt) et à la touche Entrée. Au verso, le
     // clic ouvre le choix du contenu plutôt que de déplacer : on n'y range
     // pas une collection, on y compose une face.
     const agir = () => (faceActive === 'verso'
@@ -733,8 +733,8 @@ async function supprimerLeClasseur(){
   if(!c) return;
   const accord = await demanderConfirmation({
     titre: 'Supprimer ce classeur ?',
-    message: `<b>${echapper(c.nom)}</b> et son rangement — ${compterLesCartes(c)} carte(s)
-              sur ${c.pages.length} page(s) — seront effacés. Tes marquages de cartes,
+    message: `<b>${echapper(c.nom)}</b> et son rangement (${compterLesCartes(c)} carte(s)
+              sur ${c.pages.length} page(s)) seront effacés. Tes marquages de cartes,
               eux, ne bougent pas : un classeur n'est qu'une mise en page.`,
     action: 'Supprimer',
     danger: true,
@@ -757,7 +757,7 @@ async function retirerLaPage(){
     const accord = await demanderConfirmation({
       titre: 'Retirer cette page ?',
       message: `Cette page contient <b>${cartes} carte(s)</b>. Elles seront retirées
-                du classeur — les pages suivantes remontent d'un rang.`,
+                du classeur, et les pages suivantes remontent d'un rang.`,
       action: 'Retirer la page',
       danger: true,
     });
@@ -1027,7 +1027,7 @@ function dessinerLeTiroir(){
   let liste = cartesDuTiroir;
   // Par extension, on cherche une carte dans une extension : le filtre porte
   // sur son nom et son numéro. Par Pokémon, toutes les cartes portent le même
-  // nom — le filtre porte alors sur l'extension, seule chose qui les sépare.
+  // nom : le filtre porte alors sur l'extension, seule chose qui les sépare.
   if(q){
     liste = modeTiroir === 'extension'
       ? liste.filter(c => c.name.toLowerCase().includes(q) || (c.localId ?? '').includes(q))
@@ -1055,7 +1055,7 @@ function dessinerLeTiroir(){
   grille.innerHTML = '<div class="grille-choix">' + liste.slice(0, 240).map(c => `
     <button data-poser="${echapper(c.id)}"
             title="${echapper(c.name)}${direLExtension
-              ? ' — ' + echapper(nomDeLExtension(extensionDeLaCarte(c.id)) ?? '')
+              ? ' · ' + echapper(nomDeLExtension(extensionDeLaCarte(c.id)) ?? '')
               : ''}">
       <img src="${echapper(c.image ?? `images/cards/${c.id}.png`)}" alt="${echapper(c.name)}"
            loading="lazy" data-secours="${echapper(c.imageSecours ?? '')}"
@@ -1144,7 +1144,7 @@ initCompte().then(afficherEtatCompte);
 // ------------------------------------------------- feuilleter les pages ---
 //
 // Un classeur se feuillette : on ne va pas chercher un bouton à chaque page.
-// Trois gestes mènent à la page suivante — la flèche du clavier, le doigt
+// Trois gestes mènent à la page suivante : la flèche du clavier, le doigt
 // qui balaie, et les boutons, qui restent pour qui préfère viser.
 
 function allerALaPage(numero, sens){
@@ -1205,7 +1205,7 @@ document.addEventListener('keydown', e => {
 // ------------------------------------------------------- la vue « livre » ---
 //
 // Le classeur ouvert à plat : deux pages en vis-à-vis, comme on le regarde
-// vraiment. C'est là qu'on juge un rangement — une page seule ne dit pas ce
+// vraiment. C'est là qu'on juge un rangement : une page seule ne dit pas ce
 // que donne la double page, et c'est pourtant ce qu'on a sous les yeux quand
 // on ouvre le classeur.
 //
@@ -1309,11 +1309,11 @@ const ICONE_PARTAGE = `
     <line x1="8.3" y1="13.2" x2="15.7" y2="17.8"></line>
   </svg>`;
 
-// Fabriquer l'image prend un instant — chaque carte est chargée puis
+// Fabriquer l'image prend un instant : chaque carte est chargée puis
 // peinte. Le bouton le dit, plutôt que de laisser croire à un clic perdu.
 // La page en cours d'abord : c'est immédiat. La fenêtre propose ensuite
 // d'ajouter les autres, ce qui évite de faire attendre qui ne veut qu'une
-// page — vingt pages, c'est cent quatre-vingts visuels à charger.
+// page : vingt pages, c'est cent quatre-vingts visuels à charger.
 async function partagerDepuisLeClasseur(pages, bouton){
   const c = actif();
   if(!c) return;
@@ -1495,10 +1495,10 @@ async function choisirLePokemon(dexId){
 //
 // Trois façons de remplir une pochette de verso, et une pour la vider :
 //
-//   — le dos d'une carte, ce qu'on voit d'ordinaire en retournant la feuille ;
-//   — une carte à l'endroit, pour qui veut la voir des deux côtés ;
-//   — une image importée ;
-//   — rien du tout.
+//   - le dos d'une carte, ce qu'on voit d'ordinaire en retournant la feuille ;
+//   - une carte à l'endroit, pour qui veut la voir des deux côtés ;
+//   - une image importée ;
+//   - rien du tout.
 //
 // Ce choix n'existe qu'au verso. Au recto, une pochette se remplit d'une
 // carte ou d'une image, et poser la question à chaque clic alourdirait le

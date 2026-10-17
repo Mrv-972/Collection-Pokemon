@@ -2,7 +2,7 @@
 //
 // GitHub Pages dit aux navigateurs de garder les fichiers un moment. C'est
 // bien pour la vitesse, mais quand le code change, un visiteur peut se
-// retrouver avec l'ancien script et les nouvelles données — ou l'inverse. Il
+// retrouver avec l'ancien script et les nouvelles données, ou l'inverse. Il
 // n'a alors aucun moyen de le savoir, et « recharge en forçant » n'est pas
 // une réponse acceptable.
 //

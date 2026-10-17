@@ -1,7 +1,7 @@
 # Vérifie carte par carte si le visuel s'affiche, et dépose le verdict.
 #
 # Remplace la sonde de couverture, qui recalculait les adresses et
-# n'échantillonnait que huit cartes par extension — elle a déclaré muettes
+# n'échantillonnait que huit cartes par extension : elle a déclaré muettes
 # des séries qui s'affichaient très bien. Ici : une requête d'en-tête par
 # carte, sur l'adresse que le site sert réellement. Aucune image téléchargée.
 name: Vérifier les visuels
@@ -65,7 +65,7 @@ jobs:
               echo "déposé."
               exit 0
             fi
-            echo "dépôt refusé (tentative $essai) — on reprend la branche et on réessaie."
+            echo "dépôt refusé (tentative $essai) : on reprend la branche et on réessaie."
             sleep $((essai * 5))
           done
           echo "::error::dépôt impossible après cinq tentatives."

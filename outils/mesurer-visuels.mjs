@@ -3,7 +3,7 @@
 // Combien pèseraient les visuels qu'on n'a pas encore ?
 //
 // Les 1366 cartes récoltées chez le wiki pèsent 93 Ko pièce. Les 2497 autres
-// viennent de TCGdex, qui propose deux définitions par carte — « low » pour
+// viennent de TCGdex, qui propose deux définitions par carte : « low » pour
 // les grilles, « high » pour le zoom. Copier les deux, ou une seule, ou
 // aucune, ne se décide pas au jugé : ça se pèse.
 
@@ -84,7 +84,7 @@ async function principal(){
 
   console.log(`Échantillon de ${echantillon.length} cartes :`);
   console.log(`  définition d'affichage  ${ko(moyenne(bas))} en moyenne  (${bas.length} mesurées)`);
-  console.log(`  haute définition        ${hauts.length ? ko(moyenne(hauts)) : '—'}  (${hauts.length} mesurées)`);
+  console.log(`  haute définition        ${hauts.length ? ko(moyenne(hauts)) : '-'}  (${hauts.length} mesurées)`);
 
   console.log(`\nSi on copiait tout dans le dépôt :`);
   console.log(`  affichage seul          + ${mo(moyenne(bas) * restantes.length)}`);

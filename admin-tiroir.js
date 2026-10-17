@@ -10,7 +10,7 @@
 // ouverture du tiroir. Il ne protège rien pour autant : chaque fonction de
 // la base qu'il appelle vérifie elle-même que l'appelant est administrateur.
 //
-// Le code est déménagé, pas réécrit : les garde-fous restent — le pseudo à
+// Le code est déménagé, pas réécrit : les garde-fous restent : le pseudo à
 // recopier avant de supprimer un compte, le motif écrit exigé avant de lire
 // une discussion, et la trace au journal que l'administrateur ne peut pas
 // effacer.
@@ -18,7 +18,7 @@
 // Une chose a changé en route, et c'est une correction de sécurité :
 // l'ancienne page insérait tels quels le pseudo, l'e-mail et la ville des
 // membres. Un membre ayant choisi un pseudo contenant du code l'aurait fait
-// exécuter dans la session de l'administrateur à l'ouverture de la liste —
+// exécuter dans la session de l'administrateur à l'ouverture de la liste :
 // c'est-à-dire là où ce code aurait eu le plus de pouvoir. Toute valeur
 // venue d'un membre passe désormais par echapper().
 
@@ -114,7 +114,7 @@ function dessiner(){
 //
 // Une photo proposée attend dans un dépôt privé. La valider, c'est la
 // recopier dans le dépôt public, sous le dossier du membre, puis la
-// déclarer sienne — la base vérifie que l'adresse est bien celle de ce
+// déclarer sienne : la base vérifie que l'adresse est bien celle de ce
 // dossier. La refuser, c'est la retirer, avec un motif que le membre lira.
 
 async function afficherPhotos(){
@@ -332,7 +332,7 @@ async function afficherListe(){
         ${c.image_chemin ? `<img class="apercu" src="${SUPABASE_URL}/storage/v1/object/public/corrections/${encodeURI(c.image_chemin)}" alt="">` : ''}
         <span class="quoi">
           <span class="cible">${echapper(c.cible)}</span>
-          <span class="detail"> — ${({ visuel: 'visuel de carte', carte: 'carte',
+          <span class="detail"> · ${({ visuel: 'visuel de carte', carte: 'carte',
               extension: 'extension', 'logo-extension': "logo d'extension",
               'logo-serie': 'logo de série' })[c.genre] ?? echapper(c.genre)}
             · ${echapper(c.univers)} · ${new Date(c.cree_le).toLocaleDateString('fr-FR')}</span>
@@ -340,7 +340,7 @@ async function afficherListe(){
         <span class="etiquette ${etats[i] ? 'absorbee' : 'attente'}">${etats[i] ? 'absorbée par le site' : 'en attente'}</span>
         <button class="retour" data-id="${Number(c.id)}">Supprimer</button>
       </li>`).join('') + '</ul>' +
-      `<p class="aide">« Absorbée » signifie que la construction nocturne a inscrit la correction dans les fichiers du site : tu peux la supprimer ici sans rien perdre. « En attente » signifie que le site ne l'affiche que grâce à cette ligne — ne la supprime pas encore.</p>`;
+      `<p class="aide">« Absorbée » signifie que la construction nocturne a inscrit la correction dans les fichiers du site : tu peux la supprimer ici sans rien perdre. « En attente » signifie que le site ne l'affiche que grâce à cette ligne : ne la supprime pas encore.</p>`;
 
     zone.querySelectorAll('button[data-id]').forEach(b => b.onclick = async () => {
       b.disabled = true;
@@ -365,7 +365,7 @@ async function afficherListe(){
 
 let comptesCharges = [];
 
-const jamais = '—';
+const jamais = '-';
 const dateCourte = d => d ? new Date(d).toLocaleDateString('fr-FR') : jamais;
 
 function ligneCompte(c){
@@ -442,7 +442,7 @@ async function afficherComptes(){
 
 // Supprimer le compte de quelqu'un d'autre ne se défait pas, et ne prévient
 // pas l'intéressé. On annonce donc ce qui disparaît, et on demande de
-// recopier le pseudo — de quoi rendre impossible la suppression du voisin
+// recopier le pseudo : de quoi rendre impossible la suppression du voisin
 // de ligne par un clic mal visé.
 async function supprimerLeCompte(id, bouton){
   const c = comptesCharges.find(x => x.id === id);
@@ -481,7 +481,7 @@ async function supprimerLeCompte(id, bouton){
 // ------------------------------------------------- les discussions ------
 //
 // Les discussions appartiennent à leurs deux participants. Cet accès existe
-// pour répondre à un signalement, à une plainte ou à une réquisition —
+// pour répondre à un signalement, à une plainte ou à une réquisition :
 // pas pour lire par-dessus l'épaule des membres.
 //
 // Il est donc payant : un motif écrit est exigé, et chaque ouverture laisse
@@ -519,8 +519,8 @@ async function ouvrirLesDiscussions(idMembre){
       <li>
         <span class="quoi">
           <span class="cible">avec ${echapper(d.avec_pseudo ?? 'un membre supprimé')}</span>
-          <span class="detail"> — ${Number(d.nb_messages ?? 0)} message(s)
-            · dernier le ${d.dernier_le ? new Date(d.dernier_le).toLocaleDateString('fr-FR') : '—'}</span>
+          <span class="detail"> · ${Number(d.nb_messages ?? 0)} message(s)
+            · dernier le ${d.dernier_le ? new Date(d.dernier_le).toLocaleDateString('fr-FR') : '-'}</span>
         </span>
         <button class="discret-admin" data-lire="${echapper(d.conversation_id)}">Lire</button>
       </li>`).join('') + '</ul>';

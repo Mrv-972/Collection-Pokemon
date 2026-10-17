@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-33av"></script>
-<title>Échanges — PokéClasseur</title>
+<script src="theme.js?v=2026-10-17-4gr7"></script>
+<title>Échanges - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -120,7 +120,7 @@
      quatre libellés ne tiennent plus côte à côte.
 
      Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable — en bas de
+     et porte les commandes à une hauteur tactile confortable : en bas de
      42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
@@ -175,23 +175,23 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-17-33av"></script>
-<script src="catalogue.js?v=2026-10-17-33av"></script>
-<script src="supabase-config.js?v=2026-10-17-33av"></script>
-<script src="pied.js?v=2026-10-17-33av"></script>
-<script src="admin.js?v=2026-10-17-33av"></script>
-<script src="admin-site.js?v=2026-10-17-33av"></script>
-<script src="sets.js?v=2026-10-17-33av"></script>
-<script src="confirmation.js?v=2026-10-17-33av"></script>
-<script src="tags.js?v=2026-10-17-33av"></script>
-<script src="raretes.js?v=2026-10-17-33av"></script>
-<script src="glissement.js?v=2026-10-17-33av"></script>
-<script src="cards.js?v=2026-10-17-33av"></script>
-<script src="prix.js?v=2026-10-17-33av"></script>
-<script src="localisation.js?v=2026-10-17-33av"></script>
-<script src="compte.js?v=2026-10-17-33av"></script>
-<script src="communaute.js?v=2026-10-17-33av"></script>
-<script src="messagerie.js?v=2026-10-17-33av"></script>
+<script src="univers.js?v=2026-10-17-4gr7"></script>
+<script src="catalogue.js?v=2026-10-17-4gr7"></script>
+<script src="supabase-config.js?v=2026-10-17-4gr7"></script>
+<script src="pied.js?v=2026-10-17-4gr7"></script>
+<script src="admin.js?v=2026-10-17-4gr7"></script>
+<script src="admin-site.js?v=2026-10-17-4gr7"></script>
+<script src="sets.js?v=2026-10-17-4gr7"></script>
+<script src="confirmation.js?v=2026-10-17-4gr7"></script>
+<script src="tags.js?v=2026-10-17-4gr7"></script>
+<script src="raretes.js?v=2026-10-17-4gr7"></script>
+<script src="glissement.js?v=2026-10-17-4gr7"></script>
+<script src="cards.js?v=2026-10-17-4gr7"></script>
+<script src="prix.js?v=2026-10-17-4gr7"></script>
+<script src="localisation.js?v=2026-10-17-4gr7"></script>
+<script src="compte.js?v=2026-10-17-4gr7"></script>
+<script src="communaute.js?v=2026-10-17-4gr7"></script>
+<script src="messagerie.js?v=2026-10-17-4gr7"></script>
 <script>
 let correspondances = [];
 let avisConnus = new Map();   // résumé des avis reçus par chaque membre listé
@@ -213,7 +213,7 @@ function chargerPreferenceDistance(){
 // courte distance, un kilomètre de plus décide qu'on se déplace ou non ;
 // passé quelques centaines, l'écart entre 700 et 750 km ne veut plus dire
 // grand-chose. Un pas régulier aurait rendu le bas de l'échelle impossible à
-// viser — c'est justement là qu'on veut pouvoir régler finement.
+// viser : c'est justement là qu'on veut pouvoir régler finement.
 function construireCrans(){
   const crans = [];
   for(let km = 1;   km <= 30;   km += 1)  crans.push(km);   // au kilomètre près
@@ -231,7 +231,7 @@ function texteDistance(km){
 }
 
 // Retrouve le cran d'une distance déjà enregistrée, même si elle ne tombe
-// pas exactement dessus — les paliers ont changé depuis la première version.
+// pas exactement dessus : les paliers ont changé depuis la première version.
 function cranPourDistance(km){
   if(km === null) return CRANS_DISTANCE.length - 1;
   let cran = 0;
@@ -427,7 +427,7 @@ function rendre(){
 async function afficherPrix(){
   // Les cartes de l'application ne s'achètent ni ne se revendent : aucune
   // cote n'existe, et il n'y a rien à peser. On remplace donc la balance par
-  // ce qui compte vraiment là-bas — l'échange se conclut dans le jeu.
+  // ce qui compte vraiment là-bas : l'échange se conclut dans le jeu.
   if(estPocket()){
     document.querySelectorAll('[data-balance]').forEach(el => {
       el.className = 'balance';
@@ -479,7 +479,7 @@ function texteBalance(recu, donne, el){
   const manquantes = recu.sansCote + donne.sansCote;
 
   return `${proche
-      ? `<span class="ecart">Valeurs proches</span> — l'échange paraît équilibré.`
+      ? `<span class="ecart">Valeurs proches</span> : l'échange paraît équilibré.`
       : `<span class="ecart">Écart d'environ ${prixLisible({ montant: ecart, devise: recu.devise ?? donne.devise ?? 'EUR' })}</span> ${sens}.`}
     <small>Cotes indicatives, mises à jour chaque jour, pour des cartes en bon état.
     L'état réel de chaque exemplaire change beaucoup la donne.${manquantes > 0 ? ` ${manquantes} carte${manquantes > 1 ? 's' : ''} sans cote ne ${manquantes > 1 ? 'sont' : 'est'} pas comptée${manquantes > 1 ? 's' : ''}.` : ''}</small>`;

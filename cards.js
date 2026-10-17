@@ -74,7 +74,7 @@ function raritySymbol(rarity){
 // aussi à remplir le menu déroulant des filtres, et un <option> ne peut pas
 // contenir d'image. Les deux cohabitent donc, chacun là où il fonctionne.
 //
-// Le jeu répète le même symbole — trois losanges pour « Trois Diamants ».
+// Le jeu répète le même symbole : trois losanges pour « Trois Diamants ».
 // On fait pareil, plutôt que d'avoir un fichier par combinaison.
 // Les icônes de rareté vivent dans raretes.js, que la page des missions
 // partage avec les grilles de cartes.
@@ -145,7 +145,7 @@ async function probeRarities(scopeQuery, cacheKey, cards){
     // le filtre n'a pas été appliqué par l'API. Mieux vaut aucune rareté
     // qu'une rareté fausse sur toutes les cartes.
     if(results.some(r => r.cards.length === cards.length && cards.length > 12)){
-      console.warn("Le filtre par rareté n'est pas appliqué par l'API — raretés ignorées.");
+      console.warn("Le filtre par rareté n'est pas appliqué par l'API : raretés ignorées.");
       return null;
     }
     results.forEach(({ rarity, cards: matched }) => {
@@ -231,7 +231,7 @@ function cardTile(c, subtitle){
   `;
 }
 
-// La cote n'est affichée que si elle a déjà été récupérée — c'est-à-dire
+// La cote n'est affichée que si elle a déjà été récupérée, c'est-à-dire
 // après un tri par valeur. Sinon la ligne est absente, plutôt que d'occuper
 // une place vide.
 function coteVignette(carteId){
@@ -427,7 +427,7 @@ function openCardZoom(img){
 
     // La vignette est déjà en cache : on l'affiche tout de suite, puis on la
     // remplace par la haute définition dès qu'elle est prête. Celle-ci
-    // voyage avec la vignette — toutes les sources ne la nomment pas en
+    // voyage avec la vignette : toutes les sources ne la nomment pas en
     // remplaçant « low » par « high » dans l'adresse.
     const grande = source.dataset.haute
       || (vignette.includes('/low.webp') ? vignette.replace('/low.webp', '/high.webp') : vignette);
@@ -472,7 +472,7 @@ function openCardZoom(img){
     const prix = await prixCarte(carteId).catch(() => null);
     if(monJeton !== jeton) return;
     elValeur.innerHTML = noteLangue + (prix
-      ? `≈ ${prixLisible(prix)}<small>Cote indicative pour une carte en bon état${prix.devise === 'USD' ? ', marché nord-américain faute de cote européenne' : ''}${prix.variantes ? ' — d\'autres éditions de cette carte se négocient à des prix très différents' : ''}</small>`
+      ? `≈ ${prixLisible(prix)}<small>Cote indicative pour une carte en bon état${prix.devise === 'USD' ? ', marché nord-américain faute de cote européenne' : ''}${prix.variantes ? '. D\'autres éditions de cette carte se négocient à des prix très différents' : ''}</small>`
       : `<small>Pas de cote connue pour cette carte</small>`);
   }
 
@@ -534,7 +534,7 @@ document.addEventListener('click', (e) => {
 // Message bref, affiché au bas de l'écran puis effacé.
 //
 // Il sert aux explications qu'un survol de souris donnerait, mais qu'un
-// téléphone ne peut pas montrer — par exemple pourquoi une carte ne peut pas
+// téléphone ne peut pas montrer : par exemple pourquoi une carte ne peut pas
 // être marquée « échangeable ». Les styles sont posés ici plutôt que dans la
 // feuille de chaque page : le message doit pouvoir apparaître partout sans
 // qu'on ait à se souvenir d'ajouter du CSS.

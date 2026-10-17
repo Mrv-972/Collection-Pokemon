@@ -1,12 +1,12 @@
 // Classeurs virtuels : essayer un rangement avant de le faire pour de vrai.
 //
-// Ranger un classeur de cartes se fait une fois — après, changer l'ordre
+// Ranger un classeur de cartes se fait une fois : après, changer l'ordre
 // veut dire tout ressortir des pochettes. D'où cette page : on dispose les
 // cartes à l'écran, on regarde ce que ça donne, on recommence, et on ne
 // touche au vrai classeur qu'une fois décidé.
 //
 // Tout est enregistré dans la mémoire du navigateur, sur cet appareil. Ce
-// n'est pas idéal — les marquages de cartes, eux, suivent le compte — mais
+// n'est pas idéal (les marquages de cartes, eux, suivent le compte) mais
 // cela évite d'imposer une table de plus en base pour une première version.
 // La suite logique est d'y ajouter la synchronisation.
 
@@ -225,7 +225,7 @@ const imageDuClasseur = (classeur, cle) => classeur?.images?.[cle] ?? null;
 // reprend la couleur du classeur : un classeur a toujours une couverture.
 // Les dossiers sont une liste à part : on peut en créer un vide et le
 // remplir ensuite. Un dossier nommé dans un classeur mais absent de la liste
-// compte quand même — un enregistrement abîmé ne doit pas cacher un classeur.
+// compte quand même : un enregistrement abîmé ne doit pas cacher un classeur.
 const SANS_DOSSIER = 'Sans dossier';
 
 const parOrdreAlphabetique = (a, b) =>
@@ -262,7 +262,7 @@ function couvertureDe(classeur){
 
 // La couleur des pages. Sans choix, elles suivent la couverture : c'est le
 // cas le plus courant, un classeur d'une seule couleur. Une couverture en
-// photo n'a pas de couleur à suivre — les pages restent alors crème.
+// photo n'a pas de couleur à suivre : les pages restent alors crème.
 const pagesSuiventLaCouverture = classeur => !classeur?.couleur;
 
 function couleurDesPages(classeur){
@@ -292,7 +292,7 @@ function oublierLesImagesInutiles(classeur){
 // --------------------------------------------------------- les versos ----
 //
 // Une feuille de classeur a deux faces. Longtemps, le verso n'a été que le
-// dos des cartes du recto — c'est ce que montre une feuille à pochettes
+// dos des cartes du recto : c'est ce que montre une feuille à pochettes
 // simple face. Mais on peut aussi vouloir y mettre quelque chose : une carte
 // à voir des deux côtés, une illustration, un intercalaire.
 //

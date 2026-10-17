@@ -4,7 +4,7 @@
 // se met aux couleurs du site, et certains navigateurs bloquent l'autre.
 //
 // Sortie de tags.js le jour où la suppression de compte en a eu besoin :
-// c'est le même geste — annoncer ce qui va se passer avant que ça arrive.
+// c'est le même geste : annoncer ce qui va se passer avant que ça arrive.
 
 const STYLE_CONFIRMATION = `
   .confirmation{position:fixed;inset:0;z-index:75;display:flex;align-items:center;
@@ -49,7 +49,7 @@ const STYLE_CONFIRMATION = `
 // bouton s'active. Réservé à ce qui ne se défait pas : on ne supprime pas un
 // compte par un clic de trop.
 // La feuille de style vit à part : d'autres fenêtres que celle-ci s'en
-// servent — la demande de motif, dans l'administration. Sans cet appel,
+// servent : la demande de motif, dans l'administration. Sans cet appel,
 // elles s'affichaient en pleine page, au fil du texte.
 function poserStyleConfirmation(){
   if(document.getElementById('style-confirmation')) return;

@@ -6,14 +6,14 @@
 -- Jusqu'ici, l'espace d'administration ne savait remplacer que le visuel
 -- d'une carte. Deux genres de correction s'ajoutent :
 --
---   logo-extension — « cible » est l'identifiant de l'extension (« sv01 »).
---   logo-serie     — « cible » est le NOM de la série, tel qu'il s'affiche
+--   logo-extension : « cible » est l'identifiant de l'extension (« sv01 »).
+--   logo-serie     : « cible » est le NOM de la série, tel qu'il s'affiche
 --                    (« Écarlate et Violet »). Les séries n'ont pas
 --                    d'identifiant dans les données que le site sert ; leur
 --                    nom est ce qui les désigne partout ailleurs.
 --
 -- Rien d'autre ne change : mêmes règles de lecture et d'écriture, même
--- contrainte d'unicité — une seule correction par univers, genre et cible.
+-- contrainte d'unicité : une seule correction par univers, genre et cible.
 
 alter table corrections drop constraint if exists corrections_genre_check;
 

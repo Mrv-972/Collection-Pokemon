@@ -2,9 +2,9 @@
 // ================================================
 //
 // Trois mesures existent séparément, et aucune ne répond seule :
-//   — donnees/couverture-visuels.json   ce qui manque, et où ;
-//   — donnees/appariement-pkmcards.json ce que PkmCards couvre, chez nous ;
-//   — donnees/physique/                 la taille réelle de chaque extension.
+//   - donnees/couverture-visuels.json   ce qui manque, et où ;
+//   - donnees/appariement-pkmcards.json ce que PkmCards couvre, chez nous ;
+//   - donnees/physique/                 la taille réelle de chaque extension.
 //
 // Ce bilan les croise pour répondre à la seule question qui compte :
 // des cartes aujourd'hui sans visuel français, combien une source donnée
@@ -73,7 +73,7 @@ const restant = trous.filter(t => !t.chezPkmcards)
   .sort((a, b) => b.manqueEstime - a.manqueEstime);
 
 // ------------------------------------------------------------- dire ------
-const pc = (a, b) => b ? `${(100*a/b).toFixed(0)} %` : '—';
+const pc = (a, b) => b ? `${(100*a/b).toFixed(0)} %` : '-';
 
 console.log('=============== extensions muettes ===============');
 console.log("Rien ne s'affiche, dans aucune langue.");

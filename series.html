@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-33av"></script>
-<title>Par extension — PokéClasseur</title>
+<script src="theme.js?v=2026-10-17-4gr7"></script>
+<title>Par extension - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -94,7 +94,7 @@
      quatre libellés ne tiennent plus côte à côte.
 
      Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable — en bas de
+     et porte les commandes à une hauteur tactile confortable : en bas de
      42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
@@ -150,15 +150,15 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-17-33av"></script>
-<script src="catalogue.js?v=2026-10-17-33av"></script>
-<script src="supabase-config.js?v=2026-10-17-33av"></script>
-<script src="pied.js?v=2026-10-17-33av"></script>
-<script src="admin.js?v=2026-10-17-33av"></script>
-<script src="admin-site.js?v=2026-10-17-33av"></script>
-<script src="compte.js?v=2026-10-17-33av"></script>
-<script src="progression.js?v=2026-10-17-33av"></script>
-<script src="sets.js?v=2026-10-17-33av"></script>
+<script src="univers.js?v=2026-10-17-4gr7"></script>
+<script src="catalogue.js?v=2026-10-17-4gr7"></script>
+<script src="supabase-config.js?v=2026-10-17-4gr7"></script>
+<script src="pied.js?v=2026-10-17-4gr7"></script>
+<script src="admin.js?v=2026-10-17-4gr7"></script>
+<script src="admin-site.js?v=2026-10-17-4gr7"></script>
+<script src="compte.js?v=2026-10-17-4gr7"></script>
+<script src="progression.js?v=2026-10-17-4gr7"></script>
+<script src="sets.js?v=2026-10-17-4gr7"></script>
 <script>
 // Récupère la liste complète des extensions depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), puis les regroupe par série (Écarlate et
@@ -190,7 +190,7 @@ const PRESENTATION = {
   pocket: {
     kicker: 'Catalogue · TCG Pocket',
     titre: "Toutes les extensions de l'application",
-    intro: "Pokémon TCG Pocket sort ses propres extensions, qui n'existent que dans l'application. Choisis-en une pour voir son classeur — tes cartes physiques restent rangées de l'autre côté.",
+    intro: "Pokémon TCG Pocket sort ses propres extensions, qui n'existent que dans l'application. Choisis-en une pour voir son classeur : tes cartes physiques restent rangées de l'autre côté.",
   },
 };
 
@@ -268,10 +268,10 @@ function groupBySeries(sets){
 // L'extension qui ouvre la série, celle dont le logo porte le nom de l'ère.
 //
 // La plus ancienne ne convient pas : les extensions de promotion sortent
-// d'ordinaire les premières et portent un logo de promotion — on aurait eu
+// d'ordinaire les premières et portent un logo de promotion : on aurait eu
 // « swshp » pour Épée et Bouclier. Le jeu nomme en revanche l'extension
 // fondatrice avec une régularité dont on peut se servir : des lettres puis
-// 1, éventuellement 01 — base1, xy1, swsh1, sv01, me01. À défaut, la plus
+// 1, éventuellement 01 : base1, xy1, swsh1, sv01, me01. À défaut, la plus
 // ancienne qui ne soit pas une promotion ; à défaut encore, la plus
 // ancienne, une extension sans date passant en dernier.
 function extensionFondatrice(setsDeLaSerie){
@@ -287,7 +287,7 @@ function extensionFondatrice(setsDeLaSerie){
 // TCGdex n'héberge aucun logo de série : ses fiches de série n'en déclarent
 // pas, et une sonde lancée depuis un exécuteur GitHub, témoins à l'appui,
 // n'en a trouvé pour aucune des vingt. On montre donc le logo de l'extension
-// fondatrice, qui porte le nom de l'ère — « Écarlate et Violet », « Épée et
+// fondatrice, qui porte le nom de l'ère : « Écarlate et Violet », « Épée et
 // Bouclier », « Soleil et Lune ». Là où il manque, le titre reste seul,
 // sans image cassée : c'est le rôle de « onerror ».
 const cotePocket = () =>

@@ -3,17 +3,17 @@
 //
 // Même principe que pour le reste du catalogue Pocket : les fichiers
 // atterrissent dans images/cards/<carte>.webp, et l'instantané les ramasse
-// tout seul au prochain passage — il préfère déjà un fichier local à une
+// tout seul au prochain passage : il préfère déjà un fichier local à une
 // adresse distante. Aucun code du site à changer.
 //
 // Pourquoi copier plutôt que renvoyer chez eux, mesuré et non supposé :
-//   — leur serveur n'envoie pas d'en-tête CORS, donc le partage d'un
+//   - leur serveur n'envoie pas d'en-tête CORS, donc le partage d'un
 //     classeur contenant une de ces cartes échouerait ;
-//   — leurs fichiers pèsent 2 Mo, soit dix fois trop pour une vignette ;
-//   — et une source distante peut disparaître ou changer d'adresse.
+//   - leurs fichiers pèsent 2 Mo, soit dix fois trop pour une vignette ;
+//   - et une source distante peut disparaître ou changer d'adresse.
 //
-// Licence : CC BY-NC-SA 3.0. Le crédit est obligatoire — il est affiché
-// dans le pied de page du site — et l'usage doit rester non commercial.
+// Licence : CC BY-NC-SA 3.0. Le crédit est obligatoire : il est affiché
+// dans le pied de page du site, et l'usage doit rester non commercial.
 // L'outil écrit aussi la liste de ce qu'il a pris, pour que ce crédit soit
 // justifiable sans fouiller un journal d'exécution.
 //
@@ -58,8 +58,8 @@ if(!releve.complet)
 
 const extensions = JSON.parse(await readFile('donnees/physique/extensions.json', 'utf8'));
 
-// Leurs noms de série contre les nôtres. Ils concordent de près — « Set de
-// Base », « Jungle », « Gym Heroes » — mais pas au caractère : on compare
+// Leurs noms de série contre les nôtres. Ils concordent de près : « Set de
+// Base », « Jungle », « Gym Heroes », mais pas au caractère : on compare
 // des formes aplaties, sans accents ni ponctuation.
 const leurs = new Map(Object.keys(releve.series).map(nom => [aplatir(nom), nom]));
 
@@ -91,7 +91,7 @@ const aDeja = id => ['.webp', '.png', '.jpg', '.jpeg']
 // On ne prend QUE les cartes qui en ont besoin. Sans cette restriction,
 // l'outil voulait 6 874 visuels au lieu des 1 603 demandés : il prenait
 // toute carte dont Poképédia a une image et dont nous n'avons pas de
-// fichier local — y compris celles dont le visuel français de TCGdex
+// fichier local, y compris celles dont le visuel français de TCGdex
 // fonctionne déjà. Remplacer une image qui marche n'apporte rien et
 // alourdit le dépôt pour rien.
 //
@@ -126,7 +126,7 @@ console.log(`${aViser.size} extensions à viser, d'après la mesure du ` +
 // Et dans ces extensions, carte par carte : l'adresse française de TCGdex
 // répond-elle ? Une extension « à trous » en a par définition qui vont
 // bien. Mesurer plutôt que supposer, même au prix de quelques milliers de
-// requêtes en tête — qui ne téléchargent aucune image.
+// requêtes en tête : qui ne téléchargent aucune image.
 async function visuelFrancaisManque(carte){
   if(!/^https?:/.test(carte.image ?? '')) return true;
   try{
@@ -175,7 +175,7 @@ console.log(`${horsCible} extensions écartées : leurs visuels français vont b
 console.log(`${sansSerie.length} des extensions visées n'ont pas d'équivalent de nom chez eux.`);
 console.log(`${dejaBon} cartes écartées : leur visuel français répond déjà.`);
 if(bonnesParExtension.size){
-  console.log('  réparties ainsi — à comparer avec la mesure de couverture,');
+  console.log('  réparties ainsi : à comparer avec la mesure de couverture,');
   console.log('  qui annonce certaines de ces extensions comme totalement muettes :');
   for(const [id, n] of [...bonnesParExtension].sort((a,b) => b[1]-a[1]).slice(0, 20)){
     const muette = bilan.muettes.restantes.some(m => m.id === id);

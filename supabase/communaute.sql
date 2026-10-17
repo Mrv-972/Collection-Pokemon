@@ -67,7 +67,7 @@ alter table profils drop column if exists pref_notif_email,
 
 -- --- 2. avis après un échange -------------------------------------------------
 -- Un avis par membre et par partenaire, modifiable. Seul celui qui a
--- réellement discuté avec l'autre — un message envoyé de chaque côté — peut
+-- réellement discuté avec l'autre (un message envoyé de chaque côté) peut
 -- en donner un : sans cette règle, n'importe qui pourrait noter n'importe
 -- qui.
 create table if not exists avis (
@@ -343,7 +343,7 @@ $$;
 grant execute on function profil_public(uuid) to authenticated;
 
 -- --- 6. liste de souhaits partageable -----------------------------------------
--- Lisible sans compte, par quiconque a le lien : c'est le but — l'envoyer
+-- Lisible sans compte, par quiconque a le lien : c'est le but : l'envoyer
 -- sur Discord ou à un ami. Elle ne montre que ce que le membre a choisi de
 -- partager (cartes recherchées et échangeables), et rien du tout sans le
 -- bon jeton.

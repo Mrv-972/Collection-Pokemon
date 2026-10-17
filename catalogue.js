@@ -8,9 +8,9 @@
 //
 // C'est ce qui permet aux deux univers d'avoir chacun le sien :
 //
-//   — le jeu physique reste sur TCGdex, qui le suit de près (le dépôt reçoit
+//   - le jeu physique reste sur TCGdex, qui le suit de près (le dépôt reçoit
 //     des contributions chaque semaine) ;
-//   — l'application passe sur le jeu de données de flibustier, parce que
+//   - l'application passe sur le jeu de données de flibustier, parce que
 //     TCGdex a cessé de mettre Pocket à jour après le 26 février 2026, soit
 //     sept extensions de retard.
 //
@@ -21,8 +21,8 @@
 //   carte     : { id, localId, name, rarity, dexId, image, imageHaute }
 //
 // « image » est une adresse complète et utilisable telle quelle. Les
-// sources n'ont pas les mêmes conventions — TCGdex demande qu'on ajoute la
-// taille voulue au bout, l'autre non — et c'est précisément le genre de
+// sources n'ont pas les mêmes conventions : TCGdex demande qu'on ajoute la
+// taille voulue au bout, l'autre non, et c'est précisément le genre de
 // détail que les pages n'ont pas à connaître.
 
 // ------------------------------------------------------- utilitaires ----
@@ -59,7 +59,7 @@ async function lireJson(adresses, cle){
 const TCGDEX = 'https://api.tcgdex.net/v2';
 
 // Le jeu de données français est incomplet : vingt et une extensions
-// n'existent que dans sa version anglaise — Gym Heroes, Legendary
+// n'existent que dans sa version anglaise : Gym Heroes, Legendary
 // Collection, Team Rocket Returns, Arceus... Les faire disparaître du
 // classeur parce que personne ne les a traduites serait absurde.
 async function extensionsTcgdex(){
@@ -221,7 +221,7 @@ const sourcePocket = {
       POCKET_DONNEES.map(base => `${base}/sets.json`),
       'pokeclasseur_pocket_sets');
     const liste = [];
-    // Le fichier est rangé par série — « A », « B » — ce qui est justement
+    // Le fichier est rangé par série (« A », « B ») ce qui est justement
     // le découpage que le catalogue affiche.
     for(const [lettre, extensions] of Object.entries(parSerie)){
       extensions.forEach(s => liste.push({
@@ -275,7 +275,7 @@ const sourcePocket = {
 // reste Léviator.
 //
 // La méthode a ses limites, et il faut les connaître : une carte de
-// Dresseur ne correspond à aucun Pokémon — c'est voulu — et une forme
+// Dresseur ne correspond à aucun Pokémon (c'est voulu) et une forme
 // régionale ou une appellation inhabituelle peut ne pas être reconnue. Elle
 // est donc inexacte par construction, là où TCGdex était exact.
 
@@ -309,7 +309,7 @@ function dexDuNomDeCarte(nom){
 
   // Le nom complet ne tombe pas juste : on rogne. D'abord ce que le jeu de
   // cartes ajoute autour (« ex », « Méga- »), puis, mot à mot depuis la fin,
-  // ce que le jeu vidéo ajoute — « Noadkoko d'Alola », « Motisma Tonte »,
+  // ce que le jeu vidéo ajoute : « Noadkoko d'Alola », « Motisma Tonte »,
   // « Palkia Forme Originelle » désignent tous un Pokémon du Pokédex.
   const mots = String(nom).split(/[\s\u00A0-]+/).filter(Boolean);
   for(let garde = mots.length; garde >= 1; garde--){
@@ -352,7 +352,7 @@ async function lireInstantane(chemin){
   return r.json();
 }
 
-// Sert à distinguer « ce Pokémon n'a aucune carte » — une réponse, donc —
+// Sert à distinguer « ce Pokémon n'a aucune carte » : une réponse, donc :
 // de « l'instantané n'existe pas », qui appelle un repli.
 async function instantaneDisponible(){
   const cle = universActuel().cle;
@@ -419,13 +419,13 @@ async function cartesDuPokemonBrutes(dexId){
 // Une correction prend effet tout de suite, sans attendre la construction
 // nocturne : elle se pose par-dessus l'instantané, au moment de l'affichage.
 // La nuit suivante, la construction l'absorbe dans les fichiers du dépôt et
-// la correction devient redondante — elle s'applique alors sur une donnée
+// la correction devient redondante : elle s'applique alors sur une donnée
 // déjà identique, donc ne change plus rien.
 //
 // On interroge la base sans la bibliothèque Supabase : une seule requête de
 // lecture, sur une table publique, ne justifie pas de charger 100 Ko de
 // code sur chaque page. Et le catalogue doit rester utilisable si la base
-// est injoignable — une correction en moins n'est pas une page cassée.
+// est injoignable : une correction en moins n'est pas une page cassée.
 // ======================================================================
 
 const CLE_CORRECTIONS = 'pokeclasseur-corrections';
@@ -607,8 +607,8 @@ async function cartesDuPokemon(dexId){
   return corrigerCartes(await cartesDuPokemonBrutes(dexId));
 }
 
-// Les cartes qui ne sont pas des Pokémon — Supporters, Objets, Outils,
-// Stades, Énergies — sont rangées par nom dans l'instantané, comme celles
+// Les cartes qui ne sont pas des Pokémon : Supporters, Objets, Outils,
+// Stades, Énergies : sont rangées par nom dans l'instantané, comme celles
 // d'un Pokémon le sont par son numéro : un index, puis un fichier par nom.
 // Sans instantané, pas de rangement : la liste est simplement vide.
 async function listerAutresCartes(){

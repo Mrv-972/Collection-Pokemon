@@ -6,14 +6,14 @@
 // ne relie les deux a priori, et deviner serait la cinquième erreur de la
 // soirée. Mais deux choses sont vraies :
 //
-//   — leurs adresses portent le NOM FRANÇAIS de la carte en fin de nom de
+//   - leurs adresses portent le NOM FRANÇAIS de la carte en fin de nom de
 //     fichier (…-fr-001-me055-30e-anniversaire-noeunoeuf.webp) ;
-//   — notre instantané porte ce même nom, pour le même numéro.
+//   - notre instantané porte ce même nom, pour le même numéro.
 //
 // On apparie donc sur les faits : pour chaque code chez eux, on regarde
 // quelle extension de chez nous place les MÊMES noms aux MÊMES numéros.
 // Un appariement n'est retenu que s'il est à la fois net et sans
-// concurrent sérieux — mieux vaut un code non apparié qu'un faux.
+// concurrent sérieux : mieux vaut un code non apparié qu'un faux.
 //
 //   node outils/apparier-pkmcards.mjs [--releve donnees/visuels-pkmcards.json]
 //                                     [--instantane donnees] [--sortie donnees]
@@ -46,7 +46,7 @@ const releve = JSON.parse(await readFile(releveChemin, 'utf8'));
 // c'est le nom de l'extension, puis celui de la carte. Ainsi
 //   …-30c-fr-001-me055-30e-anniversaire-noeunoeuf.webp
 // porte « me055-30e-anniversaire » avant « noeunoeuf ». Comparer le tout
-// à « Nœunœuf » ne pouvait rien donner — et ne donnait rien.
+// à « Nœunœuf » ne pouvait rien donner, et ne donnait rien.
 //
 // Ce préfixe est constant à l'intérieur d'un même code. On le DÉTECTE donc,
 // en prenant le plus long début commun à toutes les cartes du code, plutôt

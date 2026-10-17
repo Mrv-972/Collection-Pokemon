@@ -27,7 +27,7 @@ une API pendant que le visiteur attend. Il est reconstruit chaque nuit par
 
 Les visuels des cartes ne sont pas copiés ici : ils restent chez leurs
 hébergeurs. C'est la seule dépendance que le site garde au moment de
-l'affichage, et la seule qu'on ne peut pas raisonnablement supprimer —
+l'affichage, et la seule qu'on ne peut pas raisonnablement supprimer :
 il y en a plus de vingt-cinq mille.
 
 ## Reconstruire à la main

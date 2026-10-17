@@ -3,7 +3,7 @@
 //
 // La sonde précédente a conclu « PAS TROUVÉ » pour nos six trous. Ce
 // n'était pas un verdict sur Pokécardex, c'était mon outil qui était
-// cassé : leurs liens de série n'ont AUCUN texte — ce sont des vignettes —
+// cassé : leurs liens de série n'ont AUCUN texte : ce sont des vignettes :
 // donc je comparais des noms à du vide. Troisième fois aujourd'hui que je
 // prends un outil défaillant pour une absence de données.
 //

@@ -1,6 +1,6 @@
 # Dos de carte
 
-`dos.webp` — le dos des cartes du jeu Pokémon, affiché dans la vue livre des
+`dos.webp` : le dos des cartes du jeu Pokémon, affiché dans la vue livre des
 classeurs sur les pages de verso.
 
 Ramené à 500 px de large et réencodé en WebP : la plus grande case d'un

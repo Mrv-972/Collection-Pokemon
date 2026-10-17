@@ -5,7 +5,7 @@
 //
 // Sept extensions sur huit ont livré leurs visuels français. La huitième,
 // P-B, résiste : cinq graphies de son dossier répondent 400, y compris en
-// anglais — ce n'est donc pas la traduction qui manque, c'est leur nom
+// anglais : ce n'est donc pas la traduction qui manque, c'est leur nom
 // d'extension qu'on ne devine pas.
 //
 // Plutôt qu'une sixième supposition, on pose la question à leur propre point
@@ -119,7 +119,7 @@ async function comparerLesPromos(base, cle){
 }
 
 // Les symboles de rareté affichés aujourd'hui sont des caractères
-// typographiques — « ◆◆◆ », « ♛ » — qui approchent l'idée sans être les
+// typographiques (« ◆◆◆ », « ♛ ») qui approchent l'idée sans être les
 // vraies icônes du jeu. Le wiki en sert de vraies, sous
 // /icons/card-rarity/<code>.png. Reste à savoir quels codes existent : on les
 // lit dans les cartes elles-mêmes, puis on vérifie que l'icône répond.
@@ -173,7 +173,7 @@ async function principal(){
   console.log(`  point d'entrée : ${base}`);
   console.log(cle
     ? `  clé d'accès    : trouvée (non affichée, volontairement)\n`
-    : `  clé d'accès    : aucune trouvée — on demande sans, le point d'entrée est peut-être ouvert\n`);
+    : `  clé d'accès    : aucune trouvée : on demande sans, le point d'entrée est peut-être ouvert\n`);
 
   for(const [chemin, corps] of [
     ['/cards', {}],

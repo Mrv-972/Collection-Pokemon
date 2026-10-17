@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-33av"></script>
-<title>Discussions — PokéClasseur</title>
+<script src="theme.js?v=2026-10-17-4gr7"></script>
+<title>Discussions - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -96,7 +96,7 @@
      quatre libellés ne tiennent plus côte à côte.
 
      Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable — en bas de
+     et porte les commandes à une hauteur tactile confortable : en bas de
      42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
@@ -147,15 +147,15 @@
   <footer data-note="Les discussions ne sont lisibles que par leurs deux participants."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-17-33av"></script>
-<script src="supabase-config.js?v=2026-10-17-33av"></script>
-<script src="pied.js?v=2026-10-17-33av"></script>
-<script src="admin.js?v=2026-10-17-33av"></script>
-<script src="admin-site.js?v=2026-10-17-33av"></script>
-<script src="tags.js?v=2026-10-17-33av"></script>
-<script src="compte.js?v=2026-10-17-33av"></script>
-<script src="messagerie.js?v=2026-10-17-33av"></script>
-<script src="communaute.js?v=2026-10-17-33av"></script>
+<script src="univers.js?v=2026-10-17-4gr7"></script>
+<script src="supabase-config.js?v=2026-10-17-4gr7"></script>
+<script src="pied.js?v=2026-10-17-4gr7"></script>
+<script src="admin.js?v=2026-10-17-4gr7"></script>
+<script src="admin-site.js?v=2026-10-17-4gr7"></script>
+<script src="tags.js?v=2026-10-17-4gr7"></script>
+<script src="compte.js?v=2026-10-17-4gr7"></script>
+<script src="messagerie.js?v=2026-10-17-4gr7"></script>
+<script src="communaute.js?v=2026-10-17-4gr7"></script>
 <script>
 const params = new URLSearchParams(window.location.search);
 const membreDemande = params.get('membre'); // conversation à ouvrir d'emblée
@@ -365,7 +365,7 @@ async function supprimer(){
     `Supprimer la discussion avec ${conv.pseudo} ?\n\n`
     + `Elle quittera ta liste et tu n'en verras plus les messages.\n\n`
     + `${conv.pseudo} gardera la sienne : on ne peut pas effacer ce qu'on a déjà envoyé à quelqu'un. `
-    + `Si cette personne t'écrit à nouveau, la discussion reviendra — avec les nouveaux messages seulement.`
+    + `Si cette personne t'écrit à nouveau, la discussion reviendra, avec les nouveaux messages seulement.`
   )) return;
 
   try{

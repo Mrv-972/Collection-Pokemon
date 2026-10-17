@@ -14,6 +14,7 @@
 // répondent toujours.
 
 import { readFile, writeFile } from 'node:fs/promises';
+import { sansTiretPartout } from './typographie.mjs';
 
 const i = process.argv.indexOf('--sortie');
 const SORTIE = i > 0 ? process.argv[i + 1] : 'donnees';
@@ -88,7 +89,7 @@ if(articles.length < 5){
   console.error('Moins de cinq articles : les sources ont changé ? Fichier non modifié.');
   process.exit(1);
 }
-await writeFile(`${SORTIE}/actualites.json`, JSON.stringify({ majLe: new Date().toISOString(), articles }, null, 1) + '\n');
+await writeFile(`${SORTIE}/actualites.json`, JSON.stringify(sansTiretPartout({ majLe: new Date().toISOString(), articles }), null, 1) + '\n');
 console.log(`\n${articles.length} articles retenus, du ${articles.at(-1).date.slice(0, 10)} au ${articles[0].date.slice(0, 10)}`);
 articles.slice(0, 8).forEach(a => console.log(`  · [${a.source}] ${a.titre}`));
 

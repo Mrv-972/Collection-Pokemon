@@ -2,10 +2,10 @@
 // ===========================================
 //
 // C'est LA question qui décide de tout. Mesuré jusqu'ici :
-//   — /series n'annonce que 30 séries, et refuse toute pagination
+//   - /series n'annonce que 30 séries, et refuse toute pagination
 //     (?page=, ?p=, ?tout=1, ?all=1, ?limit=500 : les 30 mêmes) ;
-//   — /cards porte 38 liens de listes ;
-//   — /cards?q=... répond 200 mais rend les 30 cartes habituelles.
+//   - /cards porte 38 liens de listes ;
+//   - /cards?q=... répond 200 mais rend les 30 cartes habituelles.
 //
 // Si ces 30 séries sont les 30 plus récentes, PkmCards ne peut pas combler
 // nos extensions muettes, qui sont anciennes. Mieux vaut le savoir

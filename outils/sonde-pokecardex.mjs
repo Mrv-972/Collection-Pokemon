@@ -11,7 +11,7 @@
 // kits du dresseur, McDonald's, promos.
 //
 // La sonde ne suppose rien de leur structure. Elle regarde, dans l'ordre :
-//   1. ce que robots.txt autorise — une piste close se referme ici ;
+//   1. ce que robots.txt autorise : une piste close se referme ici ;
 //   2. par où l'on entre : leurs pages de séries ;
 //   3. à quoi ressemble une page de série, et où sont ses images ;
 //   4. si leur serveur autorise l'affichage chez nous (CORS), sans quoi le

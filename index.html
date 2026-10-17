@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-33av"></script>
-<title>PokéClasseur — le classeur qui échange pour toi</title>
+<script src="theme.js?v=2026-10-17-4gr7"></script>
+<title>PokéClasseur, le classeur qui échange pour toi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -31,7 +31,7 @@
   a{color:inherit}
   /* La barre du haut se lit comme sur les autres pages : le lien du compte
      y remplace un bouton, qui n'était pas souligné. La règle s'arrête à la
-     barre — ailleurs, un lien souligné se voit, et c'est ce qu'on veut. */
+     barre : ailleurs, un lien souligné se voit, et c'est ce qu'on veut. */
   nav a{text-decoration:none}
   .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
   @media(max-width:640px){.wrap{padding:0 20px}}
@@ -76,7 +76,7 @@
   .section-head h2{font-size:32px;}
   .section-head p{color:var(--text-on-ink-dim);margin-top:14px;font-size:16px;}
 
-  /* how it works — real sequence, numbered legitimately */
+  /* how it works : real sequence, numbered legitimately */
   .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;}
   @media(max-width:760px){.steps{grid-template-columns:1fr}}
   .step{border-left:1px solid rgba(var(--trait-rgb),0.15);padding-left:20px;}
@@ -118,7 +118,7 @@
      quatre libellés ne tiennent plus côte à côte.
 
      Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable — en bas de
+     et porte les commandes à une hauteur tactile confortable : en bas de
      42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
@@ -157,7 +157,7 @@
   <div class="hero">
     <div>
       <h1>Ton classeur de cartes, prêt à être échangé.</h1>
-      <p>Range ta collection Pokémon extension par extension, marque ce que tu cherches et ce que tu peux céder — PokéClasseur trouve les collectionneurs avec qui échanger, automatiquement.</p>
+      <p>Range ta collection Pokémon extension par extension, marque ce que tu cherches et ce que tu peux céder : PokéClasseur trouve les collectionneurs avec qui échanger, automatiquement.</p>
       <div class="hero-actions">
         <a class="cta-btn" href="series.html">Créer mon classeur</a>
         <a class="link-quiet" href="series.html">Voir une collection type</a>
@@ -191,7 +191,7 @@
       <div class="step">
         <div class="num">1</div>
         <h3>Range ta collection</h3>
-        <p>Ajoute tes cartes par extension, comme dans un vrai classeur — recherche rapide par nom ou numéro.</p>
+        <p>Ajoute tes cartes par extension, comme dans un vrai classeur, avec une recherche rapide par nom ou numéro.</p>
       </div>
       <div class="step">
         <div class="num">2</div>
@@ -245,14 +245,14 @@
   <footer></footer>
 </div>
 
-<script src="sets.js?v=2026-10-17-33av"></script>
-<script src="univers.js?v=2026-10-17-33av"></script>
-<script src="catalogue.js?v=2026-10-17-33av"></script>
-<script src="supabase-config.js?v=2026-10-17-33av"></script>
-<script src="pied.js?v=2026-10-17-33av"></script>
-<script src="admin.js?v=2026-10-17-33av"></script>
-<script src="admin-site.js?v=2026-10-17-33av"></script>
-<script src="compte.js?v=2026-10-17-33av"></script>
+<script src="sets.js?v=2026-10-17-4gr7"></script>
+<script src="univers.js?v=2026-10-17-4gr7"></script>
+<script src="catalogue.js?v=2026-10-17-4gr7"></script>
+<script src="supabase-config.js?v=2026-10-17-4gr7"></script>
+<script src="pied.js?v=2026-10-17-4gr7"></script>
+<script src="admin.js?v=2026-10-17-4gr7"></script>
+<script src="admin-site.js?v=2026-10-17-4gr7"></script>
+<script src="compte.js?v=2026-10-17-4gr7"></script>
 <script>
 // Les dernières extensions de l'univers courant, avec leurs vrais noms.
 // Les nommer en dur voulait dire les retaper à chaque sortie, et inventer
@@ -279,7 +279,7 @@ async function chargerVedettes(){
 }
 
 // Charge de vraies cartes depuis l'API publique et gratuite TCGdex (images
-// hébergées par eux, pas par ce prototype — voir https://tcgdex.dev).
+// hébergées par eux, pas par ce prototype : voir https://tcgdex.dev).
 async function loadHeroCards(){
   const slotsEl = document.getElementById('hero-slots');
   const tags = ['rech', null, 'ech', null, 'ech', 'rech']; // démo de tagging

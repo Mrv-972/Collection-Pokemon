@@ -5,7 +5,7 @@
 // cartes n'ont aucun visuel français, toutes sources essayées et langue lue
 // sur l'image. Reste à savoir POURQUOI : la carte n'a jamais été imprimée en
 // français, ou son scan français manque seulement à nos sources ? Les deux
-// ne méritent pas le même bandeau — écrire « n'existe pas en français » sur
+// ne méritent pas le même bandeau : écrire « n'existe pas en français » sur
 // une carte qui existe serait faux.
 //
 // L'indice : le nom que TCGdex connaît. Sa base française donne un nom
@@ -13,11 +13,11 @@
 // anglais (« Blaine's Charizard », « Special Delivery Bidoof »), c'est
 // qu'elle ne connaît pas d'édition française.
 //
-//   — « sans édition française » : aucun visuel français ET nom anglais,
+//   - « sans édition française » : aucun visuel français ET nom anglais,
 //     ou carte d'une extension dont la plupart des cartes sont dans ce cas
-//     (Gym Heroes…) — sauf si au moins trois cartes de cette extension ont
+//     (Gym Heroes…) : sauf si au moins trois cartes de cette extension ont
 //     été lues en français sur leur image : elle existe alors en français ;
-//   — « visuel anglais » : aucun visuel français, mais un nom français —
+//   - « visuel anglais » : aucun visuel français, mais un nom français :
 //     la carte existe, seul son scan nous manque. On montre l'image
 //     anglaise en le disant.
 //
@@ -83,7 +83,7 @@ for(const [ext, e] of Object.entries(verdict.extensions)){
   const jugees = concernees.filter(c => c.langueNom !== '?');
   const serieAuxNomsAnglais = concernees.length >= cartes.length / 2 && jugees.length >= 3 &&
     jugees.filter(c => c.langueNom === 'en').length / jugees.length >= SERIE_ANGLAISE;
-  // Platine : Arceus — noms anglais chez TCGdex, scans anglais presque
+  // Platine : Arceus : noms anglais chez TCGdex, scans anglais presque
   // partout, mais AR1 à AR9 lues en français : l'extension existe en
   // français, il ne manque que des scans. Ses noms anglais ne prouvent
   // alors rien, ni pour l'extension ni pour ses cartes.

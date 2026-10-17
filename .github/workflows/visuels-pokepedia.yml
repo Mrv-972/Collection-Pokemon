@@ -1,7 +1,7 @@
 # Relève l'index de Poképédia, puis copie les visuels manquants dans le dépôt.
 #
 # Le relevé ne touche que du texte. La copie télécharge des images, les
-# réduit, et les dépose dans images/cards — où l'instantané les ramasse
+# réduit, et les dépose dans images/cards : où l'instantané les ramasse
 # tout seul au passage suivant.
 #
 # Licence CC BY-NC-SA 3.0 : le crédit est affiché dans le pied de page du
@@ -70,7 +70,7 @@ jobs:
               echo "déposé."
               exit 0
             fi
-            echo "dépôt refusé (tentative $essai) — on reprend la branche et on réessaie."
+            echo "dépôt refusé (tentative $essai) : on reprend la branche et on réessaie."
             sleep $((essai * 5))
           done
           echo "::error::dépôt impossible après cinq tentatives."

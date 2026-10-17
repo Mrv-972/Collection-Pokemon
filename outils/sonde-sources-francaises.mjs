@@ -66,7 +66,7 @@ function lireRobots(texte){
 
 for(const c of CANDIDATS){
   console.log(`\n${'='.repeat(60)}`);
-  console.log(`${c.nom}  —  ${c.hote}`);
+  console.log(`${c.nom}  :  ${c.hote}`);
   console.log(c.note);
   console.log('='.repeat(60));
 
@@ -77,7 +77,7 @@ for(const c of CANDIDATS){
     for(const i of interdits.slice(0, 12)) console.log(`   interdit : ${i}`);
     if(interdits.includes('/')) console.log('   >>> TOUT LE SITE EST INTERDIT aux programmes <<<');
   }else{
-    console.log(`robots.txt : ${robots.code} — aucune règle publiée`);
+    console.log(`robots.txt : ${robots.code} : aucune règle publiée`);
   }
 
   for(const page of c.pages){

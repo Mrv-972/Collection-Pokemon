@@ -7,7 +7,7 @@ le donne.
 
 ## À faire une fois, avant tout
 
-**1. Fermer une faille — à faire en premier.** Ouvre l'éditeur SQL de
+**1. Fermer une faille : à faire en premier.** Ouvre l'éditeur SQL de
 Supabase, colle le contenu de **`supabase/securite-profils.sql`**, et
 exécute.
 
@@ -40,7 +40,7 @@ pour de bon : la base refuse ce changement à tout autre que l'éditeur SQL.
 ## Les deux environnements
 
 **Un membre ou un visiteur** ne voit rien de changé. Le site lui pose une
-seule question à la base — « suis-je administrateur ? » — reçoit « non », et
+seule question à la base (« suis-je administrateur ? ») reçoit « non », et
 s'arrête là : aucun bouton, aucun outil, aucun code supplémentaire.
 
 **Toi**, une fois connecté, tu vois en bas de l'écran une barre
@@ -131,7 +131,7 @@ minutes, huit réponses par tranche de deux minutes).
 **Modérer.** Connecté en administrateur, ouvre un sujet : un bandeau
 « ◆ Modération » propose de l'**épingler** (il reste en tête de liste), de le
 **verrouiller** (plus de réponses) et, pour une idée, de régler son
-**avancement** — Proposée, À l'étude, Prévue, Réalisée, Écartée. Tu peux
+**avancement** : Proposée, À l'étude, Prévue, Réalisée, Écartée. Tu peux
 aussi **supprimer** n'importe quel sujet ou réponse. Les messages signalés
 arrivent dans le tiroir, onglet **Signalements**, avec un lien vers le sujet
 et un bouton pour supprimer le contenu.
@@ -210,7 +210,7 @@ laisse au journal une trace que tu ne peux pas effacer.
 
 ## Limites assumées
 
-- **Les champs corrigibles sont une liste fermée** — nom, rareté, Pokémon
+- **Les champs corrigibles sont une liste fermée** : nom, rareté, Pokémon
   rattaché pour une carte ; nom, série, date pour une extension. Une saisie
   ne peut pas remplacer l'identifiant d'une carte, ce qui la détacherait des
   collections des membres.

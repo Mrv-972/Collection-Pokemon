@@ -9,7 +9,7 @@ où s'afficher.
 ## Comment faire
 
 Ouvre `extensions-manuelles.json` et écris dedans. Le fichier contient un
-tableau — les crochets `[ ]` — et chaque extension est une fiche entre
+tableau (les crochets `[ ]`) et chaque extension est une fiche entre
 accolades `{ }`.
 
 ```json

@@ -1,4 +1,4 @@
--- Espace d'administration — À EXÉCUTER SEUL
+-- Espace d'administration : À EXÉCUTER SEUL
 --
 -- Ce fichier ne contient QUE les ajouts liés à l'espace d'administration.
 -- Le reste du schéma est déjà en place dans ta base : inutile de le rejouer,
@@ -17,8 +17,8 @@
 -- Espace d'administration
 --
 -- Le catalogue vient de sources extérieures, puis d'un instantané figé dans
--- le dépôt. Quand une source se trompe — nom mal traduit, rareté fausse,
--- carte absente, visuel anglais — il faut pouvoir corriger sans attendre la
+-- le dépôt. Quand une source se trompe : nom mal traduit, rareté fausse,
+-- carte absente, visuel anglais : il faut pouvoir corriger sans attendre la
 -- prochaine construction.
 --
 -- Une correction saisie ici prend effet immédiatement sur le site, puis la
@@ -33,7 +33,7 @@
 -- ATTENTION : ce fichier seul ne suffit pas à empêcher un compte de se
 -- promouvoir. La règle « chacun modifie son profil » filtre des lignes, pas
 -- des colonnes, et Supabase accorde par défaut l'écriture de toutes les
--- colonnes. C'est supabase/securite-profils.sql qui ferme cette porte —
+-- colonnes. C'est supabase/securite-profils.sql qui ferme cette porte :
 -- droits ramenés aux colonnes utiles, et déclencheur sur « est_admin ».
 --
 --   update profils set est_admin = true where pseudo = 'TonPseudo';
@@ -49,7 +49,7 @@ alter table profils add column if not exists est_admin boolean not null default 
 
 -- La fonction est appelée par les règles d'accès ci-dessous. Elle est
 -- « security definer » parce qu'elle doit lire profils sans être soumise
--- elle-même aux règles de lecture de profils — sinon la règle s'appellerait
+-- elle-même aux règles de lecture de profils, sinon la règle s'appellerait
 -- elle-même sans fin.
 create or replace function est_admin()
 returns boolean
@@ -88,7 +88,7 @@ create table if not exists corrections (
 alter table corrections enable row level security;
 
 -- Lecture ouverte à tous, y compris aux visiteurs non connectés. Ce sont des
--- données de catalogue — un nom de carte, une rareté, un visuel — déjà
+-- données de catalogue (un nom de carte, une rareté, un visuel) déjà
 -- publiques par nature. La construction nocturne les lit aussi, sans compte.
 drop policy if exists "corrections lisibles par tous" on corrections;
 create policy "corrections lisibles par tous"

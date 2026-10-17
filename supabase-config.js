@@ -3,7 +3,7 @@
 // Ces deux valeurs sont conçues pour être publiques et figurer dans le code
 // d'un site : elles ne donnent accès à rien par elles-mêmes. Ce sont les
 // règles d'accès (RLS) définies dans supabase/schema.sql qui protègent les
-// données — sans elles, cette clé suffirait à tout lire et tout modifier.
+// données, sans elles, cette clé suffirait à tout lire et tout modifier.
 // Ne mets JAMAIS ici la clé "service_role" (ni une clé "sb_secret_"), qui
 // contourne justement ces règles.
 

@@ -5,9 +5,9 @@
 // Poképédia n'est pas un catalogue de cartes. Restent deux pistes, qu'on
 // examine de près, toujours sans rien récolter :
 //
-//   — pokemon.com, l'ayant droit, qui sert des visuels sous « cms-fr-fr »
+//   - pokemon.com, l'ayant droit, qui sert des visuels sous « cms-fr-fr »
 //     avec NOS identifiants d'extension ;
-//   — pkmcards.fr, qui sert des scans français sous « static.pkmcards.fr ».
+//   - pkmcards.fr, qui sert des scans français sous « static.pkmcards.fr ».
 //
 // Les deux questions : l'adresse d'une CARTE se devine-t-elle, et nos
 // extensions vides y sont-elles ?
@@ -36,7 +36,7 @@ const liens = corps => [...new Set((corps.match(/href="([^"]+)"/g) ?? [])
 
 // ---------------------------------------------------- Pokémon officiel ---
 console.log('='.repeat(64));
-console.log('Pokémon officiel — les cartes suivent-elles une adresse régulière ?');
+console.log('Pokémon officiel : les cartes suivent-elles une adresse régulière ?');
 console.log('='.repeat(64));
 
 // La recherche de cartes du site officiel, en français.
@@ -68,7 +68,7 @@ for(const id of MUETTES){
 
 // ----------------------------------------------------------- PkmCards ---
 console.log('\n' + '='.repeat(64));
-console.log('PkmCards — nos extensions vides y sont-elles, et avec quels visuels ?');
+console.log('PkmCards : nos extensions vides y sont-elles, et avec quels visuels ?');
 console.log('='.repeat(64));
 
 const liste = await lire('https://www.pkmcards.fr/cards/liste-cartes-francaises');

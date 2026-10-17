@@ -1,5 +1,5 @@
 -- ==========================================================================
--- PokéClasseur — administration des comptes
+-- PokéClasseur : administration des comptes
 -- ==========================================================================
 --
 -- À exécuter une fois dans l'éditeur SQL de Supabase
@@ -120,8 +120,8 @@ grant execute on function public.admin_liste_comptes() to authenticated;
 -- messages, les blocages, les signalements et les lectures.
 --
 -- Deux garde-fous :
---   — seul un administrateur peut appeler la fonction ;
---   — un administrateur ne peut pas se supprimer lui-même par ce chemin.
+--   - seul un administrateur peut appeler la fonction ;
+--   - un administrateur ne peut pas se supprimer lui-même par ce chemin.
 --     Ce n'est pas de la prudence excessive : c'est le seul cas où l'erreur
 --     coûterait l'accès à l'administration, sans moyen de revenir en arrière.
 --     La page du compte reste là pour qui veut vraiment partir.
@@ -177,7 +177,7 @@ grant execute on function public.admin_supprimer_compte(uuid, text) to authentic
 --   select pseudo, email, inscrit_le from admin_liste_comptes();
 --
 -- Avec un compte ordinaire, la même requête doit échouer sur
--- « Réservé aux administrateurs. » — c'est le résultat attendu.
+-- « Réservé aux administrateurs. » : c'est le résultat attendu.
 
 notify pgrst, 'reload schema';
 
@@ -193,12 +193,12 @@ notify pgrst, 'reload schema';
 --
 -- Cet accès est donc possible, et strictement encadré :
 --
---   — il est réservé à l'administrateur ;
---   — il exige un motif écrit, d'au moins dix caractères : on ne lit pas une
+--   - il est réservé à l'administrateur ;
+--   - il exige un motif écrit, d'au moins dix caractères : on ne lit pas une
 --     conversation « pour voir » ;
---   — chaque lecture est inscrite au journal, avec ce motif, avant que le
+--   - chaque lecture est inscrite au journal, avec ce motif, avant que le
 --     moindre message ne soit renvoyé ;
---   — le journal n'est pas modifiable, même par l'administrateur.
+--   - le journal n'est pas modifiable, même par l'administrateur.
 --
 -- Autrement dit : l'accès existe, mais il laisse une trace que son auteur ne
 -- peut pas effacer. C'est ce qui sépare un pouvoir encadré d'un pouvoir

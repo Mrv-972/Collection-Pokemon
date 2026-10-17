@@ -1,7 +1,7 @@
 # Cherche où récupérer les visuels français qui manquent encore.
 #
 # Cette action ne modifie rien : elle interroge les sources listées dans
-# outils/sources-visuels.json et affiche un rapport. C'est volontaire — une
+# outils/sources-visuels.json et affiche un rapport. C'est volontaire : une
 # source n'est allumée qu'à la main, après lecture du rapport.
 #
 # Elle existe parce qu'un serveur d'action, contrairement au navigateur qui

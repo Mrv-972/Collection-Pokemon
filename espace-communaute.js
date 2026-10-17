@@ -2,7 +2,7 @@
 // ====================
 //
 // Une seule page (communaute.html), plusieurs rubriques, choisies par
-// l'adresse — « ?r=questions », « ?sujet=12 » — pour que chaque vue se
+// l'adresse (« ?r=questions », « ?sujet=12 ») pour que chaque vue se
 // partage par un lien :
 //
 //   accueil        un aperçu de tout le reste ;
@@ -193,7 +193,7 @@ async function afficher(){
   await chargerSuivis();
   if(!encore()) return;
   const titre = RUBRIQUES.find(r => r.cle === rubrique)?.nom;
-  document.title = `${rubrique === 'accueil' ? 'Communauté' : titre + ' — Communauté'} — PokéClasseur`;
+  document.title = `${rubrique === 'accueil' ? 'Communauté' : titre + ' - Communauté'} - PokéClasseur`;
   if(p.sujet) return afficherFil(vue, Number(p.sujet), encore);
   ({
     accueil: afficherAccueil, questions: afficherListe, ameliorations: afficherListe, forums: afficherForums,
@@ -379,7 +379,7 @@ async function afficherFil(vue, id, encore){
   const rubrique = Object.keys(ESPACES).find(k => ESPACES[k].espace === s.espace);
   const moi = estConnecte() && membre.id === s.auteur_id;
   const cat = categorie(s.categorie);
-  document.title = `${s.titre} — Communauté — PokéClasseur`;
+  document.title = `${s.titre} - Communauté - PokéClasseur`;
 
   // La meilleure réponse remonte en tête, juste sous la question.
   const ordonnees = s.reponse_acceptee
@@ -604,7 +604,7 @@ async function afficherAccueil(vue, encore){
       <h1>La communauté PokéClasseur</h1>
       <p>Pose tes questions, propose tes idées pour le site, discute avec d'autres collectionneurs, et découvre
          l'origine du nom de chaque Pokémon.</p>
-      <p class="badges-annonce">🏅 Participer rapporte des badges — Bonne réponse, Idée retenue, Expert… —,
+      <p class="badges-annonce">🏅 Participer rapporte des badges (Bonne réponse, Idée retenue, Expert…),
          affichés sur ton profil.${estConnecte() ? ' <a href="connexion.html">Voir mes badges →</a>' : ''}</p>
       ${estConnecte() ? '' : '<a class="bouton-principal" href="connexion.html">Rejoindre la communauté</a>'}
     </section>
@@ -702,7 +702,7 @@ function carteAnecdote(a, { duJour = false, lienPlus = false } = {}){
       ${a.n ? `<img class="illustration" src="${artwork(a.n)}" alt="" loading="lazy" onerror="this.remove()">`
             : `<span class="illustration icone" aria-hidden="true">${theme.icone}</span>`}
       <div>
-        <p class="sur-titre">✨ ${duJour ? 'Le saviez-vous ? — l\'anecdote du jour' : 'Le saviez-vous ?'}${a.nom ? ` · ${esc(a.nom)}` : ''}</p>
+        <p class="sur-titre">✨ ${duJour ? 'Le saviez-vous ? L\'anecdote du jour' : 'Le saviez-vous ?'}${a.nom ? ` · ${esc(a.nom)}` : ''}</p>
         <p class="texte-anecdote">${gras(a.texte)}</p>
         ${a.page ? `<p class="source">Source : <a href="${pageWiki(a.page)}" target="_blank" rel="noopener">Poképédia</a>, licence CC BY-NC-SA 3.0</p>` : ''}
         ${lienPlus ? `<a class="voir-tout" href="${lien({ r: 'savoir' })}" data-interne>D'autres anecdotes →</a>` : ''}
@@ -788,9 +788,9 @@ async function afficherNoms(vue, encore, rubrique, p){
         <h2><small>n° ${String(x.n).padStart(4, '0')}</small> ${esc(x.nom)}</h2>
         <p>${x.fr ? gras(x.fr) : '<span class="vide">Pas encore d\'explication.</span>'}</p>
         ${x.en || x.ja || x.de ? `<details><summary>Dans d'autres langues</summary>
-          ${x.en ? `<p><b>Anglais</b> — ${gras(x.en)}</p>` : ''}
-          ${x.ja ? `<p><b>Japonais</b> — ${gras(x.ja)}</p>` : ''}
-          ${x.de ? `<p><b>Allemand</b> — ${gras(x.de)}</p>` : ''}</details>` : ''}
+          ${x.en ? `<p><b>Anglais</b> : ${gras(x.en)}</p>` : ''}
+          ${x.ja ? `<p><b>Japonais</b> : ${gras(x.ja)}</p>` : ''}
+          ${x.de ? `<p><b>Allemand</b> : ${gras(x.de)}</p>` : ''}</details>` : ''}
         ${recits.has(x.n) ? `<details><summary>Le saviez-vous ?</summary>
           ${recits.get(x.n).map(t => `<p>${gras(t)}</p>`).join('')}</details>` : ''}
         <a class="source" href="${pageWiki(x.page ?? x.nom)}" target="_blank" rel="noopener">Fiche Poképédia ↗</a>

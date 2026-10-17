@@ -2,7 +2,7 @@
 //
 // Trois pages obligatoires répètent les mêmes coordonnées. Les recopier
 // trois fois, c'est se garantir qu'un jour deux d'entre elles diront des
-// choses différentes — et sur ces pages-là, c'est exactement ce qu'il ne
+// choses différentes, et sur ces pages-là, c'est exactement ce qu'il ne
 // faut pas.
 //
 // ┌─────────────────────────────────────────────────────────────────────┐
@@ -14,11 +14,11 @@
 const IDENTITE = {
   // Le nom sous lequel tu publies. La loi (LCEN, article 6) permet à un
   // particulier qui édite un site à titre non professionnel de ne pas
-  // afficher son nom et son adresse au public — à condition d'avoir
+  // afficher son nom et son adresse au public : à condition d'avoir
   // communiqué son identité à l'hébergeur, qui la tient à disposition de la
   // justice. Deux possibilités, donc :
-  //   — soit tu mets ton nom complet ici ;
-  //   — soit tu mets ton pseudo, et tu coches « anonymat » ci-dessous.
+  //   - soit tu mets ton nom complet ici ;
+  //   - soit tu mets ton pseudo, et tu coches « anonymat » ci-dessous.
   nom: 'Mrv972',
   anonymat: true,
 
@@ -99,7 +99,7 @@ function remplirLesBlancs(){
 
   // Les passages qui ne valent que dans un cas se règlent d'abord : sans
   // quoi l'adresse postale, masquée par l'anonymat, serait quand même
-  // signalée « à compléter » — un trou dans une phrase que personne ne lit.
+  // signalée « à compléter » : un trou dans une phrase que personne ne lit.
   document.querySelectorAll('[data-si-anonymat]').forEach(el => {
     el.hidden = el.dataset.siAnonymat === 'oui' ? !IDENTITE.anonymat : IDENTITE.anonymat;
   });

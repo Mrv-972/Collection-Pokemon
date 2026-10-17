@@ -4,7 +4,7 @@ Affichés dans le rail latéral quand on le survole.
 
 | Fichier | Contenu | Dimensions |
 |---|---|---|
-| `tcg-physique.png` | « Pokémon — Trading Card Game » | 167 × 80 |
+| `tcg-physique.png` | « Pokémon : Trading Card Game » | 167 × 80 |
 | `tcg-pocket.png` | le même, suivi de « Pocket » | 167 × 105 |
 
 ## D'où ils viennent
@@ -22,7 +22,7 @@ transparence d'origine sont reprises telles quelles.
 
 **Une seule chose compte pour trouver ces bornes : la transparence.** Une
 première version avait tenu le blanc pour du fond, et rogné trois lignes au
-bas de « Pocket » — car ce mot, comme le bandeau, porte un contour blanc. Le
+bas de « Pocket » : car ce mot, comme le bandeau, porte un contour blanc. Le
 blanc est de l'encre ici, pas du vide.
 
 Les deux logos ont donc le même style et le même cadrage, ce qu'un logo

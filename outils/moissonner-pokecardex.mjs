@@ -3,26 +3,27 @@
 //
 // Tout ce qui suit a été mesuré, pas supposé :
 //
-//   — robots.txt autorise tout ; seul Baidu est bloqué ;
-//   — une lecture simple ne rend qu'une coquille de 159 Ko : c'est
+//   - robots.txt autorise tout ; seul Baidu est bloqué ;
+//   - une lecture simple ne rend qu'une coquille de 159 Ko : c'est
 //     Cloudflare, pas une application JavaScript. Il faut donc un vrai
 //     navigateur, qui franchit sa page de vérification ;
-//   — /series liste 249 séries sous la forme /series/<CODE> ; le code est
+//   - /series liste 249 séries sous la forme /series/<CODE> ; le code est
 //     dans l'adresse ET dans l'attribut « alt » du symbole ;
-//   — une page de série porte le nom français en <h1>, et chaque carte
+//   - une page de série porte le nom français en <h1>, et chaque carte
 //     une image dont l'adresse est de la forme
 //         pokecardex-scans.b-cdn.net/sets/<CODE>/FR/<numéro>.jpg
 //     avec « alt » valant « <nom> <numéro>/<total> » ;
-//   — ces images sont en chargement différé (loading="lazy") : sans
+//   - ces images sont en chargement différé (loading="lazy") : sans
 //     descendre dans la page, on n'en voit qu'une partie. C'est l'erreur
 //     qui m'avait fait rater dix cartes sur trente-quatre chez PkmCards ;
-//   — leur CDN répond « access-control-allow-origin: * », donc on pourra
+//   - leur CDN répond « access-control-allow-origin: * », donc on pourra
 //     pointer vers ces images sans les copier.
 //
 //   node outils/moissonner-pokecardex.mjs --sortie donnees [--series 0]
 
 import { chromium } from 'playwright';
 import { writeFile, mkdir } from 'node:fs/promises';
+import { sansTiretPartout } from './typographie.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
   a.startsWith('--') ? [a.slice(2), (t[i+1] && !t[i+1].startsWith('--')) ? t[i+1] : true] : []
@@ -30,7 +31,7 @@ const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
 
 const sortie = args.sortie ?? 'donnees';
 // 0 veut dire « toutes ». Une valeur vide serait remplacée par le défaut du
-// formulaire GitHub, et la passe « complète » s'arrêterait sans le dire —
+// formulaire GitHub, et la passe « complète » s'arrêterait sans le dire :
 // c'est arrivé avec PkmCards.
 const maxSeries = Number(args.series ?? 0) || Infinity;
 const essai = Boolean(args.essai);
@@ -45,8 +46,8 @@ const contexte = await nav.newContext({ userAgent: IDENTITE, locale: 'fr-FR',
                                         viewport: { width: 1600, height: 1200 } });
 // On laisse les images se charger, et c'est une leçon payée : refuser les
 // images pour « alléger leur serveur » a rendu ZÉRO carte sur douze
-// séries. Leur page pose deux images par carte — un fond provisoire et le
-// vrai visuel — et bloquer le second déclenche leur gestion d'erreur, qui
+// séries. Leur page pose deux images par carte : un fond provisoire et le
+// vrai visuel, et bloquer le second déclenche leur gestion d'erreur, qui
 // remet le fond provisoire à la place. L'adresse qu'on venait chercher
 // disparaissait donc à cause de l'optimisation elle-même.
 //
@@ -93,7 +94,7 @@ for(const [i, code] of retenues.entries()){
     // Leur page ne pose le vrai visuel d'une carte qu'au moment où elle
     // passe à l'écran. On descendait par bonds de deux écrans : une rangée
     // de huit cartes sur neuf n'était jamais à l'écran à l'arrêt, et
-    // manquait au relevé — les positions 33 à 40, puis 105 à 112, dans
+    // manquait au relevé : les positions 33 à 40, puis 105 à 112, dans
     // presque chaque série. 2 393 cartes, et autant de visuels français
     // qu'on croyait inexistants. Avec un pas de 60 % de l'écran, chaque
     // rangée y passe au moins une fois.
@@ -183,11 +184,11 @@ for(const [i, code] of retenues.entries()){
       // et « 0 carte sur 0 image » sont deux pannes différentes, et la
       // première m'aurait fait gagner une passe.
       console.log(`  ${code} : 0 carte retenue sur ${lu.cartes.length} images` +
-        ` — exemple : ${JSON.stringify(lu.cartes.find(c => c.src || c.dataSrc) ?? null)}`);
+        ` : exemple : ${JSON.stringify(lu.cartes.find(c => c.src || c.dataSrc) ?? null)}`);
     }
 
     if((i + 1) % 20 === 0 || i === retenues.length - 1)
-      console.log(`  ${i + 1}/${retenues.length} séries — ${totalCartes} cartes relevées`);
+      console.log(`  ${i + 1}/${retenues.length} séries : ${totalCartes} cartes relevées`);
   }catch(err){
     console.log(`  ÉCHEC ${code} : ${err.message.split('\n')[0]}`);
     sansCarte.push(code);
@@ -218,7 +219,7 @@ if(essai){
 }else{
   await mkdir(sortie, { recursive: true });
   const fichier = `${sortie}/visuels-pokecardex.json`;
-  await writeFile(fichier, JSON.stringify({
+  await writeFile(fichier, JSON.stringify(sansTiretPartout({
     source: RACINE,
     cdn: 'https://pokecardex-scans.b-cdn.net',
     releveLe: new Date().toISOString(),
@@ -231,6 +232,6 @@ if(essai){
     cartes: totalCartes,
     numerosSautes: totalTrous,
     series,
-  }, null, 1) + '\n');
+  }), null, 1) + '\n');
   console.log(`\nécrit dans ${fichier}`);
 }

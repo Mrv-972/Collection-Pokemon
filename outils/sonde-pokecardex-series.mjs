@@ -3,14 +3,14 @@
 //
 // Rectification d'une erreur à moi : je les croyais en « application
 // JavaScript » parce qu'une lecture simple ne rendait qu'une coquille de
-// 159 Ko sans un lien. C'était Cloudflare — la sonde au navigateur a
+// 159 Ko sans un lien. C'était Cloudflare : la sonde au navigateur a
 // montré un « cdn-cgi/challenge-platform », donc une page de vérification
 // anti-robot, pas une coquille vide. Avec un vrai navigateur, elle passe.
 //
 // Ce qu'on sait désormais, mesuré : robots.txt autorise tout ; les pages
 // portent de vrais liens ; les images viennent de pokecardex.b-cdn.net et
 // ce CDN répond « access-control-allow-origin: * », donc on pourrait les
-// afficher sans les copier — contrairement à Poképédia.
+// afficher sans les copier : contrairement à Poképédia.
 //
 // Reste à savoir : où sont listées les séries, comment on nomme les
 // nôtres chez eux, et à quoi ressemble l'adresse d'un visuel de carte.

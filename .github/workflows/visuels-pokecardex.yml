@@ -1,7 +1,7 @@
 # Relève l'index de Pokécardex, l'apparie à nos extensions, et dépose les deux.
 #
 # On ne copie aucune image : leur CDN répond « access-control-allow-origin: * »,
-# donc le site peut pointer vers leurs visuels directement — l'export d'un
+# donc le site peut pointer vers leurs visuels directement : l'export d'un
 # classeur partagé fonctionnera, et le dépôt n'enfle pas.
 #
 # Il faut un navigateur : une lecture simple ne rend que la page de
@@ -80,7 +80,7 @@ jobs:
               echo "déposé."
               exit 0
             fi
-            echo "dépôt refusé (tentative $essai) — on reprend la branche et on réessaie."
+            echo "dépôt refusé (tentative $essai) : on reprend la branche et on réessaie."
             sleep $((essai * 5))
           done
           echo "::error::dépôt impossible après cinq tentatives."

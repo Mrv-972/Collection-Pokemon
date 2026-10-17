@@ -8,8 +8,8 @@
 // une fois la page affichée. Reste à savoir où.
 //
 // Cet outil ne décide rien. Il ouvre une adresse et déballe ce qu'elle
-// contient — les scripts qu'elle charge, les serveurs qu'elle nomme, les
-// fichiers de données qu'elle référence — pour qu'on puisse lire, plutôt que
+// contient : les scripts qu'elle charge, les serveurs qu'elle nomme, les
+// fichiers de données qu'elle référence : pour qu'on puisse lire, plutôt que
 // deviner, la vraie source.
 //
 //   node outils/explorer.mjs --url="https://exemple.fr/cartes"
@@ -29,7 +29,7 @@ const IDENTITE = {
 const titre = t => { console.log('\n' + '─'.repeat(70)); console.log(t); console.log('─'.repeat(70)); };
 const lister = (nom, valeurs, max = 25) => {
   titre(`${nom} (${valeurs.length})`);
-  if(!valeurs.length){ console.log('  — rien —'); return; }
+  if(!valeurs.length){ console.log('  : rien -'); return; }
   valeurs.slice(0, max).forEach(v => console.log('  ' + v));
   if(valeurs.length > max) console.log(`  … et ${valeurs.length - max} autres`);
 };
@@ -77,7 +77,7 @@ async function explorer(adresse){
   ]){
     const m = texte.match(motif);
     if(m){
-      titre(`Bloc « ${nom} » — début du contenu`);
+      titre(`Bloc « ${nom} » : début du contenu`);
       console.log('  ' + m[1].trim().slice(0, 700).replace(/\n/g, '\n  '));
     }
   }
@@ -127,7 +127,7 @@ async function suivreLesScripts(adressePage, texte){
       }
     }
   }
-  if(!total) console.log('  — aucune adresse ne correspond au filtre —');
+  if(!total) console.log('  : aucune adresse ne correspond au filtre -');
 }
 
 const adresses = String(args.url ?? '').split(',').filter(Boolean);

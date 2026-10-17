@@ -3,7 +3,7 @@
 //
 // Mesuré : leur robots.txt autorise tout, mais chacune de leurs pages
 // renvoie la même coquille de 159 Ko, sans un lien ni une image. C'est une
-// application JavaScript — le contenu est construit dans le navigateur, à
+// application JavaScript : le contenu est construit dans le navigateur, à
 // partir d'une interface de données qu'il faut trouver.
 //
 // Même situation que PkmCards, et la méthode qui avait fini par marcher :

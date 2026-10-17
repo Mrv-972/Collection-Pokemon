@@ -5,7 +5,7 @@
 // même site que tout le monde, et trouve, là où il en a besoin, de quoi
 // modifier ce qu'il regarde : une carte sur sa vignette, une extension sur
 // son en-tête, le logo d'une série sur son titre. Il n'a plus jamais à
-// taper un identifiant — c'est le contexte qui le donne.
+// taper un identifiant : c'est le contexte qui le donne.
 //
 // Pour un visiteur ou un membre, ce fichier ne fait RIEN : il pose une
 // question à la base, reçoit « non », et s'arrête. Aucun bouton n'est créé,
@@ -13,9 +13,9 @@
 //
 // Mais ce fichier ne PROTÈGE rien, et c'est voulu. Un site statique livre
 // tout son code au navigateur : quiconque le veut peut appeler ces
-// fonctions. La protection est dans la base — elle refuse toute écriture
+// fonctions. La protection est dans la base : elle refuse toute écriture
 // dans « corrections », dans le stockage des visuels et dans la gestion des
-// comptes à qui n'est pas administrateur — et supabase/securite-profils.sql
+// comptes à qui n'est pas administrateur, et supabase/securite-profils.sql
 // empêche un membre de se déclarer administrateur. Si ce fichier
 // disparaissait entièrement, rien ne serait moins sûr.
 
@@ -133,7 +133,7 @@ function poserBarre(){
   appliquerVue(vueVisiteur());
 }
 
-// Le tiroir — comptes, corrections — n'est chargé qu'à la demande : la
+// Le tiroir (comptes, corrections) n'est chargé qu'à la demande : la
 // plupart des pages ouvertes par l'administrateur n'en ont pas besoin.
 let tiroirCharge = null;
 async function ouvrirLeTiroir(onglet){
@@ -370,7 +370,7 @@ function blocCorrectionsEnPlace(corrections){
   return `<div class="admin-en-place">
       <p>Corrections déjà en place sur cet élément :</p>
       <ul>${corrections.map(c => `
-        <li><span>${libelleGenre(c.genre)} — ${new Date(c.cree_le).toLocaleDateString('fr-FR')}</span>
+        <li><span>${libelleGenre(c.genre)} · ${new Date(c.cree_le).toLocaleDateString('fr-FR')}</span>
             <button type="button" class="admin-retirer" data-retirer="${c.id}">Retirer</button></li>`).join('')}
       </ul>
     </div>`;
@@ -499,7 +499,7 @@ async function ajouterUneExtension(){
     titre: 'Ajouter une extension',
     intro: 'Pour une extension qu\'aucune source ne publie encore. Elle apparaîtra dans sa série, prête à recevoir ses cartes.',
     champs: [
-      { nom: 'cible', etiquette: 'Identifiant', obligatoire: true, aide: 'Court, sans espace — par exemple B5. Il figurera dans l\'adresse de la page.' },
+      { nom: 'cible', etiquette: 'Identifiant', obligatoire: true, aide: 'Court, sans espace, par exemple B5. Il figurera dans l\'adresse de la page.' },
       { nom: 'name', etiquette: 'Nom français', obligatoire: true },
       { nom: 'serieNom', etiquette: 'Série', options: series, valeur: series[0] },
       { nom: 'dateSortie', etiquette: 'Date de sortie', type: 'date' },

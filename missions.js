@@ -5,7 +5,7 @@
 // lire : il faut savoir à l'avance ce qu'elles demandent. C'est tout l'objet
 // de cette page.
 //
-// Ces missions ne figurent dans aucune base de données ouverte — ni TCGdex,
+// Ces missions ne figurent dans aucune base de données ouverte, ni TCGdex,
 // ni le jeu de données de flibustier, ni le wiki francophone. Elles ont été
 // relevées dans deux guides francophones, recoupées, et rangées à la main
 // dans donnees/missions-secretes.json. Là où les guides se contredisent ou
@@ -17,7 +17,7 @@ const CLE_MISSIONS_FAITES = 'pokeclasseur-missions-faites';
 
 // Le jeu ne dit nulle part « mission accomplie » à un site extérieur, et les
 // versions full art ou chromatiques d'une carte ne sont pas distinguées dans
-// les marquages du site. Cocher reste donc à la main — mais la coche, elle,
+// les marquages du site. Cocher reste donc à la main, mais la coche, elle,
 // est bien enregistrée.
 function missionsFaites(){
   try{
@@ -64,8 +64,8 @@ function enregistrerExtensionsOuvertes(ouvertes){
 
 // --------------------------------------------- retrouver les visuels ------
 //
-// Une mission nomme ses cartes en toutes lettres — « Azurill », « Méga-
-// Florizarre ex (full art) » — là où le site les connaît par identifiant.
+// Une mission nomme ses cartes en toutes lettres : « Azurill », « Méga-
+// Florizarre ex (full art) » : là où le site les connaît par identifiant.
 // Il faut donc rapprocher les deux.
 //
 // Le nom seul ne suffit pas : Azurill existe deux fois dans Source Secrète,

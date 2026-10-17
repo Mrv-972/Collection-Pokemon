@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-33av"></script>
-<title>Liste de souhaits — PokéClasseur</title>
+<script src="theme.js?v=2026-10-17-4gr7"></script>
+<title>Liste de souhaits - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -107,7 +107,7 @@
      quatre libellés ne tiennent plus côte à côte.
 
      Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable — en bas de
+     et porte les commandes à une hauteur tactile confortable : en bas de
      42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
@@ -192,14 +192,14 @@
   <footer data-note="Cette page ne montre que ce que son auteur a choisi de partager : les cartes qu'il recherche et celles qu'il propose."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-17-33av"></script>
-<script src="sets.js?v=2026-10-17-33av"></script>
-<script src="supabase-config.js?v=2026-10-17-33av"></script>
-<script src="pied.js?v=2026-10-17-33av"></script>
-<script src="admin.js?v=2026-10-17-33av"></script>
-<script src="admin-site.js?v=2026-10-17-33av"></script>
-<script src="compte.js?v=2026-10-17-33av"></script>
-<script src="communaute.js?v=2026-10-17-33av"></script>
+<script src="univers.js?v=2026-10-17-4gr7"></script>
+<script src="sets.js?v=2026-10-17-4gr7"></script>
+<script src="supabase-config.js?v=2026-10-17-4gr7"></script>
+<script src="pied.js?v=2026-10-17-4gr7"></script>
+<script src="admin.js?v=2026-10-17-4gr7"></script>
+<script src="admin-site.js?v=2026-10-17-4gr7"></script>
+<script src="compte.js?v=2026-10-17-4gr7"></script>
+<script src="communaute.js?v=2026-10-17-4gr7"></script>
 <script>
 const zone = document.getElementById('souhaits');
 const jeton = new URLSearchParams(location.search).get('j') ?? '';
@@ -210,7 +210,7 @@ const extensionDe = id => String(id).replace(/-[^-]+$/, '');
 const universDe = setId => (typeof isPocketSet === 'function' && isPocketSet(setId)) ? 'pocket' : 'physique';
 
 // Nom, visuel et extension de chaque carte, lus dans les fichiers du site
-// — un fichier par extension concernée, pas un par carte.
+// - un fichier par extension concernée, pas un par carte.
 async function infosDesCartes(ids){
   const infos = {}, noms = {};
   const parExtension = {};
@@ -277,7 +277,7 @@ async function afficher(){
   const auteur = lignes[0];
   const recherchees = lignes.filter(l => l.genre === 'recherchee').map(l => l.carte_id);
   const proposees = lignes.filter(l => l.genre === 'echangeable').map(l => l.carte_id);
-  document.title = `Liste de souhaits de ${auteur.pseudo} — PokéClasseur`;
+  document.title = `Liste de souhaits de ${auteur.pseudo} - PokéClasseur`;
 
   // Un visiteur connecté voit, en plus, ce qui colle avec sa propre
   // collection : les cartes qu'il peut offrir, celles qu'il cherche.
@@ -307,7 +307,7 @@ async function afficher(){
     </header>
     ${estConnecte() ? '' : `
     <p class="invitation">Tu as une carte que ${echapperCommun(auteur.pseudo)} recherche ?
-      <a href="connexion.html">Crée ton compte PokéClasseur</a> — c'est gratuit — pour lui écrire,
+      <a href="connexion.html">Crée ton compte PokéClasseur</a> (c'est gratuit) pour lui écrire,
       et tenir toi aussi ton classeur.</p>`}
 
     <section class="section-liste" aria-labelledby="titre-recherchees">

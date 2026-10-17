@@ -36,7 +36,7 @@ function saveTags(){
 
 function toggleTag(cardId, tag){
   // L'affichage désactive déjà le bouton ; cette garde couvre les autres
-  // chemins — marquage groupé, raccourci clavier, ou données héritées.
+  // chemins : marquage groupé, raccourci clavier, ou données héritées.
   if(tag === 'ech' && raisonsParCarte.has(cardId)) return;
   if(!tagState[cardId]) tagState[cardId] = emptyTagState();
   tagState[cardId][tag] = !tagState[cardId][tag];
@@ -57,7 +57,7 @@ function leLotRetire(cards, tag){
   return lot.length > 0 && lot.every(c => tagState[c.id]?.[tag]);
 }
 
-// Applique un tag à un lot de cartes — ou le retire si elles le portent déjà
+// Applique un tag à un lot de cartes, ou le retire si elles le portent déjà
 // toutes.
 function bulkToggleTag(cards, tag){
   cards = cartesDuLot(cards, tag);
@@ -95,11 +95,11 @@ function synchroniser(envoi){
 //
 // La liste s'arrête là, et c'est volontaire : les Deux Étoiles, les
 // Chromatique et les Chromatique deux étoiles S'ÉCHANGENT. Elles ne le
-// faisaient pas à une époque, ce qui rend l'erreur facile — ne les ajoute
+// faisaient pas à une époque, ce qui rend l'erreur facile : ne les ajoute
 // pas ici sans avoir revérifié dans le jeu.
 //
 // La règle ne vaut que pour l'univers Pocket. Le jeu physique n'a ni ces
-// raretés ni cette contrainte — on n'y touche pas.
+// raretés ni cette contrainte : on n'y touche pas.
 
 const RARETES_NON_ECHANGEABLES = new Set(['Trois Étoiles', 'Couronne']);
 
@@ -120,7 +120,7 @@ function raisonNonEchangeable(carte){
 const raisonsParCarte = new Map();
 
 // Un membre a pu marquer une de ces cartes « échangeable » avant que la règle
-// existe. On efface ces marquages devenus faux — une fois par affichage, et
+// existe. On efface ces marquages devenus faux : une fois par affichage, et
 // non carte par carte, pour n'écrire qu'une seule fois en base.
 const aNettoyer = new Set();
 let nettoyagePrevu = false;
@@ -163,7 +163,7 @@ function tagButtons(carte){
     if(tag === 'ech' && raison){
       const texte = echapperAttribut(raison);
       // Le bouton est désactivé, donc muet au clic. L'enveloppe, elle,
-      // reçoit le clic et sert à expliquer pourquoi — sans quoi un visiteur
+      // reçoit le clic et sert à expliquer pourquoi, sans quoi un visiteur
       // sur téléphone, qui n'a pas de survol, n'aurait aucune explication.
       return `<span class="ech-bloque" data-raison="${texte}" title="${texte}"><button class="tag-toggle ech bloque" disabled aria-label="${texte}">${TAG_META.ech.emoji}</button></span>`;
     }

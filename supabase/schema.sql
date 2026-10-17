@@ -14,7 +14,7 @@
 --
 -- "ne_le" sert au seuil d'âge. Cet âge est déclaré, jamais vérifié :
 -- n'importe qui peut saisir une fausse date. Ce que la règle apporte, c'est
--- un cadre — celui qui ment enfreint les conditions — et un garde-fou contre
+-- un cadre (celui qui ment enfreint les conditions) et un garde-fou contre
 -- les inscriptions trop jeunes. Le seuil de 15 ans est celui en dessous
 -- duquel, en France, le consentement des parents serait requis, un accord
 -- qu'un site comme celui-ci ne peut pas recueillir sérieusement.
@@ -32,7 +32,7 @@ alter table profils add column if not exists ne_le date;
 -- de chez soi a donc une vraie valeur.
 --
 -- Ce qui est enregistré n'est jamais une adresse, mais le centre de la
--- commune choisie — un point identique pour tous les habitants de cette
+-- commune choisie : un point identique pour tous les habitants de cette
 -- commune. La précision s'arrête donc volontairement là où commencerait le
 -- fait de pouvoir retrouver quelqu'un chez lui.
 alter table profils add column if not exists ville       text;
@@ -102,7 +102,7 @@ create table if not exists signalements (
 -- ce qu'il a rangé ou effacé. Une conversation appartient à deux personnes,
 -- donc tout ce qui est ici ne vaut que pour l'une d'elles : archiver ou
 -- supprimer ne touche jamais la liste de l'autre. Il ne peut pas en aller
--- autrement — sinon n'importe qui pourrait effacer d'un compte les messages
+-- autrement, sinon n'importe qui pourrait effacer d'un compte les messages
 -- qu'il vient d'y envoyer, et le signalement ne servirait plus à rien.
 create table if not exists lectures (
   utilisateur_id     uuid not null references auth.users on delete cascade,
@@ -112,7 +112,7 @@ create table if not exists lectures (
 );
 
 -- Archivage et suppression marchent pareil : on retient le numéro du dernier
--- message au moment du geste. Tout ce qui arrive après passe outre — une
+-- message au moment du geste. Tout ce qui arrive après passe outre : une
 -- discussion rangée ressort quand on t'écrit à nouveau, plutôt que de faire
 -- disparaître un message sans prévenir.
 --
@@ -227,7 +227,7 @@ create policy "ouvrir une conversation"
 
 -- La limite de suppression est posée ici plutôt que dans l'affichage : un
 -- message effacé ne doit pas simplement être caché à l'écran, il ne doit plus
--- sortir de la base. Tout ce qui lit des messages en hérite sans y penser —
+-- sortir de la base. Tout ce qui lit des messages en hérite sans y penser :
 -- l'aperçu des conversations, le compte des non-lus, le fil lui-même.
 drop policy if exists "lire mes messages" on messages;
 create policy "lire mes messages"
@@ -320,7 +320,7 @@ $$;
 -- propriétaire pour atteindre des colonnes que l'appelant ne peut pas lire,
 -- et ne renvoie qu'un nombre : jamais les coordonnées elles-mêmes. Comme ces
 -- coordonnées sont celles du centre d'une commune, le plus précis qu'on
--- puisse déduire d'une distance reste la commune — jamais un domicile.
+-- puisse déduire d'une distance reste la commune, jamais un domicile.
 --
 -- Le calcul est la formule de haversine : la Terre étant ronde, une simple
 -- soustraction de latitudes donnerait un résultat faux.
@@ -534,7 +534,7 @@ begin
 end;
 $$;
 
--- Supprimer une conversation — pour moi seul. Les messages restent chez
+-- Supprimer une conversation : pour moi seul. Les messages restent chez
 -- l'autre membre : personne ne peut effacer ce qu'il a envoyé à quelqu'un.
 drop function if exists supprimer_conversation(uuid);
 create function supprimer_conversation(conversation uuid)
@@ -555,7 +555,7 @@ begin
   -- Les commentaires sont sortis de l'instruction parce que l'éditeur SQL de
   -- Supabase les retire avant d'analyser le script, et découpe alors
   -- l'instruction au mauvais endroit : « syntax error at or near
-  -- effacee_jusqua ». Le SQL était correct — vérifié sur PostgreSQL 16 — mais
+  -- effacee_jusqua ». Le SQL était correct (vérifié sur PostgreSQL 16) mais
   -- un commentaire au milieu d'une instruction n'apporte pas assez pour
   -- valoir ce piège.
   do update set
@@ -587,8 +587,8 @@ $$;
 -- Espace d'administration
 --
 -- Le catalogue vient de sources extérieures, puis d'un instantané figé dans
--- le dépôt. Quand une source se trompe — nom mal traduit, rareté fausse,
--- carte absente, visuel anglais — il faut pouvoir corriger sans attendre la
+-- le dépôt. Quand une source se trompe : nom mal traduit, rareté fausse,
+-- carte absente, visuel anglais : il faut pouvoir corriger sans attendre la
 -- prochaine construction.
 --
 -- Une correction saisie ici prend effet immédiatement sur le site, puis la
@@ -603,7 +603,7 @@ $$;
 -- ATTENTION : ce fichier seul ne suffit pas à empêcher un compte de se
 -- promouvoir. La règle « chacun modifie son profil » filtre des lignes, pas
 -- des colonnes, et Supabase accorde par défaut l'écriture de toutes les
--- colonnes. C'est supabase/securite-profils.sql qui ferme cette porte —
+-- colonnes. C'est supabase/securite-profils.sql qui ferme cette porte :
 -- droits ramenés aux colonnes utiles, et déclencheur sur « est_admin ».
 --
 --   update profils set est_admin = true where pseudo = 'TonPseudo';
@@ -619,7 +619,7 @@ alter table profils add column if not exists est_admin boolean not null default 
 
 -- La fonction est appelée par les règles d'accès ci-dessous. Elle est
 -- « security definer » parce qu'elle doit lire profils sans être soumise
--- elle-même aux règles de lecture de profils — sinon la règle s'appellerait
+-- elle-même aux règles de lecture de profils, sinon la règle s'appellerait
 -- elle-même sans fin.
 create or replace function est_admin()
 returns boolean
@@ -658,7 +658,7 @@ create table if not exists corrections (
 alter table corrections enable row level security;
 
 -- Lecture ouverte à tous, y compris aux visiteurs non connectés. Ce sont des
--- données de catalogue — un nom de carte, une rareté, un visuel — déjà
+-- données de catalogue (un nom de carte, une rareté, un visuel) déjà
 -- publiques par nature. La construction nocturne les lit aussi, sans compte.
 drop policy if exists "corrections lisibles par tous" on corrections;
 create policy "corrections lisibles par tous"

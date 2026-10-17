@@ -3,9 +3,9 @@
 // ===================================================================
 //
 // Les serveurs d'images des cartes ne répondent qu'aux exécuteurs de
-// GitHub. Pour juger d'un rattachement à l'œil — la carte est-elle bien
+// GitHub. Pour juger d'un rattachement à l'œil : la carte est-elle bien
 // en français ? est-ce bien la même illustration que la version
-// anglaise ? —, l'outil assemble les visuels demandés en une seule image
+// anglaise ?, l'outil assemble les visuels demandés en une seule image
 // et l'écrit dans le journal, en texte (base64), découpée en lignes
 // « PLANCHE <n> <morceau> ». Il suffit de recoller les morceaux.
 //

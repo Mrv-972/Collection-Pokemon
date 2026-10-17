@@ -2,7 +2,7 @@
 
 Le site affiche en priorité les visuels français de TCGdex. Quand TCGdex n'en a
 pas, il cherche automatiquement un fichier ici. Il suffit de déposer l'image au
-bon endroit, avec le bon nom — aucune autre modification n'est nécessaire.
+bon endroit, avec le bon nom : aucune autre modification n'est nécessaire.
 
 ## Logos d'extension → `images/sets/`
 
@@ -18,13 +18,13 @@ Exemples :
 ## Images de carte → `images/cards/`
 
 **Depuis la mise en place de l'instantané, une image déposée ici passe
-devant toutes les sources extérieures** — elle n'est plus seulement un
+devant toutes les sources extérieures** : elle n'est plus seulement un
 recours quand les autres échouent. C'est utile pour les cartes qui n'ont
 de visuel français nulle part, comme les extensions Pocket les plus
 récentes.
 
 Formats acceptés : `.webp`, `.png`, `.jpg`. L'image apparaît à la
-prochaine reconstruction — automatique chaque nuit, ou déclenchée à la
+prochaine reconstruction : automatique chaque nuit, ou déclenchée à la
 main depuis l'onglet **Actions** du dépôt.
 
 
@@ -51,8 +51,8 @@ toi-même n'est jamais écrasée : la récolte ne télécharge que ce qui manque
 
 ### Deux définitions par carte
 
-- `images/cards/A1-001.webp`    — la vignette, affichée dans les grilles
-- `images/cards/A1-001-hd.webp` — la haute définition, affichée au zoom
+- `images/cards/A1-001.webp`    : la vignette, affichée dans les grilles
+- `images/cards/A1-001-hd.webp` : la haute définition, affichée au zoom
 
 Le suffixe `-hd` est la seule chose qui les distingue. Une carte sans fichier
 `-hd` affiche simplement sa vignette au zoom : c'est le cas des visuels venus

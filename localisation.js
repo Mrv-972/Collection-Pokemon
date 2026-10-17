@@ -5,7 +5,7 @@
 // facilement entre voisins. D'où ce repère de distance dans les échanges.
 //
 // Ce qui est enregistré n'est jamais une adresse : c'est la commune choisie,
-// ramenée à son point central — le même pour tous ses habitants. Personne ne
+// ramenée à son point central : le même pour tous ses habitants. Personne ne
 // peut donc être localisé plus finement que « quelque part dans cette
 // commune », et le site lui-même n'affiche aux autres membres que le
 // département et une distance approximative.
@@ -61,7 +61,7 @@ function libelleDepartement(commune){
 }
 
 // Traduit une commune de l'API en ce que le site manipule, ou null si la
-// réponse n'a pas la forme attendue — mieux vaut ignorer une commune que
+// réponse n'a pas la forme attendue : mieux vaut ignorer une commune que
 // d'enregistrer un point de coordonnées vides.
 function communeUtilisable(commune, codePostalCherche){
   const point = commune?.centre?.coordinates;   // l'API donne [longitude, latitude]
@@ -113,5 +113,5 @@ function distanceLisible(km){
 function zoneLisible(profil){
   if(!profil?.ville) return null;
   const lieu = profil.code_postal ? `${profil.ville} (${profil.code_postal})` : profil.ville;
-  return profil.departement ? `${lieu} — ${profil.departement}` : lieu;
+  return profil.departement ? `${lieu} · ${profil.departement}` : lieu;
 }

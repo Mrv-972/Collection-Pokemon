@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-33av"></script>
-<title>Diagnostic — PokéClasseur</title>
+<script src="theme.js?v=2026-10-17-4gr7"></script>
+<title>Diagnostic - PokéClasseur</title>
 <style>
   :root{--ink:#15171B;--ink-soft:#20232A;--gold:#C9A227;--accent-clair:#E3C766;
         --teal:#1F6F63;--text:#EDEAE0;--dim:#9B9E9C;}
@@ -36,9 +36,9 @@
   <pre id="sortie">…</pre>
 </div>
 
-<script src="sets.js?v=2026-10-17-33av"></script>
-<script src="univers.js?v=2026-10-17-33av"></script>
-<script src="catalogue.js?v=2026-10-17-33av"></script>
+<script src="sets.js?v=2026-10-17-4gr7"></script>
+<script src="univers.js?v=2026-10-17-4gr7"></script>
+<script src="catalogue.js?v=2026-10-17-4gr7"></script>
 <script>
 const sortie = document.getElementById('sortie');
 let lignes = [];
@@ -77,7 +77,7 @@ async function rapport(universVoulu){
 
   dire(`Adresse      : ${location.href}`);
   dire(`Univers      : ${universActuel().cle}`);
-  dire(`catalogue.js : ${typeof CATALOGUE_VERSION !== 'undefined' ? CATALOGUE_VERSION : 'ANCIENNE VERSION (sans repère) — ton navigateur sert un fichier en cache'}`);
+  dire(`catalogue.js : ${typeof CATALOGUE_VERSION !== 'undefined' ? CATALOGUE_VERSION : 'ANCIENNE VERSION (sans repère) : ton navigateur sert un fichier en cache'}`);
   dire(`Pokédex fr   : ${p.size} noms chargés`);
   dire();
 
@@ -89,7 +89,7 @@ async function rapport(universVoulu){
     dire(`  physique : ${version.corps.physique.extensions} extensions, ${version.corps.physique.cartes} cartes`);
     dire(`  pocket   : ${version.corps.pocket.extensions} extensions, ${version.corps.pocket.cartes} cartes`);
   }else{
-    dire('  ABSENT — le site retombe sur les sources en direct.');
+    dire('  ABSENT : le site retombe sur les sources en direct.');
   }
   dire();
 
@@ -120,7 +120,7 @@ async function rapport(universVoulu){
       const part = simples.length ? Math.round(100 * francais / simples.length) : 0;
       dire(`  ${ext.id.padEnd(8)} ${String(cartes.length).padStart(4)} cartes · ${part}% reconnus au Pokédex français`);
       dire(`           ${noms.slice(0, 6).join(', ')}`);
-    }catch(err){ dire(`  ${ext.id} : échec — ${err.message}`); }
+    }catch(err){ dire(`  ${ext.id} : échec (${err.message})`); }
   }
   dire();
 
@@ -184,7 +184,7 @@ async function rapport(universVoulu){
   }else{
     dire("  Tout est en place : instantané servi, catalogue à jour.");
     dire('  Si des cartes restent en anglais, ce sont celles dont la');
-    dire("  source n'a pas de version française — la ligne « % reconnus »");
+    dire("  source n'a pas de version française : la ligne « % reconnus »");
     dire('  ci-dessus le chiffre extension par extension.');
   }
 }
@@ -203,7 +203,7 @@ document.getElementById('copier').addEventListener('click', async (e) => {
   catch(err){
     const r = document.createRange(); r.selectNodeContents(sortie);
     getSelection().removeAllRanges(); getSelection().addRange(r);
-    b.textContent = 'Sélectionné — Ctrl+C';
+    b.textContent = 'Sélectionné : Ctrl+C';
   }
   setTimeout(() => { b.textContent = 'Tout copier'; }, 2500);
 });

@@ -7,8 +7,8 @@
 //
 // Mélanger les deux n'aurait servi personne : on ne troque pas une carte
 // d'application contre une carte de carton. Le site se partage donc en deux
-// moitiés étanches côté cartes — chacune son catalogue, ses classeurs, ses
-// mises en relation — tandis que le compte et la messagerie restent communs :
+// moitiés étanches côté cartes : chacune son catalogue, ses classeurs, ses
+// mises en relation : tandis que le compte et la messagerie restent communs :
 // c'est la même personne des deux côtés.
 //
 // L'univers courant voyage dans l'adresse (?u=pocket) pour qu'un lien
@@ -46,7 +46,7 @@ const MEMOIRE_UNIVERS = 'pokeclasseur_univers';
 const PHYSIQUE_OUVERT_A_TOUS = false;
 
 // L'administrateur ne se reconnaît qu'en interrogeant la base, ce qui prend
-// un instant — trop tard pour choisir l'univers avant que la page ne se
+// un instant : trop tard pour choisir l'univers avant que la page ne se
 // dessine. On garde donc, le temps d'une visite, l'INDICE qu'on l'est déjà.
 //
 // Cet indice n'est pas une protection, et n'a pas à l'être : il ne donne
@@ -63,8 +63,8 @@ function physiqueAccessible(){
   return PHYSIQUE_OUVERT_A_TOUS || indiceAdmin();
 }
 
-// Le physique a été demandé — par l'adresse, le souvenir de la dernière
-// visite, ou un lien d'extension — et refusé. On s'en souvient pour, si
+// Le physique a été demandé : par l'adresse, le souvenir de la dernière
+// visite, ou un lien d'extension, et refusé. On s'en souvient pour, si
 // l'administrateur se révèle, le ramener là où il voulait aller.
 let universRefuse = null;
 
@@ -175,7 +175,7 @@ const STYLE_RAIL = `
   }
   /* L'accent du site change avec l'univers : doré pour le carton, bleu pour
      l'application. C'est le signal le plus économique pour savoir d'un coup
-     d'œil de quel côté on se trouve — plus sûr qu'un libellé qu'on finit par
+     d'œil de quel côté on se trouve : plus sûr qu'un libellé qu'on finit par
      ne plus lire. */
   html[data-univers="pocket"]{
     --gold:#4B96D8; --gold-rgb:75,150,216; --accent-clair:#8CC4EC;
@@ -231,7 +231,7 @@ const STYLE_RAIL = `
      cette variable vaut justement bleu quand on est côté Pocket, si bien que
      les deux moitiés auraient viré ensemble. Ici on veut que le jaune
      désigne toujours le jeu physique et le bleu toujours Pocket, quel que
-     soit celui où l'on se trouve — c'est ce qui en fait un repère. */
+     soit celui où l'on se trouve : c'est ce qui en fait un repère. */
   .rail-item[data-cible="physique"]{--teinte:#C9A227;--teinte-rgb:201,162,39;}
   .rail-item[data-cible="pocket"]  {--teinte:#4B96D8;--teinte-rgb:75,150,216;}
 
@@ -362,7 +362,7 @@ function ongletDUnivers(u){
     // Un bouton, pas un lien : il n'y a nulle part où aller pour l'instant.
     return `
     <button type="button" class="rail-item a-venir-onglet" data-cible="${u.cle}"
-            title="${u.nom} — à venir">
+            title="${u.nom} (à venir)">
       <span class="rail-compact">${u.icone}<span class="rail-nom">${u.court}</span></span>
       <span class="rail-badge rail-badge-a-venir">À venir</span>
       <img class="rail-logo" src="${u.logo}" alt="" aria-hidden="true" loading="lazy">
@@ -373,7 +373,7 @@ function ongletDUnivers(u){
   return `
     <a class="rail-item ${u.cle === universCourant ? 'on' : ''}" data-cible="${u.cle}"
        href="${cibleBascule(u.cle)}"
-       title="${u.nom}${prive ? ' — visible par toi seul pour l\'instant' : ''}"
+       title="${u.nom}${prive ? ' (visible par toi seul pour l\'instant)' : ''}"
        ${u.cle === universCourant ? 'aria-current="page"' : ''}>
       <span class="rail-compact">${u.icone}<span class="rail-nom">${u.court}</span>
         ${prive ? '<span class="rail-badge rail-badge-prive">Privé</span>' : ''}</span>
@@ -410,17 +410,17 @@ function blocAVenir(){
   return `
     <div class="a-venir">
       <span class="a-venir-icone" aria-hidden="true">${UNIVERS.physique.icone}</span>
-      <h2>TCG Physique — à venir</h2>
+      <h2>TCG Physique : à venir</h2>
       <p>${TEXTE_A_VENIR}</p>
       <a class="a-venir-lien" href="${avecUnivers('series.html', 'pocket')}">Voir le TCG Pocket</a>
     </div>`;
 }
 
 // Confronter l'indice à la base. Trois issues :
-//   — administrateur sans indice : on le pose, et s'il voulait aller côté
+//   - administrateur sans indice : on le pose, et s'il voulait aller côté
 //     physique, on l'y emmène ;
-//   — administrateur avec indice : rien à faire ;
-//   — pas administrateur, mais physique affiché (indice périmé ou
+//   - administrateur avec indice : rien à faire ;
+//   - pas administrateur, mais physique affiché (indice périmé ou
 //     fabriqué) : retour immédiat côté Pocket.
 async function verifierAccesPhysique(){
   if(PHYSIQUE_OUVERT_A_TOUS) return;
@@ -470,7 +470,7 @@ function poserRail(){
 
 // Tous les liens internes emportent l'univers courant. On le fait à deux
 // moments : au chargement, pour que l'adresse affichée au survol soit juste,
-// et au clic, qui seul rattrape les liens créés après coup — une vignette
+// et au clic, qui seul rattrape les liens créés après coup : une vignette
 // d'extension, un bouton « Lui écrire ».
 function propagerLien(a){
   if(a.closest('.rail')) return;
@@ -502,8 +502,8 @@ function initUnivers(){
   // Les pages construisent l'essentiel de leurs liens après coup : vignettes
   // d'extensions, boutons « Lui écrire »... On repasse donc à chaque arrivée
   // de contenu, pour que l'adresse lue au survol soit déjà la bonne.
-  // On surveille aussi les adresses réécrites en place — compte.js remet la
-  // sienne à jour au fil de la connexion — sans quoi elles repartiraient
+  // On surveille aussi les adresses réécrites en place : compte.js remet la
+  // sienne à jour au fil de la connexion, sans quoi elles repartiraient
   // sans univers. La réécriture ne se déclenche pas elle-même : quand
   // l'adresse porte déjà le bon univers, rien n'est écrit.
   const guetteur = new MutationObserver(lots => {

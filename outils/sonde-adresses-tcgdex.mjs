@@ -6,8 +6,8 @@
 // Quand elle répond 404 dans les deux langues, deux explications tiennent,
 // et elles n'appellent pas du tout le même remède :
 //
-//   — le fichier n'existe pas          → il faut une autre source ;
-//   — mon adresse est fausse           → il suffit de la corriger.
+//   - le fichier n'existe pas          → il faut une autre source ;
+//   - mon adresse est fausse           → il suffit de la corriger.
 //
 // L'API de TCGdex, elle, connaît la vraie adresse de chaque carte : elle la
 // publie dans le champ « image ». On la lui demande et on compare. Rien
@@ -65,7 +65,7 @@ for(const setId of MUETTES){
   const carte = nous[0];
   const fiche = await lireJson(`https://api.tcgdex.net/v2/fr/cards/${encodeURIComponent(carte.id)}`);
   if(fiche.erreur){
-    verdicts['extension inconnue'].push(`${setId} — l'API ne connaît pas ${carte.id} (${fiche.erreur})`);
+    verdicts['extension inconnue'].push(`${setId} : l'API ne connaît pas ${carte.id} (${fiche.erreur})`);
     console.log(`${setId.padEnd(12)} API : ${fiche.erreur}`);
     continue;
   }
@@ -78,7 +78,7 @@ for(const setId of MUETTES){
   const sienneMarche = await estUneImage(sienne);
 
   if(!sienne){
-    verdicts['vraiment absente'].push(`${setId} — l'API ne donne aucune image`);
+    verdicts['vraiment absente'].push(`${setId} : l'API ne donne aucune image`);
     console.log(`${setId.padEnd(12)} l'API elle-même n'a pas d'image pour ${carte.id}`);
   }else if(sienneMarche && !memeAdresse){
     verdicts['adresse fausse'].push(`${setId} → ${sienne}`);
@@ -86,7 +86,7 @@ for(const setId of MUETTES){
     console.log(`${' '.repeat(12)}   la nôtre : ${notre}`);
     console.log(`${' '.repeat(12)}   la vraie : ${sienne}`);
   }else if(sienneMarche){
-    console.log(`${setId.padEnd(12)} même adresse, et elle marche — à re-sonder`);
+    console.log(`${setId.padEnd(12)} même adresse, et elle marche : à re-sonder`);
   }else{
     verdicts['vraiment absente'].push(`${setId} (${sienne})`);
     console.log(`${setId.padEnd(12)} absente : même l'adresse de l'API ne répond pas`);

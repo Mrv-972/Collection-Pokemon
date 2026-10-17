@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-33av"></script>
-<title>Missions secrètes — PokéClasseur</title>
+<script src="theme.js?v=2026-10-17-4gr7"></script>
+<title>Missions secrètes - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.tcgdex.net">
@@ -78,7 +78,7 @@
      quatre libellés ne tiennent plus côte à côte.
 
      Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable — en bas de
+     et porte les commandes à une hauteur tactile confortable : en bas de
      42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
@@ -258,18 +258,18 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-17-33av"></script>
-<script src="catalogue.js?v=2026-10-17-33av"></script>
-<script src="supabase-config.js?v=2026-10-17-33av"></script>
-<script src="pied.js?v=2026-10-17-33av"></script>
-<script src="admin.js?v=2026-10-17-33av"></script>
-<script src="admin-site.js?v=2026-10-17-33av"></script>
-<script src="compte.js?v=2026-10-17-33av"></script>
-<script src="progression.js?v=2026-10-17-33av"></script>
-<script src="sets.js?v=2026-10-17-33av"></script>
-<script src="raretes.js?v=2026-10-17-33av"></script>
-<script src="glissement.js?v=2026-10-17-33av"></script>
-<script src="missions.js?v=2026-10-17-33av"></script>
+<script src="univers.js?v=2026-10-17-4gr7"></script>
+<script src="catalogue.js?v=2026-10-17-4gr7"></script>
+<script src="supabase-config.js?v=2026-10-17-4gr7"></script>
+<script src="pied.js?v=2026-10-17-4gr7"></script>
+<script src="admin.js?v=2026-10-17-4gr7"></script>
+<script src="admin-site.js?v=2026-10-17-4gr7"></script>
+<script src="compte.js?v=2026-10-17-4gr7"></script>
+<script src="progression.js?v=2026-10-17-4gr7"></script>
+<script src="sets.js?v=2026-10-17-4gr7"></script>
+<script src="raretes.js?v=2026-10-17-4gr7"></script>
+<script src="glissement.js?v=2026-10-17-4gr7"></script>
+<script src="missions.js?v=2026-10-17-4gr7"></script>
 <script>
 // Les missions secrètes n'existent que dans l'application mobile : du côté
 // du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
@@ -295,7 +295,7 @@ function poserCreditDesSources(donnees){
   // Le fichier des missions arrive après coup : le pied de page est déjà
   // construit, et changer son data-note ne le referait pas. On écrit donc
   // dans la note posée, et on retombe sur l'attribut si elle n'existe pas
-  // encore — selon lequel des deux est prêt le premier.
+  // encore : selon lequel des deux est prêt le premier.
   const posee = pied.querySelector('.pied-note');
   if(posee) posee.innerHTML = note;
   else pied.dataset.note = note;
@@ -374,8 +374,8 @@ function blocMission(idExt, mission, faites){
     </div>`;
 }
 
-// Le catalogue range les extensions de l'application en grandes séries — A,
-// B — et la page des extensions les présente ainsi. Les missions suivent le
+// Le catalogue range les extensions de l'application en grandes séries : A,
+// B, et la page des extensions les présente ainsi. Les missions suivent le
 // même découpage, pour qu'on s'y retrouve d'une page à l'autre.
 function parSerie(extensions){
   const groupes = new Map();
@@ -673,7 +673,7 @@ function agrandirLaCarte(vignette){
         changer: pas => afficher(position + pas),
       })
     : null;
-  // Cliquer à côté referme ; cliquer sur la carte elle-même, non — ni le
+  // Cliquer à côté referme ; cliquer sur la carte elle-même, non, ni le
   // clic qui termine un glissement.
   image.addEventListener('click', e => e.stopPropagation());
   voile.addEventListener('click', () => { if(!glissement?.vientDeGlisser()) fermer(); });

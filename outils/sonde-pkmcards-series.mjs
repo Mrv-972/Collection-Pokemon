@@ -2,7 +2,7 @@
 // ========================================================================
 //
 // Une première tentative devinait l'adresse d'une extension à partir de
-// notre identifiant. Elle a répondu « oui » sept fois sur sept — un faux
+// notre identifiant. Elle a répondu « oui » sept fois sur sept : un faux
 // positif complet : le site renvoie son catalogue générique pour toute
 // adresse inconnue, et je mesurais sept fois la même page.
 //
@@ -51,12 +51,12 @@ const candidat = pagesSerie[0];
 if(candidat){
   const page = await lire(`https://www.pkmcards.fr${candidat}`);
   const visuels = [...new Set((page.corps.match(/https?:\/\/static\.pkmcards\.fr\/cards\/fr\/[^"'\s)]+/gi) ?? []))];
-  console.log(`\nexemple — ${candidat}`);
+  console.log(`\nexemple : ${candidat}`);
   console.log(`   ${page.code}, ${visuels.length} visuels français`);
   for(const v of visuels.slice(0, 3)) console.log(`   ${v}`);
   // Une page redirigée vers le catalogue ne prouve rien : on le dit.
   if(!page.finale.includes(candidat)){
-    console.log(`   ATTENTION : redirigé vers ${page.finale} — cette page n'existe pas.`);
+    console.log(`   ATTENTION : redirigé vers ${page.finale} : cette page n'existe pas.`);
   }
 }
 

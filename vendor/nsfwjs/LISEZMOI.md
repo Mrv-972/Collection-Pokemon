@@ -1,4 +1,4 @@
-# NSFWJS — détection d'images inappropriées
+# NSFWJS : détection d'images inappropriées
 
 Copie de la bibliothèque [NSFWJS](https://github.com/infinitered/nsfwjs)
 (version 4.3.0, licence MIT, fichier `LICENSE`) et de son modèle

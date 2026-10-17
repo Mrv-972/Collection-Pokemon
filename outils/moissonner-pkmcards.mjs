@@ -11,14 +11,14 @@
 // Tout est en français. Soit environ 25 900 cartes.
 //
 // Les fausses pistes, inscrites ici pour ne pas les repayer :
-//   — /cards/liste-cartes-francaises est une VITRINE : 34 cartes, aucun
+//   - /cards/liste-cartes-francaises est une VITRINE : 34 cartes, aucun
 //     paginateur, aucune requête de données. Elle ignore ?page=, ?p=,
 //     ?offset=, ?skip=, ?start= en rendant toujours les mêmes cartes.
-//   — /series n'annonce que 30 séries, les plus récentes, et refuse
+//   - /series n'annonce que 30 séries, les plus récentes, et refuse
 //     ?page=, ?p=, ?tout=1, ?all=1, ?limit=500. Partir de là fait manquer
 //     tout ce qui précède 2022.
-//   — il n'y a pas de plan de site, pas de Next.js, pas d'API publique.
-//   — deviner une adresse de carte sans son nom (/cards/base1-fr-001)
+//   - il n'y a pas de plan de site, pas de Next.js, pas d'API publique.
+//   - deviner une adresse de carte sans son nom (/cards/base1-fr-001)
 //     renvoie 200 : leur site détourne l'inconnu vers /cards. Un 200 ne
 //     prouve donc jamais qu'une carte existe chez eux.
 //
@@ -82,13 +82,13 @@ for(let page = 1; page <= maxPages; page++){
   const r = await lire(`${RACINE}/cards/${page}`);
 
   if(r.code !== 200){
-    console.log(`page ${page} : ${r.code} — on s'arrête là.`);
+    console.log(`page ${page} : ${r.code} : on s'arrête là.`);
     break;
   }
   // Leur site détourne l'inconnu vers /cards : si l'on n'est plus sur la
   // page demandée, c'est qu'on a dépassé la fin.
   if(!r.finale.endsWith(`/cards/${page}`)){
-    console.log(`page ${page} : détournée vers ${r.finale.replace(RACINE,'')} — fin du catalogue.`);
+    console.log(`page ${page} : détournée vers ${r.finale.replace(RACINE,'')} : fin du catalogue.`);
     break;
   }
 

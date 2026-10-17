@@ -4,17 +4,17 @@
 // La sonde a établi les faits ; cet outil en tire l'index dont la copie a
 // besoin. Ce qu'on sait, mesuré :
 //
-//   — « allimages » énumère tout : 27 998 fichiers, 281 séries, fin de
+//   - « allimages » énumère tout : 27 998 fichiers, 281 séries, fin de
 //     liste atteinte. C'est l'interface officielle de MediaWiki : elle
 //     DÉCLARE l'adresse de chaque fichier, on n'en devine aucune ;
-//   — les noms suivent « Carte_<Série>_<numéro>.png », avec des tirets
+//   - les noms suivent « Carte_<Série>_<numéro>.png », avec des tirets
 //     BAS, et un numéro qui n'est pas toujours un nombre (« H1 », « TG01 ») ;
-//   — le remplissage des numéros varie selon la série : « Carte_Set_de_
+//   - le remplissage des numéros varie selon la série : « Carte_Set_de_
 //     Base_4.png » mais « Carte_10th_Movie_Promo_001.png ». On indexe donc
 //     sur le numéro débarrassé de ses zéros, jamais sur une forme supposée ;
-//   — leur serveur n'envoie pas d'en-tête CORS et leurs images pèsent
+//   - leur serveur n'envoie pas d'en-tête CORS et leurs images pèsent
 //     2 Mo : c'est pourquoi on les copie chez nous au lieu d'y renvoyer ;
-//   — licence CC BY-NC-SA 3.0 : crédit obligatoire, usage non commercial.
+//   - licence CC BY-NC-SA 3.0 : crédit obligatoire, usage non commercial.
 //     Mrv972 en a été informé et a tranché.
 //
 //   node outils/moissonner-pokepedia.mjs --sortie donnees [--pages 0]
@@ -80,7 +80,7 @@ for(let i = 0; i < maxPages; i++){
     ailimit: '500', aiprop: 'url|size',
     ...(suite ? { aicontinue: suite } : {}),
   });
-  if(d.erreur){ console.log(`  page ${i+1} : erreur ${d.erreur} — on s'arrête.`); break; }
+  if(d.erreur){ console.log(`  page ${i+1} : erreur ${d.erreur} : on s'arrête.`); break; }
   const images = d.query?.allimages ?? [];
   vus += images.length;
   pages++;
@@ -101,7 +101,7 @@ for(let i = 0; i < maxPages; i++){
   suite = d.continue?.aicontinue;
   if(pages % 10 === 0 || !suite)
     console.log(`  ${pages} pages, ${vus} fichiers vus, ${retenus} cartes retenues` +
-      `${suite ? '' : '  — fin de la liste'}`);
+      `${suite ? '' : '  : fin de la liste'}`);
   if(!suite) break;
   await dormir(1200);
 }
@@ -114,7 +114,7 @@ console.log(`fichiers vus      : ${vus}`);
 console.log(`cartes retenues   : ${retenus}`);
 console.log(`écartés (sans n°) : ${ecartes}`);
 console.log(`séries            : ${series.length}`);
-console.log(`complet           : ${suite ? 'NON — relevé partiel' : 'oui'}`);
+console.log(`complet           : ${suite ? 'NON : relevé partiel' : 'oui'}`);
 
 await mkdir(sortie, { recursive: true });
 const fichier = `${sortie}/visuels-pokepedia.json`;

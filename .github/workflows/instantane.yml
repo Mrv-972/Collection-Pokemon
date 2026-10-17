@@ -2,7 +2,7 @@
 #
 # Le site ne dépend donc plus d'une API au moment où un visiteur ouvre une
 # page : il dépend d'elle une fois par jour, ici, où un échec est visible et
-# sans conséquence pour les visiteurs — l'instantané de la veille reste en
+# sans conséquence pour les visiteurs : l'instantané de la veille reste en
 # place.
 name: Instantané des cartes
 
@@ -66,7 +66,7 @@ jobs:
               echo "déposé."
               exit 0
             fi
-            echo "dépôt refusé (tentative $essai) — on reprend la branche et on réessaie."
+            echo "dépôt refusé (tentative $essai) : on reprend la branche et on réessaie."
             sleep $((essai * 5))
           done
           echo "::error::dépôt impossible après cinq tentatives."

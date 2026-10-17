@@ -3,8 +3,8 @@
 // TCGdex ne fournit le prix que dans la fiche détaillée d'une carte, jamais
 // dans une liste : afficher un prix sous chacune des deux cents cartes d'une
 // extension coûterait deux cents requêtes par page. On ne les récupère donc
-// que là où ils servent à décider — un échange à peser, une carte qu'on
-// regarde de près — et on les garde en mémoire pour la durée de la visite.
+// que là où ils servent à décider : un échange à peser, une carte qu'on
+// regarde de près, et on les garde en mémoire pour la durée de la visite.
 //
 // Ces prix sont indicatifs. Ils valent pour la variante courante d'une carte
 // en bon état, sont mis à jour une fois par jour, et ignorent tout ce qui
@@ -25,7 +25,7 @@ chargerCachePrix();
 
 // Le fournisseur européen propose plusieurs mesures. On prend la tendance,
 // qui est la valeur de référence des collectionneurs, et on se rabat sur les
-// suivantes quand elle manque — c'est fréquent sur les cartes peu échangées.
+// suivantes quand elle manque : c'est fréquent sur les cartes peu échangées.
 function coteCardmarket(cardmarket){
   if(!cardmarket) return null;
   for(const champ of ['trend', 'avg30', 'avg7', 'avg', 'low', 'trend-holo', 'avg30-holo', 'avg-holo', 'low-holo']){
@@ -38,7 +38,7 @@ function coteCardmarket(cardmarket){
 }
 
 // Faute de cote européenne, celle du marché nord-américain vaut mieux que
-// rien — signalée comme telle, car elle n'est pas dans la même devise.
+// rien : signalée comme telle, car elle n'est pas dans la même devise.
 function coteTcgplayer(tcgplayer){
   if(!tcgplayer) return null;
   // Les variantes (holofoil, normal...) sont des objets ; "unit" et "updated"
@@ -111,7 +111,7 @@ function prixLisible(prix){
 //
 // Deux précautions : les cartes sans cote sont comptées à part, car annoncer
 // un total en taisant qu'il en manque donnerait une fausse impression de
-// précision ; et les devises ne sont jamais mélangées — additionner des
+// précision ; et les devises ne sont jamais mélangées : additionner des
 // euros et des dollars produirait un nombre faux présenté comme juste. En
 // cas de mélange, on retient la devise majoritaire et on écarte le reste.
 function totalLisible(prixParCarte, idsCartes){

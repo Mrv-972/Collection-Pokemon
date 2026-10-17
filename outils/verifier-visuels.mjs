@@ -37,8 +37,8 @@ const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
 const sortie = typeof args.sortie === 'string' ? args.sortie : null;
 const largeur = Number(args.largeur ?? 16);
 // Reprendre une vérification : on ne refait que les extensions qui avaient
-// des cartes indécises. Un indécis n'est pas une absence — c'est un hoquet
-// de réseau — et le compter comme manquant gonflerait le chiffre.
+// des cartes indécises. Un indécis n'est pas une absence : c'est un hoquet
+// de réseau, et le compter comme manquant gonflerait le chiffre.
 const reprendre = typeof args.reprendre === 'string' ? args.reprendre : null;
 const DOSSIER = 'images/cards';
 const IDENTITE = { 'User-Agent': 'PokeClasseur/1.0 (verification des visuels)' };
@@ -125,7 +125,7 @@ const verdicts = await parPaquets(toutes, largeur, async carte => {
   let etat;
   // Un fichier du dépôt lu en anglais n'est servi que faute de mieux :
   // l'instantané le laisse quand un scan français existe, et la carte
-  // désigne alors une adresse distante — c'est elle qu'on vérifie.
+  // désigne alors une adresse distante : c'est elle qu'on vérifie.
   const servieDuDepot = aDejaUnFichier(carte.id) && (!depotEnAnglais(carte.id) || !/^https?:/.test(carte.image ?? ''));
   if(servieDuDepot) etat = depotEnAnglais(carte.id) ? 'secoursAnglais' : 'depot';
   else {
@@ -188,7 +188,7 @@ console.log(`indécis (réseau)        : ${compte.indecis} (${pc(compte.indecis)
 const pasEnFrancais = compteFinalProvisoire =>
   (compteFinalProvisoire.manquant ?? 0) + (compteFinalProvisoire.secoursAnglais ?? 0);
 console.log(`\nPAS EN FRANÇAIS         : ${pasEnFrancais(compte)}` +
-  ` (${pc(pasEnFrancais(compte))}) — absentes et anglaises réunies`);
+  ` (${pc(pasEnFrancais(compte))}) : absentes et anglaises réunies`);
 
 const anglaises = [...parExtension.entries()]
   .filter(([, e]) => e.secoursAnglais)

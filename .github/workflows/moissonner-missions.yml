@@ -2,7 +2,7 @@
 # brut dans donnees/missions-brutes.json, pour relecture.
 #
 # Lancé à la main : c'est une lecture ponctuelle, pas une dépendance du site.
-# Le fichier produit est un relevé, pas une vérité — rien ne s'en sert tant
+# Le fichier produit est un relevé, pas une vérité : rien ne s'en sert tant
 # qu'il n'a pas été relu.
 name: Moissonner les missions secrètes
 

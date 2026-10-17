@@ -2,7 +2,7 @@
 //
 // Le site reste utilisable sans compte : les tags vivent alors dans le
 // navigateur, comme avant. Dès qu'on se connecte, ils partent en ligne et
-// suivent le membre d'un appareil à l'autre — condition nécessaire pour que
+// suivent le membre d'un appareil à l'autre : condition nécessaire pour que
 // la mise en relation entre collectionneurs ait un sens.
 
 let supabase = null;
@@ -86,7 +86,7 @@ const PSEUDO_EN_ATTENTE = 'pokeclasseur_profil_en_attente';
 
 // La version des conditions acceptée par le membre. Le jour où les
 // conditions changent, cette valeur change aussi, et l'on sait alors qui a
-// accepté quoi — c'est ce que le RGPD appelle pouvoir démontrer le
+// accepté quoi : c'est ce que le RGPD appelle pouvoir démontrer le
 // consentement. Elle doit suivre la date de « miseAJour » dans legal.js.
 const VERSION_CONDITIONS = '2026-10-11';
 
@@ -324,7 +324,7 @@ async function envoyerCollectionLocale(){
 
 // À la connexion, on réunit ce qui est en ligne et ce qui a été marqué sur
 // cet appareil : un tag posé d'un côté ou de l'autre est conservé. Fusionner
-// plutôt qu'écraser évite de perdre du travail sans prévenir — au pire on
+// plutôt qu'écraser évite de perdre du travail sans prévenir : au pire on
 // garde un tag en trop, qui se retire d'un clic.
 async function fusionnerCollection(){
   const enLigne = await lireCollection();
@@ -505,7 +505,7 @@ function afficherEtatCompte(){
 // (discussions, échanges). Les fonctions qui fournissent ces listes ne
 // renvoient que le pseudo : on complète par une lecture à part. Tant que la
 // base n'a pas reçu les colonnes, la lecture échoue et la liste garde ses
-// initiales — rien ne casse.
+// initiales : rien ne casse.
 const avatarsConnus = new Map();
 async function avatarsDe(ids){
   const manquants = [...new Set(ids)].filter(id => id && !avatarsConnus.has(id));
@@ -612,8 +612,8 @@ async function retirerPhoto(){
   await chargerProfil();
 }
 
-// Le choix est retenu sur le compte ; à défaut — base pas encore mise à
-// jour —, sur l'appareil. Par défaut : activé.
+// Le choix est retenu sur le compte ; à défaut : base pas encore mise à
+// jour, sur l'appareil. Par défaut : activé.
 const CLE_NOTIF_MESSAGES = 'pokeclasseur-notif-messages';
 function notificationsVoulues(){
   if(profilAPreferences()) return profil.pref_notif_messages !== false;
@@ -652,7 +652,7 @@ function prevenirNouveauxMessages(nombre){
 //
 // Le rythme est lent à dessein : c'est une pastille de notification, pas une
 // conversation. Vérifier plus souvent depuis chaque onglet ouvert
-// solliciterait la base sans rien apporter — la page Discussions, elle, a
+// solliciterait la base sans rien apporter : la page Discussions, elle, a
 // son propre rythme rapide pour les messages eux-mêmes.
 const DELAI_PASTILLE = 25000;
 let suiviPastilleLance = false;
@@ -769,7 +769,7 @@ async function afficherReponsesNonLues(){
 // (voir supabase/rgpd.sql). Elle efface la ligne du compte ; toutes les
 // tables du site pointent dessus en cascade, si bien que le profil, les
 // cartes, les conversations, les messages, les blocages, les signalements
-// et les lectures s'en vont avec — sans qu'on puisse en oublier une.
+// et les lectures s'en vont avec, sans qu'on puisse en oublier une.
 async function supprimerMonCompte(){
   if(!estConnecte()) throw new Error('Aucune session ouverte.');
 

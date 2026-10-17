@@ -2,10 +2,10 @@
 // ==========================================================================
 //
 // Mesuré jusqu'ici, pour ne pas le repayer :
-//   — /cards/liste-cartes-francaises : 34 cartes, AUCUN paginateur, aucune
+//   - /cards/liste-cartes-francaises : 34 cartes, AUCUN paginateur, aucune
 //     requête de données (seul Analytics parle). C'est une vitrine.
-//   — /series : n'annonce que 30 séries alors qu'il en existe 240 et plus.
-//   — pas de plan de site ; pas de pagination par adresse ; pas d'API.
+//   - /series : n'annonce que 30 séries alors qu'il en existe 240 et plus.
+//   - pas de plan de site ; pas de pagination par adresse ; pas d'API.
 //
 // Reste à savoir comment EUX mènent au catalogue entier. Cette sonde relève
 // les liens internes de leurs pages d'entrée, groupés par forme, et teste
@@ -44,7 +44,7 @@ for(const entree of ['/', '/series', '/cards', '/sets', '/extensions']){
   const r = await lire(`${RACINE}${entree}`);
   const liens = liensDe(r.corps);
   console.log(`\n=============== ${entree} ===============`);
-  console.log(`code ${r.code} — arrivé sur ${r.finale.replace(RACINE, '') || '/'} — ${liens.length} liens internes`);
+  console.log(`code ${r.code} (arrivé sur ${r.finale.replace(RACINE, '') || '/'}) ${liens.length} liens internes`);
   if(r.code !== 200) continue;
   const familles = {};
   for(const l of liens){ const f = forme(l); (familles[f] ??= []).push(l); }

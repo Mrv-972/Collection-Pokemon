@@ -8,12 +8,12 @@
 //
 // Deux pistes à éprouver, sur de VRAIES cartes de ces extensions :
 //
-//   1. les wikis — Poképédia (francophone) et Bulbapedia. Ils documentent
+//   1. les wikis : Poképédia (francophone) et Bulbapedia. Ils documentent
 //      les vieilles séries carte par carte, là où les API s'arrêtent. Ils
 //      servent leurs images depuis un MediaWiki, dont l'interface de
 //      données est publique et documentée : pas de devinette d'adresse.
 //
-//   2. Cardmarket — un site de vente, donc des photos de tout ce qui
+//   2. Cardmarket : un site de vente, donc des photos de tout ce qui
 //      s'échange, promos comprises.
 //
 // On regarde pour chacune : ce que robots.txt autorise, si la carte est
@@ -64,7 +64,7 @@ for(const racine of ['https://www.pokepedia.fr', 'https://bulbapedia.bulbagarden
   await dormir(1000);
   const r = await lire(`${racine}/robots.txt`);
   const lignes = r.corps.split('\n').filter(l => /^(user-agent|disallow|allow|crawl-delay)/i.test(l));
-  console.log(`\n${racine} — code ${r.code}, ${lignes.length} règles`);
+  console.log(`\n${racine} : code ${r.code}, ${lignes.length} règles`);
   console.log(lignes.slice(0, 18).map(l => '    ' + l.trim()).join('\n'));
   if(lignes.length > 18) console.log(`    … et ${lignes.length - 18} autres règles`);
 }
