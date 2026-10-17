@@ -6,7 +6,9 @@
 // Lit une liste de pages (guides, wiki, archives du web) et
 // en dépose le texte dans donnees/missions-pages.json, pour relecture. Elle
 // ne décide de rien : c'est le recoupement à la main qui fait foi. Le
-// fichier est un brouillon de travail, retiré une fois les missions saisies.
+// fichier est un brouillon de travail, retiré une fois les missions saisies
+// (relevé d'octobre 2026 : Gamewave et Pokémon GO Hub ont répondu ;
+// Bulbapedia, Pokémon Zone et Eternia refusent les robots).
 //
 // Tourne sur un serveur GitHub : le poste de travail n'a pas accès à ces
 // sites.

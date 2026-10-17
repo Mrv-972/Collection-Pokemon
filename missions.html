@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-e11d"></script>
+<script src="theme.js?v=2026-10-17-xefq"></script>
 <title>Missions secrètes — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -144,6 +144,7 @@
   .mission .condition{font-size:13px;color:var(--text-on-ink-dim);margin:9px 0 0;line-height:1.5}
   /* Une mission qui réunit des cartes de plusieurs extensions le dit tout
      de suite : on ne les trouvera pas toutes dans le même booster. */
+  .note-bloc{font-size:13.5px;color:var(--text-on-ink-dim);line-height:1.55;margin:4px 0 14px;max-width:70ch}
   .mission .multi-ext{display:inline-block;margin:8px 0 0;padding:3px 9px;border-radius:999px;font-size:12px;
     color:var(--text-on-ink);background:rgba(var(--gold-rgb),0.14);border:1px solid rgba(var(--gold-rgb),0.45)}
   .mission .cartes{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0;padding:0;list-style:none}
@@ -257,18 +258,18 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-17-e11d"></script>
-<script src="catalogue.js?v=2026-10-17-e11d"></script>
-<script src="supabase-config.js?v=2026-10-17-e11d"></script>
-<script src="pied.js?v=2026-10-17-e11d"></script>
-<script src="admin.js?v=2026-10-17-e11d"></script>
-<script src="admin-site.js?v=2026-10-17-e11d"></script>
-<script src="compte.js?v=2026-10-17-e11d"></script>
-<script src="progression.js?v=2026-10-17-e11d"></script>
-<script src="sets.js?v=2026-10-17-e11d"></script>
-<script src="raretes.js?v=2026-10-17-e11d"></script>
-<script src="glissement.js?v=2026-10-17-e11d"></script>
-<script src="missions.js?v=2026-10-17-e11d"></script>
+<script src="univers.js?v=2026-10-17-xefq"></script>
+<script src="catalogue.js?v=2026-10-17-xefq"></script>
+<script src="supabase-config.js?v=2026-10-17-xefq"></script>
+<script src="pied.js?v=2026-10-17-xefq"></script>
+<script src="admin.js?v=2026-10-17-xefq"></script>
+<script src="admin-site.js?v=2026-10-17-xefq"></script>
+<script src="compte.js?v=2026-10-17-xefq"></script>
+<script src="progression.js?v=2026-10-17-xefq"></script>
+<script src="sets.js?v=2026-10-17-xefq"></script>
+<script src="raretes.js?v=2026-10-17-xefq"></script>
+<script src="glissement.js?v=2026-10-17-xefq"></script>
+<script src="missions.js?v=2026-10-17-xefq"></script>
 <script>
 // Les missions secrètes n'existent que dans l'application mobile : du côté
 // du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
@@ -401,6 +402,7 @@ function blocExtension(ext, faites, ouverte){
         ${barreProgression({ obtenues: accomplies, total })}
       </summary>
       <div class="ext-corps">
+        ${ext.note ? `<p class="note-bloc">${echapper(ext.note)}</p>` : ''}
         ${ext.missions.map(m => blocMission(ext.id, m, faites)).join('')}
       </div>
     </details>`;
