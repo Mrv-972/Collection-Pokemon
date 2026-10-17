@@ -19,22 +19,22 @@ const IDENTITE = {
   'Accept': 'text/html,application/xhtml+xml,application/json',
 };
 
-// Bulbapedia et Pokémon Zone refusent les robots : on lit leur copie
-// publique dans les archives du web (Wayback Machine), sans contourner
-// leur refus.
-const ARCHIVE = adresse => `https://web.archive.org/web/2027id_/${adresse}`;
+// Pokémon GO Hub publie une page par extension : une collection qui mêle
+// plusieurs extensions y figure dans celle de l'extension qui l'introduit.
+const GOHUB = nom => `https://pokemongohub.net/post/tcg-pocket/pokemon-tcg-pocket-${nom}-all-themed-collection-and-secret-missions/`;
 
 const PAGES = [
-  ARCHIVE('https://bulbapedia.bulbagarden.net/wiki/Mission_(TCG_Pocket)'),
-  ARCHIVE('https://www.pokemon-zone.com/themed-collections/multiple-expansions/b/'),
-  ARCHIVE('https://www.pokemon-zone.com/themed-collections/multiple-expansions/'),
-  ARCHIVE('https://bulbapedia.bulbagarden.net/wiki/Ruler_of_the_Skies_(TCG_Pocket)'),
-  ARCHIVE("https://bulbapedia.bulbagarden.net/wiki/Team_Rocket%27s_Ambition_(TCG_Pocket)"),
-  ARCHIVE('https://bulbapedia.bulbagarden.net/wiki/Deluxe_Pack:_Mega_(TCG_Pocket)'),
-  ARCHIVE('https://bulbapedia.bulbagarden.net/wiki/Everyday_Wonders_(TCG_Pocket)'),
-  ARCHIVE('https://www.pokemon-zone.com/themed-collections/b4/'),
-  ARCHIVE('https://www.pokemon-zone.com/themed-collections/b4a/'),
-  ARCHIVE('https://www.pokemon-zone.com/themed-collections/b4b/'),
+  GOHUB('mega-rising'),
+  GOHUB('crimson-blaze'),
+  GOHUB('fantastical-parade'),
+  GOHUB('paldean-wonders'),
+  GOHUB('mega-shine'),
+  GOHUB('pulsing-aura'),
+  GOHUB('paradox-drive'),
+  GOHUB('everyday-wonders'),
+  GOHUB('deluxe-pack-ex'),
+  'https://game8.co/games/Pokemon-TCG-Pocket/archives/483769',
+  'https://gamewave.fr/pokemon-pocket/pokemon-pocket-les-missions-secretes-de-booster-de-luxe-ex-et-comment-les-valider/',
 ];
 
 function enTexte(html){
