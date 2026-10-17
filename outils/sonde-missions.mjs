@@ -64,10 +64,19 @@ function enTexte(html){
 
 async function principal(){
   const pages = [];
+  const pause = ms => new Promise(f => setTimeout(f, ms));
   for(const adresse of PAGES){
     try{
-      const r = await fetch(adresse, { headers: IDENTITE, redirect: 'follow' });
-      const corps = await r.text();
+      // L'archive limite le rythme : une page toutes les quelques secondes,
+      // et on patiente davantage quand elle demande de ralentir.
+      let r, corps;
+      for(let essai = 0; essai < 5; essai++){
+        await pause(essai === 0 ? 4000 : 15000 * essai);
+        r = await fetch(adresse, { headers: IDENTITE, redirect: 'follow' });
+        corps = await r.text();
+        if(r.status !== 429) break;
+        console.log(`  429, nouvel essai — ${adresse}`);
+      }
       let texte;
       texte = enTexte(corps);
       // Les données embarquées d'une page construite en JavaScript.
