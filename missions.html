@@ -463,7 +463,8 @@ async function construire(){
 
   // Les missions qui réunissent plusieurs extensions se rangent d'après
   // leurs cartes : toutes d'une même série, elles ouvrent la section de
-  // cette série ; de plusieurs séries, elles vont dans « Multi-Séries ».
+  // cette série (« Multi-Extensions - Série B ») ; de plusieurs séries,
+  // elles vont dans « Multi-Séries ».
   // Une mission ajoutée au fichier trouve ainsi sa place toute seule.
   const lot = donnees.extensions.find(e => e.id === LOT_PLUSIEURS);
   const parSerieCommune = new Map(), multiSeries = [];
@@ -481,7 +482,7 @@ async function construire(){
   for(const [serie, missions] of parSerieCommune){
     const bloc = {
       id: `plusieurs-${formeComparable(serie).replace(/ /g, '-')}`, cle: LOT_PLUSIEURS, virtuel: true,
-      nom: 'Entre plusieurs extensions', serieNom: serie, missions,
+      nom: `Multi-Extensions - ${serie}`, serieNom: serie, missions,
       note: `Ces collections réunissent des cartes de plusieurs extensions de la ${serie.replace(/^Série/, 'série')} : aucun booster ne les contient toutes.${reserve}`,
     };
     const tete = extensions.findIndex(e => e.serieNom === serie);
