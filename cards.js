@@ -354,12 +354,9 @@ document.head.appendChild(Object.assign(document.createElement('style'), { textC
      couvrir la page entière. Sans cela, le rail passait devant et masquait
      la flèche de gauche. */
   .card-zoom{position:fixed;inset:0;z-index:70;background:rgba(10,11,13,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;cursor:zoom-out;opacity:0;transition:opacity .15s;
-    /* Un glissement horizontal du doigt est pour nous (passer d'une carte à
-       l'autre) ; le navigateur garde le pincement pour zoomer. */
-    touch-action:pan-y pinch-zoom;}
+}
   .card-zoom.shown{opacity:1}
-  .card-zoom img{max-width:min(460px,100%);max-height:78vh;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,0.6);
-    user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+  .card-zoom img{max-width:min(460px,100%);max-height:78vh;border-radius:12px;box-shadow:0 24px 70px rgba(0,0,0,0.6);}
   .card-zoom .caption{font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;color:#EDEAE0;text-align:center;}
   .card-zoom .caption .hint{display:block;margin-top:4px;font-size:11.5px;color:#9B9E9C;}
   .card-zoom .valeur{display:block;margin-top:6px;font-size:15px;color:#E3C766;}
@@ -397,13 +394,12 @@ function openCardZoom(img){
     <button class="fleche avant" aria-label="Carte précédente">‹</button>
     <img alt="">
     <div class="caption"><span class="titre"></span><span class="valeur" id="zoom-valeur"></span><span class="hint">${
-      ecranTactile() ? 'Glisse vers la gauche ou la droite pour défiler · Touche le fond pour fermer'
+      typeof ecranTactile === 'function' && ecranTactile() ? 'Glisse vers la gauche ou la droite pour défiler · Touche le fond pour fermer'
                      : 'Flèches ← → pour défiler · Échap pour fermer'}</span></div>
     <button class="fleche apres" aria-label="Carte suivante">›</button>
   `;
 
   const elImage  = overlay.querySelector('img');
-  elImage.draggable = false;
   const elTitre  = overlay.querySelector('.titre');
   const elValeur = overlay.querySelector('#zoom-valeur');
   const avant    = overlay.querySelector('.fleche.avant');
@@ -485,86 +481,15 @@ function openCardZoom(img){
     if(cible >= 0 && cible < vignettes.length) afficher(cible);
   };
 
-  // ------------------------------------------------ le glissement du doigt
-  //
-  // Sur un téléphone, on passe d'une carte à l'autre en la faisant glisser,
-  // comme dans une galerie de photos. La carte suit le doigt ; lâchée assez
-  // loin (ou d'un geste vif), elle part et la suivante arrive du côté
-  // opposé ; sinon, elle revient en place. Au bout de la série, elle résiste
-  // et revient : rien ne suit. Le geste marche aussi à la souris.
-  const SEUIL = 60;                // pixels parcourus pour changer de carte
-  const VITESSE = 0.35;            // ou pixels par milliseconde, pour un geste vif
-  let geste = null;                // { id, x, y, dx, horizontal, traces }
-  let vientDeGlisser = false;      // le clic qui suit un glissement ne ferme pas la vue
-  const doigts = new Set();
-
-  const placer = (dx, anime) => {
-    elImage.style.transition = anime ? 'transform .2s ease-out, opacity .2s ease-out' : 'none';
-    elImage.style.transform = dx ? `translateX(${dx}px)` : '';
-    elImage.style.opacity = dx ? String(Math.max(0.35, 1 - Math.abs(dx) / (innerWidth * 1.2))) : '';
-  };
-
-  const changerEnGlissant = pas => {
-    const sortie = -pas * Math.min(innerWidth, 640);
-    placer(sortie, true);
-    setTimeout(() => {
-      aller(pas);
-      // La nouvelle carte entre du côté opposé.
-      placer(-sortie * 0.6, false);
-      void elImage.offsetWidth;
-      placer(0, true);
-    }, 170);
-  };
-
-  overlay.addEventListener('pointerdown', (e) => {
-    doigts.add(e.pointerId);
-    // Deux doigts : c'est un pincement pour zoomer, pas un glissement.
-    if(doigts.size > 1){ if(geste){ placer(0, true); geste = null; } return; }
-    if(e.button > 0 || e.target.closest('.fleche')) return;
-    geste = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, horizontal: null,
-      traces: [{ x: e.clientX, t: performance.now() }] };
-  });
-
-  overlay.addEventListener('pointermove', (e) => {
-    if(!geste || e.pointerId !== geste.id) return;
-    const dx = e.clientX - geste.x, dy = e.clientY - geste.y;
-    if(geste.horizontal === null && Math.hypot(dx, dy) > 10){
-      geste.horizontal = Math.abs(dx) > Math.abs(dy);
-      // Le geste est à nous : le doigt peut sortir de l'image sans le perdre.
-      if(geste.horizontal) try{ overlay.setPointerCapture(e.pointerId); }catch(err){}
-    }
-    if(!geste.horizontal) return;
-    e.preventDefault();
-    // Les derniers instants du geste disent s'il était vif.
-    const maintenant = performance.now();
-    geste.traces.push({ x: e.clientX, t: maintenant });
-    while(geste.traces.length > 2 && maintenant - geste.traces[0].t > 120) geste.traces.shift();
-    const auBout = (dx > 0 && position === 0) || (dx < 0 && position === vignettes.length - 1);
-    geste.dx = dx;
-    placer(auBout ? dx * 0.25 : dx, false);
-  });
-
-  const finDuGeste = (e) => {
-    doigts.delete(e.pointerId);
-    if(!geste || e.pointerId !== geste.id) return;
-    const { dx, horizontal, traces } = geste;
-    geste = null;
-    if(!horizontal){ placer(0, true); return; }
-    vientDeGlisser = true;
-    setTimeout(() => { vientDeGlisser = false; }, 400);
-    const debut = traces[0], fin = traces[traces.length - 1];
-    const vitesse = Math.abs(fin.x - debut.x) / Math.max(16, fin.t - debut.t);
-    const vif = vitesse > VITESSE && Math.abs(dx) > 25 && Math.sign(fin.x - debut.x) === Math.sign(dx);
-    const pas = dx < 0 ? 1 : -1;
-    const cible = position + pas;
-    if(e.type === 'pointerup' && (Math.abs(dx) > SEUIL || vif) && cible >= 0 && cible < vignettes.length){
-      changerEnGlissant(pas);
-    }else{
-      placer(0, true);
-    }
-  };
-  overlay.addEventListener('pointerup', finDuGeste);
-  overlay.addEventListener('pointercancel', finDuGeste);
+  // Sur un téléphone, on passe d'une carte à l'autre en la faisant glisser
+  // (glissement.js) ; sans ce fichier, les flèches restent.
+  const glissement = typeof brancherGlissement === 'function'
+    ? brancherGlissement({
+        zone: overlay, image: elImage,
+        peutAller: pas => position + pas >= 0 && position + pas < vignettes.length,
+        changer: aller,
+      })
+    : null;
 
   const fermer = () => {
     overlay.classList.remove('shown');
@@ -582,7 +507,7 @@ function openCardZoom(img){
   // Le fond ferme la vue ; les flèches, elles, doivent pouvoir être
   // cliquées sans la refermer aussitôt.
   overlay.addEventListener('click', (e) => {
-    if(vientDeGlisser){ vientDeGlisser = false; return; }
+    if(glissement?.vientDeGlisser()) return;
     const fleche = e.target.closest('.fleche');
     if(!fleche) return fermer();
     e.stopPropagation();
@@ -594,12 +519,6 @@ function openCardZoom(img){
   document.body.appendChild(overlay);
   afficher(position);
   requestAnimationFrame(() => overlay.classList.add('shown'));
-}
-
-// Un écran qu'on touche du doigt, sans souris pour survoler : l'aide de la
-// vue agrandie y parle de glisser plutôt que de touches du clavier.
-function ecranTactile(){
-  try{ return matchMedia('(hover: none) and (pointer: coarse)').matches; }catch(err){ return false; }
 }
 
 function echapperTexte(texte){

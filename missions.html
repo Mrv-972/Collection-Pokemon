@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-px1b"></script>
+<script src="theme.js?v=2026-10-17-e11d"></script>
 <title>Missions secrètes — PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -142,6 +142,10 @@
   .mission.faite h3{text-decoration:line-through}
   .mission-coche{flex-shrink:0;width:22px;height:22px;margin-top:1px;accent-color:var(--gold);cursor:pointer}
   .mission .condition{font-size:13px;color:var(--text-on-ink-dim);margin:9px 0 0;line-height:1.5}
+  /* Une mission qui réunit des cartes de plusieurs extensions le dit tout
+     de suite : on ne les trouvera pas toutes dans le même booster. */
+  .mission .multi-ext{display:inline-block;margin:8px 0 0;padding:3px 9px;border-radius:999px;font-size:12px;
+    color:var(--text-on-ink);background:rgba(var(--gold-rgb),0.14);border:1px solid rgba(var(--gold-rgb),0.45)}
   .mission .cartes{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0;padding:0;list-style:none}
   .mission .cartes li{font-size:12.5px;padding:3px 9px;border-radius:4px;
                       background:rgba(var(--trait-rgb),0.06);color:var(--text-on-ink);}
@@ -190,6 +194,7 @@
                       background:rgba(var(--trait-rgb),0.10);color:var(--text-on-ink);font-size:26px;
                       line-height:1;display:flex;align-items:center;justify-content:center;
                       transition:background .12s,opacity .12s;}
+  .zoom-carte .fleche{z-index:2}
   .zoom-carte .fleche:hover{background:rgba(var(--trait-rgb),0.20)}
   .zoom-carte .fleche:disabled{opacity:.25;cursor:default}
   .zoom-carte .fleche.avant{left:72px}
@@ -252,17 +257,18 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-17-px1b"></script>
-<script src="catalogue.js?v=2026-10-17-px1b"></script>
-<script src="supabase-config.js?v=2026-10-17-px1b"></script>
-<script src="pied.js?v=2026-10-17-px1b"></script>
-<script src="admin.js?v=2026-10-17-px1b"></script>
-<script src="admin-site.js?v=2026-10-17-px1b"></script>
-<script src="compte.js?v=2026-10-17-px1b"></script>
-<script src="progression.js?v=2026-10-17-px1b"></script>
-<script src="sets.js?v=2026-10-17-px1b"></script>
-<script src="raretes.js?v=2026-10-17-px1b"></script>
-<script src="missions.js?v=2026-10-17-px1b"></script>
+<script src="univers.js?v=2026-10-17-e11d"></script>
+<script src="catalogue.js?v=2026-10-17-e11d"></script>
+<script src="supabase-config.js?v=2026-10-17-e11d"></script>
+<script src="pied.js?v=2026-10-17-e11d"></script>
+<script src="admin.js?v=2026-10-17-e11d"></script>
+<script src="admin-site.js?v=2026-10-17-e11d"></script>
+<script src="compte.js?v=2026-10-17-e11d"></script>
+<script src="progression.js?v=2026-10-17-e11d"></script>
+<script src="sets.js?v=2026-10-17-e11d"></script>
+<script src="raretes.js?v=2026-10-17-e11d"></script>
+<script src="glissement.js?v=2026-10-17-e11d"></script>
+<script src="missions.js?v=2026-10-17-e11d"></script>
 <script>
 // Les missions secrètes n'existent que dans l'application mobile : du côté
 // du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
@@ -321,16 +327,33 @@ function echapper(t){
   return String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 }
 
+// Le nom lisible de chaque extension, pour les missions qui en réunissent
+// plusieurs.
+const nomsExtensions = new Map();
+const extensionDeLaCarte = id => String(id).replace(/-\d+$/, '');
+
+// Les extensions dont une mission réclame des cartes : celles que le
+// fichier nomme, sinon celles des identifiants donnés, sinon la sienne.
+function extensionsDeLaMission(idExt, mission){
+  const ids = (mission.ids ?? []).filter(Boolean).map(extensionDeLaCarte);
+  const toutes = [...(mission.extensions ?? []), ...ids];
+  return toutes.length ? [...new Set(toutes)] : [idExt];
+}
+
 function blocMission(idExt, mission, faites){
   const cle = cleMission(idExt, mission.nom);
   const faite = faites.has(cle);
+  const extensions = extensionsDeLaMission(idExt, mission);
+  const plusieurs = extensions.length > 1 || extensions[0] !== idExt;
   return `
-    <div class="mission${faite ? ' faite' : ''}" data-cle="${echapper(cle)}">
+    <div class="mission${faite ? ' faite' : ''}" data-cle="${echapper(cle)}" data-extensions="${echapper(extensions.join(','))}">
       <div class="mission-tete">
         <input class="mission-coche" type="checkbox" ${faite ? 'checked' : ''}
                aria-label="Marquer « ${echapper(mission.nom)} » comme accomplie">
         <h3>${echapper(mission.nom)}</h3>
       </div>
+      ${plusieurs ? `<p class="multi-ext">Cartes de ${echapper(extensions.map(id => nomsExtensions.get(id) ?? id)
+          .join(', ').replace(/, ([^,]*)$/, ' et $1'))}</p>` : ''}
       ${mission.condition ? `<p class="condition">${echapper(mission.condition)}</p>` : ''}
       ${mission.cartes?.length
         ? `<ul class="cartes">${mission.cartes.map((c, i) => {
@@ -419,11 +442,14 @@ async function construire(){
   // nom affiché et le logo viennent du catalogue, pour qu'ils restent les
   // mêmes partout sur le site.
   const parId = new Map(extensionsConnues.map(e => [e.id, e]));
+  for(const e of extensionsConnues) nomsExtensions.set(e.id, e.name);
+  // Un bloc qui n'est pas une extension du catalogue — les missions qui
+  // réunissent plusieurs extensions — porte son nom et sa série lui-même.
   const extensions = donnees.extensions
     .map(e => ({
       ...e,
-      nom: parId.get(e.id)?.name ?? e.id,
-      serieNom: parId.get(e.id)?.serieNom ?? guessSeriesName(e.id),
+      nom: parId.get(e.id)?.name ?? e.nom ?? e.id,
+      serieNom: parId.get(e.id)?.serieNom ?? e.serieNom ?? guessSeriesName(e.id),
     }))
     .reverse();   // les plus récentes d'abord, comme le catalogue
 
@@ -454,56 +480,70 @@ async function construire(){
 // Les visuels ne sont cherchés qu'à l'ouverture d'une extension, et une
 // seule fois : charger les cartes des dix-huit extensions au chargement de
 // la page ferait attendre pour des images que personne ne regarde encore.
+// La promesse est gardée, pas seulement son résultat : deux blocs ouverts en
+// même temps ne demandent pas deux fois la même extension.
 const cartesParExtension = new Map();
+
+async function cartesDe(idExt){
+  if(!cartesParExtension.has(idExt)) cartesParExtension.set(idExt, cartesDeLExtension(idExt));
+  return cartesParExtension.get(idExt);
+}
 
 async function poserLesVisuels(bloc){
   if(bloc.dataset.visuels) return;
   bloc.dataset.visuels = 'en cours';
 
-  const id = bloc.dataset.ext;
-  let cartes;
-  try{
-    if(!cartesParExtension.has(id)) cartesParExtension.set(id, await cartesDeLExtension(id));
-    cartes = cartesParExtension.get(id);
-  }catch(err){
+  // Les cartes de toutes les extensions que réclament les missions du bloc :
+  // la sienne, et celles des missions qui en réunissent plusieurs.
+  const missions = [...bloc.querySelectorAll('.mission')];
+  const voulues = new Set([bloc.dataset.ext]);
+  for(const m of missions) for(const id of (m.dataset.extensions || '').split(',').filter(Boolean)) voulues.add(id);
+  const cartesPar = new Map();
+  await Promise.all([...voulues].map(async id => {
+    try{ cartesPar.set(id, await cartesDe(id)); }
+    catch(err){ console.warn(`Cartes de ${id} indisponibles`, err); }
+  }));
+  if(!cartesPar.size){
     // Sans les cartes, les noms restent : la mission se lit quand même.
-    console.warn(`Cartes de ${id} indisponibles`, err);
     bloc.dataset.visuels = 'échec';
     return;
   }
+  const nomDe = id => nomsExtensions.get(id) ?? bloc.querySelector('.ext-tete h3')?.textContent?.trim() ?? id;
 
-  // Le nom lisible de l'extension est déjà affiché en tête du bloc : on le
-  // reprend plutôt que de le redemander au catalogue.
-  const nomExtension = bloc.querySelector('.ext-tete h3')?.textContent?.trim() ?? id;
-
-  bloc.querySelectorAll('.mission').forEach(mission => {
+  missions.forEach(mission => {
     const liste = mission.querySelector('.visuels');
     if(!liste) return;
     const condition = mission.querySelector('.condition')?.textContent ?? '';
+    const ici = (mission.dataset.extensions || bloc.dataset.ext).split(',').filter(Boolean);
+    const parmi = ici.flatMap(id => cartesPar.get(id) ?? []);
     const demandees = [...mission.querySelectorAll('.cartes li')]
       .map(li => ({ nom: li.textContent, id: li.dataset.id ?? null }));
     const trouvees = demandees.map(({ nom, id }) => [
       nom,
-      id ? (cartes.find(c => c.id === id) ?? null) : trouverLaCarte(nom, condition, cartes),
+      id ? ((cartesPar.get(extensionDeLaCarte(id)) ?? []).find(c => c.id === id) ?? null) : trouverLaCarte(nom, condition, parmi),
     ]);
 
     // Tout ou rien : une mission à moitié illustrée se lit plus mal que la
     // même en toutes lettres.
     if(!trouvees.some(([, c]) => c)) return;
 
-    liste.innerHTML = trouvees.map(([nom, carte]) => `
+    liste.innerHTML = trouvees.map(([nom, carte]) => {
+      const sienne = carte ? (cartesPar.get(extensionDeLaCarte(carte.id)) ?? parmi) : [];
+      const nomExtension = carte ? nomDe(extensionDeLaCarte(carte.id)) : '';
+      return `
       <li>
         ${carte
           ? `<img class="carte ${classeObtention(carte.id)}" src="${echapper(carte.image)}" alt="${echapper(carte.name)}"
-                  loading="lazy" title="${echapper(nom)}" data-fiche="${echapper(ficheDeLaCarte(carte, nomExtension, cartes))}"
+                  loading="lazy" title="${echapper(nom)}" data-fiche="${echapper(ficheDeLaCarte(carte, nomExtension, sienne))}"
                   onerror="this.replaceWith(Object.assign(document.createElement('span'),
                            { className: 'sans-visuel', textContent: '?' }))">`
           : `<span class="sans-visuel" title="Carte non retrouvée dans le catalogue">?</span>`}
         <span class="nom">${echapper(carte ? carte.name : nom)}</span>
         ${carte ? `<span class="fiche">${rarityIcon(carte.rarity)}
-          ${echapper(nomDeLaVersion(carte, cartes) ?? '')}
+          ${echapper(nomDeLaVersion(carte, sienne) ?? '')}
           <span class="ext">${echapper(nomExtension)} · n° ${echapper(carte.localId)}</span></span>` : ''}
-      </li>`).join('');
+      </li>`;
+    }).join('');
     liste.hidden = false;
     // Les noms sont maintenant sous les vignettes : la liste de texte ferait double emploi.
     mission.querySelector('.cartes')?.remove();
@@ -536,7 +576,9 @@ function agrandirLaCarte(vignette){
     <button class="fleche avant" aria-label="Carte précédente">‹</button>
     <img alt="">
     <p class="legende"><span class="titre"></span>
-       <span class="sous">Flèches ← → pour défiler · Échap pour fermer</span></p>
+       <span class="sous">${typeof ecranTactile === 'function' && ecranTactile()
+         ? 'Glisse vers la gauche ou la droite pour défiler · Touche le fond pour fermer'
+         : 'Flèches ← → pour défiler · Échap pour fermer'}</span></p>
     <button class="fleche apres" aria-label="Carte suivante">›</button>`;
 
   const image  = voile.querySelector('img');
@@ -570,9 +612,19 @@ function agrandirLaCarte(vignette){
 
   avant.addEventListener('click', e => { e.stopPropagation(); afficher(position - 1); });
   apres.addEventListener('click', e => { e.stopPropagation(); afficher(position + 1); });
-  // Cliquer à côté referme ; cliquer sur la carte elle-même, non.
+  // Sur un téléphone, on passe d'une carte à l'autre en la faisant glisser
+  // (glissement.js), comme dans les grilles du catalogue.
+  const glissement = typeof brancherGlissement === 'function'
+    ? brancherGlissement({
+        zone: voile, image,
+        peutAller: pas => position + pas >= 0 && position + pas < soeurs.length,
+        changer: pas => afficher(position + pas),
+      })
+    : null;
+  // Cliquer à côté referme ; cliquer sur la carte elle-même, non — ni le
+  // clic qui termine un glissement.
   image.addEventListener('click', e => e.stopPropagation());
-  voile.addEventListener('click', fermer);
+  voile.addEventListener('click', () => { if(!glissement?.vientDeGlisser()) fermer(); });
   document.addEventListener('keydown', auClavier);
 
   afficher(position);

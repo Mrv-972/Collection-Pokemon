@@ -358,6 +358,52 @@ const aplatir = donnees => Array.isArray(donnees) ? donnees : Object.values(donn
 //   3. le souvenir ;
 //   4. à défaut, la traduction automatique — signalée au visiteur.
 const MEMOIRE_NOMS_POCKET = 'noms-pocket-fr.json';
+
+// Un nom français, d'où qu'il vienne, doit désigner le même Pokémon que le
+// nom anglais : en octobre 2026, TCGdex donnait « Amonita » à la carte
+// anglaise « Mantyke » (Babimanta), et la promo « Mega Sceptile ex » était
+// retenue sous le nom de « Feunnec ». La table des noms d'espèces de PokeAPI
+// (données ouvertes, toutes langues) permet de le vérifier ; un nom qui ne
+// désigne pas d'espèce (un Dresseur, un Objet) passe sans contrôle.
+const ESPECES = 'https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv';
+const formeEspece = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+async function chargerEspeces(){
+  try{
+    const r = await fetch(ESPECES);
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    const parEn = new Map(), parFr = new Map();
+    for(const ligne of (await r.text()).split('\n').slice(1)){
+      const [n, langue, nom] = ligne.split(',');
+      if(langue === '9') parEn.set(formeEspece(nom), Number(n));
+      if(langue === '5') parFr.set(formeEspece(nom), Number(n));
+    }
+    if(parEn.size < 1000 || parFr.size < 1000) throw new Error('table incomplète');
+    return { parEn, parFr };
+  }catch(err){
+    console.log(`  Table des espèces indisponible (${err.message}) : noms français non contrôlés`);
+    return null;
+  }
+}
+
+// L'espèce nommée dans un nom de carte : le plus long groupe de mots connu.
+function especeNommee(nom, table){
+  const mots = formeEspece(nom).split(' ');
+  for(let l = 3; l >= 1; l--){
+    for(let i = 0; i + l <= mots.length; i++){
+      const n = table.get(mots.slice(i, i + l).join(' '));
+      if(n) return n;
+    }
+  }
+  return null;
+}
+
+function memePokemon(especes, anglais, francais){
+  if(!especes || !francais) return Boolean(francais);
+  const a = especeNommee(anglais, especes.parEn), b = especeNommee(francais, especes.parFr);
+  return !(a && b && a !== b);
+}
 const apostrophes = nom => String(nom ?? '').replace(/[\u2018\u2019]/g, "'").trim();
 
 async function lireMemoireNoms(){
@@ -443,14 +489,16 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
                                 categories = new Map(), nomsTcgdex = new Map()){
   const parSerie = await telecharger(`${POCKET_BASE}/sets.json`);
   const memoire = await lireMemoireNoms();
+  const especes = await chargerEspeces();
+  let rejetes = 0;
   // Les noms des cartes de l'application que TCGdex connaît enrichissent le
   // dictionnaire : « Copycat » s'y dit « Copieuse », ce que les cartes
   // physiques n'apprennent pas.
   // La mémoire aussi : une extension de réimpressions, comme les boosters
   // de luxe, reprend des cartes dont on connaît déjà le nom français.
   const nomsDeLApplication = new Map();
-  for(const [en, fr] of memoire.values()) nomsDeLApplication.set(apostrophes(en), fr);
-  for(const { en, fr } of nomsTcgdex.values()) nomsDeLApplication.set(apostrophes(en), fr);
+  for(const [en, fr] of memoire.values()) if(memePokemon(especes, en, fr)) nomsDeLApplication.set(apostrophes(en), fr);
+  for(const { en, fr } of nomsTcgdex.values()) if(memePokemon(especes, en, fr)) nomsDeLApplication.set(apostrophes(en), fr);
   const dictionnaire = new Map([...traductions, ...nomsDeLApplication]);
 
   const extensions = [];
@@ -502,10 +550,19 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
       const anglais = c.name;
       const tcgdex = nomsTcgdex.get(id);
       const souvenir = memoire.get(id);
-      let nom;
-      if(tcgdex && apostrophes(tcgdex.en) === apostrophes(anglais)){ nom = tcgdex.fr; officiels++; }
-      else if(enFrancaisSource.has(c.number)){ nom = enFrancaisSource.get(c.number); deLaSource++; }
-      else if(souvenir && apostrophes(souvenir[0]) === apostrophes(anglais)){ nom = souvenir[1]; souvenirs++; }
+      // Chaque source proposée n'est retenue que si elle nomme le même
+      // Pokémon que l'anglais ; sinon on passe à la suivante.
+      const verifie = fr => {
+        if(!fr) return false;
+        if(memePokemon(especes, anglais, fr)) return true;
+        rejetes++;
+        console.log(`  ${id} : « ${fr} » écarté, ce n'est pas le Pokémon de « ${anglais} »`);
+        return false;
+      };
+      let nom, sur = false;
+      if(tcgdex && apostrophes(tcgdex.en) === apostrophes(anglais) && verifie(tcgdex.fr)){ nom = tcgdex.fr; officiels++; sur = true; }
+      else if(enFrancaisSource.has(c.number) && verifie(enFrancaisSource.get(c.number))){ nom = enFrancaisSource.get(c.number); deLaSource++; sur = true; }
+      else if(souvenir && apostrophes(souvenir[0]) === apostrophes(anglais) && verifie(souvenir[1])){ nom = souvenir[1]; souvenirs++; }
       // Une réimpression : une carte de l'application portait déjà ce nom
       // anglais, son nom français est connu.
       else if(nomsDeLApplication.has(apostrophes(anglais))){ nom = nomsDeLApplication.get(apostrophes(anglais)); reprises++; }
@@ -515,8 +572,10 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
         if(nom !== anglais) traduites++;
       }
       // Un nom sûr rejoint la mémoire ; une traduction automatique, jamais —
-      // ni un nom dont on n'a pas lu la version anglaise pour contrôle.
-      if(anglaisLu && ((tcgdex && nom === tcgdex.fr) || enFrancaisSource.has(c.number))) memoire.set(id, [anglais, nom]);
+      // ni un nom dont on n'a pas lu la version anglaise pour contrôle. Un
+      // souvenir démenti par le contrôle en sort.
+      if(anglaisLu && sur) memoire.set(id, [anglais, nom]);
+      else if(souvenir && !memePokemon(especes, souvenir[0], souvenir[1])) memoire.delete(id);
       // La catégorie vient de TCGdex quand il connaît l'extension ; sinon, le
       // nom du fichier image dit au moins si c'est une carte Dresseur
       // (« cTR_… ») — sa famille se déduira des cartes du même nom.
@@ -552,6 +611,7 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
     delete ext.codeDistant;
   }
   await ecrireMemoireNoms(memoire);
+  if(rejetes) console.log(`  ${rejetes} nom(s) français écarté(s) par le contrôle des espèces`);
   return { extensions, cartesParSet };
 }
 

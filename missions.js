@@ -78,7 +78,7 @@ const PREFERENCES_PAR_VERSION = [
   [/gold\s*crown|couronne/i,                 ['Couronne']],
   [/immersive/i,                             ['Trois Étoiles']],
   [/arc.?en.?ciel|rainbow|bordered|2\s*★|deux\s*étoiles/i, ['Deux Étoiles', 'Une Étoile']],
-  [/full\s*art|1\s*★|une\s*étoile/i,                      ['Une Étoile', 'Deux Étoiles']],
+  [/full\s*art|1\s*★|une\s*étoile|illustration\s*rare/i,  ['Une Étoile', 'Deux Étoiles']],
   [/shiny|chromatique/i,                     ['Chromatique', 'Chromatique deux étoiles']],
 ];
 
