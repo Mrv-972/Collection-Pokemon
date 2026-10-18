@@ -26,7 +26,9 @@ modifie, et ajoute un verrou indépendant sur `est_admin`.
 **`supabase/communaute.sql`** (profils publics, badges, avis, signalements,
 liste de souhaits partageable, réglages d'affichage), puis
 **`supabase/espace-communaute.sql`** (l'onglet Communauté : questions,
-idées, forums). Chacun peut être relancé sans dommage.
+idées, forums), puis **`supabase/echanges-limites.sql`** (trois
+propositions d'échange au plus par carte recherchée, et le bouton
+« Refuser »). Chacun peut être relancé sans dommage.
 
 **3. Te désigner administrateur.** Toujours dans l'éditeur SQL :
 

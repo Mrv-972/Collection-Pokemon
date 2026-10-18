@@ -95,6 +95,24 @@
   .mini .nom{font-size:11.5px;line-height:1.25;}
   .mini .valeur{font-size:11px;color:var(--accent-clair);}
   .mini .ext{font-size:10.5px;color:var(--text-on-ink-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mini .refuser{align-self:flex-start;margin-top:2px;background:none;border:1px solid rgba(var(--trait-rgb),0.14);color:var(--text-on-ink-dim);font:inherit;font-size:11px;padding:4px 9px;border-radius:3px;cursor:pointer;}
+  .mini .refuser:hover,.mini .refuser:focus-visible{color:var(--alerte);border-color:currentColor}
+  .mini .refuser:disabled{opacity:.5;cursor:wait}
+
+  /* Les propositions refusées restent à portée de main : un refus donné
+     par erreur se rattrape sans avoir à chercher. */
+  .mes-refus{margin:8px 0 34px;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:6px;padding:14px 18px;font-size:13.5px;}
+  .mes-refus summary{cursor:pointer;color:var(--text-on-ink-dim);}
+  .mes-refus summary:hover{color:var(--text-on-ink)}
+  .mes-refus ul{list-style:none;margin:12px 0 2px;padding:0;display:flex;flex-direction:column;gap:8px;}
+  .mes-refus li{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .mes-refus li span strong{font-weight:500;color:var(--text-on-ink)}
+  .mes-refus .retablir{background:none;border:1px solid rgba(var(--gold-rgb),0.45);color:var(--accent-clair);font:inherit;font-size:12px;padding:5px 11px;border-radius:3px;cursor:pointer;}
+  .mes-refus .retablir:hover{background:rgba(var(--gold-rgb),0.1)}
+
+  .bandeau-refus{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:16px;width:max-content;max-width:calc(100vw - 32px);background:var(--ink-soft);border:1px solid rgba(var(--gold-rgb),0.45);border-radius:6px;padding:12px 18px;font-size:13.5px;box-shadow:0 8px 28px rgba(0,0,0,.35);}
+  .bandeau-refus[hidden]{display:none}
+  .bandeau-refus button{background:none;border:none;color:var(--accent-clair);font:inherit;font-weight:600;cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}
 
   .status-msg{color:var(--text-on-ink-dim);font-size:15px;padding:28px 0;}
   .status-msg.err{color:var(--alerte)}
@@ -138,6 +156,8 @@
     .filter-btn{min-height:42px}
     .membre{padding:18px 16px}
     .membre-tete h2{font-size:19px}
+    .mini .refuser{padding:7px 10px;font-size:12px}
+    .mes-refus .retablir{padding:8px 13px}
   }
 </style>
 </head>
@@ -162,6 +182,7 @@
     <div class="kicker">Mise en relation</div>
     <h1>Les échanges possibles</h1>
     <p>PokéClasseur croise ton classeur avec celui des autres membres : dès que quelqu'un propose une carte que tu cherches, ou cherche une carte que tu proposes, il apparaît ici.</p>
+    <p>Pour chaque carte que tu recherches, tu vois au plus trois collectionneurs qui la proposent, d'abord ceux avec qui l'échange peut se faire dans les deux sens. Une proposition ne te convient pas ? Refuse-la : la suivante prend sa place. De même, pour chaque carte que tu proposes, tu vois au plus trois membres qui la recherchent.</p>
   </div>
 
   <div class="filtres" id="filtres" hidden>
@@ -171,6 +192,8 @@
   </div>
 
   <div id="content"></div>
+  <div id="mes-refus"></div>
+  <div class="bandeau-refus" id="bandeau-refus" role="status" hidden></div>
 
   <footer></footer>
 </div>
@@ -194,6 +217,13 @@
 <script src="messagerie.js?v=2026-10-17-4gr7"></script>
 <script>
 let correspondances = [];
+// Les propositions que j'ai refusées, pour pouvoir les rétablir, et le
+// pseudo des membres concernés. Tant que supabase/echanges-limites.sql n'a
+// pas été exécuté, la table n'existe pas : on n'affiche alors aucun bouton
+// « Refuser », plutôt qu'un bouton qui échouerait à chaque clic.
+let mesRefus = [];
+let pseudosRefus = new Map();
+let refusDisponible = false;
 let avisConnus = new Map();   // résumé des avis reçus par chaque membre listé
 let equilibresSeulement = false;
 
@@ -352,7 +382,10 @@ async function chargerInfosCartes(idsCartes){
   }
 }
 
-function miniCarte(carteId){
+// « refus », quand il est donné, porte le sens de la proposition (« recoit » :
+// ce membre me donnerait la carte ; « donne » : je la lui donnerais) et le
+// membre en face. Il ajoute le bouton qui écarte cette proposition.
+function miniCarte(carteId, refus){
   const info = infosCartes[carteId] || {};
   const setId = setIdOfCard(carteId);
   const nom = info.name || carteId;
@@ -366,18 +399,22 @@ function miniCarte(carteId){
       <div class="nom">${nom}</div>
       <div class="valeur" data-prix="${carteId}"></div>
       <div class="ext">${nomsExtensions[setId] || setId}${info.localId ? ' · #' + info.localId : ''}</div>
+      ${refus && refusDisponible
+        ? `<button type="button" class="refuser" data-sens="${refus.sens}" data-membre="${refus.membreId}" data-carte="${texteEchappe(carteId)}"
+             title="${refus.sens === 'recoit' ? 'Ne plus me proposer cette carte chez ce membre' : 'Ne plus lui proposer cette carte'}">✕ Refuser</button>`
+        : ''}
     </div>
   `;
 }
 
-function colonne(classe, titre, cartes, messageVide){
+function colonne(classe, titre, cartes, messageVide, refus){
   return `
     <div class="colonne ${classe}">
       <h3>${titre}</h3>
       <div class="total" data-total="${cartes.join(',')}"></div>
       ${cartes.length === 0
         ? `<p class="vide">${messageVide}</p>`
-        : `<div class="mini-grid">${cartes.map(miniCarte).join('')}</div>`}
+        : `<div class="mini-grid">${cartes.map(id => miniCarte(id, refus)).join('')}</div>`}
     </div>
   `;
 }
@@ -414,9 +451,9 @@ function rendre(){
       <div class="balance" data-balance="${m.membre_id}"></div>
       <div class="colonnes">
         ${colonne('recoit', `↓ Ce qu'il peut te donner (${m.il_me_donne.length})`, m.il_me_donne,
-                  'Rien que tu recherches pour le moment.')}
+                  'Rien que tu recherches pour le moment.', { sens: 'recoit', membreId: m.membre_id })}
         ${colonne('donne', `↑ Ce que tu peux lui donner (${m.je_lui_donne.length})`, m.je_lui_donne,
-                  'Rien qu\'il recherche pour le moment.')}
+                  'Rien qu\'il recherche pour le moment.', { sens: 'donne', membreId: m.membre_id })}
       </div>
     </div>
   `).join('');
@@ -517,13 +554,17 @@ async function init(){
   await chargerCorrespondances();
 }
 
-async function chargerCorrespondances(){
+// « silencieux » : après un refus, on recharge sans repasser par les cadres
+// d'attente, pour que la page ne clignote pas sous les yeux.
+async function chargerCorrespondances({ silencieux = false } = {}){
   const content = document.getElementById('content');
-  content.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+  if(!silencieux) content.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
   try{
     const db = await clientSupabase();
-    const { data, error } = await db.rpc('echanges_possibles',
-      distanceMax && !estPocket() ? { distance_max: distanceMax } : {});
+    const [{ data, error }] = await Promise.all([
+      db.rpc('echanges_possibles', distanceMax && !estPocket() ? { distance_max: distanceMax } : {}),
+      chargerMesRefus(db),
+    ]);
     if(error) throw error;
     // On ne troque pas une carte d'application contre une carte de carton :
     // chaque univers ne montre que ses propres correspondances, et un membre
@@ -542,11 +583,13 @@ async function chargerCorrespondances(){
       || (distancePourTri(a) - distancePourTri(b))
       || (b.il_me_donne.length + b.je_lui_donne.length) - (a.il_me_donne.length + a.je_lui_donne.length));
 
-    const ids = [...new Set(correspondances.flatMap(m => [...m.il_me_donne, ...m.je_lui_donne]))];
+    const ids = [...new Set([...correspondances.flatMap(m => [...m.il_me_donne, ...m.je_lui_donne]),
+                             ...mesRefus.map(r => r.carte_id)])];
     await Promise.all([chargerInfosCartes(ids), avatarsDe(correspondances.map(m => m.membre_id)),
       resumesAvis(correspondances.map(m => m.membre_id)).then(r => { avisConnus = r; })]);
     majResume();
     rendre();
+    rendreMesRefus();
     afficherPrix().catch(err => console.warn('Cotes indisponibles', err));
   }catch(err){
     console.warn('Impossible de charger les échanges', err);
@@ -554,6 +597,131 @@ async function chargerCorrespondances(){
       <span style="font-size:12px;opacity:.7">${err.message ?? err}</span></p>`;
   }
 }
+
+// --- refus -------------------------------------------------------------------
+// Une proposition est un trio : qui cherche la carte, qui la donne, laquelle.
+function trioRefus(sens, membreId, carteId){
+  return sens === 'recoit'
+    ? { chercheur_id: membre.id, donneur_id: membreId, carte_id: carteId }
+    : { chercheur_id: membreId, donneur_id: membre.id, carte_id: carteId };
+}
+
+function tableAbsente(error){
+  return error?.code === 'PGRST205' || error?.code === '42P01';
+}
+
+// Mes refus, limités à l'univers affiché : un refus de carte Pocket n'a rien
+// à faire dans la liste des cartes physiques.
+async function chargerMesRefus(db){
+  const { data, error } = await db.from('refus_echanges')
+    .select('chercheur_id, donneur_id, carte_id, refuse_le')
+    .eq('refuse_par', membre.id)
+    .order('refuse_le', { ascending: false });
+  if(error){
+    refusDisponible = false;
+    mesRefus = [];
+    if(!tableAbsente(error)) console.warn('Impossible de relire les refus', error);
+    return;
+  }
+  refusDisponible = true;
+  mesRefus = data.filter(r => appartientAUnivers(setIdOfCard(r.carte_id)));
+  const autres = [...new Set(mesRefus.map(r => r.chercheur_id === membre.id ? r.donneur_id : r.chercheur_id))]
+    .filter(id => !pseudosRefus.has(id));
+  if(autres.length === 0) return;
+  const { data: profils, error: erreurProfils } = await db.from('profils').select('id, pseudo').in('id', autres);
+  if(erreurProfils){ console.warn('Pseudos indisponibles', erreurProfils); return; }
+  profils.forEach(p => pseudosRefus.set(p.id, p.pseudo));
+}
+
+function rendreMesRefus(){
+  const zone = document.getElementById('mes-refus');
+  if(!refusDisponible || mesRefus.length === 0){ zone.innerHTML = ''; return; }
+  const ouvert = zone.querySelector('details')?.open ?? false;
+  zone.innerHTML = `
+    <details class="mes-refus"${ouvert ? ' open' : ''}>
+      <summary>Propositions que tu as refusées (${mesRefus.length})</summary>
+      <ul>
+        ${mesRefus.map(r => {
+          const jeCherche = r.chercheur_id === membre.id;
+          const autre = jeCherche ? r.donneur_id : r.chercheur_id;
+          const pseudo = texteEchappe(pseudosRefus.get(autre) ?? 'un membre');
+          const nom = texteEchappe(infosCartes[r.carte_id]?.name ?? r.carte_id);
+          return `<li>
+            <span>${jeCherche
+              ? `<strong>${nom}</strong>, proposée par ${pseudo}`
+              : `<strong>${nom}</strong>, recherchée par ${pseudo}`}</span>
+            <button type="button" class="retablir" data-chercheur="${r.chercheur_id}" data-donneur="${r.donneur_id}"
+                    data-carte="${texteEchappe(r.carte_id)}">Rétablir</button>
+          </li>`;
+        }).join('')}
+      </ul>
+    </details>`;
+}
+
+let minuteurBandeau = null;
+function afficherBandeau(message, annulation){
+  const bandeau = document.getElementById('bandeau-refus');
+  bandeau.innerHTML = `<span>${message}</span>${annulation ? '<button type="button">Annuler</button>' : ''}`;
+  bandeau.hidden = false;
+  if(annulation){
+    bandeau.querySelector('button').addEventListener('click', () => {
+      bandeau.hidden = true;
+      annulation();
+    }, { once: true });
+  }
+  clearTimeout(minuteurBandeau);
+  minuteurBandeau = setTimeout(() => { bandeau.hidden = true; }, 8000);
+}
+
+async function refuser(sens, membreId, carteId){
+  const db = await clientSupabase();
+  const trio = trioRefus(sens, membreId, carteId);
+  const { error } = await db.from('refus_echanges').insert({ ...trio, refuse_par: membre.id });
+  // Un refus déjà enregistré (double clic, autre onglet) n'est pas une erreur.
+  if(error && error.code !== '23505'){
+    console.warn('Refus non enregistré', error);
+    afficherBandeau(tableAbsente(error)
+      ? 'Le refus n\'est pas encore disponible : la base doit d\'abord être mise à jour.'
+      : 'Cette proposition a changé entre-temps : la liste est mise à jour.');
+    await chargerCorrespondances({ silencieux: true });
+    return;
+  }
+  await chargerCorrespondances({ silencieux: true });
+  afficherBandeau('Proposition refusée. Si un autre membre propose la même chose, il prend sa place.',
+    () => retablir(trio));
+}
+
+async function retablir(trio){
+  const db = await clientSupabase();
+  const { error } = await db.from('refus_echanges').delete()
+    .eq('chercheur_id', trio.chercheur_id)
+    .eq('donneur_id', trio.donneur_id)
+    .eq('carte_id', trio.carte_id)
+    .eq('refuse_par', membre.id);
+  if(error){
+    console.warn('Refus non annulé', error);
+    afficherBandeau('Impossible de rétablir cette proposition pour le moment.');
+    return;
+  }
+  await chargerCorrespondances({ silencieux: true });
+  afficherBandeau('Proposition rétablie.');
+}
+
+document.getElementById('content').addEventListener('click', (e) => {
+  const bouton = e.target.closest('.refuser');
+  if(!bouton) return;
+  bouton.disabled = true;
+  refuser(bouton.dataset.sens, bouton.dataset.membre, bouton.dataset.carte)
+    .catch(err => { console.warn(err); bouton.disabled = false; });
+});
+
+document.getElementById('mes-refus').addEventListener('click', (e) => {
+  const bouton = e.target.closest('.retablir');
+  if(!bouton) return;
+  bouton.disabled = true;
+  retablir({ chercheur_id: bouton.dataset.chercheur, donneur_id: bouton.dataset.donneur, carte_id: bouton.dataset.carte })
+    .catch(err => { console.warn(err); bouton.disabled = false; });
+});
 
 document.getElementById('btn-equilibres').addEventListener('click', (e) => {
   equilibresSeulement = !equilibresSeulement;

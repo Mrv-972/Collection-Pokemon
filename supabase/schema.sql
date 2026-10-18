@@ -350,6 +350,10 @@ $$;
 -- la base plutôt que par le navigateur : elle seule a toutes les données, et
 -- cela évite d'envoyer des milliers d'identifiants de cartes sur le réseau.
 -- Un membre bloqué disparaît des correspondances, dans les deux sens.
+--
+-- Cette version liste tout le monde. supabase/echanges-limites.sql la
+-- remplace par celle qui ne retient que trois propositions par carte : si
+-- ce fichier-ci est relancé, relancer celui-là juste après.
 drop function if exists echanges_possibles();
 drop function if exists echanges_possibles(integer);
 create function echanges_possibles(distance_max integer default null)
