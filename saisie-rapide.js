@@ -5,6 +5,10 @@
 // bouton, « Remplissage accéléré », qui ouvre une fenêtre à quatre encarts :
 //   · « Marquer d'un coup les N cartes » : pose ou retire un marquage sur les
 //     cartes affichées, filtres compris ;
+//   · « Depuis une vidéo du jeu » (page d'une extension Pocket) : la vidéo
+//     de l'écran Collection est lue par lecture-video.js, un message de
+//     validation montre le compteur du jeu à côté du résultat, et « Valider »
+//     met la collection à jour d'un coup ;
 //   · « Saisie rapide » : un toucher sur l'image d'une carte la coche (ou la
 //     décoche), au lieu de l'agrandir. On choisit ce que le toucher marque :
 //     obtenue, recherchée ou échangeable. Une pastille, en bas de l'écran,
@@ -25,6 +29,7 @@
 //     rafraichir,  // () => redessine la grille
 //     ensemble,    // « de l'extension », « de cette page »
 //     sousTitre,   // carte => ce qui la distingue sous son nom (« #94 »)
+//     video,       // true : propose la lecture d'une vidéo (une extension)
 //   })
 //
 // Tout le fichier vit dans sa propre enveloppe : ses noms ne peuvent pas
@@ -102,6 +107,21 @@ const STYLE_REMPLISSAGE = `
   .apercu .apercu-total{color:var(--accent-clair);font-weight:500;}
   .resultat{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--text-on-ink) !important;}
   .resultat[hidden]{display:none}
+  .encart .encart-note{font-size:12px;}
+  label.encart-action{display:inline-block;text-align:center;}
+  .video-etat[hidden]{display:none}
+  .video-etat{display:flex;flex-direction:column;gap:10px;font-size:13px;color:var(--text-on-ink);}
+  .video-etat progress{width:100%;height:8px;accent-color:var(--gold);}
+  .video-etat .erreur{color:var(--alerte) !important;}
+  .video-comparaison{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+  .video-comparaison figure{margin:0;flex:1 1 200px;}
+  .video-comparaison img{display:block;width:100%;border-radius:6px;border:1px solid rgba(var(--trait-rgb),0.16);}
+  .video-comparaison figcaption{font-size:11.5px;color:var(--text-on-ink-dim);margin-top:4px;}
+  .video-lu{flex:1 1 160px;font-size:12.5px;color:var(--text-on-ink-dim) !important;}
+  .video-compteur{display:block;margin-top:4px;font-size:17px;font-weight:600;color:var(--accent-clair);}
+  .video-etat ul{margin:0;padding-left:18px;}
+  .video-boutons{display:flex;gap:10px;flex-wrap:wrap;}
+  .lien-video{background:none;border:none;color:var(--accent-clair);font:inherit;cursor:pointer;padding:2px;text-decoration:underline;text-underline-offset:3px;align-self:flex-start;}
   .resultat button,.pastille-saisie button{background:none;border:none;color:var(--accent-clair);font:inherit;font-weight:600;cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}
   /* En saisie rapide, l'image d'une carte devient un bouton : celles qui
      n'ont pas encore le marquage choisi s'estompent, celles qui l'ont
@@ -284,7 +304,7 @@ function construireSaisieRapide(zone){
         <h2 id="remplissage-titre">Remplissage accéléré</h2>
         <button type="button" class="remplissage-fermer" aria-label="Fermer">✕</button>
       </div>
-      <p class="remplissage-intro">Quatre façons de remplir ton classeur sans passer carte par carte.</p>
+      <p class="remplissage-intro">${saisiePage.video ? 'Cinq' : 'Quatre'} façons de remplir ton classeur sans passer carte par carte.</p>
 
       <section class="encart" aria-labelledby="encart-lot">
         <h3 id="encart-lot">📚 Marquer d'un coup <span id="remplissage-lot-nombre"></span></h3>
@@ -294,6 +314,16 @@ function construireSaisieRapide(zone){
         </div>
       </section>
 
+      ${saisiePage.video ? `
+      <section class="encart" aria-labelledby="encart-video">
+        <h3 id="encart-video">🎬 Depuis une vidéo du jeu</h3>
+        <p>Dans Pokémon TCG Pocket, ouvre ta Collection, active « Tout afficher » et place-toi sur le titre de cette extension. Lance l'enregistrement de l'écran de ton téléphone, fais défiler jusqu'à la dernière carte, puis choisis la vidéo ici.</p>
+        <p class="encart-note">La vidéo est lue sur ton appareil : elle n'est envoyée nulle part.</p>
+        <label class="encart-action" for="remplissage-video" id="remplissage-video-bouton">Choisir la vidéo</label>
+        <input type="file" id="remplissage-video" accept="video/*" hidden>
+        <div class="video-etat" id="video-etat" role="status" hidden></div>
+      </section>
+` : ''}
       <section class="encart" aria-labelledby="encart-saisie">
         <h3 id="encart-saisie">⚡ Saisie rapide</h3>
         <p>Touche une carte pour la marquer, touche-la de nouveau pour la décocher : plus besoin des petits boutons sous chaque carte.</p>
@@ -404,6 +434,157 @@ function ouvrirRemplissage(){
 
 function fermerRemplissage(){
   document.getElementById('remplissage').close();
+}
+
+// Refermer la fenêtre arrête une lecture en cours : sans quoi elle tournerait
+// pour rien, et son message de validation apparaîtrait sans personne pour le
+// lire.
+function quandLaFenetreSeFerme(){
+  if(lectureEnCours){ lectureEnCours.abort(); lectureEnCours = null; }
+  if(document.getElementById('video-etat')){
+    propositionVideo = null;
+    etatVideo('');
+    const bouton = document.getElementById('remplissage-video-bouton');
+    bouton.hidden = false;
+    bouton.textContent = 'Choisir la vidéo';
+  }
+}
+
+// --- la vidéo ---------------------------------------------------------------------
+// Les numéros de la vidéo sont ceux des cartes de l'extension : la case 52
+// est la carte #52.
+function cartesParNumero(){
+  const parNumero = new Map();
+  saisiePage.toutes().forEach(c => { const n = Number(c.localId); if(Number.isInteger(n)) parNumero.set(n, c); });
+  return parNumero;
+}
+
+// Le compteur du jeu, avec ses trois familles : les diamants (« 311/402 »),
+// les étoiles et les chromatiques (l'étincelle). Les couronnes n'ont pas de
+// case à elles dans ce compteur : on les range avec les étoiles, à revoir le
+// jour où une vidéo montrera une couronne possédée.
+function compteurCommeLeJeu(possedees, parNumero){
+  const famille = r => !r ? null : /Diamant/i.test(r) ? 'd' : /Chromatique/i.test(r) ? 's' : 'e';
+  const total = { d: 0, e: 0, s: 0 }, vus = { d: 0, e: 0, s: 0 };
+  let sansRarete = false;
+  parNumero.forEach(c => { const f = famille(c.rarity); if(f) total[f]++; else sansRarete = true; });
+  possedees.forEach(n => { const f = famille(parNumero.get(n)?.rarity); if(f) vus[f]++; });
+  if(sansRarete) return `${pluriel(possedees.length, 'carte')} sur ${parNumero.size}`;
+  return `◆ ${vus.d}/${total.d} · ★ ${vus.e} · ✨ ${vus.s}`;
+}
+
+function plagesLisibles(ns){
+  const out = []; let debut = null, prec = null;
+  for(const n of ns){
+    if(prec !== null && n === prec + 1){ prec = n; continue; }
+    if(debut !== null) out.push(debut === prec ? `${debut}` : `${debut} à ${prec}`);
+    debut = prec = n;
+  }
+  if(debut !== null) out.push(debut === prec ? `${debut}` : `${debut} à ${prec}`);
+  return out.join(', ');
+}
+
+let lectureEnCours = null;   // AbortController de la lecture en cours
+let propositionVideo = null; // ce que « Valider » appliquera
+
+function etatVideo(html){
+  const etat = document.getElementById('video-etat');
+  etat.innerHTML = html;
+  etat.hidden = !html;
+}
+
+async function lireLaVideo(fichier){
+  if(lectureEnCours) lectureEnCours.abort();
+  const controle = new AbortController();
+  lectureEnCours = controle;
+  propositionVideo = null;
+  const bouton = document.getElementById('remplissage-video-bouton');
+  bouton.hidden = true;
+  etatVideo(`<p>Lecture de la vidéo… <span id="video-pourcent">0 %</span></p>
+    <progress id="video-progression" max="1" value="0"></progress>
+    <button type="button" class="lien-video" data-video="arreter">Arrêter</button>`);
+  const parNumero = cartesParNumero();
+  const total = Math.max(0, ...parNumero.keys());
+  try{
+    const res = await window.lireVideoCollection(fichier, {
+      total,
+      signal: controle.signal,
+      surProgression: f => {
+        const barre = document.getElementById('video-progression');
+        if(barre) barre.value = f;
+        const pourcent = document.getElementById('video-pourcent');
+        if(pourcent) pourcent.textContent = `${Math.round(f * 100)} %`;
+      },
+    });
+    if(controle.signal.aborted) return;
+    if(res.fin === 'incoherente'){
+      const nom = document.getElementById('page-head')?.dataset.nom || 'cette extension';
+      throw new Error(`Cette vidéo ne semble pas montrer « ${echapperAttribut(nom)} » : le nombre de cases ne correspond pas. Ouvre la page de l'extension filmée, puis recommence.`);
+    }
+    proposerVideo(res, parNumero);
+  }catch(err){
+    if(controle.signal.aborted){ etatVideo(''); }
+    else{
+      console.warn('Lecture de la vidéo impossible', err);
+      etatVideo(`<p class="erreur">${err?.message || 'La vidéo n\'a pas pu être lue.'}</p>`);
+    }
+  }finally{
+    if(lectureEnCours === controle) lectureEnCours = null;
+    bouton.hidden = false;
+    bouton.textContent = 'Choisir une autre vidéo';
+    document.getElementById('remplissage-video').value = '';
+  }
+}
+
+// Le message de validation : le compteur du jeu, tel que la vidéo le montre,
+// à côté de ce que PokéClasseur a lu, et ce que « Valider » va changer.
+function proposerVideo(res, parNumero){
+  const ajouts = [], retraits = [];
+  res.possedees.forEach(n => { const c = parNumero.get(n); if(c && !tagState[c.id]?.obt) ajouts.push(c); });
+  res.vides.forEach(n => { const c = parNumero.get(n); if(c && tagState[c.id]?.obt) retraits.push(c); });
+  propositionVideo = { ajouts, retraits, possedees: res.possedees.length };
+  const nonVues = res.nonVues.length
+    ? `<p class="encart-note">Les cartes n° ${plagesLisibles(res.nonVues)} n'apparaissent pas dans la vidéo : elles ne changent pas.</p>`
+    : '';
+  const aJour = ajouts.length === 0 && retraits.length === 0;
+  etatVideo(`
+    <div class="video-comparaison">
+      <figure><img src="${res.imageEnTete}" alt="Le compteur de l'extension, tel que la vidéo le montre">
+        <figcaption>Ce que le jeu affiche</figcaption></figure>
+      <p class="video-lu">Ce que PokéClasseur a lu
+        <span class="video-compteur">${compteurCommeLeJeu(res.possedees, parNumero)}</span></p>
+    </div>
+    <p>Si les deux compteurs sont identiques, la lecture est juste.</p>
+    ${aJour
+      ? '<p>Ta collection est déjà à jour pour cette extension.</p>'
+      : `<p>« Valider » va :</p>
+         <ul>
+           ${ajouts.length ? `<li>marquer <b>${pluriel(ajouts.length, 'carte')}</b> « obtenue »</li>` : ''}
+           ${retraits.length ? `<li>retirer « obtenue » de <b>${pluriel(retraits.length, 'carte')}</b> absente${retraits.length > 1 ? 's' : ''} de ta vidéo</li>` : ''}
+         </ul>`}
+    ${nonVues}
+    <div class="video-boutons">
+      ${aJour ? '' : '<button type="button" class="encart-action" data-video="valider">Valider</button>'}
+      <button type="button" class="encart-action secondaire" data-video="annuler">${aJour ? 'Fermer' : 'Annuler'}</button>
+    </div>`);
+}
+
+function validerVideo(){
+  if(!propositionVideo) return;
+  const { ajouts, retraits, possedees } = propositionVideo;
+  propositionVideo = null;
+  const touchees = [...ajouts, ...retraits];
+  const avant = touchees.map(c => [c.id, { ...(tagState[c.id] || emptyTagState()) }]);
+  ajouts.forEach(c => { tagState[c.id] = { ...(tagState[c.id] || emptyTagState()), obt: true }; });
+  retraits.forEach(c => { tagState[c.id] = { ...(tagState[c.id] || emptyTagState()), obt: false }; });
+  saveTags();
+  synchroniser(() => enregistrerCartes(touchees.map(c => [c.id, tagState[c.id]])));
+  saisiePage.rafraichir();
+  etatVideo('');
+  fermerRemplissage();
+  const nom = document.getElementById('page-head')?.dataset.nom || 'cette extension';
+  bandeauSaisie(`Collection mise à jour : ${pluriel(possedees, 'carte')} ${possedees > 1 ? 'obtenues' : 'obtenue'} dans ${echapperAttribut(nom)}.`,
+    () => restaurer(avant));
 }
 
 // La confirmation se pose au-dessus de la fenêtre (confirmation.js sait
@@ -557,6 +738,9 @@ function installerSaisieRapide(page){
     sousTitre: c => `#${c.localId}`,
     ...page,
   };
+  // Seul l'écran Collection de Pokémon TCG Pocket sait se lire en vidéo.
+  saisiePage.video = Boolean(page.video && typeof window.lireVideoCollection === 'function'
+    && typeof estPocket === 'function' && estPocket());
   poserStyleRemplissage();
   lireMemoireSaisie();
   construireSaisieRapide(zone);
@@ -570,8 +754,21 @@ function installerSaisieRapide(page){
   // dans une enveloppe : un clic dans la fenêtre ne vise jamais la fenêtre
   // elle-même.
   fenetre.addEventListener('click', (e) => { if(e.target === fenetre) fermerRemplissage(); });
+  fenetre.addEventListener('close', quandLaFenetreSeFerme);
+  document.getElementById('remplissage-video')?.addEventListener('change', (e) => {
+    const fichier = e.target.files?.[0];
+    if(fichier) lireLaVideo(fichier);
+  });
 
   fenetre.addEventListener('click', (e) => {
+    const actionVideo = e.target.closest('[data-video]');
+    if(actionVideo){
+      const quoi = actionVideo.dataset.video;
+      if(quoi === 'valider') validerVideo();
+      else if(quoi === 'arreter'){ lectureEnCours?.abort(); }
+      else{ propositionVideo = null; etatVideo(''); }
+      return;
+    }
     const choix = e.target.closest('.choix-tag');
     if(choix){
       saisieTag = choix.dataset.tag;
