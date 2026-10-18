@@ -3,6 +3,8 @@
 // Ajouter toute sa collection fait peur au nouvel arrivant : des centaines
 // de cartes, trois petits boutons sous chacune. La page ne montre qu'un
 // bouton, « Remplissage accéléré », qui ouvre une fenêtre à quatre encarts :
+//   · « Marquer d'un coup les N cartes » : pose ou retire un marquage sur les
+//     cartes affichées, filtres compris ;
 //   · « Saisie rapide » : un toucher sur l'image d'une carte la coche (ou la
 //     décoche), au lieu de l'agrandir. On choisit ce que le toucher marque :
 //     obtenue, recherchée ou échangeable. Une pastille, en bas de l'écran,
@@ -10,8 +12,6 @@
 //   · « Tout marquer d'un coup, sauf… » : toutes les cartes de la page
 //     reçoivent le marquage choisi, puis la saisie rapide s'active pour le
 //     retirer aux cartes qui font exception ;
-//   · « Marquer d'un coup les N cartes » : pose ou retire un marquage sur les
-//     cartes affichées, filtres compris ;
 //   · « Par Pokémon / numéro » : une liste de noms ou de numéros
 //     (« Pikachu, Dracaufeu, 1-50, 52 »). Les cartes trouvées s'affichent en
 //     vignettes : on touche celles à marquer.
@@ -286,6 +286,14 @@ function construireSaisieRapide(zone){
       </div>
       <p class="remplissage-intro">Quatre façons de remplir ton classeur sans passer carte par carte.</p>
 
+      <section class="encart" aria-labelledby="encart-lot">
+        <h3 id="encart-lot">📚 Marquer d'un coup <span id="remplissage-lot-nombre"></span></h3>
+        <p>Pose un marquage sur toutes les cartes affichées, en tenant compte de tes filtres. Si elles le portent déjà toutes, il leur est retiré.</p>
+        <div class="encart-choix" role="group" aria-label="Marquer les cartes affichées">
+          ${boutonsDeTag('lot-tag', { obt: 'Obtenues', rech: 'Recherchées', ech: 'Échangeables' })}
+        </div>
+      </section>
+
       <section class="encart" aria-labelledby="encart-saisie">
         <h3 id="encart-saisie">⚡ Saisie rapide</h3>
         <p>Touche une carte pour la marquer, touche-la de nouveau pour la décocher : plus besoin des petits boutons sous chaque carte.</p>
@@ -304,14 +312,6 @@ function construireSaisieRapide(zone){
           ${boutonsDeTag('tout-tag', { obt: 'Obtenue', rech: 'Recherchée', ech: 'Échangeable' })}
         </div>
         <button type="button" class="encart-action" id="remplissage-tout"></button>
-      </section>
-
-      <section class="encart" aria-labelledby="encart-lot">
-        <h3 id="encart-lot">📚 Marquer d'un coup <span id="remplissage-lot-nombre"></span></h3>
-        <p>Pose un marquage sur toutes les cartes affichées, en tenant compte de tes filtres. Si elles le portent déjà toutes, il leur est retiré.</p>
-        <div class="encart-choix" role="group" aria-label="Marquer les cartes affichées">
-          ${boutonsDeTag('lot-tag', { obt: 'Obtenues', rech: 'Recherchées', ech: 'Échangeables' })}
-        </div>
       </section>
 
       <section class="encart" aria-labelledby="encart-liste">
