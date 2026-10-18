@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-17-4gr7"></script>
+<script src="theme.js?v=2026-10-18-y0qu"></script>
 <title>Extension - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -61,6 +61,33 @@
   .bulk-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:-14px;padding-bottom:28px;font-size:12.5px;color:var(--text-on-ink-dim);}
   .bulk-btn{font-size:14px;line-height:1.2;padding:4px 12px;border-radius:3px;cursor:pointer;border:1px solid rgba(var(--trait-rgb),0.14);background:transparent;font-family:inherit;transition:.12s;}
   .bulk-btn:hover{border-color:rgba(var(--trait-rgb),0.35);background:rgba(var(--trait-rgb),0.04)}
+
+  /* Saisie accélérée (saisie-rapide.js). */
+  .saisie-row{display:flex;flex-direction:column;gap:10px;margin-top:-18px;padding-bottom:28px;font-size:12.5px;color:var(--text-on-ink-dim);}
+  .saisie-ligne{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .saisie-btn,.saisie-choix{font-size:13px;line-height:1.2;padding:6px 12px;border-radius:3px;cursor:pointer;border:1px solid rgba(var(--trait-rgb),0.14);background:transparent;color:var(--text-on-ink);font-family:inherit;transition:.12s;}
+  .saisie-btn:hover,.saisie-choix:hover{border-color:rgba(var(--trait-rgb),0.35);background:rgba(var(--trait-rgb),0.04)}
+  .saisie-btn.on,.saisie-choix.on{color:var(--accent-clair);border-color:rgba(var(--gold-rgb),0.55);background:rgba(var(--gold-rgb),0.12)}
+  .saisie-numeros{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .saisie-numeros input{width:150px;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:7px 10px;border-radius:4px;font-size:13px;font-family:inherit;}
+  .saisie-numeros input::placeholder{color:var(--text-on-ink-dim)}
+  .saisie-aide{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-radius:5px;background:rgba(var(--gold-rgb),0.08);border:1px solid rgba(var(--gold-rgb),0.3);color:var(--text-on-ink);}
+  .saisie-aide[hidden]{display:none}
+  /* En saisie rapide, l'image d'une carte devient un bouton : celles qui
+     n'ont pas encore le marquage choisi s'estompent, celles qui l'ont
+     portent son symbole dans un coin. */
+  body.saisie-rapide #content .card-img-wrap,
+  body.saisie-rapide #content .card-img-wrap img{cursor:pointer}
+  body.saisie-rapide[data-saisie-tag="obt"] .card-tile:not(:has(.tag-toggle.obt.active)) .card-img-wrap img,
+  body.saisie-rapide[data-saisie-tag="rech"] .card-tile:not(:has(.tag-toggle.rech.active)) .card-img-wrap img,
+  body.saisie-rapide[data-saisie-tag="ech"] .card-tile:not(:has(.tag-toggle.ech.active)) .card-img-wrap img{filter:grayscale(1);opacity:.45}
+  body.saisie-rapide .card-img-wrap::after{position:absolute;top:6px;right:6px;font-size:17px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));pointer-events:none}
+  body.saisie-rapide[data-saisie-tag="obt"] .card-tile:has(.tag-toggle.obt.active) .card-img-wrap::after{content:'✅'}
+  body.saisie-rapide[data-saisie-tag="rech"] .card-tile:has(.tag-toggle.rech.active) .card-img-wrap::after{content:'❤️'}
+  body.saisie-rapide[data-saisie-tag="ech"] .card-tile:has(.tag-toggle.ech.active) .card-img-wrap::after{content:'🔁'}
+  .bandeau-saisie{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:16px;width:max-content;max-width:calc(100vw - 32px);background:var(--ink-soft);border:1px solid rgba(var(--gold-rgb),0.45);border-radius:6px;padding:12px 18px;font-size:13.5px;color:var(--text-on-ink);box-shadow:0 8px 28px rgba(0,0,0,.35);}
+  .bandeau-saisie[hidden]{display:none}
+  .bandeau-saisie button{background:none;border:none;color:var(--accent-clair);font:inherit;font-weight:600;cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}
 
   /* Cinq cartes par ligne, comme l'application TCG Pocket : retrouver une
      carte au même endroit d'une grille à l'autre compte plus que d'en voir
@@ -160,6 +187,11 @@
        séparent et le dernier tombe seul en dessous. */
     .bulk-row > span:first-child{flex:1 0 100%}
     .bulk-btn{min-height:40px;padding:6px 16px}
+    .saisie-row{margin-top:-10px;padding-bottom:22px}
+    .saisie-titre{flex:1 0 100%}
+    .saisie-btn,.saisie-choix{min-height:40px}
+    .saisie-numeros{flex:1 0 100%}
+    .saisie-numeros input{flex:1;min-width:0;min-height:40px;font-size:16px}
     /* Trois colonnes laissent des cartes d'une centaine de pixels : les tags
        en dessous gagnent en hauteur ce qu'ils ne peuvent pas gagner en
        largeur. */
@@ -217,6 +249,8 @@
     <button class="bulk-btn" data-bulk="ech" title="Marquer comme échangeables (recliquer pour tout décocher)">🔁</button>
   </div>
 
+  <div class="saisie-row" id="saisie-rapide"></div>
+
   <div id="content">
     <div class="card-grid">
       <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
@@ -227,21 +261,22 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="sets.js?v=2026-10-17-4gr7"></script>
-<script src="univers.js?v=2026-10-17-4gr7"></script>
-<script src="catalogue.js?v=2026-10-17-4gr7"></script>
-<script src="supabase-config.js?v=2026-10-17-4gr7"></script>
-<script src="pied.js?v=2026-10-17-4gr7"></script>
-<script src="admin.js?v=2026-10-17-4gr7"></script>
-<script src="admin-site.js?v=2026-10-17-4gr7"></script>
-<script src="progression.js?v=2026-10-17-4gr7"></script>
-<script src="confirmation.js?v=2026-10-17-4gr7"></script>
-<script src="tags.js?v=2026-10-17-4gr7"></script>
-<script src="raretes.js?v=2026-10-17-4gr7"></script>
-<script src="glissement.js?v=2026-10-17-4gr7"></script>
-<script src="cards.js?v=2026-10-17-4gr7"></script>
-<script src="prix.js?v=2026-10-17-4gr7"></script>
-<script src="compte.js?v=2026-10-17-4gr7"></script>
+<script src="sets.js?v=2026-10-18-y0qu"></script>
+<script src="univers.js?v=2026-10-18-y0qu"></script>
+<script src="catalogue.js?v=2026-10-18-y0qu"></script>
+<script src="supabase-config.js?v=2026-10-18-y0qu"></script>
+<script src="pied.js?v=2026-10-18-y0qu"></script>
+<script src="admin.js?v=2026-10-18-y0qu"></script>
+<script src="admin-site.js?v=2026-10-18-y0qu"></script>
+<script src="progression.js?v=2026-10-18-y0qu"></script>
+<script src="confirmation.js?v=2026-10-18-y0qu"></script>
+<script src="tags.js?v=2026-10-18-y0qu"></script>
+<script src="raretes.js?v=2026-10-18-y0qu"></script>
+<script src="glissement.js?v=2026-10-18-y0qu"></script>
+<script src="cards.js?v=2026-10-18-y0qu"></script>
+<script src="prix.js?v=2026-10-18-y0qu"></script>
+<script src="compte.js?v=2026-10-18-y0qu"></script>
+<script src="saisie-rapide.js?v=2026-10-18-y0qu"></script>
 <script>
 // Récupère les cartes d'une extension depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
@@ -281,7 +316,7 @@ async function init(){
     document.getElementById('content').innerHTML = blocAVenir();
     // « hidden » ne suffirait pas : les règles de style de ces barres posent
     // un « display » qui l'emporte sur lui.
-    document.querySelectorAll('.toolbar, .tri-row, .bulk-row').forEach(b => { b.style.display = 'none'; });
+    document.querySelectorAll('.toolbar, .tri-row, .bulk-row, .saisie-row').forEach(b => { b.style.display = 'none'; });
     return;
   }
   document.getElementById('content').innerHTML = `<div class="card-grid">${Array(12).fill('<div class="skeleton"></div>').join('')}</div>`;
@@ -481,6 +516,7 @@ FILTERS.forEach(filter => {
 });
 
 installerTri(() => allCards, applyFilters);
+installerSaisieRapide({ toutes: () => allCards, rafraichir: applyFilters });
 
 init();
 </script>
