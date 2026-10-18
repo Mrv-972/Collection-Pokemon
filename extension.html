@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-18-i7jh"></script>
+<script src="theme.js?v=2026-10-18-h0n1"></script>
 <title>Extension - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,75 +58,7 @@
   .tri-row #tri-etat{color:var(--accent-clair);}
   .card-cote{font-size:11.5px;color:var(--accent-clair);margin-top:-3px;}
 
-  .bulk-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:-14px;padding-bottom:28px;font-size:12.5px;color:var(--text-on-ink-dim);}
-  .bulk-btn{font-size:14px;line-height:1.2;padding:4px 12px;border-radius:3px;cursor:pointer;border:1px solid rgba(var(--trait-rgb),0.14);background:transparent;font-family:inherit;transition:.12s;}
-  .bulk-btn:hover{border-color:rgba(var(--trait-rgb),0.35);background:rgba(var(--trait-rgb),0.04)}
 
-  /* Remplissage accéléré (saisie-rapide.js). */
-  .saisie-row{margin-top:-18px;padding-bottom:28px;}
-  .remplissage-btn{font-size:14px;font-weight:500;line-height:1.2;padding:10px 18px;border-radius:5px;cursor:pointer;border:1px solid rgba(var(--gold-rgb),0.55);background:rgba(var(--gold-rgb),0.12);color:var(--accent-clair);font-family:inherit;transition:.12s;}
-  .remplissage-btn:hover{background:rgba(var(--gold-rgb),0.2)}
-  .remplissage-btn,.choix-tag,.tout-tag,.marquer-tag,.encart-action{-webkit-tap-highlight-color:transparent}
-  .remplissage{padding:0;border:1px solid rgba(var(--trait-rgb),0.14);border-radius:10px;background:var(--ink);color:var(--text-on-ink);width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);box-shadow:0 24px 60px rgba(0,0,0,0.55);}
-  .remplissage::backdrop{background:rgba(10,11,13,0.72)}
-  .remplissage-corps{padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px;}
-  .remplissage-tete{display:flex;align-items:center;justify-content:space-between;gap:12px;}
-  .remplissage-tete h2{font-size:22px;}
-  .remplissage-fermer{background:none;border:none;color:var(--text-on-ink-dim);font-size:18px;cursor:pointer;padding:6px 10px;border-radius:4px;font-family:inherit;}
-  .remplissage-fermer:hover{color:var(--text-on-ink);background:rgba(var(--trait-rgb),0.06)}
-  .remplissage-intro{margin:-6px 0 0;font-size:13.5px;color:var(--text-on-ink-dim);}
-  .encart{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.1);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
-  .encart h3{font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:600;}
-  .encart h3 label{cursor:inherit}
-  .encart p{margin:0;font-size:13px;line-height:1.5;color:var(--text-on-ink-dim);}
-  .encart-choix{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:var(--text-on-ink-dim);}
-  .choix-tag,.tout-tag,.marquer-tag{font-size:13px;line-height:1.2;padding:6px 11px;border-radius:4px;cursor:pointer;border:1px solid rgba(var(--trait-rgb),0.16);background:transparent;color:var(--text-on-ink);font-family:inherit;transition:.12s;}
-  .choix-tag:hover,.tout-tag:hover,.marquer-tag:hover:not(:disabled){border-color:rgba(var(--trait-rgb),0.35);background:rgba(var(--trait-rgb),0.05)}
-  .choix-tag.on,.tout-tag.on{color:var(--accent-clair);border-color:rgba(var(--gold-rgb),0.55);background:rgba(var(--gold-rgb),0.12)}
-  .marquer-tag:disabled{opacity:.4;cursor:default}
-  .encart-action{align-self:flex-start;font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:5px;cursor:pointer;border:1px solid transparent;background:var(--gold);color:var(--ink);font-family:inherit;}
-  .encart-action:hover{filter:brightness(1.08)}
-  .encart-action.secondaire{background:transparent;color:var(--text-on-ink);border-color:rgba(var(--trait-rgb),0.2);font-weight:500}
-  .encart input{width:100%;box-sizing:border-box;background:var(--ink);border:1px solid rgba(var(--trait-rgb),0.16);color:var(--text-on-ink);padding:9px 12px;border-radius:5px;font-size:14px;font-family:inherit;}
-  .encart input::placeholder{color:var(--text-on-ink-dim)}
-  .apercu{display:flex;flex-direction:column;gap:12px;}
-  .apercu:empty{display:none}
-  .groupe-tete{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--text-on-ink);margin-bottom:6px;}
-  .groupe-tete span{color:var(--text-on-ink-dim)}
-  .groupe-tete button{background:none;border:none;color:var(--accent-clair);font:inherit;cursor:pointer;padding:2px;text-decoration:underline;text-underline-offset:3px;}
-  .groupe.rien{font-size:12.5px;color:var(--alerte);}
-  /* Les vignettes départagent des cartes de même nom (les quatre
-     Pikachu-ex) : seule l'illustration les distingue vraiment. */
-  .vignettes{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;max-height:300px;overflow-y:auto;padding:2px;}
-  .vignette{position:relative;display:flex;flex-direction:column;gap:4px;padding:4px;border-radius:7px;border:2px solid transparent;background:none;cursor:pointer;font:inherit;color:var(--text-on-ink);text-align:center;-webkit-tap-highlight-color:transparent;}
-  .vignette img{width:100%;aspect-ratio:2.5/3.5;object-fit:contain;border-radius:4px;opacity:.4;filter:grayscale(.7);transition:opacity .12s,filter .12s;}
-  .vignette span{font-size:10.5px;line-height:1.25;}
-  .vignette i{font-style:normal;color:var(--text-on-ink-dim);}
-  .vignette.on{border-color:var(--gold);background:rgba(var(--gold-rgb),0.1);}
-  .vignette.on img{opacity:1;filter:none;}
-  .vignette.on::after{content:'✓';position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--gold);color:var(--ink);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
-  .apercu .apercu-total{color:var(--accent-clair);font-weight:500;}
-  .resultat{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--text-on-ink) !important;}
-  .resultat[hidden]{display:none}
-  .resultat button,.pastille-saisie button{background:none;border:none;color:var(--accent-clair);font:inherit;font-weight:600;cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}
-  /* En saisie rapide, l'image d'une carte devient un bouton : celles qui
-     n'ont pas encore le marquage choisi s'estompent, celles qui l'ont
-     portent son symbole dans un coin. */
-  body.saisie-rapide #content .card-img-wrap,
-  body.saisie-rapide #content .card-img-wrap img{cursor:pointer}
-  body.saisie-rapide[data-saisie-tag="obt"] .card-tile:not(:has(.tag-toggle.obt.active)) .card-img-wrap img,
-  body.saisie-rapide[data-saisie-tag="rech"] .card-tile:not(:has(.tag-toggle.rech.active)) .card-img-wrap img,
-  body.saisie-rapide[data-saisie-tag="ech"] .card-tile:not(:has(.tag-toggle.ech.active)) .card-img-wrap img{filter:grayscale(1);opacity:.45}
-  body.saisie-rapide .card-img-wrap::after{position:absolute;top:6px;right:6px;font-size:17px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));pointer-events:none}
-  body.saisie-rapide[data-saisie-tag="obt"] .card-tile:has(.tag-toggle.obt.active) .card-img-wrap::after{content:'✅'}
-  body.saisie-rapide[data-saisie-tag="rech"] .card-tile:has(.tag-toggle.rech.active) .card-img-wrap::after{content:'❤️'}
-  body.saisie-rapide[data-saisie-tag="ech"] .card-tile:has(.tag-toggle.ech.active) .card-img-wrap::after{content:'🔁'}
-  .pastille-saisie{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:49;display:flex;align-items:center;gap:14px;width:max-content;max-width:calc(100vw - 32px);background:var(--ink-soft);border:1px solid rgba(var(--gold-rgb),0.55);border-radius:999px;padding:9px 12px 9px 18px;font-size:13.5px;color:var(--text-on-ink);box-shadow:0 8px 28px rgba(0,0,0,.35);}
-  .pastille-saisie[hidden]{display:none}
-  body.saisie-rapide .bandeau-saisie{bottom:84px}
-  .bandeau-saisie{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:16px;width:max-content;max-width:calc(100vw - 32px);background:var(--ink-soft);border:1px solid rgba(var(--gold-rgb),0.45);border-radius:6px;padding:12px 18px;font-size:13.5px;color:var(--text-on-ink);box-shadow:0 8px 28px rgba(0,0,0,.35);}
-  .bandeau-saisie[hidden]{display:none}
-  .bandeau-saisie button{background:none;border:none;color:var(--accent-clair);font:inherit;font-weight:600;cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}
 
   /* Cinq cartes par ligne, comme l'application TCG Pocket : retrouver une
      carte au même endroit d'une grille à l'autre compte plus que d'en voir
@@ -221,18 +153,6 @@
     #filter-input, .filtres select, select{min-height:42px}
     .tri-row{margin-top:-6px;padding-bottom:12px}
     .tri-row select, .tri-row button{min-height:40px;padding:8px 12px}
-    .bulk-row{margin-top:-6px;padding-bottom:22px}
-    /* L'intitulé prend toute la ligne, sinon les trois boutons se
-       séparent et le dernier tombe seul en dessous. */
-    .bulk-row > span:first-child{flex:1 0 100%}
-    .bulk-btn{min-height:40px;padding:6px 16px}
-    .saisie-row{margin-top:-10px;padding-bottom:22px}
-    .remplissage-btn{width:100%;min-height:44px}
-    .remplissage-corps{padding:16px 16px 18px}
-    .choix-tag,.marquer-tag,.tout-tag{min-height:40px}
-    .vignettes{grid-template-columns:repeat(auto-fill,minmax(74px,1fr))}
-    .encart-action{min-height:44px;align-self:stretch}
-    .encart input{min-height:44px;font-size:16px}
     /* Trois colonnes laissent des cartes d'une centaine de pixels : les tags
        en dessous gagnent en hauteur ce qu'ils ne peuvent pas gagner en
        largeur. */
@@ -283,13 +203,6 @@
     <span id="tri-etat"></span>
   </div>
 
-  <div class="bulk-row">
-    <span>Marquer d'un coup <span id="bulk-count">toutes les cartes</span> :</span>
-    <button class="bulk-btn" data-bulk="obt" title="Marquer comme obtenues (recliquer pour tout décocher)">✅</button>
-    <button class="bulk-btn" data-bulk="rech" title="Marquer comme recherchées (recliquer pour tout décocher)">❤️</button>
-    <button class="bulk-btn" data-bulk="ech" title="Marquer comme échangeables (recliquer pour tout décocher)">🔁</button>
-  </div>
-
   <div class="saisie-row" id="saisie-rapide"></div>
 
   <div id="content">
@@ -302,22 +215,22 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="sets.js?v=2026-10-18-i7jh"></script>
-<script src="univers.js?v=2026-10-18-i7jh"></script>
-<script src="catalogue.js?v=2026-10-18-i7jh"></script>
-<script src="supabase-config.js?v=2026-10-18-i7jh"></script>
-<script src="pied.js?v=2026-10-18-i7jh"></script>
-<script src="admin.js?v=2026-10-18-i7jh"></script>
-<script src="admin-site.js?v=2026-10-18-i7jh"></script>
-<script src="progression.js?v=2026-10-18-i7jh"></script>
-<script src="confirmation.js?v=2026-10-18-i7jh"></script>
-<script src="tags.js?v=2026-10-18-i7jh"></script>
-<script src="raretes.js?v=2026-10-18-i7jh"></script>
-<script src="glissement.js?v=2026-10-18-i7jh"></script>
-<script src="cards.js?v=2026-10-18-i7jh"></script>
-<script src="prix.js?v=2026-10-18-i7jh"></script>
-<script src="compte.js?v=2026-10-18-i7jh"></script>
-<script src="saisie-rapide.js?v=2026-10-18-i7jh"></script>
+<script src="sets.js?v=2026-10-18-h0n1"></script>
+<script src="univers.js?v=2026-10-18-h0n1"></script>
+<script src="catalogue.js?v=2026-10-18-h0n1"></script>
+<script src="supabase-config.js?v=2026-10-18-h0n1"></script>
+<script src="pied.js?v=2026-10-18-h0n1"></script>
+<script src="admin.js?v=2026-10-18-h0n1"></script>
+<script src="admin-site.js?v=2026-10-18-h0n1"></script>
+<script src="progression.js?v=2026-10-18-h0n1"></script>
+<script src="confirmation.js?v=2026-10-18-h0n1"></script>
+<script src="tags.js?v=2026-10-18-h0n1"></script>
+<script src="raretes.js?v=2026-10-18-h0n1"></script>
+<script src="glissement.js?v=2026-10-18-h0n1"></script>
+<script src="cards.js?v=2026-10-18-h0n1"></script>
+<script src="prix.js?v=2026-10-18-h0n1"></script>
+<script src="compte.js?v=2026-10-18-h0n1"></script>
+<script src="saisie-rapide.js?v=2026-10-18-h0n1"></script>
 <script>
 // Récupère les cartes d'une extension depuis l'API publique et gratuite
 // TCGdex (aucune clé requise), à partir de l'id passé dans l'URL (?set=...).
@@ -357,7 +270,7 @@ async function init(){
     document.getElementById('content').innerHTML = blocAVenir();
     // « hidden » ne suffirait pas : les règles de style de ces barres posent
     // un « display » qui l'emporte sur lui.
-    document.querySelectorAll('.toolbar, .tri-row, .bulk-row, .saisie-row').forEach(b => { b.style.display = 'none'; });
+    document.querySelectorAll('.toolbar, .tri-row, .saisie-row').forEach(b => { b.style.display = 'none'; });
     return;
   }
   document.getElementById('content').innerHTML = `<div class="card-grid">${Array(12).fill('<div class="skeleton"></div>').join('')}</div>`;
@@ -523,27 +436,10 @@ function applyFilters(){
   const filtered = trierCartes(filteredCards());
   renderCards(filtered);
   majProgression();
-  const count = filtered.length;
-  document.getElementById('bulk-count').textContent =
-    count === allCards.length ? `les ${count} cartes` : `les ${count} cartes affichées`;
 }
 
 document.getElementById('filter-input').addEventListener('input', applyFilters);
 document.getElementById('rarity-filter').addEventListener('change', applyFilters);
-
-// Un clic sur ces boutons touche toute la grille : on demande confirmation
-// avant, plutôt que de laisser quelqu'un défaire cent marquages à la main.
-document.querySelectorAll('.bulk-btn').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    // La grille est relue une seule fois : entre la question et la réponse,
-    // rien ne peut la changer, mais marquer un autre lot que celui annoncé
-    // serait le genre de surprise qu'on cherche justement à éviter.
-    const lot = filteredCards();
-    if(!(await confirmerMarquageGroupe(lot, btn.dataset.bulk))) return;
-    bulkToggleTag(lot, btn.dataset.bulk);
-    applyFilters();
-  });
-});
 
 // Les filtres s'excluent : en activer un désactive les autres.
 FILTERS.forEach(filter => {
@@ -557,7 +453,12 @@ FILTERS.forEach(filter => {
 });
 
 installerTri(() => allCards, applyFilters);
-installerSaisieRapide({ toutes: () => allCards, rafraichir: applyFilters });
+installerSaisieRapide({
+  toutes: () => allCards,
+  affichees: filteredCards,
+  rafraichir: applyFilters,
+  ensemble: "de l'extension",
+});
 
 init();
 </script>

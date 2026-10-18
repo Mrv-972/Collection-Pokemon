@@ -2,14 +2,16 @@
 //
 // Ajouter toute sa collection fait peur au nouvel arrivant : des centaines
 // de cartes, trois petits boutons sous chacune. La page ne montre qu'un
-// bouton, « Remplissage accéléré », qui ouvre une fenêtre à trois encarts :
+// bouton, « Remplissage accéléré », qui ouvre une fenêtre à quatre encarts :
 //   · « Saisie rapide » : un toucher sur l'image d'une carte la coche (ou la
 //     décoche), au lieu de l'agrandir. On choisit ce que le toucher marque :
 //     obtenue, recherchée ou échangeable. Une pastille, en bas de l'écran,
 //     rappelle que le mode est actif et permet d'en sortir ;
-//   · « Tout marquer d'un coup, sauf… » : toute l'extension reçoit le
-//     marquage choisi, puis la saisie rapide s'active pour le retirer aux
-//     cartes qui font exception ;
+//   · « Tout marquer d'un coup, sauf… » : toutes les cartes de la page
+//     reçoivent le marquage choisi, puis la saisie rapide s'active pour le
+//     retirer aux cartes qui font exception ;
+//   · « Marquer d'un coup les N cartes » : pose ou retire un marquage sur les
+//     cartes affichées, filtres compris ;
 //   · « Par Pokémon / numéro » : une liste de noms ou de numéros
 //     (« Pikachu, Dracaufeu, 1-50, 52 »). Les cartes trouvées s'affichent en
 //     vignettes : on touche celles à marquer.
@@ -17,7 +19,19 @@
 // Les deux derniers se rattrapent par « Annuler ».
 //
 // La page fournit ses cartes et sa façon de se redessiner :
-//   installerSaisieRapide({ toutes, rafraichir })
+//   installerSaisieRapide({
+//     toutes,      // () => toutes les cartes de la page
+//     affichees,   // () => celles que les filtres laissent voir
+//     rafraichir,  // () => redessine la grille
+//     ensemble,    // « de l'extension », « de cette page »
+//     sousTitre,   // carte => ce qui la distingue sous son nom (« #94 »)
+//   })
+//
+// Tout le fichier vit dans sa propre enveloppe : ses noms ne peuvent pas
+// écraser ceux des autres scripts. catalogue.js a déjà un normaliserNom() et
+// un cartesDuNom(), et un nom repris ici les remplaçait sur toute la page.
+// Seul installerSaisieRapide() en sort.
+(() => {
 
 const MEMOIRE_SAISIE = 'pokeclasseur-saisie-rapide';
 
@@ -38,6 +52,92 @@ function lireMemoireSaisie(){
 function ecrireMemoireSaisie(){
   try{ sessionStorage.setItem(MEMOIRE_SAISIE, JSON.stringify({ active: saisieActive, tag: saisieTag })); }
   catch(err){ /* sans mémoire, le mode tient jusqu'au changement de page */ }
+}
+
+// Les styles voyagent avec le script : chaque page qui l'accueille n'a qu'à
+// lui donner un emplacement.
+const STYLE_REMPLISSAGE = `
+  .saisie-row{padding-bottom:28px;}
+  .remplissage-btn{font-size:14px;font-weight:500;line-height:1.2;padding:10px 18px;border-radius:5px;cursor:pointer;border:1px solid rgba(var(--gold-rgb),0.55);background:rgba(var(--gold-rgb),0.12);color:var(--accent-clair);font-family:inherit;transition:.12s;}
+  .remplissage-btn:hover{background:rgba(var(--gold-rgb),0.2)}
+  .remplissage-btn,.choix-tag,.tout-tag,.lot-tag,.marquer-tag,.encart-action{-webkit-tap-highlight-color:transparent}
+  .remplissage{padding:0;border:1px solid rgba(var(--trait-rgb),0.14);border-radius:10px;background:var(--ink);color:var(--text-on-ink);width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);box-shadow:0 24px 60px rgba(0,0,0,0.55);}
+  .remplissage::backdrop{background:rgba(10,11,13,0.72)}
+  .remplissage-corps{padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px;}
+  .remplissage-tete{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .remplissage-tete h2{font-size:22px;}
+  .remplissage-fermer{background:none;border:none;color:var(--text-on-ink-dim);font-size:18px;cursor:pointer;padding:6px 10px;border-radius:4px;font-family:inherit;}
+  .remplissage-fermer:hover{color:var(--text-on-ink);background:rgba(var(--trait-rgb),0.06)}
+  .remplissage-intro{margin:-6px 0 0;font-size:13.5px;color:var(--text-on-ink-dim);}
+  .encart{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.1);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+  .encart h3{font-family:'IBM Plex Sans',sans-serif;font-size:15px;font-weight:600;}
+  .encart h3 label{cursor:inherit}
+  .encart p{margin:0;font-size:13px;line-height:1.5;color:var(--text-on-ink-dim);}
+  .encart-choix{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:var(--text-on-ink-dim);}
+  .choix-tag,.tout-tag,.marquer-tag,.lot-tag{font-size:13px;line-height:1.2;padding:6px 11px;border-radius:4px;cursor:pointer;border:1px solid rgba(var(--trait-rgb),0.16);background:transparent;color:var(--text-on-ink);font-family:inherit;transition:.12s;}
+  .choix-tag:hover,.tout-tag:hover,.lot-tag:hover,.marquer-tag:hover:not(:disabled){border-color:rgba(var(--trait-rgb),0.35);background:rgba(var(--trait-rgb),0.05)}
+  .choix-tag.on,.tout-tag.on{color:var(--accent-clair);border-color:rgba(var(--gold-rgb),0.55);background:rgba(var(--gold-rgb),0.12)}
+  .marquer-tag:disabled{opacity:.4;cursor:default}
+  .encart-action{align-self:flex-start;font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:5px;cursor:pointer;border:1px solid transparent;background:var(--gold);color:var(--ink);font-family:inherit;}
+  .encart-action:hover{filter:brightness(1.08)}
+  .encart-action.secondaire{background:transparent;color:var(--text-on-ink);border-color:rgba(var(--trait-rgb),0.2);font-weight:500}
+  .encart input{width:100%;box-sizing:border-box;background:var(--ink);border:1px solid rgba(var(--trait-rgb),0.16);color:var(--text-on-ink);padding:9px 12px;border-radius:5px;font-size:14px;font-family:inherit;}
+  .encart input::placeholder{color:var(--text-on-ink-dim)}
+  .apercu{display:flex;flex-direction:column;gap:12px;}
+  .apercu:empty{display:none}
+  .groupe-tete{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--text-on-ink);margin-bottom:6px;}
+  .groupe-tete span{color:var(--text-on-ink-dim)}
+  .groupe-tete button{background:none;border:none;color:var(--accent-clair);font:inherit;cursor:pointer;padding:2px;text-decoration:underline;text-underline-offset:3px;}
+  .groupe.rien{font-size:12.5px;color:var(--alerte);}
+  /* Les vignettes départagent des cartes de même nom (les quatre
+     Pikachu-ex) : seule l'illustration les distingue vraiment. */
+  .vignettes{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;max-height:300px;overflow-y:auto;padding:2px;}
+  .vignette{position:relative;display:flex;flex-direction:column;gap:4px;padding:4px;border-radius:7px;border:2px solid transparent;background:none;cursor:pointer;font:inherit;color:var(--text-on-ink);text-align:center;-webkit-tap-highlight-color:transparent;}
+  .vignette img{width:100%;aspect-ratio:2.5/3.5;object-fit:contain;border-radius:4px;opacity:.4;filter:grayscale(.7);transition:opacity .12s,filter .12s;}
+  .vignette span{font-size:10.5px;line-height:1.25;}
+  .vignette i{font-style:normal;color:var(--text-on-ink-dim);}
+  .vignette.on{border-color:var(--gold);background:rgba(var(--gold-rgb),0.1);}
+  .vignette.on img{opacity:1;filter:none;}
+  .vignette.on::after{content:'✓';position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--gold);color:var(--ink);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .apercu .apercu-total{color:var(--accent-clair);font-weight:500;}
+  .resultat{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--text-on-ink) !important;}
+  .resultat[hidden]{display:none}
+  .resultat button,.pastille-saisie button{background:none;border:none;color:var(--accent-clair);font:inherit;font-weight:600;cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}
+  /* En saisie rapide, l'image d'une carte devient un bouton : celles qui
+     n'ont pas encore le marquage choisi s'estompent, celles qui l'ont
+     portent son symbole dans un coin. */
+  body.saisie-rapide #content .card-img-wrap,
+  body.saisie-rapide #content .card-img-wrap img{cursor:pointer}
+  body.saisie-rapide[data-saisie-tag="obt"] .card-tile:not(:has(.tag-toggle.obt.active)) .card-img-wrap img,
+  body.saisie-rapide[data-saisie-tag="rech"] .card-tile:not(:has(.tag-toggle.rech.active)) .card-img-wrap img,
+  body.saisie-rapide[data-saisie-tag="ech"] .card-tile:not(:has(.tag-toggle.ech.active)) .card-img-wrap img{filter:grayscale(1);opacity:.45}
+  body.saisie-rapide .card-img-wrap::after{position:absolute;top:6px;right:6px;font-size:17px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));pointer-events:none}
+  body.saisie-rapide[data-saisie-tag="obt"] .card-tile:has(.tag-toggle.obt.active) .card-img-wrap::after{content:'✅'}
+  body.saisie-rapide[data-saisie-tag="rech"] .card-tile:has(.tag-toggle.rech.active) .card-img-wrap::after{content:'❤️'}
+  body.saisie-rapide[data-saisie-tag="ech"] .card-tile:has(.tag-toggle.ech.active) .card-img-wrap::after{content:'🔁'}
+  .pastille-saisie{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:49;display:flex;align-items:center;gap:14px;width:max-content;max-width:calc(100vw - 32px);background:var(--ink-soft);border:1px solid rgba(var(--gold-rgb),0.55);border-radius:999px;padding:9px 12px 9px 18px;font-size:13.5px;color:var(--text-on-ink);box-shadow:0 8px 28px rgba(0,0,0,.35);}
+  .pastille-saisie[hidden]{display:none}
+  body.saisie-rapide .bandeau-saisie{bottom:84px}
+  .bandeau-saisie{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:16px;width:max-content;max-width:calc(100vw - 32px);background:var(--ink-soft);border:1px solid rgba(var(--gold-rgb),0.45);border-radius:6px;padding:12px 18px;font-size:13.5px;color:var(--text-on-ink);box-shadow:0 8px 28px rgba(0,0,0,.35);}
+  .bandeau-saisie[hidden]{display:none}
+  .bandeau-saisie button{background:none;border:none;color:var(--accent-clair);font:inherit;font-weight:600;cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}
+  @media(max-width:720px){
+    .saisie-row{padding-bottom:22px}
+    .remplissage-btn{width:100%;min-height:44px}
+    .remplissage-corps{padding:16px 16px 18px}
+    .choix-tag,.tout-tag,.lot-tag,.marquer-tag{min-height:40px}
+    .vignettes{grid-template-columns:repeat(auto-fill,minmax(74px,1fr))}
+    .encart-action{min-height:44px;align-self:stretch}
+    .encart input{min-height:44px;font-size:16px}
+  }
+`;
+
+function poserStyleRemplissage(){
+  if(document.getElementById('style-remplissage')) return;
+  const style = document.createElement('style');
+  style.id = 'style-remplissage';
+  style.textContent = STYLE_REMPLISSAGE;
+  document.head.appendChild(style);
 }
 
 const pluriel = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
@@ -107,7 +207,7 @@ function lireListe(cartes, texte){
     // « precis » : un numéro ou une plage désignent exactement ce qu'on veut ;
     // un nom peut en désigner plusieurs, parmi lesquelles on choisira.
     if(plage){
-      elements.push({ texte: element, precis: true, cartes: cartesDeLaPlage(cartes, plage[1], plage[2]) });
+      elements.push({ texte: element, precis: true, plage: true, cartes: cartesDeLaPlage(cartes, plage[1], plage[2]) });
     }else if(mots.length > 1 && mots.every(m => MOTIF_NUMERO.test(m))
              && mots.every(m => cartesDuNumero(cartes, m).length)){
       mots.forEach(m => elements.push({ texte: m, precis: true, cartes: cartesDuNumero(cartes, m) }));
@@ -184,7 +284,7 @@ function construireSaisieRapide(zone){
         <h2 id="remplissage-titre">Remplissage accéléré</h2>
         <button type="button" class="remplissage-fermer" aria-label="Fermer">✕</button>
       </div>
-      <p class="remplissage-intro">Trois façons de remplir ton classeur sans passer carte par carte.</p>
+      <p class="remplissage-intro">Quatre façons de remplir ton classeur sans passer carte par carte.</p>
 
       <section class="encart" aria-labelledby="encart-saisie">
         <h3 id="encart-saisie">⚡ Saisie rapide</h3>
@@ -198,12 +298,20 @@ function construireSaisieRapide(zone){
 
       <section class="encart" aria-labelledby="encart-tout">
         <h3 id="encart-tout">✅ Tout marquer d'un coup, sauf…</h3>
-        <p>Toutes les cartes de l'extension reçoivent le marquage choisi. Ensuite, tu touches celles qui font exception pour le leur retirer.</p>
+        <p>Toutes les cartes ${saisiePage.ensemble} reçoivent le marquage choisi. Ensuite, tu touches celles qui font exception pour le leur retirer.</p>
         <div class="encart-choix" role="group" aria-label="Le marquage à poser partout">
           <span>Tout marquer :</span>
           ${boutonsDeTag('tout-tag', { obt: 'Obtenue', rech: 'Recherchée', ech: 'Échangeable' })}
         </div>
         <button type="button" class="encart-action" id="remplissage-tout"></button>
+      </section>
+
+      <section class="encart" aria-labelledby="encart-lot">
+        <h3 id="encart-lot">📚 Marquer d'un coup <span id="remplissage-lot-nombre"></span></h3>
+        <p>Pose un marquage sur toutes les cartes affichées, en tenant compte de tes filtres. Si elles le portent déjà toutes, il leur est retiré.</p>
+        <div class="encart-choix" role="group" aria-label="Marquer les cartes affichées">
+          ${boutonsDeTag('lot-tag', { obt: 'Obtenues', rech: 'Recherchées', ech: 'Échangeables' })}
+        </div>
       </section>
 
       <section class="encart" aria-labelledby="encart-liste">
@@ -243,6 +351,21 @@ function majSaisieRapide(){
   // interdit d'échanger ne seront pas touchées.
   const tout = document.getElementById('remplissage-tout');
   if(tout) tout.textContent = `Tout marquer « ${LIBELLE_POSE[toutTag]} » (${pluriel(cartesDuLot(saisiePage.toutes(), toutTag).length, 'carte')})`;
+  // Même formule que l'ancienne ligne de la page : « les 286 cartes », ou
+  // « les 12 cartes affichées » quand un filtre en cache une partie.
+  const lotNombre = document.getElementById('remplissage-lot-nombre');
+  if(lotNombre){
+    const n = saisiePage.affichees().length;
+    lotNombre.textContent = n === saisiePage.toutes().length ? `les ${pluriel(n, 'carte')}` : `les ${pluriel(n, 'carte')} ${n > 1 ? 'affichées' : 'affichée'}`;
+  }
+  // Un marquage que toutes les cartes affichées portent déjà se retire : le
+  // bouton le dit avant qu'on clique.
+  document.querySelectorAll('.lot-tag').forEach(b => {
+    const lot = saisiePage.affichees();
+    const retrait = leLotRetire(lot, b.dataset.tag);
+    b.disabled = cartesDuLot(lot, b.dataset.tag).length === 0;
+    b.textContent = `${TAG_META[b.dataset.tag].emoji} ${retrait ? 'Retirer « ' + LIBELLE_POSE[b.dataset.tag] + ' »' : { obt: 'Obtenues', rech: 'Recherchées', ech: 'Échangeables' }[b.dataset.tag]}`;
+  });
 
   // Le bouton du haut défile hors de vue : la pastille, elle, reste en bas
   // de l'écran tant que le mode est actif, pour qu'on sache pourquoi un
@@ -283,6 +406,17 @@ function fermerRemplissage(){
   document.getElementById('remplissage').close();
 }
 
+// La confirmation se pose au-dessus de la fenêtre (confirmation.js sait
+// se placer dans une fenêtre modale ouverte). La grille est relue une seule
+// fois : marquer un autre lot que celui annoncé serait une mauvaise surprise.
+async function marquerLeLot(tag){
+  const lot = saisiePage.affichees();
+  if(!(await confirmerMarquageGroupe(lot, tag))) return;
+  bulkToggleTag(lot, tag);
+  saisiePage.rafraichir();
+  majSaisieRapide();
+}
+
 function toutSauf(){
   const tag = toutTag;
   const avant = poserTag(saisiePage.toutes(), tag);
@@ -294,11 +428,12 @@ function toutSauf(){
     + 'Touche maintenant celles qui font exception.', () => restaurer(avant));
 }
 
-// Ce que la liste désigne en ce moment, et ce qu'on en retient. Un numéro ou
-// une plage sont précis : leurs cartes sont retenues d'emblée. Un nom peut en
-// désigner plusieurs (« Pikachu » : la carte simple et quatre Pikachu-ex) :
-// rien n'est retenu d'office, sauf s'il n'en trouve qu'une, et l'on touche
-// les vignettes pour choisir.
+// Ce que la liste désigne en ce moment, et ce qu'on en retient. Une plage
+// est précise : ses cartes sont retenues d'emblée. Un nom peut en désigner
+// plusieurs (« Pikachu » : la carte simple et quatre Pikachu-ex), un numéro
+// aussi sur la page d'un Pokémon, où chaque extension a son « 94 » : rien
+// n'est retenu d'office, sauf s'il n'en trouve qu'une, et l'on touche les
+// vignettes pour choisir.
 let listeCourante = { elements: [], cartes: [] };
 const selection = new Set();
 const elementsConnus = new Set();
@@ -314,7 +449,7 @@ function majApercu(){
   for(const e of elements){
     if(elementsConnus.has(e.texte)) continue;
     elementsConnus.add(e.texte);
-    if(e.precis || e.cartes.length === 1) e.cartes.forEach(c => selection.add(c.id));
+    if(e.plage || e.cartes.length === 1) e.cartes.forEach(c => selection.add(c.id));
   }
   const trouvees = new Set(cartes.map(c => c.id));
   [...selection].forEach(id => { if(!trouvees.has(id)) selection.delete(id); });
@@ -324,10 +459,10 @@ function majApercu(){
 function vignetteListe(c){
   const choisie = selection.has(c.id);
   return `<button type="button" class="vignette${choisie ? ' on' : ''}" data-id="${attrCarte(c.id)}"
-      aria-pressed="${choisie}" title="${attrCarte(c.name)} #${attrCarte(c.localId)}">
+      aria-pressed="${choisie}" title="${attrCarte(c.name)} · ${attrCarte(saisiePage.sousTitre(c))}">
     <img src="${attrCarte(c.image || `images/cards/${c.id}.png`)}" alt="" loading="lazy"
          data-fallback="${attrCarte(c.imageSecours ?? `images/cards/${c.id}.png`)}" onerror="cardImgFallback(this)">
-    <span>${echapperAttribut(c.name)} <i>#${echapperAttribut(c.localId)}</i></span>
+    <span>${echapperAttribut(c.name)} <i>${echapperAttribut(saisiePage.sousTitre(c))}</i></span>
   </button>`;
 }
 
@@ -416,7 +551,13 @@ function toucherCarte(e){
 function installerSaisieRapide(page){
   const zone = document.getElementById('saisie-rapide');
   if(!zone) return;
-  saisiePage = page;
+  saisiePage = {
+    affichees: page.toutes,
+    ensemble: 'de la page',
+    sousTitre: c => `#${c.localId}`,
+    ...page,
+  };
+  poserStyleRemplissage();
   lireMemoireSaisie();
   construireSaisieRapide(zone);
   majSaisieRapide();
@@ -451,6 +592,8 @@ function installerSaisieRapide(page){
       return;
     }
     if(e.target.closest('#remplissage-tout')){ toutSauf(); return; }
+    const lotTag = e.target.closest('.lot-tag');
+    if(lotTag){ marquerLeLot(lotTag.dataset.tag); return; }
     const vignette = e.target.closest('.vignette');
     if(vignette){
       const id = vignette.dataset.id;
@@ -476,3 +619,6 @@ function installerSaisieRapide(page){
     if(e.key === 'Enter'){ e.preventDefault(); marquerLaListe('obt'); }
   });
 }
+
+window.installerSaisieRapide = installerSaisieRapide;
+})();
