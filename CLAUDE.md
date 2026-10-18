@@ -37,6 +37,14 @@ simple tiret « - » dans un titre d'onglet (« Communauté - PokéClasseur »).
 Les textes récoltés ailleurs passent par `outils/typographie.mjs`, qui
 retire ce caractère avant de les déposer.
 
+## Pas d'avertissement « noms traduits automatiquement »
+
+Mrv972 ne veut plus jamais voir le message « noms traduits automatiquement
+(x/y) » sur le site. Quand `outils/instantane.mjs` doit reconstruire le nom
+français d'une carte, il le signale dans son journal seulement. Pour qu'il
+cesse de le signaler, on vérifie le nom et on l'ajoute à
+`donnees/noms-pocket-fr.json`, avec son nom anglais pour contrôle.
+
 ## Travailler sur ce dépôt
 
 - Après toute modification d'un fichier `.js`, relancer

@@ -356,7 +356,9 @@ const aplatir = donnees => Array.isArray(donnees) ? donnees : Object.values(donn
 //   1. le nom officiel de TCGdex, quand il connaît l'extension ;
 //   2. celui du fichier français de la source, s'il est vraiment français ;
 //   3. le souvenir ;
-//   4. à défaut, la traduction automatique : signalée au visiteur.
+//   4. à défaut, la traduction automatique : signalée dans le journal de la
+//      construction, jamais au visiteur. Pour qu'elle ne revienne pas, on
+//      vérifie le nom et on l'ajoute à la mémoire des noms.
 const MEMOIRE_NOMS_POCKET = 'noms-pocket-fr.json';
 
 // Un nom français, d'où qu'il vienne, doit désigner le même Pokémon que le
@@ -599,13 +601,13 @@ async function construirePocket(traductions = new Map(), nomsFrancais = new Set(
       imageSecours: `${POCKET_IMAGES}/${encodeURIComponent(ext.codeDistant)}/${c.number}.webp`,
       };
     });
-    // Les cartes qui n'ont reçu ni nom sûr ni souvenir : le site le dira au
-    // visiteur, ces noms-là sont une reconstruction, pas les noms officiels.
+    // Les cartes qui n'ont reçu ni nom sûr ni souvenir : leurs noms sont une
+    // reconstruction. Le journal le dit, pour qu'on aille les vérifier ; le
+    // site, lui, ne l'affiche plus (demande de Mrv972, voir CLAUDE.md).
     const sansNomSur = cartes.length - officiels - deLaSource - souvenirs - reprises;
     if(sansNomSur > 0){
       console.log(`  ${ext.id} : ${officiels} noms TCGdex, ${souvenirs} retrouvés en mémoire, ` +
         `${reprises} réimpressions, ${traduites}/${sansNomSur} traduits automatiquement`);
-      ext.traductionAutomatique = { traduits: traduites, total: cartes.length };
     }
     cartesParSet.set(ext.id, cartes);
     delete ext.codeDistant;

@@ -345,15 +345,12 @@ function renderHead(set){
   const year = set.releaseDate ? new Date(set.releaseDate).getFullYear() : '';
   const total = set.cardCount?.official ?? set.cardCount?.total ?? '?';
   const serie = set.serie?.name || set.serieNom || '';
-  // Deux réserves possibles sur une extension, qu'on annonce plutôt que de
-  // laisser découvrir : des noms reconstitués faute de version française
-  // publiée, et des visuels dont le texte imprimé reste en anglais parce
-  // qu'aucune source n'héberge la version française.
+  // Une réserve qu'on annonce plutôt que de laisser découvrir : des visuels
+  // dont le texte imprimé reste en anglais, parce qu'aucune source n'héberge
+  // la version française. Les noms reconstitués automatiquement, eux, ne
+  // s'annoncent plus : Mrv972 ne veut plus jamais de ce message (voir
+  // CLAUDE.md), et ces noms se vérifient dans la mémoire des noms.
   const reserves = [];
-  if(set.traductionAutomatique){
-    const t = set.traductionAutomatique;
-    reserves.push(`noms traduits automatiquement (${t.traduits}/${t.total})`);
-  }
   if(set.visuelsAnglais) reserves.push('visuels des cartes en anglais');
   // Les données de l'extension voyagent avec son en-tête : l'environnement
   // d'administration s'en sert pour préremplir sa fenêtre de modification.
