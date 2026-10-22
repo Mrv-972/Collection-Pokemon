@@ -1,12 +1,26 @@
 {
- "majLe": "2026-10-21T20:41:42.617Z",
+ "majLe": "2026-10-22T12:04:01.923Z",
  "articles": [
+  {
+   "titre": "Pokémon Home, Pokémon Champions et Pokémon Sleep hors ligne : une faille critique dans PHP touche une grande partie du web",
+   "lien": "https://news.google.com/rss/articles/CBMi8gFBVV95cUxPSUFjbUVuMHBxS0JDcjBnMTN0NUw4TVBKS3JBcTlTdlRsNUhFOS00MS16V3BXOTh2OGV3aGMyeFNvX2NLS2hyTVNsZW1sQTZfdzlGQmxsS1VWNjk3UURLWWthbEJFY2ViVmp3U2tvU25weTl6QW1WaTFpMVhVdEVjQzZndldzbFBRd1QxQmljbG51THpPT2pZcjhJZnpNRzFOWmNOdzVoekVib0dPem44YUYxY3JkaG5pMDhOb2pscnFJUTJmM25kdEc1Z1J6SFJUQ3luNTlZQTJWQjV2WjR0Y1U0X2VHM1FoUmVnTUtPYldFZw?oc=5",
+   "source": "Nintendo-Town",
+   "date": "2026-10-21T19:34:45.000Z",
+   "sujet": "pokemon"
+  },
   {
    "titre": "Une boutique officielle Pokémon va enfin ouvrir en Europe de façon permanente",
    "lien": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNbWp6YmZYN2VRRkxlaURHeXVPOXVoYlNNMGZJZXZBZWtNQnhvdENSVi1wRlVrMHN5d3d4ODk0Q2Z4RFc1NnY1VFhxb3hQWERrR0tlSWt2VllGOHBQQlpmV05STC1CZk82X0F6U0lpTmxnd25JTy03dE9raWZKRlpTREtjcjhpZmtNM0JaYXdiWFpKZVdQUWJac0JVS1hkaFh4VWFkam9uc1FuQVd1eU5NbktRZnhFTTctVUJn?oc=5",
    "source": "Journal du Geek",
    "date": "2026-10-21T15:47:48.000Z",
    "sujet": "pokemon"
+  },
+  {
+   "titre": "JCC Pokémon Pocket : Fusion Double ouvre la série C le 29 octobre avec les premières cartes à double type",
+   "lien": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOd01xc2hodXdfcUNMR3RuS1UxNExGbUFPd0J6Q2lmazhCR2ZpT2RReEpYWExsXzM5aTRjbGlyaDNpZ09MNkNnS01DRHBQY0stZDI5d3ctQUR2LWtiY29SZnR0emhjbXFvbmpsRi1kb2g5WTVZT1IyMGdvdmN6VDVVXzdoRVBxWUI0cUdaREltVEZ0ZnFFRE8wYlVIMVhOTTJyUzJfYWNvVGZndTdTa1FOWTVraEhOLXJsQTBoM0VDbk5aYzRhX3d2NnhPZmZ4aVktZ2FpNlRHTQ?oc=5",
+   "source": "Pokemon-France.com",
+   "date": "2026-10-21T13:21:06.000Z",
+   "sujet": "pocket"
   },
   {
    "titre": "Test – Razer x Pokémon Pikachu & Évoli : le setup collector qui joue à fond la carte Pokémon",
@@ -79,6 +93,13 @@
    "sujet": "pokemon"
   },
   {
+   "titre": "JCC Pokémon Pocket : la Pioche Miracle célèbre Carolina avec Salamèche et Draïeul promo",
+   "lien": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPRC1LalVPb3VKLVduZkNmejNXU2Rtb25GTmZZMHVnNXpJNHdGOXhpVkdDcTg0N0toeDU5dU9pQkR4YmNacmc5WFJhQ2h6NHpGdThhT2ZUczNRQ09EQjdPRk96NjcwakM2SHdpaTZQX1Z4bVE5RVpWcUtvTDE0SDlUcENDcW1HNlFIUmtyS3ltQ1BMVWoyNXBCenVIaENsTV9SSE1ERnNWQ3pnQ3lEUnlzZGo1YmVKT0J4ODRBT3FTSQ?oc=5",
+   "source": "Pokemon-France.com",
+   "date": "2026-10-19T15:24:04.000Z",
+   "sujet": "pocket"
+  },
+  {
    "titre": "Chronique Sors si... : Ronflex = Meilleur pokémon pour faire un blocus",
    "lien": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOREZqcTVJdUdxNlVIang2WGRQejl4cGkxTzdheVFZTDlmeC1RNENsLTN3bkFKUEkwc1BobXBqMjJjdXZLVUxLMWlqTFlfQVNPeUpSc0wwckdnVmVaRG1UOGJkclJPd0ZQTjZCZnN1RW1WNjNrNVdWenN4eHJ0ODJCYUhtUXE0UDJfdDJsRVFCelRRMlExWXdWRWMzX1FEenIyWTJz?oc=5",
    "source": "JeuxVideo.com",
@@ -111,6 +132,13 @@
    "lien": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNV2plR3hnbm4zUGV1NFhRd0tTbHRjbHJxQ0RhZm1CUW9CdDhqN1ZsX3B4SFp3aUNXempwZnVEaGQ3NjJ3WnBZOG4wTUxfbWg5SzBtUF9MM25mVVBtX1dsekRCeENsX3NNRTIzVjNGTVo5cUZBdmdNTVJJYjhvdGg5Q2tCZU9pSV9IU0xVZS1PR0lkbTNtRGpCdEU5Tmp5TmlxS1E?oc=5",
    "source": "Pokekalos.fr",
    "date": "2026-10-19T04:34:09.000Z",
+   "sujet": "pokemon"
+  },
+  {
+   "titre": "Pokémon Vents et Vagues : une fuite dévoile les inspirations de 7 créatures inédites avant leur annonce officielle",
+   "lien": "https://news.google.com/rss/articles/CBMi_AFBVV95cUxOUFZYLThxYWVnWU5MQXdPM0pMdlE4N0hpcXdWeHNHOUZiYjcyWTZNaWV4NUNleEVfeTBoNG9Kb0Y4eTFRak5yOFNPQUFZM0NhbjA3ZDVzRDU4cVhqamRGZ0tIcl82Q0VmSE11UzVxbGVLRGh2NDlfaDA1UVFQd2pGSHd3eUNRRU1rMDd2R2JhWXpvVlQ1V1g0eExCdUd5M0NKM2I1bVNsUmt1TDdFT2N4N05kaF84SW5WUXI3U3B0MzhLVUs1VjRRUTdya0Z0RUc2aWJlVVhsR0k3VFZJZGRiUkNnZmpBdXpKTlpKUk83MlNlNmhIcVJmTmFSbUs?oc=5",
+   "source": "La Crème Du Gaming",
+   "date": "2026-10-19T04:00:55.000Z",
    "sujet": "pokemon"
   },
   {
@@ -170,39 +198,11 @@
    "sujet": "pokemon"
   },
   {
-   "titre": "Consultez la lettre de la production du JCC Pokémon Pocket du mois d’octobre",
-   "lien": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNaHA3ak9IbjZXcF9NLUh2RVpKclZ4WVFSZmI5SUlDcEtWOGZKOTZkRlpVb1dkdi1hdWt6R3RwcEhQck9QOGNPRThSZWRJQlNfcTg0ZDlGUV9pZTVSNXVaNlJVa3RIcnBuUGJhWkZoUXVSVW1tMGFOUURsR0ktdzE5UFQzem40b3dfV0NzS0l4RTNhQjFWUzNwcVlUM28tc29BczM1ekE3bEJFejZXLUNOdVlyVQ?oc=5",
-   "source": "Pokemon.com",
-   "date": "2026-10-15T07:00:00.000Z",
-   "sujet": "cartes"
-  },
-  {
    "titre": "JCC Pokémon Pocket : événement butin Méga-Carchacrok-ex",
    "lien": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPMWJObkhPLUlGSFVkX29DSFZHZFVUcUpCOU9BODFQdnliMDBGaWpLVC1jMXNQRDEtNGI5SGsxcndyZkRqUFhKaWtQXzBhX29UNUdnX3pRMVg0emRMcElkdkRxQlA2OV9RU2NCWWRBQkhvSjRvMnI4YXN4RG9Ma01sOWhicmVWMmV1dTlSX1AtVG9WdUlieGZJM3FOaUFrZklnQmRaUlNVUQ?oc=5",
    "source": "Pokekalos.fr",
    "date": "2026-10-15T06:00:00.000Z",
    "sujet": "pocket"
-  },
-  {
-   "titre": "Pokémon Or sur Game Boy tenait sur une cartouche de 1 Mo et proposait une fonctionnalité encore rare dans les jeux de 2026",
-   "lien": "https://news.google.com/rss/articles/CBMi-AFBVV95cUxQakp1RWMyZjh5UUUwMEwtN2FVWm8tdFh2dGtTQjFjWHd0WEw3cVdxUm9ya0JFQ0V1dERtOFhod0x3TFNmdkpFb3pOdVJUSGVLTnZHNVg5eHYtUWdyLXd6UVhET3hsa0JOT3RZU1NHRGlCV1JDdWxSam1XNnVWN01HTTAyRGNuQXpjRksxX2dvazFXZmNOWXZCaG5fRUVYY0ROVm4yd1dWcEk4eVlNVXVrTXdDQ05SNERSc3JoLVFHdUdLYi1BeWluajN4T3JiTGQyRDZpSWM5SXBwMG1oOXR4RzY0eVNCSndKbjVCTzNqcUdBS3pYc3pIQg?oc=5",
-   "source": "JeuxVideo.com",
-   "date": "2026-10-15T04:05:10.000Z",
-   "sujet": "pokemon"
-  },
-  {
-   "titre": "Pokémon s'associe à Beats pour une enceinte aux couleurs de Pikachu et Mimiqui",
-   "lien": "https://news.google.com/rss/articles/CBMiuAFBVV95cUxOZVpzSHdQSlkxZVpoWlRSNExrUHphdzM3bDVCaWdiS3ZrWjl4em80aklHV3BKZmpXelpDYXd3Mm5aZHNPVktIdXZfZ3pnV0NxMVVMS3EwakVaR1JXQUZDeWZfNHEtUE1JWDNUUUhubGVZVDJhWVpDeEZ6M1BBT0xidmlQTGFzS09mb2hCT3hKd3dyUXF2NTBYY1VQcGY2QmswejZ1eEduRWRvNjl4UUI1bzZGdnhvWWxK?oc=5",
-   "source": "Puissance Nintendo",
-   "date": "2026-10-14T20:48:00.000Z",
-   "sujet": "pokemon"
-  },
-  {
-   "titre": "Pleins feux sur 10 cartes de la Collection Classique de l’extension 30ᵉ Anniversaire du JCC Pokémon",
-   "lien": "https://news.google.com/rss/articles/CBMizgFBVV95cUxNNjVsWlRPc2g2VnNjTHdYOUxmYkwxZUxUTUhYQ1pFRmI0ZkdETkpxOFNlX2d2RDdiZlA0ZTdTd2I3WGdyckNIbm42anB3REpQVG5YalNMVjFPRHBKaW04MjZfamlmY3NxRk9mU1d5NU5OSlBhRm0wY1U0QW13OVpUNWtvRDFhVzRCZFJHZm00STNPN2tHeUtRLXZLTVg5Z0tTWU1wT2hidDBRSVc3UG9pb2hJZktWRTRhQUR5dXhaM2VpTDY2UnUzT3ctVEFoQQ?oc=5",
-   "source": "Pokemon.com",
-   "date": "2026-10-14T16:07:47.000Z",
-   "sujet": "cartes"
   },
   {
    "titre": "Lunettes connectées : des fans font sortir les monstres des cartes Pokémon et Yu-Gi-Oh! grâce aux Snap Specs",
