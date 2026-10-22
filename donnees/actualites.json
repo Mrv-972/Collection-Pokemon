@@ -1,5 +1,5 @@
 {
- "majLe": "2026-10-22T12:04:01.923Z",
+ "majLe": "2026-10-22T20:36:13.400Z",
  "articles": [
   {
    "titre": "Pokémon Home, Pokémon Champions et Pokémon Sleep hors ligne : une faille critique dans PHP touche une grande partie du web",
@@ -20,7 +20,7 @@
    "lien": "https://news.google.com/rss/articles/CBMi1wFBVV95cUxOd01xc2hodXdfcUNMR3RuS1UxNExGbUFPd0J6Q2lmazhCR2ZpT2RReEpYWExsXzM5aTRjbGlyaDNpZ09MNkNnS01DRHBQY0stZDI5d3ctQUR2LWtiY29SZnR0emhjbXFvbmpsRi1kb2g5WTVZT1IyMGdvdmN6VDVVXzdoRVBxWUI0cUdaREltVEZ0ZnFFRE8wYlVIMVhOTTJyUzJfYWNvVGZndTdTa1FOWTVraEhOLXJsQTBoM0VDbk5aYzRhX3d2NnhPZmZ4aVktZ2FpNlRHTQ?oc=5",
    "source": "Pokemon-France.com",
    "date": "2026-10-21T13:21:06.000Z",
-   "sujet": "pocket"
+   "sujet": "cartes"
   },
   {
    "titre": "Test – Razer x Pokémon Pikachu & Évoli : le setup collector qui joue à fond la carte Pokémon",
@@ -42,13 +42,6 @@
    "source": "Pokekalos.fr",
    "date": "2026-10-20T11:13:02.000Z",
    "sujet": "pocket"
-  },
-  {
-   "titre": "Galerie d'images: Pokémon TCG: Mega Evolution : Delta Reign Cards",
-   "lien": "https://news.google.com/rss/articles/CBMirAFBVV95cUxNVktjTVBadTN1dnhOZHMzSGJxMFdYRDFQZHZtem00VnE4V25EWlV3cXJOTGxhaTl2SHNOS1pwY3ZweHUtLU1BdjRrRTZsdnFjVDRtN1YtOERwa3AwZ3E4MW00d0FRMGRIQXRVcDVsQXRsandaN0kzMjNYMHRHLW5pZ0o1SUY2Tm11SUdhR08wMnRxUEEtR0MyMEZDdkFiZWxuT0lqR1d0bHFONGFu?oc=5",
-   "source": "IGN France",
-   "date": "2026-10-20T10:25:21.000Z",
-   "sujet": "cartes"
   },
   {
    "titre": "Pokémon 30 ans : cartes Pikachu, laquelle est la plus rare ?",
@@ -93,11 +86,18 @@
    "sujet": "pokemon"
   },
   {
+   "titre": "Tout savoir sur Pokémon Champions : date et heure de sortie, prix…",
+   "lien": "https://news.google.com/rss/articles/CBMiekFVX3lxTFBrWlVzbVVtTTFtUDJqN0JPQUh2QThGczBGdER0SVZSMEhBLTE4Vm5ndzZPZTZSd0YwZmxjd0FpLXpXOXJTdkZlY2hQYWNxWklXS2RaaldpYmg1V0s3U2xOTW5sQm5fTW1UbExyTjFpbWdxbFpzcE0ycVJR?oc=5",
+   "source": "Dexerto.fr",
+   "date": "2026-10-19T17:45:40.000Z",
+   "sujet": "pokemon"
+  },
+  {
    "titre": "JCC Pokémon Pocket : la Pioche Miracle célèbre Carolina avec Salamèche et Draïeul promo",
    "lien": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPRC1LalVPb3VKLVduZkNmejNXU2Rtb25GTmZZMHVnNXpJNHdGOXhpVkdDcTg0N0toeDU5dU9pQkR4YmNacmc5WFJhQ2h6NHpGdThhT2ZUczNRQ09EQjdPRk96NjcwakM2SHdpaTZQX1Z4bVE5RVpWcUtvTDE0SDlUcENDcW1HNlFIUmtyS3ltQ1BMVWoyNXBCenVIaENsTV9SSE1ERnNWQ3pnQ3lEUnlzZGo1YmVKT0J4ODRBT3FTSQ?oc=5",
    "source": "Pokemon-France.com",
    "date": "2026-10-19T15:24:04.000Z",
-   "sujet": "pocket"
+   "sujet": "cartes"
   },
   {
    "titre": "Chronique Sors si... : Ronflex = Meilleur pokémon pour faire un blocus",
@@ -184,32 +184,11 @@
    "sujet": "pocket"
   },
   {
-   "titre": "On vous raconte notre visite de l’exposition Pokémon × ESA à la Cité de l’espace",
-   "lien": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQM2RwTWNXYm1RSVBWWDVnU1dKUUlDMXltUG9UZjZjbmFoaF9Fa2ZyQUQ0bmlfck9HYUdsMi1HZWRLTktmYkdXcEVmVXluVGE1STgyTE1xVlFyaVFsaGVnZU9uc2tCd0pPRXBxSzIzb2Y1QmZ2c29yMlFpMlA4dU9UcFNDUk5wRjFqODdGNmVNM2pqaksycG5JSXMxd3h3TkdHdkJMMWl4bEdJdTdnZDFIenp3?oc=5",
-   "source": "Pokemon.com",
-   "date": "2026-10-15T19:42:34.000Z",
-   "sujet": "pokemon"
-  },
-  {
-   "titre": "On a trouvé un jeu Pokémon gratis mais on n'a toujours pas passé le niveau 1",
-   "lien": "https://news.google.com/rss/articles/CBMiywFBVV95cUxOVjVlLWM1RmlJZzhONnBJMld1dll2NWZPOVdxcmpVOHEyQVRKQ3hYUGpZVmJOb0ZSbjk5TEMxblhVN1kyY2dueENteXc3NTJzb3FXbUdHOGJHODA2U0tKSDZmTy1yLU9wNncxMk9YOUdzZVZkdm53VFVYQmpTb0s4LWJVS1hvRkJVX3JkcG9LV1FSTHdBZTdTRE9Pd0kzdy14V0t6MnB5M2FIZUI0UXd1a1dyX0hZZDVib3FnSGhxbWlnWnhRM3hnRUZDWQ?oc=5",
-   "source": "Konbini",
-   "date": "2026-10-15T15:20:38.000Z",
-   "sujet": "pokemon"
-  },
-  {
    "titre": "JCC Pokémon Pocket : événement butin Méga-Carchacrok-ex",
    "lien": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPMWJObkhPLUlGSFVkX29DSFZHZFVUcUpCOU9BODFQdnliMDBGaWpLVC1jMXNQRDEtNGI5SGsxcndyZkRqUFhKaWtQXzBhX29UNUdnX3pRMVg0emRMcElkdkRxQlA2OV9RU2NCWWRBQkhvSjRvMnI4YXN4RG9Ma01sOWhicmVWMmV1dTlSX1AtVG9WdUlieGZJM3FOaUFrZklnQmRaUlNVUQ?oc=5",
    "source": "Pokekalos.fr",
    "date": "2026-10-15T06:00:00.000Z",
    "sujet": "pocket"
-  },
-  {
-   "titre": "Lunettes connectées : des fans font sortir les monstres des cartes Pokémon et Yu-Gi-Oh! grâce aux Snap Specs",
-   "lien": "https://news.google.com/rss/articles/CBMiyAJBVV95cUxOQXl2ZkxESGEyLTFtcEV5U2JmNFdvaXJ3NUVaLTE4elhDMGhWdzhKdUJlOW1IblRrSmVWckpVekxDTDBwWFFNN19SYUl6UUtfTVNHLVMzdHRoM1hZc1VqNU9uUHpPbHROVGhmdkstaTRmVlhoRE5XNkpiSUNzamdNUWl4azZhX2J5dkVVTm1nU3dBaXdTczNfNHdWYWM3NHhTUndWYURyUWFrT3RvZTVoMnlMeDE5MXpWQmtnVEk0LTY3Z3dIbzB2TGVVZ3BzUDNWOG93bnNDbTFxVU5nT2pwNTBGajl5UVk2TVd1eHFndXhVUFYwMG5lRGxiS3Y2OHhvbTYxTGVmOFJMVGxxaEh0aE5LdkxEa2h2VU5LSThOeFcwdnlJQnpMSHRESmpBQXVUYm1BVjNlSzdzREEzYWZiMkhDS3EySzJ5?oc=5",
-   "source": "Frandroid",
-   "date": "2026-10-12T07:00:00.000Z",
-   "sujet": "cartes"
   }
  ]
 }
