@@ -1,11 +1,18 @@
 {
- "majLe": "2026-10-23T20:30:32.994Z",
+ "majLe": "2026-10-24T11:14:25.033Z",
  "articles": [
   {
    "titre": "Il retrouve des cartes Pokémon oubliées depuis 15 ans et devient millionnaire",
    "lien": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQbWlWaV93NHpzRkhfdkFSZXAxLXNTSncxQS01N1VDX2pWdnJqaTBudUVXSHYzVmpic182Z3JsMFhLeEJBaG5UQ3lqNUt1M1Vzcl83Y1JSNDJLVlYxb3lPSnFfc1l5MXM5TmQtUldKYkJWcmViRXdhVE5JMi1nZl8zUTFwVkpOUDFPa3NncTRlR2xKT3lucXZfNm9LNUoyd3FOZUIzMDdhLUVSN0ZrdVVyM1pnaTFyWU9WQlZ0QlRoRngzTkdqQnc?oc=5",
    "source": "Dexerto.fr",
-   "date": "2026-10-23T20:25:28.000Z",
+   "date": "2026-10-23T21:23:36.000Z",
+   "sujet": "cartes"
+  },
+  {
+   "titre": "JCC Pokémon : aperçu des produits Méga-Évolution – Règne Delta",
+   "lien": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQTzk1R0NaVjdfRkRoMktlOVBuaDVzaGVvQzFQcW9xVU5VaElFN202T1JpRUhUQWRUOXJUNU0tUzJOc0tBWE9aME1Ya3E3ZGdXYmpDaVN6eXRGRG5ma0p0Y20zNmdyamFQWklrejVNS1lwWmR4M1hLbDBNd0FSQVhWcGo2aFA2NllNWEE0TWdWNkd6TTlQOWVtOUNicnU?oc=5",
+   "source": "Pokemon.com",
+   "date": "2026-10-23T19:26:38.000Z",
    "sujet": "cartes"
   },
   {
@@ -16,13 +23,6 @@
    "sujet": "pokemon"
   },
   {
-   "titre": "JCC Pokémon : aperçu des produits Méga-Évolution – Règne Delta",
-   "lien": "https://news.google.com/rss/articles/CBMinAFBVV95cUxQTzk1R0NaVjdfRkRoMktlOVBuaDVzaGVvQzFQcW9xVU5VaElFN202T1JpRUhUQWRUOXJUNU0tUzJOc0tBWE9aME1Ya3E3ZGdXYmpDaVN6eXRGRG5ma0p0Y20zNmdyamFQWklrejVNS1lwWmR4M1hLbDBNd0FSQVhWcGo2aFA2NllNWEE0TWdWNkd6TTlQOWVtOUNicnU?oc=5",
-   "source": "Pokemon.com",
-   "date": "2026-10-23T15:25:34.000Z",
-   "sujet": "cartes"
-  },
-  {
    "titre": "À 20 ans, il abandonne ses études pour vendre des cartes Pokémon : aujourd’hui, il réalise 7 millions d’euros de chiffre d’affaires par an",
    "lien": "https://news.google.com/rss/articles/CBMilgJBVV95cUxNbXJiYjFDX25rT2hseFM3WXZWQnRxRjBOWHdKdTF6OTEtTXdmTjRBVEhGS3h3MFB4cmQ0d1paa0QzMGY2WUpXUldjQkxsMmJ5aVlJRnNYZ2M4QS1qOUYtc3JhOTkxdEp5MTEwaEp4SWNqSEI1ZGRzNzVUeFBOLU9fU2F5Qi1NUTBPRTlMRldhTWVhZ0xZakpTem9iSzBGbkUydWl1LTBzLWN1bU5CWGFVckl2TkNWMnlxYkZPcDNJdlZRRVpWWm9FRFNIWXNwM2tNdFdQMllUUWdnc1R4Q2ZkaDdmUlE1dk55UURyc1VjdjlRdnpYVEd1Q1kxcGNIUGxXWTFPSVRUWHZOeU1TT2xIMU01Q2F3dw?oc=5",
    "source": "La Crème Du Gaming",
@@ -30,10 +30,52 @@
    "sujet": "cartes"
   },
   {
+   "titre": "Razer x Pokémon : Pikachu et Évoli prennent possession de votre bureau",
+   "lien": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOWFFSVWM1amZWcnRadmo3MzdlLWV2MTJXLTdpa0lwOGRsWVFwNTVUM0I1MVkyM2xCQm94MzduNXpHYThJVkVKckJIcWF5VjR3V1Z6dGg1TWloVHhYYm55WE9neGJxMHdPM3dLREJGU01vVDRyYUphMXFDUjZSbk00c3YtOHJUODJNeG9vZDJYY2R2Z294WVZVR2NyOXlVdXF2?oc=5",
+   "source": "gamewave",
+   "date": "2026-10-23T08:00:00.000Z",
+   "sujet": "pokemon"
+  },
+  {
+   "titre": "Pokémon GO : Pawniard sera à l’honneur lors de la Journée Communauté du 21 novembre 2026",
+   "lien": "https://news.google.com/rss/articles/CBMie0FVX3lxTFBtQW95WmJXVUZoVmx2VVZ0blpIMFdSdHZ2amtlcXlEOWdJSVJUeVE4dWljZ2MtTzc0X1ZRczI2LUIyY2x5QlRoWEZ2TjZhTjQ1R3lMWTJ2SUZiNTkycG1NU2FYMTAxaXR3d0Rsc1RMZVlsUEZ5M3FROVVOVQ?oc=5",
+   "source": "WorldOfGeek",
+   "date": "2026-10-23T07:00:00.000Z",
+   "sujet": "pokemon"
+  },
+  {
+   "titre": "Un fan de LEGO recrée le légendaire Pokémon Lugia avec 3 000 briques LEGO officielles, et le rendu en pixels est tout simplement parfait",
+   "lien": "https://news.google.com/rss/articles/CBMimwJBVV95cUxPczU5UzQ5RGs0S0dLSm9IeU1lNm5LbkRpRjlldy1CT2V5bEV2bFBMMUpEeFU4bXhfekExMkZIa1RGZkVaaWRvTEE1ZDdpMFRrUHdENjhFUzVBQ2pHeEljNWU1bkl1YXg2RS1zVmh6bGZyRmxpbHRlN1hoWk84LUpvVmJCVlFJT3dCYWM3WWt5SWVIQ0dWSHRnX2t4NThpWHhhc2hQeGFvOWl1a2lNSTFuQUllMnFIR0RFdmZkZnloRWdTZ21YeXJpOWxUbGotaUY0V1pUTm1yM2RUUFFUbmllbXpTNzVzdno3RTFQRnJ6TGt2eEdLNUo1MTNuY2lkX2ZzSkZtSkdLcVBDUERjR0NCUGZuU2taS2txMS1z?oc=5",
+   "source": "La Crème Du Gaming",
+   "date": "2026-10-23T06:00:04.000Z",
+   "sujet": "pokemon"
+  },
+  {
+   "titre": "Pokémon GO : comment débloquer le Super Niveau Max de Méga-Ténéfix ?",
+   "lien": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBfbER2dWlEd2p4UjU1UGlNR2xWUGRQWUdCWXBVbDVnU2lpWE9qOFhBa2xfMFVJMWtaOTJ1aVZYaW02dEFFRV9VaDlUNzJLenVYNDdTcDhhNTlsR1ZaaldZZ2p4Ylh1TjRZZWdaQ3BMVFBTS3o2V1RycQ?oc=5",
+   "source": "Kingofgeek",
+   "date": "2026-10-22T19:42:53.000Z",
+   "sujet": "pokemon"
+  },
+  {
+   "titre": "Pokémon GO : Community Day de Scalpion le 21 novembre 2026",
+   "lien": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxNeHV4bmRhekZjZ25LTW1IZXBVeWhMRVpWeFRoMHR1ZDV2Q3VEQTJRZzd2aTB6a3Jrc19LNjVOUmVWeERXTG93ak1KdGpsRDNJY09TQlRoTmwzVm1nclBQVHFaQldoeUtlRER2V0xRRWZHSjdLQWNNY1lJWlRQODRYS1J1N20wZkxxTExDc0JOQTRXRzdlb1ZkLVhBMTZpMEljbFJYMnQwQW5BaVU?oc=5",
+   "source": "Pokekalos.fr",
+   "date": "2026-10-22T05:58:19.000Z",
+   "sujet": "pokemon"
+  },
+  {
    "titre": "Pokémon Champions en panne : maintenance d’urgence sans date de retour",
    "lien": "https://news.google.com/rss/articles/CBMilgFBVV95cUxQc3VWVGsyUUllcE1DWG0xTXo0RWZGVG1ENjhZZENSRlNFNDhSSVc1RnB2R3BfUHV5ZEV3R1lTX0ZmR2N0NjBIdTRWZkZ6bGdNNmhMMVFNcmNkZm5VMHoyYUV6VlcxYkVJVFVhNEZSek9FYVFsQ2Q4em9Dc0UwVU1qcHBDTjFGZFVWVTdzVFlBdVJSbFc3bnc?oc=5",
    "source": "GeeksLands",
    "date": "2026-10-21T22:56:56.000Z",
+   "sujet": "pokemon"
+  },
+  {
+   "titre": "Magasin Pokémon à Londres : la première boutique permanente hors d'Asie ouvrira d'ici 2029, à un saut d'Eurostar de Paris",
+   "lien": "https://news.google.com/rss/articles/CBMi5wFBVV95cUxPdEpObUhPYnZyUVdoUGpVclA5Y2EtdGpCU1o5VmtFWWRBS0t6ZFhHQmpPdWFLcEpUQ0JpZF91d0Z6RDJTU2g5anpSd1N3SHR6Qnl2RllRSGJZTUZXTG5oYmV5NHNNNUlHMUY5MFlpVHBNTGFYQ3hKbEg1T0RLTFcxdjBteV9HNFVOZmdqV25pdVJkU1NOOHpkV0VPWFI5LWZhYU9CY2VUcm5XMG5pZ19LMUVxdjBFNUdCUDVpMkR3X2VicG42NHJCalhkZzBoYzdDUXg0WXdMZVMyb1ZaYjZqcEhaekh4RW8?oc=5",
+   "source": "Pokemon-France.com",
+   "date": "2026-10-21T19:49:08.000Z",
    "sujet": "pokemon"
   },
   {
@@ -44,10 +86,31 @@
    "sujet": "pokemon"
   },
   {
+   "titre": "Pokémon Sleep : Mew rejoint la Journée du doux dodo dès le 25 octobre, un nouvel ingrédient arrive en novembre",
+   "lien": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxNdmlSVlhvb1dZMl9UNE1fSU1PTWNLVU9KOEg1SXNkWS1vU1NHMjNyQVFPMEVnOGdIU1dGQjlpSzM2cWhzVkVhcmlDaUxFRmdPTnQta1lOR1hSVUZ4dGtTU0J0VmxDWnBCbFNTUnJocXFVUlJjakxkYVJ4TWRkTUtmTktxeDV6RjVYWmt6UlJ6clBQUTlNZ1BSaWhkZkhQajBQR18xSzllRG9YbE1XT0NMeWFUSWV0dnQ3OE96WWtxMjFtLWxyN2tYdHF5M05ZTTQyS3FfOFVMOG1lUWtY?oc=5",
+   "source": "Pokemon-France.com",
+   "date": "2026-10-21T17:45:00.000Z",
+   "sujet": "pokemon"
+  },
+  {
+   "titre": "Razer x Pokémon : Mentali et Noctali débarquent dans votre setup",
+   "lien": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPemJkT0RERnE4V3BFTWJEMXpXT3VkZTBrMTVROFBSM2JtSVpZRHlWeVdvbTNzbGo2cEhWTmhMdjBWN3duOWE3azZNZktkRlNUTjFSYy1PMUpOYl9nSS1qV3paX2hpUkNwRWJpWE1xeklCUDlMMlVXNUJOMUNNSUU4TE9xZ1lVMWowVG5NTzRSZ2s2di1KcFBTYg?oc=5",
+   "source": "gamewave",
+   "date": "2026-10-21T16:00:00.000Z",
+   "sujet": "pokemon"
+  },
+  {
    "titre": "Une boutique officielle Pokémon va enfin ouvrir en Europe de façon permanente",
    "lien": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNbWp6YmZYN2VRRkxlaURHeXVPOXVoYlNNMGZJZXZBZWtNQnhvdENSVi1wRlVrMHN5d3d4ODk0Q2Z4RFc1NnY1VFhxb3hQWERrR0tlSWt2VllGOHBQQlpmV05STC1CZk82X0F6U0lpTmxnd25JTy03dE9raWZKRlpTREtjcjhpZmtNM0JaYXdiWFpKZVdQUWJac0JVS1hkaFh4VWFkam9uc1FuQVd1eU5NbktRZnhFTTctVUJn?oc=5",
    "source": "Journal du Geek",
    "date": "2026-10-21T15:47:48.000Z",
+   "sujet": "pokemon"
+  },
+  {
+   "titre": "Pokémon GO : comment obtenir Toutombe chromatique pendant Halloween 2026 ?",
+   "lien": "https://news.google.com/rss/articles/CBMiigFBVV95cUxPcVdTSlhlTHBfMWk4b2szSUJEU0lqcUNLbGpNa0lvdGIwbktudTlLQVZNRUVybHpSNm80TGlEZmx0S3ZEdTd2alhvbWE4d1ZhLWRXZDhwUXFqdXUtQ3dLNDBid0JfcVlIbl9MdjZHcnlPTzlPd0VkR0VNQ0xNVmU3bUdHczFKWE1USUE?oc=5",
+   "source": "Kingofgeek",
+   "date": "2026-10-21T12:59:03.000Z",
    "sujet": "pokemon"
   },
   {
@@ -65,10 +128,10 @@
    "sujet": "pocket"
   },
   {
-   "titre": "Guide des Sbires de la Team Go Rocket de Pokémon (Octobre 2026)",
-   "lien": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOeEpCd2ZQRUR0QmpuZEt6YzlYR3d0clN1RW5ZczlqWEJIeXpLOFdDQ2dLYWlFNmVGS3ZNazR0eDE5Qlp5cGtWRVNsNzRtbjQ2VnlVV0JxbWwwUENhd3lBNWJDZFE2THVYTWRPSThYaEdCeDZyM3pDZlhwTDBSR0UxX0tRcnViZjhOYnllQWR0dnFaalhnel8zZFJlVmhYbGl6YkwyXw?oc=5",
-   "source": "Dexerto.fr",
-   "date": "2026-10-20T15:47:11.000Z",
+   "titre": "Pokémon Pocket révèle Fusion Double, première extension de l'année C",
+   "lien": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNaTNQSEpCZnNVWVFpSFlmeVlnQVlqMlZubUw1S1lOTmhxZ2NiRFlBdG4tRkgyT3ZyaE1LT1pLaHN0dGRkZTY4OGZwYlEtWEtNTkZhZVV4NlB5N09IdEk2WHE4dzk3SHVMQVlfNkI5U0FEMF9sWDVPWGhOdjR6a3FuZVcwbmtkU1RLZnJTbmxzSEdKM3VxWDNnSjU2ZlZ1cF9xaDJ5d0FB?oc=5",
+   "source": "Gamewave",
+   "date": "2026-10-20T13:41:00.000Z",
    "sujet": "pokemon"
   },
   {
@@ -76,7 +139,7 @@
    "lien": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQVnI5b3pYNnQ4LVFvaXpjckNJYzFHV0RBMjAxNEpjN185QUJDbnc3cXZIYVNaSW5FRndsdS1ocXh5NDl6c2dDc1A5WENqZ1RpNGR3ZU9IZTQzRzJXTUZtR2lXdllnTG5qSmU4eHlCZ3VuOXFMZTJibTFxRzN3dnRvR0hSdnJSeVE0bDZmTjgtOTVvYVVDTTlPN3pLS2ZxMDVFNzc0dlA5TTZ0azVh?oc=5",
    "source": "Pokekalos.fr",
    "date": "2026-10-20T11:13:02.000Z",
-   "sujet": "pocket"
+   "sujet": "cartes"
   },
   {
    "titre": "Galerie d'images: Pokémon TCG: Mega Evolution : Delta Reign Cards",
@@ -93,17 +156,10 @@
    "sujet": "pokemon"
   },
   {
-   "titre": "Découvrez la Fusion Double dans la nouvelle bande-annonce de JCC Pokémon Pocket !",
-   "lien": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPU3BZazR6LUtjRmRDaV8zQnlpdzVoRGdLd0piTFpfTTNGWVFJMjR3Y1dURElpNEJLZlV0QzdvaXRGcjJSR19NRVktYXQxSm1WYlREYW5BQnQyTmx2ZWRIQVlvSTM4bzFaUVhueWdNeWVublNHQ2VaZl9mY09odF96bTRXemtMZmVMOTNtTThEcTNteUh5d0hYdGJpSUZCc2RGY0xF0gGrAUFVX3lxTE1UdjZ6RGtHNjlMTmJGR0l0ZlRpano4MDRxMXZZMGtWMy1YdG56cGJRejUzS2w0aE11YU1jRVNKZWV3RGY4YmVoblJUMHBEMEJlc1IxT2FzaHhWZnFOZ1RJQzNlZDh2NnFtSDNHb0lvZHUzZ0VteGtob0k0eVBvcVpwdTA4V1FCQ3RCdjJkd1UxcVhIOW1KZ25GVW9PN2ZvYWRMaWlUQkFjVl95RQ?oc=5",
-   "source": "Otakugame.fr",
-   "date": "2026-10-20T07:00:00.000Z",
-   "sujet": "pocket"
-  },
-  {
-   "titre": "Habitadex des événements - Astuces et guides Pokémon Pokopia",
-   "lien": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPdDF2LU94UEUwQW4zaGFoRG5fVFdZdnozS0hLaVBrV0hPTHhQNlU5RHJnZmdkWlQybHN4VUF1X1ByTXNLM1NGaUEzakwybmphQjBJSEdYTURZQW1fRnNYQ1JmdmZxTXV3Mi1KMERmZHZkY1A5cUVuZ3pQVlNEM012TlhLTGdDeWdndUNr?oc=5",
-   "source": "JeuxVideo.com",
-   "date": "2026-10-19T18:30:00.000Z",
+   "titre": "Pokémon revient à Galar avec une nouveauté qui arrive en 2027",
+   "lien": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE1JQ0cxWFE3R3ZzNnQ4bVI1NmFmSUdPU1VLSWlUX05UMFcySk1TcVdUc1lzdGs4ekxZZDNIeWlIZnlCS19odlMzMUw3WXMwYnFuVVhIMjJSdWo2ZWJmUGc?oc=5",
+   "source": "WorldOfGeek",
+   "date": "2026-10-20T06:30:00.000Z",
    "sujet": "pokemon"
   },
   {
@@ -128,17 +184,17 @@
    "sujet": "pokemon"
   },
   {
-   "titre": "Où trouver Solochi et Diamat dans Pokémon Épée ?",
-   "lien": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQSTFPM1VDel9nWUJlSTFUb09laldkOU02UW9CSTBtN3A5b09iX21tQkRIUzd3QWJlWnM2ajZ4Y1dIUjdyWE5UQ1ZvNGlxWnh1N2xRX1JWSG1DZzEzYkxUeDdTQk55ajlQWnlVbk9fMndLU3hzcl9HV3Y2WlFubS1RZTgwUXEzam4zaWp3LWszTQ?oc=5",
-   "source": "Dexerto.fr",
-   "date": "2026-10-19T17:45:40.000Z",
+   "titre": "Test – Razer x Pokémon Mentali & Noctali : une collaboration aussi belle que bien pensée",
+   "lien": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxObE5OYnhaMDIycHhKdDlLQXlWX3k2VkU0TDJ0TjB2Q3dyZWpTcDFaRU80b0czd0g2RXAxSFBUZUZRWjM4TEM2V2JOb1BMR3Y4NzdGLWtaNG5BZXMxbG5HM293a1lKWHhoX29laGdyaDFkMHI2UW4xS1FYVmtEa25uaGJTcnNVMFZTdjBBODhlZTZZZ3plU0lhMzVMd2FlMVNYRTBrUTBiVktPR3RXcVI3UUc2MGhuR2xtaXZR?oc=5",
+   "source": "Nintendo-Master",
+   "date": "2026-10-19T15:34:05.000Z",
    "sujet": "pokemon"
   },
   {
-   "titre": "Tout savoir sur Pokémon Champions : date et heure de sortie, prix…",
-   "lien": "https://news.google.com/rss/articles/CBMiekFVX3lxTFBrWlVzbVVtTTFtUDJqN0JPQUh2QThGczBGdER0SVZSMEhBLTE4Vm5ndzZPZTZSd0YwZmxjd0FpLXpXOXJTdkZlY2hQYWNxWklXS2RaaldpYmg1V0s3U2xOTW5sQm5fTW1UbExyTjFpbWdxbFpzcE0ycVJR?oc=5",
-   "source": "Dexerto.fr",
-   "date": "2026-10-19T17:45:40.000Z",
+   "titre": "Pokémon GO : les 7 variantes de Météno pleuvent sur le jeu pour les Orionides",
+   "lien": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNeG9vQkNZel9FaUpoenhOMTVhUlZCSzBSMUZCNkNQTDdMMGpYUkhPZ2N5ZW1hUE1oTl83Z3pPZW5tMjRJNm5maXNDellnZElxc1J6dkM1RERELWpPaDg1YzhvNzhPYXFKekw5VURNbURBeW1Sb3cwbjBqNFpGUE05NlZQSnd1MTdhb2V0a1BjX3pJTmxaMlF1c1RUYlNFQzBuQ3JUaElxTUFTenZoelRxTmZR?oc=5",
+   "source": "Pokemon-France.com",
+   "date": "2026-10-19T15:24:03.000Z",
    "sujet": "pokemon"
   },
   {
@@ -177,17 +233,10 @@
    "sujet": "pokemon"
   },
   {
-   "titre": "JCC Pokémon Pocket : pioche miracle 25 Salamèche et Draïeul",
-   "lien": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPbjRhelZ3aWZ1Y1NZaDBwcWRKdktiSHBHNHlkOUZkcUQ5Y1B3SWhfLUJDYXFPV1FmbDRhUXJ1Y1RUMEV3X3R3eXJvaDRXcE5zeGh0cXJDV0tWcExRMXlwY3JVUHpCOG8zc1BMeFZVSnNWMjhOdU56d3FYWW9OWE04SC0yQ2hrcVhMR3hQNXhfZXFRV1BIQjBTNTRGekUxOS1kcmk4anhhRFBWOVVJ?oc=5",
-   "source": "Pokekalos.fr",
-   "date": "2026-10-18T05:00:00.000Z",
-   "sujet": "pocket"
-  },
-  {
-   "titre": "Pokémon Pokopia : Calendrier des événements 2026",
-   "lien": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNTE5nR3RXb2kzc2Vmdm9XQjlud3lXd3ppeld1Znk0Y2c0YklYOEpzcGR6Z3U5b3NfUjd1YU0wNnBucklvRzJILVA3Z1ZnQVpfTVlEdFBwSFIxcEY2NkptUmFaOU1FMTJWdVJ0UzBpOHBPOXpsa3A5NUx5OC1GM0VjUlhPeUZFUW82Rk55UUttY3VLRWc?oc=5",
+   "titre": "En 1998, en pleine folie Pokémon, la Nintendo 64 a fait parler des milliers d'enfants à une IA Pikachu",
+   "lien": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxQNUtteXNxYWg1RWdyUnFnTVZ6MGZ2MEZ3Vlp6YTh0U1VrNktRWU5OeGN0WVdfeVFFZDFocmRNSUl4NFpxcVNlZEJDWDJRWWQ3UmhvaDZMcWlZZFVPd2J4Qy1Lc1FRbTB0UmhQZE5MdHNtZnJ5Y0NqbnZPSTZBSnhkRFpqd1dKcEtobS1YamdINzFPVldfU2ZlT29iLWVYVUZRMDhERGZNRTloaEQxenZJRkh0TkFpbHRXdk0wVzRScGRURFlkamZaZkctMHRVaUVxdFBnNVROTF83Mkk?oc=5",
    "source": "JeuxVideo.com",
-   "date": "2026-10-17T18:30:00.000Z",
+   "date": "2026-10-18T18:10:11.000Z",
    "sujet": "pokemon"
   },
   {
@@ -208,8 +257,8 @@
    "titre": "JCC Pokémon Pocket, changements à venir sur le jeu",
    "lien": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPWTdFd1B3Sm54eE9Zei1EUXRMMTJmSW5tS1JISnJpQU5GQnlrMnNJX3ZraG1EV3dKdzkwcENtd1I1eG1mX25MZV8zNVNrUmhYV0pNR3BoSDVaYmFBeGFGWUhYLWRMcHJqRzNUbkVLSk1US01pR1Q5Rnp0MXluaHMxUU0zTG5PcEh0NWp1ZVhfRnRFNkxIVTgzVUtfRko4cTAwREE?oc=5",
    "source": "Pokekalos.fr",
-   "date": "2026-10-16T12:33:00.000Z",
-   "sujet": "pocket"
+   "date": "2026-10-16T07:00:00.000Z",
+   "sujet": "cartes"
   },
   {
    "titre": "Consultez la lettre de la production du JCC Pokémon Pocket du mois d’octobre",
@@ -217,13 +266,6 @@
    "source": "Pokemon.com",
    "date": "2026-10-15T07:00:00.000Z",
    "sujet": "cartes"
-  },
-  {
-   "titre": "JCC Pokémon Pocket : événement butin Méga-Carchacrok-ex",
-   "lien": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPMWJObkhPLUlGSFVkX29DSFZHZFVUcUpCOU9BODFQdnliMDBGaWpLVC1jMXNQRDEtNGI5SGsxcndyZkRqUFhKaWtQXzBhX29UNUdnX3pRMVg0emRMcElkdkRxQlA2OV9RU2NCWWRBQkhvSjRvMnI4YXN4RG9Ma01sOWhicmVWMmV1dTlSX1AtVG9WdUlieGZJM3FOaUFrZklnQmRaUlNVUQ?oc=5",
-   "source": "Pokekalos.fr",
-   "date": "2026-10-15T06:00:00.000Z",
-   "sujet": "pocket"
   },
   {
    "titre": "Lunettes connectées : des fans font sortir les monstres des cartes Pokémon et Yu-Gi-Oh! grâce aux Snap Specs",
