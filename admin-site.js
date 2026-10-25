@@ -1,31 +1,7 @@
-// L'environnement d'administration, posé sur le site lui-même.
-// =============================================================
-//
-// Il n'y a plus de page « Administrateur ». L'administrateur navigue sur le
-// même site que tout le monde, et trouve, là où il en a besoin, de quoi
-// modifier ce qu'il regarde : une carte sur sa vignette, une extension sur
-// son en-tête, le logo d'une série sur son titre. Il n'a plus jamais à
-// taper un identifiant : c'est le contexte qui le donne.
-//
-// Pour un visiteur ou un membre, ce fichier ne fait RIEN : il pose une
-// question à la base, reçoit « non », et s'arrête. Aucun bouton n'est créé,
-// aucune feuille de style posée, aucun script supplémentaire chargé.
-//
-// Mais ce fichier ne PROTÈGE rien, et c'est voulu. Un site statique livre
-// tout son code au navigateur : quiconque le veut peut appeler ces
-// fonctions. La protection est dans la base : elle refuse toute écriture
-// dans « corrections », dans le stockage des visuels et dans la gestion des
-// comptes à qui n'est pas administrateur, et supabase/securite-profils.sql
-// empêche un membre de se déclarer administrateur. Si ce fichier
-// disparaissait entièrement, rien ne serait moins sûr.
-
 (() => {
 
 const CLE_VUE_VISITEUR = 'pokeclasseur-vue-visiteur';
 const CLE_CORRECTIONS = 'pokeclasseur-corrections';
-// La version du site, lue sur ce script même, pour charger le tiroir avec
-// le même tampon : sans lui, le navigateur pourrait servir un tiroir périmé
-// depuis son cache.
 const VERSION = (document.currentScript?.src.match(/[?&]v=([^&]+)/) ?? [])[1] ?? '';
 
 const univers = () => (typeof universActuel === 'function'
@@ -35,32 +11,20 @@ const univers = () => (typeof universActuel === 'function'
 const echapper = v => String(v ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-// ----------------------------------------------------------- démarrage ---
-
 async function demarrer(){
   if(typeof verifierAdmin !== 'function') return;
   const etat = await verifierAdmin();
-  if(!etat.admin) return;          // visiteur ou membre : on s'arrête là
+  if(!etat.admin) return;
 
   document.documentElement.dataset.admin = 'oui';
   poserStyle();
   appliquerVue(vueVisiteur());
   poserBarre();
   decorer();
-  // Les pages redessinent leur contenu à chaque filtre, recherche ou
-  // changement d'univers : on décore à mesure, au lieu d'une seule fois.
   new MutationObserver(planifier).observe(document.body, { childList: true, subtree: true });
   recopierLesTotaux().catch(err => console.info('Totaux des extensions non recopiés', err?.message ?? err));
 }
 
-// ------------------------------------------ totaux des extensions -----
-//
-// Le badge « Extension complète » se calcule dans la base, qui doit savoir
-// combien de cartes compte chaque extension. La construction nocturne le
-// résume dans donnees/totaux-extensions.json ; le navigateur de
-// l'administrateur le recopie dans la base, au plus une fois par jour et
-// seulement s'il a changé. Aucune clé secrète à ranger : la base n'accepte
-// cette écriture que d'une session d'administrateur.
 const CLE_TOTAUX = 'pokeclasseur-totaux-recopies';
 
 async function recopierLesTotaux(){
@@ -79,7 +43,6 @@ async function recopierLesTotaux(){
   if(empreinte !== memoire.empreinte){
     const db = await clientAdmin();
     const { error } = await db.rpc('enregistrer_totaux', { totaux: JSON.parse(texte) });
-    // Base pas encore à jour : rien n'est retenu, on réessaiera.
     if(error) throw error;
   }
   try{ localStorage.setItem(CLE_TOTAUX, JSON.stringify({ jour: aujourdhui, empreinte })); }catch{}
@@ -90,13 +53,6 @@ function planifier(){
   if(prevu) return;
   prevu = requestAnimationFrame(() => { prevu = null; decorer(); });
 }
-
-// ------------------------------------------- les deux environnements ----
-//
-// « Voir comme un visiteur » retire tout ce qui est propre à
-// l'administration, pour vérifier ce que voit réellement un membre. Le
-// réglage est gardé d'une page à l'autre : il s'agit d'une manière de
-// regarder le site, pas d'un geste ponctuel.
 
 function vueVisiteur(){
   try{ return localStorage.getItem(CLE_VUE_VISITEUR) === 'oui'; }catch{ return false; }
@@ -133,8 +89,6 @@ function poserBarre(){
   appliquerVue(vueVisiteur());
 }
 
-// Le tiroir (comptes, corrections) n'est chargé qu'à la demande : la
-// plupart des pages ouvertes par l'administrateur n'en ont pas besoin.
 let tiroirCharge = null;
 async function ouvrirLeTiroir(onglet){
   tiroirCharge ??= new Promise((ok, ko) => {
@@ -151,11 +105,6 @@ async function ouvrirLeTiroir(onglet){
     alert(`Impossible d'ouvrir le tiroir : ${err.message}`);
   }
 }
-
-// ---------------------------------------------------------- décorer -----
-//
-// Chaque élément n'est décoré qu'une fois : on le marque. Sans cette marque,
-// chaque passage de l'observateur ajouterait un bouton de plus.
 
 function decorer(){
   decorerLesCartes();
@@ -206,16 +155,12 @@ function ajouterLaTuileDAjout(){
 }
 
 function decorerLesSeries(){
-  // Seul le TCG physique affiche un logo de série : côté Pocket, un
-  // remplacement serait enregistré sans rien changer à l'écran.
   if(univers() === 'pocket') return;
   document.querySelectorAll('.series-block[data-serie]:not([data-admin-decore])').forEach(bloc => {
     bloc.dataset.adminDecore = '1';
     const titre = bloc.querySelector('.series-title');
     if(!titre) return;
     const b = bouton('admin-sur-serie', '✎ Logo', `Changer le logo de la série ${bloc.dataset.serie}`);
-    // Le titre d'une série replie et déplie son bloc : le clic sur le
-    // bouton ne doit pas le faire en plus.
     b.onclick = e => { e.preventDefault(); e.stopPropagation(); changerLeLogoDeSerie(bloc); };
     titre.appendChild(b);
   });
@@ -233,12 +178,6 @@ function ajouterLeBoutonDExtension(){
   contenu.insertBefore(b, premiere);
 }
 
-// --------------------------------------------- la fenêtre de saisie -----
-//
-// Une seule fenêtre pour toutes les modifications. <dialog> apporte de
-// lui-même ce qu'une fenêtre modale exige : le focus enfermé dedans, la
-// touche Échap pour fermer, et le reste de la page inerte.
-
 function champHTML({ nom, etiquette, type = 'text', valeur = '', aide = '', obligatoire = false, options }){
   const id = `admin-champ-${nom}`;
   const saisie = options
@@ -254,9 +193,6 @@ function champHTML({ nom, etiquette, type = 'text', valeur = '', aide = '', obli
     </label>`;
 }
 
-// Renvoie une promesse résolue à la fermeture. `enregistrer` reçoit les
-// valeurs saisies et le fichier éventuel ; s'il lève une erreur, la
-// fenêtre reste ouverte et l'affiche.
 function fenetre({ titre, intro = '', apercu = '', champs, action = 'Enregistrer', enregistrer, annexe = '' }){
   return new Promise(resolve => {
     const d = document.createElement('dialog');
@@ -306,8 +242,6 @@ function fenetre({ titre, intro = '', apercu = '', champs, action = 'Enregistrer
       }
     });
 
-    // Retirer une correction depuis la fenêtre même : une erreur doit
-    // pouvoir se défaire là où elle a été commise.
     d.querySelectorAll('[data-retirer]').forEach(b => b.onclick = async () => {
       b.disabled = true;
       try{
@@ -322,19 +256,10 @@ function fenetre({ titre, intro = '', apercu = '', champs, action = 'Enregistrer
   });
 }
 
-// Le catalogue garde les corrections le temps d'une visite. Sans ce
-// nettoyage, on ne verrait son propre changement qu'au prochain onglet.
 function recharger(){
   try{ sessionStorage.removeItem(CLE_CORRECTIONS); }catch{}
   setTimeout(() => location.reload(), 700);
 }
-
-// ------------------------------------------------ fusionner, pas écraser --
-//
-// Une correction est unique par univers, genre et cible : en enregistrer une
-// nouvelle REMPLACE l'ancienne en entier. Corriger seulement la rareté d'une
-// carte dont on avait déjà corrigé le nom effacerait donc la correction du
-// nom. On part toujours de ce qui existe.
 
 async function correctionsDe(cible, genres){
   const toutes = await listerCorrections();
@@ -350,9 +275,6 @@ async function enregistrerEnFusionnant({ genre, cible, changements, image_chemin
   });
 }
 
-// N'envoyer que ce qui a changé. Envoyer tous les champs préremplis
-// figerait aussi ceux qu'on n'a pas touchés : le jour où la source
-// corrigerait un nom, notre copie l'en empêcherait.
 function changementsEntre(avant, apres, nombres = []){
   const c = {};
   for(const [cle, v] of Object.entries(apres)){
@@ -380,10 +302,6 @@ const apercuImage = src => src
   ? `<img src="${echapper(src)}" alt="Visuel actuel">`
   : '<div class="admin-sans-visuel">Aucun visuel</div>';
 
-// ------------------------------------------------------------- cartes ---
-
-// La famille d'une carte Dresseur, telle que la fenêtre la propose. Le
-// premier choix, vide, laisse la famille telle quelle.
 const FAMILLES_PROPOSEES = { '': '', 'Supporter': 'supporter', 'Objet': 'objet', 'Outil': 'outil', 'Stade': 'stade' };
 const libelleFamille = code => Object.keys(FAMILLES_PROPOSEES).find(l => FAMILLES_PROPOSEES[l] === code) ?? '';
 
@@ -391,8 +309,6 @@ async function modifierUneCarte(tuile){
   const id = tuile.dataset.carte;
   const avant = { name: tuile.dataset.nom, rarity: tuile.dataset.rarete, dexId: tuile.dataset.dex,
     famille: libelleFamille(tuile.dataset.famille) };
-  // La famille ne se propose que pour une carte Dresseur, ou pour une carte
-  // qui n'est rattachée à aucun Pokémon et n'a pas encore de catégorie.
   const dresseur = tuile.dataset.categorie === 'dresseur' || (!tuile.dataset.categorie && !tuile.dataset.dex);
   const enPlace = await correctionsDe(id, ['visuel', 'carte']).catch(() => []);
   await fenetre({
@@ -427,9 +343,6 @@ async function modifierUneCarte(tuile){
 
 async function ajouterUneCarte(tete, grille){
   const setId = tete.dataset.extension;
-  // Le numéro suit la forme des cartes déjà là : « 001 » si l'extension
-  // écrit ses numéros sur trois chiffres, « 1 » sinon. Sinon la carte
-  // ajoutée ne se rangerait pas avec les autres.
   const exemple = grille.querySelector('.card-tile[data-local]')?.dataset.local ?? '';
   const largeur = /^0\d/.test(exemple) ? exemple.length : 0;
   await fenetre({
@@ -458,8 +371,6 @@ async function ajouterUneCarte(tete, grille){
     },
   });
 }
-
-// --------------------------------------------------------- extensions ---
 
 async function modifierUneExtension(tete){
   const id = tete.dataset.extension;
@@ -492,8 +403,6 @@ async function modifierUneExtension(tete){
 }
 
 async function ajouterUneExtension(){
-  // Les séries existantes, lues sur la page : on choisit au lieu de
-  // recopier un nom au caractère près.
   const series = [...document.querySelectorAll('.series-block[data-serie]')].map(b => b.dataset.serie);
   await fenetre({
     titre: 'Ajouter une extension',
@@ -519,8 +428,6 @@ async function ajouterUneExtension(){
   });
 }
 
-// ------------------------------------------------------------- séries ---
-
 async function changerLeLogoDeSerie(bloc){
   const nom = bloc.dataset.serie;
   const enPlace = await correctionsDe(nom, ['logo-serie']).catch(() => []);
@@ -533,19 +440,11 @@ async function changerLeLogoDeSerie(bloc){
     enregistrer: async (v, fichier, dire) => {
       if(!fichier) return 'rien';
       dire('Envoi du logo…', true);
-      // Une série n'a pas d'identifiant : son nom la désigne. On le prend
-      // sur la page, donc exactement tel qu'il s'affiche.
       const chemin = await televerserVisuel(nom.replace(/[^\w-]+/g, '_'), fichier);
       await enregistrerCorrection({ univers: univers(), genre: 'logo-serie', cible: nom, image_chemin: chemin });
     },
   });
 }
-
-// ------------------------------------------------------------- style ----
-//
-// Tout est rangé sous html[data-admin="oui"], posé seulement pour
-// l'administrateur : un visiteur ne reçoit même pas ces règles. Et la vue
-// « visiteur » masque tout d'une seule ligne.
 
 function poserStyle(){
   if(document.getElementById('admin-site-style')) return;
@@ -585,8 +484,6 @@ function poserStyle(){
     min-height:220px;border:2px dashed rgba(201,162,39,.5);border-radius:12px;background:rgba(201,162,39,.05);
     color:#E3C766;font-size:14px}
   .admin-ajout-carte span:first-child{font-size:34px;line-height:1}
-  /* Posés sur la page, ces boutons suivent son thème : l'or clair du
-     sombre, sur fond crème, n'avait plus qu'un contraste de 1,5 pour 1. */
   html[data-theme="clair"] .admin-sur-extension,html[data-theme="clair"] .admin-sur-serie,
   html[data-theme="clair"] .admin-ajout-extension{color:#5E4604;border-color:rgba(107,80,5,.55);background:rgba(107,80,5,.08)}
   html[data-theme="clair"] .admin-ajout-carte{color:#5E4604;border-color:rgba(107,80,5,.45);background:rgba(107,80,5,.05)}

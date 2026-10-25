@@ -1,22 +1,4 @@
 #!/usr/bin/env node
-//
-// Demander au wiki comment il nomme ses extensions
-// ================================================
-//
-// Sept extensions sur huit ont livré leurs visuels français. La huitième,
-// P-B, résiste : cinq graphies de son dossier répondent 400, y compris en
-// anglais : ce n'est donc pas la traduction qui manque, c'est leur nom
-// d'extension qu'on ne devine pas.
-//
-// Plutôt qu'une sixième supposition, on pose la question à leur propre point
-// d'entrée de données. Cela suppose d'employer la clé publique que leur site
-// embarque dans son code : elle sert précisément à ça, mais ce n'est pas la
-// même chose que lire un dossier ouvert, et c'est pourquoi cet outil est
-// séparé, lancé à la main, et ne tourne pas dans la construction nocturne.
-//
-// Il n'AFFICHE JAMAIS la clé. Elle est déjà publique dans leur code ; la
-// recopier dans des journaux consultables par tous n'apporterait rien et
-// serait discourtois.
 
 const IDENTITE = {
   'User-Agent': 'PokeClasseur/1.0 (+https://github.com/Mrv-972/Collection-Pokemon)',
@@ -24,8 +6,6 @@ const IDENTITE = {
 };
 
 const PAGE = 'https://pokemon-tcg-pocket.wiki/fr/cards';
-
-// ------------------------------------------- retrouver de quoi appeler ----
 
 async function reperages(){
   const r = await fetch(PAGE, { headers: IDENTITE });
@@ -42,8 +22,6 @@ async function reperages(){
     }catch(err){ continue; }
 
     base ??= code.match(/https:\/\/[a-z0-9.\-]+\/functions\/v1\/web_api/)?.[0] ?? null;
-    // Deux formats de clé coexistent : l'ancien est un jeton en trois
-    // morceaux commençant par « eyJ », le nouveau s'écrit « sb_publishable_ ».
     cle ??= code.match(/eyJ[A-Za-z0-9_\-]{10,}\.eyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}/)?.[0]
          ?? code.match(/sb_publishable_[A-Za-z0-9_\-]{10,}/)?.[0]
          ?? null;
@@ -51,8 +29,6 @@ async function reperages(){
   }
   return { base, cle };
 }
-
-// ----------------------------------------------------- poser la question --
 
 async function demander(base, cle, chemin, corps){
   const entetes = { ...IDENTITE };
@@ -65,13 +41,10 @@ async function demander(base, cle, chemin, corps){
   });
   const texte = await r.text();
   let donnees = null;
-  try{ donnees = JSON.parse(texte); }catch(err){ /* pas du JSON */ }
+  try{ donnees = JSON.parse(texte); }catch(err){ }
   return { statut: r.status, donnees, texte: texte.slice(0, 300) };
 }
 
-// Ce qui nous intéresse : les identifiants d'extension, et la forme du chemin
-// d'un visuel. On cherche donc, dans n'importe quelle réponse, tout ce qui
-// ressemble à une extension promotionnelle.
 function extraireExtensions(donnees, vus = new Set(), profondeur = 0){
   if(!donnees || profondeur > 6) return vus;
   if(Array.isArray(donnees)){
@@ -89,10 +62,6 @@ function extraireExtensions(donnees, vus = new Set(), profondeur = 0){
   return vus;
 }
 
-// Nous séparons les promos en P-A et P-B ; eux n'ont qu'une série « PROMO »
-// à numérotation continue. Si la suite est simplement « P-A puis P-B », leur
-// PROMO-118 doit porter le nom de notre P-B-001. On ne le suppose pas : on
-// compare les noms, carte par carte.
 async function comparerLesPromos(base, cle){
   const r = await demander(base, cle, '/cards', {});
   if(r.statut !== 200) return console.log('Comparaison impossible : la liste des cartes ne répond pas.');
@@ -118,11 +87,6 @@ async function comparerLesPromos(base, cle){
   }
 }
 
-// Les symboles de rareté affichés aujourd'hui sont des caractères
-// typographiques (« ◆◆◆ », « ♛ ») qui approchent l'idée sans être les
-// vraies icônes du jeu. Le wiki en sert de vraies, sous
-// /icons/card-rarity/<code>.png. Reste à savoir quels codes existent : on les
-// lit dans les cartes elles-mêmes, puis on vérifie que l'icône répond.
 async function trouverLesIconesDeRarete(base, cle){
   const r = await demander(base, cle, '/cards', {});
   if(r.statut !== 200) return console.log('Liste des cartes indisponible.');
@@ -160,7 +124,7 @@ async function trouverLesIconesDeRarete(base, cle){
           verdict = `${adresse}  (${rr.headers.get('content-length') ?? '?'} o)`;
           break;
         }
-      }catch(err){ /* adresse suivante */ }
+      }catch(err){ }
     }
     console.log(`  ${code.padEnd(6)} ${String(nombre).padStart(5)} cartes  →  ${verdict}`);
   }
@@ -187,7 +151,6 @@ async function principal(){
       const series = [...new Set(extensions.map(e => e.replace(/-\d+$/, '')))].sort();
       console.log(`     ${extensions.length} cartes, séries : ${series.join(', ')}`);
     }
-    // Un chemin de visuel dans la réponse vaut mieux que toutes les déductions.
     const chemins = [...new Set(
       [...JSON.stringify(r.donnees).matchAll(/[A-Za-z0-9_\-\/]*card\/[A-Za-z0-9_\-\/.]+/g)].map(m => m[0])
     )].slice(0, 5);
@@ -198,7 +161,7 @@ async function principal(){
     if(!extensions.length && !chemins.length){
       console.log('     ' + JSON.stringify(r.donnees).slice(0, 400));
     }
-    break;   // un chemin qui répond suffit : inutile de les essayer tous
+    break;
   }
 
   await trouverLesIconesDeRarete(base, cle);

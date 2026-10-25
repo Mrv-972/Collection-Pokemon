@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>Échanges - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -100,8 +100,6 @@
   .mini .refuser:hover,.mini .refuser:focus-visible{color:var(--alerte);border-color:currentColor}
   .mini .refuser:disabled{opacity:.5;cursor:wait}
 
-  /* Les propositions refusées restent à portée de main : un refus donné
-     par erreur se rattrape sans avoir à chercher. */
   .mes-refus{margin:8px 0 34px;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:6px;padding:14px 18px;font-size:13.5px;}
   .mes-refus summary{cursor:pointer;color:var(--text-on-ink-dim);}
   .mes-refus summary:hover{color:var(--text-on-ink)}
@@ -120,8 +118,6 @@
   .status-msg a{color:var(--accent-clair);text-decoration:underline;text-underline-offset:3px;}
   .cta-btn{display:inline-block;margin-top:16px;background:var(--teal);color:#EDF5F3;padding:11px 20px;border-radius:3px;font-size:14px;font-weight:500;}
   .cta-btn:hover{background:var(--teal-deep)}
-  /* Un bouton dans un message d'état reste un bouton : la règle des liens
-     de ces messages (couleur d'accent, soulignés) ne doit pas le repeindre. */
   .status-msg a.cta-btn,a.cta-btn{color:#EDF5F3;text-decoration:none}
 
   .skeleton{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:6px;height:150px;margin-bottom:18px;position:relative;overflow:hidden;}
@@ -130,17 +126,6 @@
 
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -180,7 +165,6 @@
   </nav>
 
   <div class="page-head">
-    <div class="kicker">Mise en relation</div>
     <h1>Les échanges possibles</h1>
     <p>PokéClasseur croise ton classeur avec celui des autres membres : dès que quelqu'un propose une carte que tu cherches, ou cherche une carte que tu proposes, il apparaît ici.</p>
     <p>Pour chaque carte que tu recherches, tu vois au plus trois collectionneurs qui la proposent, d'abord ceux avec qui l'échange peut se faire dans les deux sens. Une proposition ne te convient pas ? Refuse-la : la suivante prend sa place. De même, pour chaque carte que tu proposes, tu vois au plus trois membres qui la recherchent.</p>
@@ -199,38 +183,31 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="catalogue.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="sets.js?v=2026-10-25-zimk"></script>
-<script src="confirmation.js?v=2026-10-25-zimk"></script>
-<script src="tags.js?v=2026-10-25-zimk"></script>
-<script src="raretes.js?v=2026-10-25-zimk"></script>
-<script src="glissement.js?v=2026-10-25-zimk"></script>
-<script src="cards.js?v=2026-10-25-zimk"></script>
-<script src="prix.js?v=2026-10-25-zimk"></script>
-<script src="localisation.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
-<script src="communaute.js?v=2026-10-25-zimk"></script>
-<script src="messagerie.js?v=2026-10-25-zimk"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="catalogue.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="sets.js?v=2026-10-25-hgmz"></script>
+<script src="confirmation.js?v=2026-10-25-hgmz"></script>
+<script src="tags.js?v=2026-10-25-hgmz"></script>
+<script src="raretes.js?v=2026-10-25-hgmz"></script>
+<script src="glissement.js?v=2026-10-25-hgmz"></script>
+<script src="cards.js?v=2026-10-25-hgmz"></script>
+<script src="prix.js?v=2026-10-25-hgmz"></script>
+<script src="localisation.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
+<script src="communaute.js?v=2026-10-25-hgmz"></script>
+<script src="messagerie.js?v=2026-10-25-hgmz"></script>
 <script>
 let correspondances = [];
-// Les propositions que j'ai refusées, pour pouvoir les rétablir, et le
-// pseudo des membres concernés. Tant que supabase/echanges-limites.sql n'a
-// pas été exécuté, la table n'existe pas : on n'affiche alors aucun bouton
-// « Refuser », plutôt qu'un bouton qui échouerait à chaque clic.
 let mesRefus = [];
 let pseudosRefus = new Map();
 let refusDisponible = false;
-let avisConnus = new Map();   // résumé des avis reçus par chaque membre listé
+let avisConnus = new Map();
 let equilibresSeulement = false;
 
-// Distance maximale retenue, en kilomètres, ou null pour « partout ». Le
-// choix est gardé d'une visite à l'autre : quelqu'un qui n'échange qu'en main
-// propre n'a pas à le redire à chaque passage.
 const MEMOIRE_DISTANCE = 'pokeclasseur_distance_max';
 let distanceMax = null;
 
@@ -240,19 +217,14 @@ function chargerPreferenceDistance(){
   distanceMax = Number.isFinite(valeur) && valeur > 0 ? valeur : null;
 }
 
-// Les crans de la jauge. Ils se resserrent là où la précision compte : à
-// courte distance, un kilomètre de plus décide qu'on se déplace ou non ;
-// passé quelques centaines, l'écart entre 700 et 750 km ne veut plus dire
-// grand-chose. Un pas régulier aurait rendu le bas de l'échelle impossible à
-// viser : c'est justement là qu'on veut pouvoir régler finement.
 function construireCrans(){
   const crans = [];
-  for(let km = 1;   km <= 30;   km += 1)  crans.push(km);   // au kilomètre près
+  for(let km = 1;   km <= 30;   km += 1)  crans.push(km);
   for(let km = 35;  km <= 100;  km += 5)  crans.push(km);
   for(let km = 110; km <= 200;  km += 10) crans.push(km);
   for(let km = 225; km <= 500;  km += 25) crans.push(km);
   for(let km = 550; km <= 1000; km += 50) crans.push(km);
-  crans.push(null);   // tout au bout de la jauge : aucune limite
+  crans.push(null);
   return crans;
 }
 const CRANS_DISTANCE = construireCrans();
@@ -261,8 +233,6 @@ function texteDistance(km){
   return km === null ? 'Partout' : `Jusqu'à ${km} km`;
 }
 
-// Retrouve le cran d'une distance déjà enregistrée, même si elle ne tombe
-// pas exactement dessus : les paliers ont changé depuis la première version.
 function cranPourDistance(km){
   if(km === null) return CRANS_DISTANCE.length - 1;
   let cran = 0;
@@ -272,17 +242,10 @@ function cranPourDistance(km){
   return cran;
 }
 
-// Le glissement en cours, le temps qu'il se termine.
 let relanceEnAttente = null;
 
-// Le filtre n'a de sens que si je sais moi-même où je suis : sinon la base
-// n'a aucune distance à calculer. On propose alors d'aller la renseigner
-// plutôt que d'afficher une jauge qui ne ferait rien.
 function rendreFiltreDistance(){
   const el = document.getElementById('zone-filtre');
-  // Dans l'application, l'échange se fait dans le jeu : la distance entre
-  // deux joueurs n'y change rien, et proposer de filtrer dessus laisserait
-  // croire le contraire.
   if(estPocket()){ el.innerHTML = ''; return; }
   if(!aUneLocalisation()){
     el.innerHTML = `<a class="lien-zone" href="connexion.html">Renseigne ta zone pour filtrer par distance →</a>`;
@@ -298,24 +261,17 @@ function rendreFiltreDistance(){
   const jauge = document.getElementById('distance');
   majJauge(jauge);
 
-  // Le chiffre suit le doigt, mais la requête attend qu'on s'arrête : sans
-  // cela, un seul glissement en déclencherait des dizaines.
   jauge.addEventListener('input', () => {
     distanceMax = CRANS_DISTANCE[Number(jauge.value)];
     majJauge(jauge);
     clearTimeout(relanceEnAttente);
     relanceEnAttente = setTimeout(() => {
       memoriserDistance();
-      // Le filtrage se fait dans la base : à mesure que les membres se
-      // multiplient, mieux vaut ne pas télécharger ceux qui sont à l'autre
-      // bout du pays.
       chargerCorrespondances();
     }, 400);
   });
 }
 
-// La part parcourue se remplit en or : on voit d'un coup d'œil où on en est
-// sur l'échelle, ce qu'un curseur nu ne montrerait pas.
 function majJauge(jauge){
   const part = (Number(jauge.value) / Number(jauge.max)) * 100;
   jauge.style.background = `linear-gradient(90deg, var(--gold) ${part}%, rgba(var(--trait-rgb),0.15) ${part}%)`;
@@ -331,8 +287,6 @@ function memoriserDistance(){
   }catch(err){}
 }
 
-// Ce qu'on montre d'un membre : une distance approximative et un
-// département, jamais sa commune.
 function lieuLisible(m){
   const distance = distanceLisible(m.distance);
   if(!distance && !m.departement) return '<span>Zone non renseignée</span>';
@@ -343,21 +297,16 @@ function lieuLisible(m){
   ].filter(Boolean).join(' · ');
 }
 
-// Les membres sans zone passent en dernier plutôt que de se retrouver en
-// tête par accident.
 function distancePourTri(m){
   return m.distance ?? Number.POSITIVE_INFINITY;
 }
-const infosCartes = {}; // { [id de carte]: { name, image } }
+const infosCartes = {};
 let nomsExtensions = {};
 
 function estEquilibre(m){
   return m.il_me_donne.length > 0 && m.je_lui_donne.length > 0;
 }
 
-// Les correspondances ne donnent que des identifiants de cartes : on
-// récupère nom et visuel auprès de TCGdex, une requête par extension
-// concernée plutôt qu'une par carte.
 async function chargerInfosCartes(idsCartes){
   const parExtension = {};
   idsCartes.forEach(id => {
@@ -383,9 +332,6 @@ async function chargerInfosCartes(idsCartes){
   }
 }
 
-// « refus », quand il est donné, porte le sens de la proposition (« recoit » :
-// ce membre me donnerait la carte ; « donne » : je la lui donnerais) et le
-// membre en face. Il ajoute le bouton qui écarte cette proposition.
 function miniCarte(carteId, refus){
   const info = infosCartes[carteId] || {};
   const setId = setIdOfCard(carteId);
@@ -431,7 +377,7 @@ function rendre(){
       : equilibresSeulement
       ? `<p class="status-msg">Aucun échange équilibré pour l'instant. Retire le filtre pour voir les mises en relation à sens unique.</p>`
       : `<p class="status-msg">Personne ne correspond encore à ton classeur.<br><br>
-         Marque des cartes en ❤️ recherchée et en 🔁 échangeable : dès qu'un autre membre proposera ce que tu cherches, il apparaîtra ici.
+         Marque des cartes comme recherchées ou échangeables. Dès qu'un autre membre proposera ce que tu cherches, il apparaîtra ici.
          <br><a class="cta-btn" href="series.html">Compléter mon classeur</a></p>`;
     return;
   }
@@ -460,12 +406,7 @@ function rendre(){
   `).join('');
 }
 
-// Les cotes arrivent après l'affichage : chaque carte demande une requête,
-// et on ne fait pas attendre la page pour ça.
 async function afficherPrix(){
-  // Les cartes de l'application ne s'achètent ni ne se revendent : aucune
-  // cote n'existe, et il n'y a rien à peser. On remplace donc la balance par
-  // ce qui compte vraiment là-bas : l'échange se conclut dans le jeu.
   if(estPocket()){
     document.querySelectorAll('[data-balance]').forEach(el => {
       el.className = 'balance';
@@ -500,9 +441,6 @@ async function afficherPrix(){
   });
 }
 
-// Une différence de valeur ne dit pas si un échange est juste : elle dit
-// seulement de combien les cotes s'écartent. L'état réel des cartes et ce que
-// chacun y attache comptent au moins autant.
 function texteBalance(recu, donne, el){
   if(recu.cotees === 0 && donne.cotees === 0){
     el.className = 'balance';
@@ -525,8 +463,6 @@ function texteBalance(recu, donne, el){
 
 function majResume(){
   const equilibres = correspondances.filter(estEquilibre).length;
-  // La barre reste visible même sans résultat : sans elle, la jauge
-  // disparaîtrait sous les doigts de celui qui vient de la pousser trop loin.
   document.getElementById('filtres').hidden =
     correspondances.length === 0 && !distanceMax && !aUneLocalisation();
   document.getElementById('resume').textContent = correspondances.length === 0
@@ -555,8 +491,6 @@ async function init(){
   await chargerCorrespondances();
 }
 
-// « silencieux » : après un refus, on recharge sans repasser par les cadres
-// d'attente, pour que la page ne clignote pas sous les yeux.
 async function chargerCorrespondances({ silencieux = false } = {}){
   const content = document.getElementById('content');
   if(!silencieux) content.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
@@ -567,9 +501,6 @@ async function chargerCorrespondances({ silencieux = false } = {}){
       chargerMesRefus(db),
     ]);
     if(error) throw error;
-    // On ne troque pas une carte d'application contre une carte de carton :
-    // chaque univers ne montre que ses propres correspondances, et un membre
-    // dont il ne reste rien de ce côté-ci disparaît de la liste.
     correspondances = (data ?? [])
       .map(m => ({
         ...m,
@@ -577,8 +508,6 @@ async function chargerCorrespondances({ silencieux = false } = {}){
         je_lui_donne: m.je_lui_donne.filter(id => appartientAUnivers(setIdOfCard(id))),
       }))
       .filter(m => m.il_me_donne.length > 0 || m.je_lui_donne.length > 0);
-    // Les échanges équilibrés d'abord, puis les plus proches, puis les plus
-    // fournis.
     correspondances.sort((a, b) =>
       (estEquilibre(b) - estEquilibre(a))
       || (distancePourTri(a) - distancePourTri(b))
@@ -599,8 +528,6 @@ async function chargerCorrespondances({ silencieux = false } = {}){
   }
 }
 
-// --- refus -------------------------------------------------------------------
-// Une proposition est un trio : qui cherche la carte, qui la donne, laquelle.
 function trioRefus(sens, membreId, carteId){
   return sens === 'recoit'
     ? { chercheur_id: membre.id, donneur_id: membreId, carte_id: carteId }
@@ -611,8 +538,6 @@ function tableAbsente(error){
   return error?.code === 'PGRST205' || error?.code === '42P01';
 }
 
-// Mes refus, limités à l'univers affiché : un refus de carte Pocket n'a rien
-// à faire dans la liste des cartes physiques.
 async function chargerMesRefus(db){
   const { data, error } = await db.from('refus_echanges')
     .select('chercheur_id, donneur_id, carte_id, refuse_le')
@@ -678,7 +603,6 @@ async function refuser(sens, membreId, carteId){
   const db = await clientSupabase();
   const trio = trioRefus(sens, membreId, carteId);
   const { error } = await db.from('refus_echanges').insert({ ...trio, refuse_par: membre.id });
-  // Un refus déjà enregistré (double clic, autre onglet) n'est pas une erreur.
   if(error && error.code !== '23505'){
     console.warn('Refus non enregistré', error);
     afficherBandeau(tableAbsente(error)

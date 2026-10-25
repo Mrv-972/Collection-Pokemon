@@ -1,17 +1,4 @@
 #!/usr/bin/env node
-//
-// Sonde : les pages qui décrivent les missions secrètes récentes
-// ==============================================================
-//
-// Lit une liste de pages (guides, wiki, archives du web) et
-// en dépose le texte dans donnees/missions-pages.json, pour relecture. Elle
-// ne décide de rien : c'est le recoupement à la main qui fait foi. Le
-// fichier est un brouillon de travail, retiré une fois les missions saisies
-// (relevé d'octobre 2026 : Gamewave et Pokémon GO Hub ont répondu ;
-// Bulbapedia, Pokémon Zone et Eternia refusent les robots).
-//
-// Tourne sur un serveur GitHub : le poste de travail n'a pas accès à ces
-// sites.
 
 import { writeFileSync, mkdirSync } from 'node:fs';
 
@@ -21,8 +8,6 @@ const IDENTITE = {
   'Accept': 'text/html,application/xhtml+xml,application/json',
 };
 
-// Pokémon GO Hub publie une page par extension : une collection qui mêle
-// plusieurs extensions y figure dans celle de l'extension qui l'introduit.
 const GOHUB = nom => `https://pokemongohub.net/post/tcg-pocket/pokemon-tcg-pocket-${nom}-all-themed-collection-and-secret-missions/`;
 
 const PAGES = [
@@ -69,8 +54,6 @@ async function principal(){
   const pause = ms => new Promise(f => setTimeout(f, ms));
   for(const adresse of PAGES){
     try{
-      // L'archive limite le rythme : une page toutes les quelques secondes,
-      // et on patiente davantage quand elle demande de ralentir.
       let r, corps;
       for(let essai = 0; essai < 5; essai++){
         await pause(essai === 0 ? 4000 : 15000 * essai);
@@ -81,7 +64,6 @@ async function principal(){
       }
       let texte;
       texte = enTexte(corps);
-      // Les données embarquées d'une page construite en JavaScript.
       const donnees = corps.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/)?.[1] ?? null;
       pages.push({ adresse, statut: r.status, final: r.url, texte: texte.slice(0, 120000),
         donnees: donnees ? donnees.slice(0, 300000) : null });

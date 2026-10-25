@@ -1,24 +1,3 @@
-// Copier chez nous les visuels français de Poképédia.
-// ====================================================
-//
-// Même principe que pour le reste du catalogue Pocket : les fichiers
-// atterrissent dans images/cards/<carte>.webp, et l'instantané les ramasse
-// tout seul au prochain passage : il préfère déjà un fichier local à une
-// adresse distante. Aucun code du site à changer.
-//
-// Pourquoi copier plutôt que renvoyer chez eux, mesuré et non supposé :
-//   - leur serveur n'envoie pas d'en-tête CORS, donc le partage d'un
-//     classeur contenant une de ces cartes échouerait ;
-//   - leurs fichiers pèsent 2 Mo, soit dix fois trop pour une vignette ;
-//   - et une source distante peut disparaître ou changer d'adresse.
-//
-// Licence : CC BY-NC-SA 3.0. Le crédit est obligatoire : il est affiché
-// dans le pied de page du site, et l'usage doit rester non commercial.
-// L'outil écrit aussi la liste de ce qu'il a pris, pour que ce crédit soit
-// justifiable sans fouiller un journal d'exécution.
-//
-//   node outils/copier-pokepedia.mjs [--limite 0] [--essai]
-
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
@@ -29,13 +8,9 @@ const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
 
 const DOSSIER = 'images/cards';
 const essai = Boolean(args.essai);
-// 0 = pas de limite. Utile pour éprouver la chaîne sur quelques cartes
-// avant d'en demander mille six cents à leur serveur.
 const limite = Number(args.limite ?? 0) || Infinity;
 const PAUSE = Number(args.pause ?? 400);
 
-// Les tailles des visuels Pocket déjà dans le dépôt, pour que les anciennes
-// cartes ne détonnent pas dans une grille à côté des récentes.
 const COTE_VIGNETTE = 420;
 const COTE_HD = 760;
 
@@ -51,31 +26,20 @@ const aplatir = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '')
   .toLowerCase().replace(/[^a-z0-9]+/g, '');
 const sansZeros = n => String(n ?? '').replace(/^0+/, '').toLowerCase();
 
-// ------------------------------------------------- ce dont on part --------
 const releve = JSON.parse(await readFile('donnees/visuels-pokepedia.json', 'utf8'));
 if(!releve.complet)
   console.log('ATTENTION : le relevé est partiel. Des cartes manqueront sans que ce soit de leur fait.');
 
 const extensions = JSON.parse(await readFile('donnees/physique/extensions.json', 'utf8'));
 
-// Leurs noms de série contre les nôtres. Ils concordent de près : « Set de
-// Base », « Jungle », « Gym Heroes », mais pas au caractère : on compare
-// des formes aplaties, sans accents ni ponctuation.
 const leurs = new Map(Object.keys(releve.series).map(nom => [aplatir(nom), nom]));
 
-// Quand les noms diffèrent vraiment, le rattachement est écrit ici plutôt
-// que deviné. Seules y figurent des séries que Pokécardex n'a pas : pour
-// les autres, son rattrapage suffit et rien n'est copié.
 const ALIAS = {
   '2018sm-fr': "Collection McDonald's 2018 (France)",
   '2019sm-fr': "Collection McDonald's 2019 (France)",
-  // Pokécardex n'a ses « RC » qu'en anglais (vu sur planche).
   'bw11':      'Noir & Blanc Trésors Légendaires',
 };
 
-// Leurs numéros spéciaux s'écrivent « rc3 », « h1 », « bw004 » ; les
-// nôtres « RC3 », « H01 », « BW04 ». On compare une forme commune : le
-// préfixe, puis le numéro sans ses zéros.
 const formeCode = c => {
   const h = String(c ?? '').toLowerCase();
   const m = /^([a-z]*)0*(\d+)([a-z]?)$/.exec(h);
@@ -84,23 +48,9 @@ const formeCode = c => {
 const serieDe = ext => ALIAS[ext.id] && releve.series[ALIAS[ext.id]]
   ? ALIAS[ext.id] : leurs.get(aplatir(ext.name));
 
-// ------------------------------------------------- ce qu'il faut prendre --
 const aDeja = id => ['.webp', '.png', '.jpg', '.jpeg']
   .some(ext => existsSync(path.join(DOSSIER, id + ext)));
 
-// On ne prend QUE les cartes qui en ont besoin. Sans cette restriction,
-// l'outil voulait 6 874 visuels au lieu des 1 603 demandés : il prenait
-// toute carte dont Poképédia a une image et dont nous n'avons pas de
-// fichier local, y compris celles dont le visuel français de TCGdex
-// fonctionne déjà. Remplacer une image qui marche n'apporte rien et
-// alourdit le dépôt pour rien.
-//
-// La liste des extensions à viser vient de la mesure, pas d'un jugement :
-// celles où il manque du français, et celles où il n'y a rien du tout.
-//
-// La vérification carte par carte, quand elle existe, est la mesure la plus
-// fine : elle dit quelles extensions ont encore des cartes sans visuel
-// français. L'ancien bilan ne sert qu'à défaut.
 const bilan = JSON.parse(await readFile('donnees/bilan-visuels.json', 'utf8'));
 let aViser, mesureDu, cartesVisees = null;
 try{
@@ -108,8 +58,6 @@ try{
   aViser = new Set(Object.entries(v.extensions)
     .filter(([, e]) => (e.manquant ?? 0) + (e.secoursAnglais ?? 0) + (e.indecis ?? 0) > 0)
     .map(([id]) => id));
-  // Et, dans ces extensions, les seules cartes concernées : inutile
-  // d'interroger leur serveur pour les autres.
   cartesVisees = new Set(Object.values(v.extensions).flatMap(e =>
     [...(e.cartesManquantes ?? []), ...(e.cartesAnglaises ?? []), ...(e.cartesIndecises ?? [])].map(c => c.id)));
   mesureDu = v.verifieLe;
@@ -123,26 +71,17 @@ try{
 console.log(`${aViser.size} extensions à viser, d'après la mesure du ` +
   `${String(mesureDu ?? '?').slice(0, 10)}.`);
 
-// Et dans ces extensions, carte par carte : l'adresse française de TCGdex
-// répond-elle ? Une extension « à trous » en a par définition qui vont
-// bien. Mesurer plutôt que supposer, même au prix de quelques milliers de
-// requêtes en tête : qui ne téléchargent aucune image.
 async function visuelFrancaisManque(carte){
   if(!/^https?:/.test(carte.image ?? '')) return true;
   try{
     const r = await fetch(carte.image, { method: 'HEAD', redirect: 'follow', headers: IDENTITE });
     return !r.ok;
-  }catch{ return true; }   // injoignable : on considère qu'il manque
+  }catch{ return true; }
 }
 
 const aFaire = [];
 const parExtension = new Map();
 let sansSerie = [], horsCible = 0, dejaBon = 0;
-// Quelles extensions sont écartées parce que leur visuel français répond ?
-// La question n'est pas de curiosité : la mesure de couverture dit que
-// certaines n'ont RIEN dans aucune langue. Si l'adresse répond quand même,
-// l'une des deux mesures se trompe, et il faut savoir laquelle avant de
-// copier quoi que ce soit.
 const bonnesParExtension = new Map();
 for(const ext of extensions){
   if(!aViser.has(ext.id)){ horsCible++; continue; }
@@ -154,8 +93,6 @@ for(const ext of extensions){
   const chezEux = Object.fromEntries(Object.entries(releve.series[leurNom])
     .map(([n, adresse]) => [formeCode(n), adresse]));
   for(const carte of cartes){
-    // Déjà chez nous : on ne redemande rien. C'est ce qui rend l'outil
-    // relançable sans repayer les mêmes téléchargements.
     if(aDeja(carte.id)) continue;
     if(cartesVisees && !cartesVisees.has(carte.id)) continue;
     const adresse = chezEux[formeCode(carte.localId)];
@@ -191,9 +128,6 @@ if(parExtension.size > 20) console.log(`  … et ${parExtension.size - 20} autre
 if(essai){ console.log("\n--essai : rien n'est téléchargé."); process.exit(0); }
 if(!aFaire.length){ console.log('\nRien à prendre : tout est déjà dans le dépôt.'); process.exit(0); }
 
-// ------------------------------------------------- la copie ---------------
-// sharp réduit les 2 Mo de PNG en vignette WebP. Sans lui on copierait des
-// fichiers dix fois trop lourds, et le dépôt enflerait de plusieurs Go.
 let sharp;
 try{ ({ default: sharp } = await import('sharp')); }
 catch{
@@ -217,9 +151,6 @@ for(const [i, t] of aFaire.slice(0, limite === Infinity ? undefined : limite).en
     await writeFile(path.join(DOSSIER, `${t.id}.webp`), vignette);
     octets += vignette.length;
 
-    // La haute définition sert au zoom. On ne l'écrit que si la source est
-    // réellement plus grande : agrandir une petite image ne gagne rien et
-    // double le poids pour rien.
     const meta = await sharp(brut).metadata();
     if((meta.width ?? 0) > COTE_VIGNETTE){
       const haute = await sharp(brut).resize({ width: COTE_HD, withoutEnlargement: true })
@@ -238,8 +169,6 @@ console.log(`\n================ bilan ================`);
 console.log(`pris    : ${pris.length}  (${(octets/1048576).toFixed(0)} Mo)`);
 console.log(`échecs  : ${echecs}`);
 
-// La trace de ce qu'on doit créditer. Sans elle, le crédit affiché serait
-// une affirmation qu'on ne pourrait plus vérifier.
 const traceChemin = 'donnees/visuels-pokepedia-copies.json';
 let deja = { cartes: [] };
 try{ deja = JSON.parse(await readFile(traceChemin, 'utf8')); }catch{}
@@ -248,7 +177,6 @@ for(const c of pris) toutes.set(c.id, c);
 await writeFile(traceChemin, JSON.stringify({
   majLe: new Date().toISOString(),
   licence: releve.licence,
-  // À citer dans le crédit du site, et à pouvoir montrer si on le demande.
   cartes: [...toutes.values()].sort((a, b) => a.id.localeCompare(b.id)),
 }, null, 1) + '\n');
 console.log(`trace écrite dans ${traceChemin} (${toutes.size} cartes au total)`);

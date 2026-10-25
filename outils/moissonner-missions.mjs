@@ -1,20 +1,4 @@
 #!/usr/bin/env node
-//
-// Lire les guides francophones sur les missions secrètes
-// ======================================================
-//
-// Les missions secrètes de Pokémon TCG Pocket ne figurent dans aucune base
-// de données ouverte : ni TCGdex, ni le jeu de données de flibustier, ni le
-// wiki francophone ne les répertorient. Elles ne vivent que dans des guides
-// rédigés à la main.
-//
-// Cet outil va les lire et recrache leur texte. Il ne décide de rien : le
-// tri, la vérification et la mise en forme se font ensuite à la main, en
-// recoupant plusieurs guides. Un guide qui se trompe sur une carte ferait
-// chercher pour rien une mission impossible.
-//
-// Il tourne sur un serveur GitHub, jamais dans la construction nocturne :
-// c'est une lecture ponctuelle, pas une dépendance du site.
 
 const IDENTITE = {
   'User-Agent': 'Mozilla/5.0 (compatible; PokeClasseur/1.0; +https://github.com/Mrv-972/Collection-Pokemon)',
@@ -31,9 +15,6 @@ const GUIDES = [
   'https://www.next-stage.fr/2026/03/toutes-missions-secretes-mega-shine-pokemon-tcg-pocket.html',
 ];
 
-// Une page de guide, c'est 95 % de menus, de bandeaux et de publicité. On
-// retire ce qui ne se lit pas, puis on garde la structure des titres et des
-// listes : c'est elle qui porte le découpage « extension → mission → cartes ».
 function enTexte(html){
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, ' ')
@@ -42,8 +23,6 @@ function enTexte(html){
     .replace(/<svg[\s\S]*?<\/svg>/gi, ' ')
     .replace(/<!--[\s\S]*?-->/g, ' ')
     .replace(/<\/(h[1-6]|p|li|tr|div|section|table)>/gi, '\n')
-    // Le niveau de titre est ce qui distingue une extension d'une mission :
-    // on le garde, sous forme de dièses, plutôt que de tout aplatir.
     .replace(/<h([1-6])[^>]*>/gi, (_, n) => '\n' + '#'.repeat(Number(n)) + ' ')
     .replace(/<li[^>]*>/gi, '\n  - ')
     .replace(/<(br|td|th)[^>]*>/gi, ' | ')
@@ -58,8 +37,6 @@ function enTexte(html){
     .trim();
 }
 
-// Le texte utile commence là où l'on parle de missions. Tout ce qui précède
-// est du bandeau de site ; tout ce qui suit la fin de l'article aussi.
 function partieUtile(texte){
   const debut = texte.search(/mission|collection à thème|collections à thème/i);
   return debut > 0 ? texte.slice(Math.max(0, debut - 200)) : texte;
@@ -71,24 +48,10 @@ async function lire(adresse){
   return await r.text();
 }
 
-// ------------------------------------------------------- mise en forme ----
-//
-// Le guide écrit toujours la même chose, dans le même ordre :
-//
-//     ## Musée de la Source Secrète 1
-//       - Carte(s) à obtenir : Milobellus (72/071), Limonde (73/071)…
-//       - Récompenses : 12 sabliers booster, 36 sabliers miracle…
-//
-// Un titre suivi d'une ligne « Carte(s) à obtenir » est donc une mission ;
-// tout autre titre est une section, et la plus proche au-dessus donne
-// l'extension. On ne devine rien de plus : ce qui ne rentre pas dans ce
-// moule est laissé de côté plutôt que deviné de travers.
-
 function lignes(texte){
   return texte.split('\n').map(l => l.trim()).filter(Boolean);
 }
 
-// « Milobellus (72/071) » → { nom: 'Milobellus', numero: 72, total: 71 }
 function cartesDeLaLigne(ligne){
   const apres = ligne.replace(/^[-•\s]*Cartes?\(?s?\)?\s*à obtenir\s*:\s*/i, '');
   const cartes = [];
@@ -96,9 +59,6 @@ function cartesDeLaLigne(ligne){
     const nom = m[1].replace(/^(et|ou)\s+/i, '').replace(/^[-\u2013\u2014\s]+/, '').trim();
     if(nom) cartes.push({ nom, numero: Number(m[2]), total: Number(m[3]) });
   }
-  // Certaines missions ne listent pas des cartes nommées mais une condition
-  // (« trois cartes chromatiques deux étoiles ») : on garde la phrase telle
-  // quelle, à charge pour la relecture de décider quoi en faire.
   return cartes.length ? cartes : [{ condition: apres.trim() }];
 }
 
@@ -147,8 +107,6 @@ async function principal(){
     try{
       const texte = partieUtile(enTexte(await lire(adresse)));
       const sections = analyser(texte);
-      // Un guide dont la mise en forme ne ressemble pas au moule attendu
-      // repart avec son texte : il sera relu à la main plutôt que perdu.
       recolte.push(sections.length
         ? { guide: adresse, sections }
         : { guide: adresse, sections: [], texte: texte.slice(0, 40000) });

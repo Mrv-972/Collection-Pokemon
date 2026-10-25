@@ -1,26 +1,6 @@
-// Zone géographique d'un membre.
-//
-// Deux collectionneurs proches peuvent se remettre les cartes en main propre
-// plutôt que de les confier à la poste, et un échange se négocie plus
-// facilement entre voisins. D'où ce repère de distance dans les échanges.
-//
-// Ce qui est enregistré n'est jamais une adresse : c'est la commune choisie,
-// ramenée à son point central : le même pour tous ses habitants. Personne ne
-// peut donc être localisé plus finement que « quelque part dans cette
-// commune », et le site lui-même n'affiche aux autres membres que le
-// département et une distance approximative.
-//
-// Les communes viennent de l'API Découpage administratif de l'État
-// (geo.api.gouv.fr) : données publiques, gratuites, sans clé ni inscription.
-// Elle ne couvre que la France ; d'autres pays demanderaient une autre
-// source, ce qui sera à reprendre le jour où le site dépassera nos
-// frontières.
-
 const GEO_API = 'https://geo.api.gouv.fr/communes';
 const GEO_CHAMPS = 'nom,code,codesPostaux,centre,departement';
 
-// Le nom des départements, pour ne pas dépendre d'un champ de l'API qui
-// pourrait manquer : le code INSEE d'une commune suffit à le retrouver.
 const DEPARTEMENTS = {
   '01':'Ain','02':'Aisne','03':'Allier','04':'Alpes-de-Haute-Provence','05':'Hautes-Alpes',
   '06':'Alpes-Maritimes','07':'Ardèche','08':'Ardennes','09':'Ariège','10':'Aube',
@@ -45,8 +25,6 @@ const DEPARTEMENTS = {
   '971':'Guadeloupe','972':'Martinique','973':'Guyane','974':'La Réunion','976':'Mayotte',
 };
 
-// Le code du département se lit au début du code INSEE de la commune : deux
-// chiffres en métropole, trois outre-mer, et « 2A » / « 2B » en Corse.
 function codeDepartement(codeInsee){
   if(typeof codeInsee !== 'string') return null;
   if(codeInsee.startsWith('97') || codeInsee.startsWith('98')) return codeInsee.slice(0, 3);
@@ -60,11 +38,8 @@ function libelleDepartement(commune){
   return nom ? `${nom} (${code})` : `Département ${code}`;
 }
 
-// Traduit une commune de l'API en ce que le site manipule, ou null si la
-// réponse n'a pas la forme attendue : mieux vaut ignorer une commune que
-// d'enregistrer un point de coordonnées vides.
 function communeUtilisable(commune, codePostalCherche){
-  const point = commune?.centre?.coordinates;   // l'API donne [longitude, latitude]
+  const point = commune?.centre?.coordinates;
   if(!Array.isArray(point) || point.length < 2) return null;
   const [longitude, latitude] = point;
   if(typeof latitude !== 'number' || typeof longitude !== 'number') return null;
@@ -72,8 +47,6 @@ function communeUtilisable(commune, codePostalCherche){
   const codes = Array.isArray(commune.codesPostaux) ? commune.codesPostaux : [];
   return {
     nom: commune.nom ?? 'Commune',
-    // Une grande ville a plusieurs codes postaux : si la recherche partait
-    // de l'un d'eux, c'est celui-là qu'on garde.
     codePostal: codes.includes(codePostalCherche) ? codePostalCherche : (codes[0] ?? null),
     departement: libelleDepartement(commune),
     latitude,
@@ -81,7 +54,6 @@ function communeUtilisable(commune, codePostalCherche){
   };
 }
 
-// Accepte un code postal (cinq chiffres) ou un nom de commune.
 async function chercherCommunes(saisie){
   const texte = (saisie ?? '').trim();
   if(texte.length < 2) return [];
@@ -99,9 +71,6 @@ async function chercherCommunes(saisie){
   return communes.map(c => communeUtilisable(c, codePostal)).filter(Boolean);
 }
 
-// Comment une distance se dit. En dessous du kilomètre, le chiffre exact
-// n'apporte rien et donnerait une fausse impression de précision : les deux
-// points comparés sont des centres de communes, pas des domiciles.
 function distanceLisible(km){
   if(km === null || km === undefined) return null;
   if(km === 0) return 'même commune';
@@ -109,7 +78,6 @@ function distanceLisible(km){
   return `à ${km} km environ`;
 }
 
-// Comment une zone se présente à son propriétaire.
 function zoneLisible(profil){
   if(!profil?.ville) return null;
   const lieu = profil.code_postal ? `${profil.ville} (${profil.code_postal})` : profil.ville;

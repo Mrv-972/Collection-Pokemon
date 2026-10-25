@@ -1,4 +1,3 @@
-# Vérifie ce que sert le serveur des cartes de Pokécardex. Lecture seule.
 name: Sonde scans Pokécardex
 on:
   workflow_dispatch:

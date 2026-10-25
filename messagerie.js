@@ -1,11 +1,3 @@
-// Accès aux conversations entre membres.
-//
-// Les nouveaux messages sont récupérés par interrogations régulières plutôt
-// que par une connexion permanente : c'est le même chemin que le reste du
-// site, donc bien plus simple à diagnostiquer, et suffisant pour des
-// échanges entre collectionneurs. Supabase sait faire de la vraie
-// notification instantanée le jour où le besoin se fera sentir.
-
 const DELAI_RAFRAICHISSEMENT = 4000;
 
 async function listerConversations(){
@@ -15,7 +7,6 @@ async function listerConversations(){
   return data ?? [];
 }
 
-// Retrouve la conversation avec un membre, ou l'ouvre si c'est la première.
 async function ouvrirConversation(autreId){
   const db = await clientSupabase();
   const { data, error } = await db.rpc('ouvrir_conversation', { autre: autreId });
@@ -29,9 +20,6 @@ async function lireMessages(conversationId, depuisId = 0){
     .select('id, auteur_id, texte, envoye_le')
     .eq('conversation_id', conversationId)
     .gt('id', depuisId)
-    // Sur le numéro et non sur l'heure : deux messages de la même seconde
-    // s'ordonneraient au hasard, alors que l'appelant retient le dernier
-    // numéro reçu pour savoir où il en est.
     .order('id', { ascending: true });
   if(error) throw error;
   return data ?? [];
@@ -47,8 +35,6 @@ async function envoyerMessage(conversationId, texte){
   return data;
 }
 
-// Répète une tâche tant que la page est visible : inutile d'interroger la
-// base pour un onglet que personne ne regarde.
 function suivreEnContinu(tache){
   let arrete = false;
   const tour = async () => {
@@ -71,19 +57,11 @@ function heureLisible(iso){
       + ' ' + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 }
 
-// Les messages sont écrits par d'autres membres : ils sont insérés comme du
-// texte, jamais comme du code, pour qu'un message ne puisse pas agir sur la
-// page de son destinataire.
 function texteEchappe(texte){
   const boite = document.createElement('div');
   boite.textContent = texte;
   return boite.innerHTML;
 }
-
-// --------------------------------------------- ranger et faire le ménage --
-
-// Archiver et supprimer ne valent que pour moi. Une conversation a deux
-// propriétaires : je peux la retirer de ma liste, jamais de celle d'en face.
 
 async function archiverConversation(conversationId, archiver = true){
   const db = await clientSupabase();
@@ -100,15 +78,11 @@ async function supprimerConversation(conversationId){
   if(error) throw error;
 }
 
-// Le pseudo d'un membre, quand on n'a que son identifiant : c'est le cas
-// d'une discussion supprimée qu'on rouvre depuis la page Échanges.
 async function pseudoDe(membreId){
   const db = await clientSupabase();
   const { data } = await db.from('profils').select('pseudo').eq('id', membreId).maybeSingle();
   return data?.pseudo ?? null;
 }
-
-// ------------------------------------------------ blocage et signalement --
 
 async function bloquerMembre(autreId){
   const db = await clientSupabase();
@@ -142,9 +116,6 @@ async function signalerMembre(autreId, motif, messageId = null){
   if(error) throw error;
 }
 
-// ------------------------------------------------------------ non-lus --
-
-// Mémorise jusqu'où le membre a lu dans une conversation.
 async function marquerLu(conversationId, dernierMessageId){
   if(!dernierMessageId) return;
   const db = await clientSupabase();
@@ -156,9 +127,6 @@ async function marquerLu(conversationId, dernierMessageId){
   if(error) throw error;
 }
 
-// Les membres que j'ai bloqués, avec leur pseudo. Le lien entre un blocage
-// et un profil ne peut pas être déduit automatiquement (le blocage désigne
-// un compte, pas un profil) : on rapproche donc les deux en deux temps.
 async function listerBlocages(){
   const db = await clientSupabase();
   const { data: blocages, error } = await db.from('blocages')

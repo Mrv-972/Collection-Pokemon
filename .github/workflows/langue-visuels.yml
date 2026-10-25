@@ -1,5 +1,3 @@
-# Lit la langue des visuels de cartes sur l'image elle-même (reconnaissance
-# de caractères), et dépose les verdicts dans donnees/langue-visuels.json.
 name: Langue des visuels
 
 on:

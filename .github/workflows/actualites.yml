@@ -1,5 +1,3 @@
-# Les dernières actualités Pokémon (titres et liens), pour l'onglet
-# Communauté. Deux fois par jour, ou à la demande depuis l'onglet Actions.
 name: Actualités Pokémon
 
 on:

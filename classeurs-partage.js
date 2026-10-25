@@ -1,32 +1,13 @@
-// Partager une page de classeur sur les réseaux sociaux.
-//
-// Un classeur ne vit que dans le navigateur de son propriétaire : il n'y a
-// pas de page publique vers laquelle envoyer un lien. Ce qu'on partage est
-// donc une IMAGE, fabriquée ici même, que le membre publie ensuite où il
-// veut. C'est aussi ce qu'attendent les réseaux : une image se voit dans le
-// fil, un lien ne s'ouvre presque jamais.
-//
-// L'image est peinte sur une toile (canvas) plutôt que capturée à l'écran :
-// on maîtrise ainsi ses dimensions, sa netteté et ce qui y figure, sans
-// dépendre de la taille de la fenêtre ni embarquer de bibliothèque.
-
 const PARTAGE = {
-  // Un carré : c'est le format que tous les réseaux acceptent sans recadrer.
   cote: 1200,
   marge: 54,
   piedHauteur: 92,
 };
 
-// Une image venue d'un autre domaine « salit » la toile : le navigateur
-// refuse alors d'en extraire un fichier. Le réclamer en mode anonyme lève
-// l'interdiction quand le serveur l'autorise. Si le chargement échoue, pas
-// d'autorisation, visuel absent, hors ligne, on rend « null » et la case
-// sera dessinée sans son image plutôt que de faire échouer tout le partage.
 function chargerPourLaToile(source){
   return new Promise(resoudre => {
     if(!source) return resoudre(null);
     const img = new Image();
-    // Une image du site lui-même n'a rien à demander.
     if(!source.startsWith('data:') && /^https?:/.test(source)){
       img.crossOrigin = 'anonymous';
     }
@@ -36,8 +17,6 @@ function chargerPourLaToile(source){
   });
 }
 
-// Le coin arrondi d'une pochette, tracé à la main : les vieux navigateurs
-// n'ont pas « roundRect », et cette page doit marcher partout.
 function cheminArrondi(ctx, x, y, l, h, r){
   const rayon = Math.min(r, l / 2, h / 2);
   ctx.beginPath();
@@ -49,9 +28,6 @@ function cheminArrondi(ctx, x, y, l, h, r){
   ctx.closePath();
 }
 
-// Dessiner une image dans une case sans la déformer : on garde ses
-// proportions et on rogne ce qui dépasse, comme le plastique d'une pochette
-// avec une photo trop grande.
 function peindreEnRemplissant(ctx, img, x, y, l, h){
   const rapport = Math.max(l / img.width, h / img.height);
   const li = img.width * rapport;
@@ -59,8 +35,6 @@ function peindreEnRemplissant(ctx, img, x, y, l, h){
   ctx.drawImage(img, x + (l - li) / 2, y + (h - hi) / 2, li, hi);
 }
 
-// Une carte garde ses proportions entières : on la pose au milieu de la
-// case, quitte à laisser un peu de vide autour.
 function peindreEnEntier(ctx, img, x, y, l, h){
   const rapport = Math.min(l / img.width, h / img.height);
   const li = img.width * rapport;
@@ -68,8 +42,6 @@ function peindreEnEntier(ctx, img, x, y, l, h){
   ctx.drawImage(img, x + (l - li) / 2, y + (h - hi) / 2, li, hi);
 }
 
-// Le contenu d'une page, prêt à peindre : ce que « contenuDeLaCase » dit,
-// plus l'image effectivement chargée.
 async function visuelsDeLaPage(classeur, cases){
   return Promise.all(cases.map(async valeur => {
     const dedans = contenuDeLaCase(classeur, valeur);
@@ -80,7 +52,6 @@ async function visuelsDeLaPage(classeur, cases){
   }));
 }
 
-// L'image d'une page de classeur, rendue comme un Blob PNG.
 async function imageDeLaPage(classeur, indexPage, { face = 'recto' } = {}){
   const format = FORMATS[classeur.format];
   const cases = face === 'verso'
@@ -93,19 +64,15 @@ async function imageDeLaPage(classeur, indexPage, { face = 'recto' } = {}){
   toile.height = PARTAGE.cote;
   const ctx = toile.getContext('2d');
 
-  // Le fond : la couleur des pages du classeur, celle qu'on voit à l'écran.
   const teinte = couleurDesPages(classeur).page;
   ctx.fillStyle = teinte;
   ctx.fillRect(0, 0, PARTAGE.cote, PARTAGE.cote);
 
-  // La grille occupe tout sauf la marge et le bandeau du bas.
   const zoneL = PARTAGE.cote - PARTAGE.marge * 2;
   const zoneH = PARTAGE.cote - PARTAGE.marge * 2 - PARTAGE.piedHauteur;
   const espace = Math.round(PARTAGE.cote * 0.014);
   const caseL = (zoneL - espace * (format.colonnes - 1)) / format.colonnes;
   const caseH = (zoneH - espace * (format.lignes - 1)) / format.lignes;
-  // Une pochette a les proportions d'une carte : on prend la plus petite des
-  // deux dimensions possibles pour que la grille tienne dans la zone.
   const parHauteur = Math.min(caseH, caseL * 3.5 / 2.5);
   const parLargeur = parHauteur * 2.5 / 3.5;
   const grilleL = parLargeur * format.colonnes + espace * (format.colonnes - 1);
@@ -120,8 +87,6 @@ async function imageDeLaPage(classeur, indexPage, { face = 'recto' } = {}){
     const y = departY + ligne * (parHauteur + espace);
     const { dedans, img } = contenus[i] ?? {};
 
-    // La pochette vide : un rectangle à peine plus clair que la page, avec
-    // son liseré, comme à l'écran.
     ctx.save();
     cheminArrondi(ctx, x, y, parLargeur, parHauteur, parLargeur * 0.05);
     ctx.fillStyle = 'rgba(255,255,255,0.28)';
@@ -146,8 +111,6 @@ async function imageDeLaPage(classeur, indexPage, { face = 'recto' } = {}){
   return new Promise(resoudre => toile.toBlob(resoudre, 'image/png'));
 }
 
-// Le bandeau du bas : le nom du classeur, la page, et d'où vient l'image.
-// Sans lui, une capture qui circule ne dit plus d'où elle vient.
 function peindreLePied(ctx, classeur, indexPage, face){
   const bas = PARTAGE.cote - PARTAGE.marge;
   ctx.textBaseline = 'alphabetic';
@@ -175,8 +138,6 @@ function peindreLePied(ctx, classeur, indexPage, face){
 
 const ADRESSE_DU_SITE = 'mrv-972.github.io/Collection-Pokemon';
 
-// ------------------------------------------------------- le partage lui-même
-
 const texteDePartage = (classeur, nbPages = 1) => {
   const cartes = compterLesCartes(classeur);
   const pages = nbPages > 1 ? ` · ${nbPages} pages` : '';
@@ -189,9 +150,6 @@ const nomDuFichier = (classeur, index) =>
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'classeur'}-page-${index + 1}.png`;
 
-// Les réseaux qui savent ouvrir une fenêtre de publication avec un texte
-// prérempli. Aucun n'accepte qu'on y joigne une image depuis un site : c'est
-// au membre de la déposer, d'où le mot qui le dit dans la fenêtre.
 const RESEAUX = [
   { cle: 'x', nom: 'X', adresse: (t, u) =>
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(t)}&url=${encodeURIComponent(u)}` },
@@ -211,21 +169,14 @@ function telecharger(blob, nom){
   document.body.appendChild(lien);
   lien.click();
   lien.remove();
-  // Laisser le temps au navigateur d'enregistrer avant de rendre la mémoire.
   setTimeout(() => URL.revokeObjectURL(url), 30000);
 }
 
-// Sur téléphone, le navigateur sait ouvrir le sélecteur d'applications du
-// système : Instagram, WhatsApp, Messages… avec l'image déjà jointe. C'est
-// de loin le chemin le plus court, quand il existe.
 function peutPartagerUnFichier(fichiers){
   const liste = Array.isArray(fichiers) ? fichiers : [fichiers];
   return Boolean(navigator.canShare?.({ files: liste }) && navigator.share);
 }
 
-// Une page, ou toutes : le reste du chemin est le même. « avancement » est
-// appelé à chaque page finie : fabriquer vingt pages prend plusieurs
-// secondes, et un bouton muet pendant ce temps-là passe pour cassé.
 async function imagesDuClasseur(classeur, { pages, face = 'recto', avancement } = {}){
   const liste = [];
   for(let rang = 0; rang < pages.length; rang++){
@@ -240,8 +191,6 @@ async function imagesDuClasseur(classeur, { pages, face = 'recto', avancement } 
 
 const toutesLesPages = classeur => classeur.pages.map((_, i) => i);
 
-// Le sélecteur du système accepte plusieurs fichiers d'un coup, mais pas
-// partout : on lui demande avant de compter dessus.
 async function partagerDesImages(classeur, images){
   const fichiers = images.map(i => new File([i.blob], i.nom, { type: 'image/png' }));
   const texte = texteDePartage(classeur, images.length);
@@ -251,14 +200,11 @@ async function partagerDesImages(classeur, images){
       await navigator.share({ files: fichiers, text: texte, title: classeur.nom });
       return { chemin: 'systeme' };
     }catch(err){
-      // Fermer le sélecteur n'est pas une erreur : on n'insiste pas.
       if(err?.name === 'AbortError') return { chemin: 'annule' };
     }
   }
   return { chemin: 'fenetre', images, texte };
 }
-
-// ------------------------------------------------------------- la fenêtre
 
 const STYLE_PARTAGE = `
   .voile-partage{position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:120;
@@ -300,10 +246,6 @@ function poserStylePartage(){
   document.head.appendChild(style);
 }
 
-// Une page ou tout le classeur ? La question se pose avant de fabriquer la
-// moindre image, et non dans la fenêtre de repli : un navigateur qui sait
-// partager un fichier ne l'ouvre jamais, et le classeur entier y serait
-// resté hors d'atteinte : ce qui était le cas.
 function demanderLEtendue(classeur){
   return new Promise(resoudre => {
     poserStylePartage();
@@ -391,8 +333,6 @@ function ouvrirLaFenetreDePartage({ classeur, images, texte }){
   };
   function auClavier(e){ if(e.key === 'Escape') fermer(); }
 
-  // Plusieurs enregistrements d'affilée : les navigateurs en bloquent une
-  // partie s'ils arrivent tous dans la même fraction de seconde.
   voile.querySelector('[data-enregistrer]').addEventListener('click', async () => {
     for(const image of images){
       telecharger(image.blob, image.nom);

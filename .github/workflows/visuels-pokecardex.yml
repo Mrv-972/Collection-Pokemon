@@ -1,11 +1,3 @@
-# Relève l'index de Pokécardex, l'apparie à nos extensions, et dépose les deux.
-#
-# On ne copie aucune image : leur CDN répond « access-control-allow-origin: * »,
-# donc le site peut pointer vers leurs visuels directement : l'export d'un
-# classeur partagé fonctionnera, et le dépôt n'enfle pas.
-#
-# Il faut un navigateur : une lecture simple ne rend que la page de
-# vérification de Cloudflare.
 name: Visuels Pokécardex
 
 on:

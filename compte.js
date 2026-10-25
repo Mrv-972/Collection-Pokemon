@@ -1,16 +1,7 @@
-// Compte membre et synchronisation de la collection.
-//
-// Le site reste utilisable sans compte : les tags vivent alors dans le
-// navigateur, comme avant. Dès qu'on se connecte, ils partent en ligne et
-// suivent le membre d'un appareil à l'autre : condition nécessaire pour que
-// la mise en relation entre collectionneurs ait un sens.
-
 let supabase = null;
-let membre = null;   // l'utilisateur connecté, ou null
-let profil = null;   // son pseudo et son contact
+let membre = null;
+let profil = null;
 
-// Vrai quand le membre arrive depuis un lien de réinitialisation : il a une
-// session, mais elle ne sert qu'à choisir un nouveau mot de passe.
 let modeRecuperation = false;
 
 const CONFIG_MANQUANTE = SUPABASE_URL.includes('REMPLACER');
@@ -23,14 +14,9 @@ async function clientSupabase(){
   return supabase;
 }
 
-// À appeler au chargement de chaque page. Reprend la session en cours s'il y
-// en a une, sans jamais bloquer l'affichage si la base est injoignable.
 async function initCompte(){
   if(CONFIG_MANQUANTE) return null;
 
-  // Le lien reçu par courriel porte sa nature dans l'adresse. On le repère
-  // avant tout traitement, car la bibliothèque consomme ces paramètres en
-  // ouvrant la session.
   if(window.location.hash.includes('type=recovery')) modeRecuperation = true;
 
   try{
@@ -51,11 +37,8 @@ function estConnecte(){
   return membre !== null;
 }
 
-// Âge minimum pour s'inscrire. La règle est aussi posée dans la base :
-// une vérification côté navigateur se contourne trop facilement.
 const AGE_MINIMUM = 15;
 
-// Renvoie null si la date convient, sinon la raison du refus.
 function refusAge(dateNaissance){
   if(!dateNaissance) return 'Indique ta date de naissance.';
   const ne = new Date(dateNaissance);
@@ -66,11 +49,6 @@ function refusAge(dateNaissance){
   return null;
 }
 
-// Une règle d'accès filtre des lignes, jamais des colonnes : la table des
-// profils est donc lisible en partie seulement (pseudo, contact,
-// département), pour que personne ne puisse récupérer la date de naissance
-// ou la position des autres membres. Chacun relit les siennes par cette
-// fonction, qui ne renvoie que sa propre ligne.
 async function chargerProfil(){
   const db = await clientSupabase();
   const { data, error } = await db.rpc('mon_profil');
@@ -79,15 +57,8 @@ async function chargerProfil(){
   return profil;
 }
 
-// Le pseudo choisi à l'inscription est mis de côté : si Supabase exige une
-// confirmation par e-mail, le profil ne pourra être créé qu'au retour du
-// membre, une fois sa session ouverte.
 const PSEUDO_EN_ATTENTE = 'pokeclasseur_profil_en_attente';
 
-// La version des conditions acceptée par le membre. Le jour où les
-// conditions changent, cette valeur change aussi, et l'on sait alors qui a
-// accepté quoi : c'est ce que le RGPD appelle pouvoir démontrer le
-// consentement. Elle doit suivre la date de « miseAJour » dans legal.js.
 const VERSION_CONDITIONS = '2026-10-11';
 
 async function sInscrire(email, motDePasse, pseudo, contact, dateNaissance){
@@ -107,8 +78,6 @@ async function sInscrire(email, motDePasse, pseudo, contact, dateNaissance){
     cgu_version: VERSION_CONDITIONS,
   };
 
-  // Sans session, aucune écriture n'est possible : la base ne saurait pas
-  // qui écrit.
   if(!data.session){
     try{ localStorage.setItem(PSEUDO_EN_ATTENTE, JSON.stringify(profilVoulu)); }catch(err){}
     throw new Error("Compte créé. Confirme ton adresse dans l'e-mail que tu viens de recevoir, puis reviens te connecter.");
@@ -126,13 +95,9 @@ async function creerProfil({ pseudo, contact, ne_le, cgu_acceptees_le, cgu_versi
   const db = await clientSupabase();
   const { error } = await db.from('profils').insert({
     id: membre.id, pseudo, contact, ne_le,
-    // Une inscription passée par la confirmation d'e-mail revient ici plus
-    // tard : l'accord date alors du formulaire, pas du retour.
     cgu_acceptees_le: cgu_acceptees_le ?? new Date().toISOString(),
     cgu_version: cgu_version ?? VERSION_CONDITIONS,
   });
-  // Un pseudo déjà pris est le seul cas courant : on le dit clairement
-  // plutôt que de laisser remonter un message technique.
   if(error){
     if(error.code === '23505') throw new Error('Ce pseudo est déjà utilisé.');
     throw error;
@@ -141,8 +106,6 @@ async function creerProfil({ pseudo, contact, ne_le, cgu_acceptees_le, cgu_versi
   await chargerProfil();
 }
 
-// Vrai quand le membre est connecté mais n'a pas encore de profil : cela
-// arrive après une inscription passée par la confirmation d'e-mail.
 function profilAcreer(){
   return estConnecte() && !profil;
 }
@@ -162,7 +125,6 @@ async function seConnecter(email, motDePasse){
   membre = data.user;
   await chargerProfil();
 
-  // Reprise d'une inscription qui attendait la confirmation de l'e-mail.
   const enAttente = pseudoEnAttente();
   if(!profil && enAttente){
     try{ await creerProfil(enAttente); }catch(err){ console.warn('Profil à reprendre', err); }
@@ -172,14 +134,10 @@ async function seConnecter(email, motDePasse){
   return membre;
 }
 
-// ------------------------------------------------ mot de passe oublié ----
-
 function enRecuperation(){
   return modeRecuperation;
 }
 
-// Envoie le lien de réinitialisation. Le retour se fait sur cette même page,
-// qui proposera alors de choisir un nouveau mot de passe.
 async function envoyerLienReinitialisation(email){
   const db = await clientSupabase();
   const { error } = await db.auth.resetPasswordForEmail(email.trim(), {
@@ -198,11 +156,8 @@ async function definirNouveauMotDePasse(motDePasse){
   const { data, error } = await db.auth.updateUser({ password: motDePasse });
   if(error) throw error;
 
-  // Le lien de réinitialisation ouvre déjà une session : le membre est
-  // connecté une fois son mot de passe changé.
   modeRecuperation = false;
   membre = data.user;
-  // On nettoie l'adresse, pour qu'un rafraîchissement ne rejoue pas le lien.
   history.replaceState(null, '', window.location.pathname);
   await chargerProfil();
   await fusionnerCollection();
@@ -230,13 +185,7 @@ async function majProfil(pseudo, contact, dateNaissance){
   await chargerProfil();
 }
 
-// ----------------------------------------------------- localisation ------
-
-// Enregistre la commune choisie. Seul le point central de la commune part en
-// base : ni adresse, ni position réelle de l'appareil.
 async function definirLocalisation(commune){
-  // Le méridien de Greenwich traverse la France : une longitude de zéro est
-  // une vraie position, pas une absence de position.
   if(!Number.isFinite(commune?.latitude) || !Number.isFinite(commune?.longitude)){
     throw new Error("Cette commune n'a pas de position connue.");
   }
@@ -252,8 +201,6 @@ async function definirLocalisation(commune){
   await chargerProfil();
 }
 
-// Renseigner sa zone doit rester réversible, sans quoi ce serait un
-// engagement définitif pris en deux clics.
 async function retirerLocalisation(){
   const db = await clientSupabase();
   const { error } = await db.from('profils').update({
@@ -267,11 +214,6 @@ function aUneLocalisation(){
   return Number.isFinite(profil?.latitude) && Number.isFinite(profil?.longitude);
 }
 
-// ------------------------------------------------------- collection ------
-
-// Envoie l'état d'une carte. Appelée à chaque clic sur un tag ; l'échec est
-// signalé mais ne fait jamais perdre le marquage, qui reste dans le
-// navigateur.
 async function enregistrerCarte(carteId, etat){
   if(!estConnecte()) return;
   const db = await clientSupabase();
@@ -297,8 +239,6 @@ async function enregistrerCartes(entrees){
     echangeable: !!etat.ech,
     maj_le: new Date().toISOString(),
   }));
-  // Par paquets, pour ne pas envoyer une requête démesurée sur une grosse
-  // collection.
   for(let i = 0; i < lignes.length; i += 500){
     const { error } = await db.from('cartes').upsert(lignes.slice(i, i + 500));
     if(error) throw error;
@@ -322,10 +262,6 @@ async function envoyerCollectionLocale(){
   await enregistrerCartes(Object.entries(tagState));
 }
 
-// À la connexion, on réunit ce qui est en ligne et ce qui a été marqué sur
-// cet appareil : un tag posé d'un côté ou de l'autre est conservé. Fusionner
-// plutôt qu'écraser évite de perdre du travail sans prévenir : au pire on
-// garde un tag en trop, qui se retire d'un clic.
 async function fusionnerCollection(){
   const enLigne = await lireCollection();
   const aRenvoyer = [];
@@ -344,7 +280,6 @@ async function fusionnerCollection(){
     }
   });
 
-  // Les cartes marquées ici et inconnues en ligne.
   Object.entries(tagState).forEach(([carteId, etat]) => {
     if(!enLigne[carteId]) aRenvoyer.push([carteId, etat]);
   });
@@ -353,14 +288,6 @@ async function fusionnerCollection(){
   await enregistrerCartes(aRenvoyer);
 }
 
-// -------------------------------------------------------- navigation -----
-
-// ------------------------------------------------ avatar et photo -------
-//
-// L'image d'un membre, par ordre de préférence : sa photo VALIDÉE par
-// l'administrateur, sinon le Pokémon choisi dans la galerie, sinon
-// l'initiale de son pseudo. La galerie est la nôtre : un avatar ne
-// demande aucune validation.
 const AVATARS = [
   ['pikachu', 25, 'Pikachu'], ['evoli', 133, 'Évoli'], ['bulbizarre', 1, 'Bulbizarre'],
   ['salameche', 4, 'Salamèche'], ['carapuce', 7, 'Carapuce'], ['dracaufeu', 6, 'Dracaufeu'],
@@ -380,8 +307,6 @@ const urlAvatar = cle => {
 
 const echapperAttr = v => String(v ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
-// « p » porte pseudo, avatar et photo_url. Une image qui ne se charge pas
-// laisse place à l'initiale, plutôt qu'à une icône d'image cassée.
 function avatarHtml(p, taille = 32, classe = ''){
   const initiale = String(p?.pseudo ?? '?').trim().charAt(0).toUpperCase() || '?';
   const src = p?.photo_url || urlAvatar(p?.avatar);
@@ -400,8 +325,6 @@ const STYLE_PROFIL = `
   .avatar-membre img{width:100%;height:100%;object-fit:cover;display:block}
   .avatar-membre img.avatar-pokemon{object-fit:contain;padding:8%;box-sizing:border-box}
 
-  /* Le menu du profil, dans la barre du haut : il s'ouvre au survol, au
-     clic (un écran tactile n'a pas de survol) et au clavier. */
   .menu-profil{position:relative;margin-left:12px}
   .menu-profil-bouton{display:inline-flex;align-items:center;gap:9px;background:none;border:0;cursor:pointer;
     color:var(--text-on-ink,#EDEAE0);font:inherit;font-size:14px;padding:6px 4px;border-radius:999px}
@@ -411,8 +334,6 @@ const STYLE_PROFIL = `
     padding:6px;border-radius:10px;background:var(--ink-soft,#20232A);
     border:1px solid rgba(var(--trait-rgb,237,234,224),0.14);box-shadow:0 14px 34px rgba(0,0,0,0.28);
     opacity:0;visibility:hidden;transform:translateY(-4px);transition:opacity .12s,transform .12s,visibility .12s}
-  /* Un pont invisible entre le bouton et la liste : sans lui, la souris
-     qui descend vers la liste traverse un vide et la referme. */
   .menu-profil-liste::before{content:'';position:absolute;left:0;right:0;top:-8px;height:8px}
   .menu-profil:hover .menu-profil-liste,.menu-profil:focus-within .menu-profil-liste,
   .menu-profil.ouvert .menu-profil-liste{opacity:1;visibility:visible;transform:none}
@@ -435,7 +356,6 @@ function poserStyleProfil(){
     { id: 'style-profil', textContent: STYLE_PROFIL }));
 }
 
-// Le menu du profil remplace, pour un membre connecté, le lien du compte.
 function poserMenuProfil(lien){
   poserStyleProfil();
   const menu = document.createElement('div');
@@ -446,10 +366,10 @@ function poserMenuProfil(lien){
       <span class="chevron" aria-hidden="true">▼</span>
     </button>
     <div class="menu-profil-liste" role="menu">
-      <a role="menuitem" href="connexion.html"><span class="icone" aria-hidden="true">👤</span>Mon profil</a>
-      <a role="menuitem" href="parametres.html"><span class="icone" aria-hidden="true">⚙️</span>Paramètres</a>
+      <a role="menuitem" href="connexion.html"><span class="icone">${pictogramme('personne')}</span>Mon profil</a>
+      <a role="menuitem" href="parametres.html"><span class="icone">${pictogramme('reglages')}</span>Paramètres</a>
       <hr>
-      <button role="menuitem" type="button" class="deconnexion"><span class="icone" aria-hidden="true">↪</span>Se déconnecter</button>
+      <button role="menuitem" type="button" class="deconnexion"><span class="icone">${pictogramme('sortie')}</span>Se déconnecter</button>
     </div>`;
   const bouton = menu.querySelector('.menu-profil-bouton');
   const basculer = ouvrir => {
@@ -468,11 +388,8 @@ function poserMenuProfil(lien){
   lien.replaceWith(menu);
 }
 
-// Remplace le lien "Mon classeur" de l'en-tête par l'état réel du compte.
 let modeleLienCompte = null;
 function afficherEtatCompte(){
-  // La page du compte redessine l'en-tête après chaque action : le menu
-  // déjà posé redevient le lien d'origine, puis l'état est réappliqué.
   const menuPose = document.querySelector('nav .menu-profil');
   if(menuPose && modeleLienCompte){
     const gabarit = document.createElement('template');
@@ -487,8 +404,6 @@ function afficherEtatCompte(){
     lien.href = 'connexion.html';
     return;
   }
-  // Une session sans profil (inscription inachevée) garde le lien : il
-  // mène là où l'on choisit son pseudo.
   if(estConnecte() && profil){
     poserMenuProfil(lien);
   }else{
@@ -501,11 +416,6 @@ function afficherEtatCompte(){
   }
 }
 
-// Les avatars et photos de plusieurs membres d'un coup, pour les listes
-// (discussions, échanges). Les fonctions qui fournissent ces listes ne
-// renvoient que le pseudo : on complète par une lecture à part. Tant que la
-// base n'a pas reçu les colonnes, la lecture échoue et la liste garde ses
-// initiales : rien ne casse.
 const avatarsConnus = new Map();
 async function avatarsDe(ids){
   const manquants = [...new Set(ids)].filter(id => id && !avatarsConnus.has(id));
@@ -514,17 +424,11 @@ async function avatarsDe(ids){
       const db = await clientSupabase();
       const { data, error } = await db.from('profils').select('id, avatar, photo_url').in('id', manquants);
       if(!error) for(const p of data ?? []) avatarsConnus.set(p.id, p);
-    }catch{ /* initiales */ }
+    }catch{ }
   }
   return avatarsConnus;
 }
 
-// --------------------------------------------- préférences du membre -----
-//
-// Thème et notifications sont retenus sur le compte, pour suivre le membre
-// d'un appareil à l'autre. Tant que la base n'a pas reçu les colonnes
-// (supabase/profil-photo-parametres.sql), le profil ne les porte pas : on
-// s'en tient alors à ce que l'appareil a retenu.
 const profilAPreferences = () => profil && 'pref_theme' in profil;
 
 function synchroniserTheme(){
@@ -532,17 +436,13 @@ function synchroniserTheme(){
   if(profil.pref_theme && profil.pref_theme !== themeChoisi()) choisirTheme(profil.pref_theme);
 }
 
-// Taille des vignettes, contraste, grisaille : mêmes principes, colonnes
-// ajoutées par supabase/communaute.sql.
-const CLE_GRISER = 'pokeclasseur-griser-manquantes';   // celle de progression.js
+const CLE_GRISER = 'pokeclasseur-griser-manquantes';
 const profilAAffichage = () => profil && 'pref_vignettes' in profil;
 
 function synchroniserAffichage(){
   if(!profilAAffichage()) return;
   if(typeof choisirAffichage === 'function')
     choisirAffichage({ vignettes: profil.pref_vignettes, contraste: !!profil.pref_contraste });
-  // La grisaille n'est reprise du compte qu'une fois choisie : avant, le
-  // choix fait sur l'appareil reste.
   if(typeof profil.pref_griser !== 'boolean') return;
   try{ localStorage.setItem(CLE_GRISER, profil.pref_griser ? 'oui' : 'non'); }catch{}
   if(document.documentElement.dataset.griser)
@@ -564,11 +464,6 @@ async function enregistrerPreferences(changements){
   return true;
 }
 
-// ------------------------------------------------ photo de profil -------
-//
-// Une photo proposée part dans un dépôt PRIVÉ (« avatars-attente ») : seuls
-// son auteur et l'administrateur la voient. Les autres membres ne la
-// verront qu'une fois validée et recopiée dans le dépôt public.
 const DEPOT_PHOTOS_ATTENTE = 'avatars-attente';
 const DEPOT_PHOTOS = 'avatars';
 const profilAPhoto = () => profil && 'photo_statut' in profil;
@@ -587,13 +482,10 @@ async function proposerPhoto(blob){
   if(error) throw error;
   const ancienne = profil.photo_en_attente;
   await enregistrerPreferences({ photo_en_attente: chemin });
-  // L'ancienne proposition n'a plus d'objet : on la retire du dépôt.
   if(ancienne) db.storage.from(DEPOT_PHOTOS_ATTENTE).remove([ancienne]).catch(() => {});
-  await chargerProfil();   // le statut est recalculé par la base
+  await chargerProfil();
 }
 
-// Le membre voit sa propre photo en attente, par un lien temporaire : le
-// dépôt est privé, aucune adresse permanente n'existe.
 async function lienPhotoEnAttente(){
   if(!profil?.photo_en_attente) return null;
   const db = await clientSupabase();
@@ -612,8 +504,6 @@ async function retirerPhoto(){
   await chargerProfil();
 }
 
-// Le choix est retenu sur le compte ; à défaut : base pas encore mise à
-// jour, sur l'appareil. Par défaut : activé.
 const CLE_NOTIF_MESSAGES = 'pokeclasseur-notif-messages';
 function notificationsVoulues(){
   if(profilAPreferences()) return profil.pref_notif_messages !== false;
@@ -625,10 +515,6 @@ async function enregistrerNotifications(voulu){
   return enregistrerPreferences({ pref_notif_messages: voulu });
 }
 
-// Une notification du navigateur quand le nombre de messages non lus
-// augmente. Le dernier nombre annoncé est gardé : changer de page ne
-// renotifie pas les mêmes messages. L'étiquette commune fait que deux
-// onglets ouverts ne montrent qu'une seule notification.
 const CLE_NON_LUS_ANNONCES = 'pokeclasseur-non-lus-annonces';
 function prevenirNouveauxMessages(nombre){
   let annonces = 0;
@@ -636,8 +522,6 @@ function prevenirNouveauxMessages(nombre){
   try{ localStorage.setItem(CLE_NON_LUS_ANNONCES, String(nombre)); }catch{}
   if(nombre <= annonces) return;
   if(!notificationsVoulues() || !('Notification' in window) || Notification.permission !== 'granted') return;
-  // L'onglet regardé affiche déjà la pastille : inutile d'y ajouter une
-  // fenêtre. On ne prévient que si personne ne regarde la page.
   if(document.visibilityState === 'visible') return;
   try{
     const n = new Notification('PokéClasseur', {
@@ -648,12 +532,6 @@ function prevenirNouveauxMessages(nombre){
   }catch(err){ console.warn('Notification refusée', err); }
 }
 
-// La pastille se tient à jour d'elle-même, sans qu'on ait à changer de page.
-//
-// Le rythme est lent à dessein : c'est une pastille de notification, pas une
-// conversation. Vérifier plus souvent depuis chaque onglet ouvert
-// solliciterait la base sans rien apporter : la page Discussions, elle, a
-// son propre rythme rapide pour les messages eux-mêmes.
 const DELAI_PASTILLE = 25000;
 let suiviPastilleLance = false;
 
@@ -662,19 +540,14 @@ function suivreLesNonLus(){
   suiviPastilleLance = true;
 
   setInterval(() => {
-    // Rien à faire pour un onglet que personne ne regarde.
     if(document.visibilityState === 'visible' && estConnecte()) afficherNonLus();
   }, DELAI_PASTILLE);
 
-  // Au retour sur l'onglet, on rafraîchit tout de suite : c'est le moment
-  // précis où le membre regarde.
   document.addEventListener('visibilitychange', () => {
     if(document.visibilityState === 'visible' && estConnecte()) afficherNonLus();
   });
 }
 
-// Styles de la pastille, embarqués ici pour que toutes les pages en
-// bénéficient sans dupliquer de CSS.
 document.head.appendChild(Object.assign(document.createElement('style'), { textContent: `
   nav .pastille{display:inline-block;min-width:18px;padding:1px 5px;border-radius:9px;background:#A8431C;color:#F6EFEA;font-size:11px;font-weight:600;line-height:16px;text-align:center;vertical-align:1px;}
 `}));
@@ -686,13 +559,6 @@ async function totalNonLus(){
   return data ?? 0;
 }
 
-// Pastille sur le lien "Discussions". Elle n'apparaît que s'il y a quelque
-// chose à lire : une pastille à zéro n'apprend rien. Elle vit ici, et non
-// dans le module de messagerie, pour s'afficher sur toutes les pages : ce
-// module-là n'est chargé que par celles qui manipulent des conversations.
-// La pastille des non-lus n'était mise en forme que sur la page des
-// discussions : ailleurs, elle sortait en texte nu au milieu du lien. Le
-// style voyage donc avec elle, pour toutes les pages qui l'affichent.
 const STYLE_PASTILLE = `
   nav .pastille{display:inline-block;min-width:18px;padding:1px 5px;margin-left:6px;
                 border-radius:9px;background:#A8431C;color:#F6EFEA;font-size:11px;
@@ -705,10 +571,6 @@ function poserStylePastille(){
     { id: 'style-pastille', textContent: STYLE_PASTILLE }));
 }
 
-// univers.js réécrit les liens de la barre (« /discussions.html?u=pocket »)
-// pour qu'ils retiennent l'univers choisi : un lien se reconnaît donc à sa
-// page, pas à son adresse exacte. Chercher « a[href="discussions.html"] »
-// ne trouvait plus rien, et la pastille des messages ne s'affichait plus.
 function lienDeNav(page){
   return [...document.querySelectorAll('nav .navlinks a')].find(a => {
     try{ return new URL(a.getAttribute('href'), location.href).pathname.endsWith('/' + page); }
@@ -739,10 +601,6 @@ async function afficherNonLus(){
   afficherReponsesNonLues();
 }
 
-// La pastille de l'onglet Communauté : les réponses arrivées dans les sujets
-// que le membre a ouverts ou auxquels il a répondu (sujets_suivis, dans
-// supabase/espace-communaute.sql). Tant que la base n'a pas la fonction, on
-// cesse de la demander.
 let reponsesIndisponibles = false;
 async function afficherReponsesNonLues(){
   const lien = lienDeNav('communaute.html');
@@ -759,17 +617,6 @@ async function afficherReponsesNonLues(){
   }
 }
 
-// ------------------------------------------ suppression de son compte ----
-//
-// Le droit à l'effacement (RGPD, article 17) donne à chacun le droit de
-// faire disparaître ses données. Un bouton vaut mieux qu'un courriel à
-// traiter à la main : le membre n'attend pas, et rien ne se perd en route.
-//
-// Le travail se fait côté base, par la fonction « supprimer_mon_compte »
-// (voir supabase/rgpd.sql). Elle efface la ligne du compte ; toutes les
-// tables du site pointent dessus en cascade, si bien que le profil, les
-// cartes, les conversations, les messages, les blocages, les signalements
-// et les lectures s'en vont avec, sans qu'on puisse en oublier une.
 async function supprimerMonCompte(){
   if(!estConnecte()) throw new Error('Aucune session ouverte.');
 
@@ -777,22 +624,16 @@ async function supprimerMonCompte(){
   const { error } = await db.rpc('supprimer_mon_compte');
   if(error) throw error;
 
-  // Le compte n'existe plus : la session en mémoire ne vaut plus rien, et
-  // la collection gardée localement appartenait à quelqu'un qui n'est plus
-  // là. On nettoie les deux avant de rendre la main.
   try{
     await db.auth.signOut();
   }catch(err){
-    // La session est déjà invalide côté serveur : ce n'est pas un échec.
     console.warn('Déconnexion après suppression', err);
   }
   membre = null;
   profil = null;
-  // La page du compte ne charge pas tags.js : on nomme la clé quand elle
-  // n'est pas là, plutôt que d'y faire dépendre la suppression.
   const cleDesTags = typeof TAG_STORAGE_KEY === 'string' ? TAG_STORAGE_KEY : 'pokeclasseur_tags';
   try{
     localStorage.removeItem(cleDesTags);
     localStorage.removeItem(PSEUDO_EN_ATTENTE);
-  }catch(err){ /* stockage refusé : rien à nettoyer */ }
+  }catch(err){ }
 }

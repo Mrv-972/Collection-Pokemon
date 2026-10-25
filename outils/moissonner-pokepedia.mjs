@@ -1,24 +1,3 @@
-// Relever l'index des visuels de cartes de Poképédia.
-// ===================================================
-//
-// La sonde a établi les faits ; cet outil en tire l'index dont la copie a
-// besoin. Ce qu'on sait, mesuré :
-//
-//   - « allimages » énumère tout : 27 998 fichiers, 281 séries, fin de
-//     liste atteinte. C'est l'interface officielle de MediaWiki : elle
-//     DÉCLARE l'adresse de chaque fichier, on n'en devine aucune ;
-//   - les noms suivent « Carte_<Série>_<numéro>.png », avec des tirets
-//     BAS, et un numéro qui n'est pas toujours un nombre (« H1 », « TG01 ») ;
-//   - le remplissage des numéros varie selon la série : « Carte_Set_de_
-//     Base_4.png » mais « Carte_10th_Movie_Promo_001.png ». On indexe donc
-//     sur le numéro débarrassé de ses zéros, jamais sur une forme supposée ;
-//   - leur serveur n'envoie pas d'en-tête CORS et leurs images pèsent
-//     2 Mo : c'est pourquoi on les copie chez nous au lieu d'y renvoyer ;
-//   - licence CC BY-NC-SA 3.0 : crédit obligatoire, usage non commercial.
-//     Mrv972 en a été informé et a tranché.
-//
-//   node outils/moissonner-pokepedia.mjs --sortie donnees [--pages 0]
-
 import { writeFile, mkdir } from 'node:fs/promises';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
@@ -26,8 +5,6 @@ const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
 ).filter(x => x.length));
 
 const sortie = args.sortie ?? 'donnees';
-// 0 veut dire « toutes » : une valeur vide serait remplacée par le défaut du
-// formulaire GitHub, et la passe « complète » s'arrêterait sans le dire.
 const maxPages = Number(args.pages ?? 0) || Infinity;
 
 const API = 'https://www.pokepedia.fr/api.php';
@@ -54,8 +31,6 @@ async function interroger(parametres){
   return { erreur: 'abandon' };
 }
 
-// La licence, relevée à la source et inscrite dans le fichier : le crédit
-// qu'on affichera doit pouvoir se justifier sans fouiller un journal.
 const infos = await interroger({ action: 'query', meta: 'siteinfo', siprop: 'rightsinfo|general' });
 const licence = {
   texte: infos.query?.rightsinfo?.text ?? null,
@@ -66,11 +41,10 @@ console.log(`licence : ${licence.texte}`);
 console.log(`          ${licence.adresse}\n`);
 await dormir(1000);
 
-// « Carte_Set_de_Base_4.png » -> série « Set de Base », numéro « 4 ».
 const DECOUPE = /^Carte_(.+)_([A-Za-z]{0,3}[0-9]+[a-z]?)\.(png|jpe?g|webp|gif)$/i;
 const sansZeros = n => String(n ?? '').replace(/^0+/, '').toLowerCase();
 
-const parSerie = {};          // série -> { numéro -> adresse }
+const parSerie = {};
 let suite = null, vus = 0, retenus = 0, pages = 0, ecartes = 0;
 
 console.log('Énumération des visuels de cartes…');
@@ -86,14 +60,10 @@ for(let i = 0; i < maxPages; i++){
   pages++;
   for(const img of images){
     const m = DECOUPE.exec(img.name);
-    // Sans numéro final, ce n'est pas une carte mais une image
-    // d'habillage : la retenir ferait croire à une couverture plus large.
     if(!m){ ecartes++; continue; }
     const serie = m[1].replace(/_/g, ' ');
     const numero = sansZeros(m[2]);
     (parSerie[serie] ??= {});
-    // Deux fichiers pour un même numéro : on garde le premier, et on le
-    // signale plutôt que d'en écraser un en silence.
     if(numero in parSerie[serie]) continue;
     parSerie[serie][numero] = img.url;
     retenus++;
@@ -124,8 +94,6 @@ await writeFile(fichier, JSON.stringify({
   licence,
   pagesLues: pages,
   fichiersVus: vus,
-  // Un relevé partiel pris pour complet ferait conclure à tort qu'une
-  // carte est absente de chez eux.
   complet: !suite,
   series: Object.fromEntries(series),
 }, null, 1) + '\n');

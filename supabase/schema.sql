@@ -1,23 +1,5 @@
--- Schéma de la base PokéClasseur.
--- À coller dans l'éditeur SQL de Supabase, puis exécuter (bouton "Run").
--- Le script peut être relancé sans risque : il ne détruit ni les tables ni
--- les données existantes.
 
--- ==========================================================================
--- Tables
--- ==========================================================================
 
--- Un profil par membre.
---
--- "contact" est ce que le membre accepte de communiquer à quelqu'un avec qui
--- un échange est possible ; il n'est affiché que dans ce cas.
---
--- "ne_le" sert au seuil d'âge. Cet âge est déclaré, jamais vérifié :
--- n'importe qui peut saisir une fausse date. Ce que la règle apporte, c'est
--- un cadre (celui qui ment enfreint les conditions) et un garde-fou contre
--- les inscriptions trop jeunes. Le seuil de 15 ans est celui en dessous
--- duquel, en France, le consentement des parents serait requis, un accord
--- qu'un site comme celui-ci ne peut pas recueillir sérieusement.
 create table if not exists profils (
   id      uuid primary key references auth.users on delete cascade,
   pseudo  text unique not null,
@@ -27,22 +9,12 @@ create table if not exists profils (
 );
 alter table profils add column if not exists ne_le date;
 
--- Localisation. Deux échangeurs proches peuvent se remettre les cartes en
--- main propre plutôt que de les confier à la poste : savoir qui est à côté
--- de chez soi a donc une vraie valeur.
---
--- Ce qui est enregistré n'est jamais une adresse, mais le centre de la
--- commune choisie : un point identique pour tous les habitants de cette
--- commune. La précision s'arrête donc volontairement là où commencerait le
--- fait de pouvoir retrouver quelqu'un chez lui.
 alter table profils add column if not exists ville       text;
 alter table profils add column if not exists code_postal text;
 alter table profils add column if not exists departement text;
 alter table profils add column if not exists latitude    double precision;
 alter table profils add column if not exists longitude   double precision;
 
--- L'état d'une carte pour un membre. Une ligne n'existe que si au moins un
--- des trois marquages a été posé.
 create table if not exists cartes (
   utilisateur_id uuid not null references auth.users on delete cascade,
   carte_id       text not null,
@@ -53,13 +25,9 @@ create table if not exists cartes (
   primary key (utilisateur_id, carte_id)
 );
 
--- Accélère la recherche de correspondances, qui part toujours d'une carte.
 create index if not exists cartes_recherchees  on cartes (carte_id) where recherchee;
 create index if not exists cartes_echangeables on cartes (carte_id) where echangeable;
 
--- Une conversation relie exactement deux membres. Les identifiants sont
--- rangés dans un ordre fixe (le plus petit d'abord) pour qu'une même paire
--- ne puisse pas ouvrir deux conversations en double.
 create table if not exists conversations (
   id       uuid primary key default gen_random_uuid(),
   membre_a uuid not null references auth.users on delete cascade,
@@ -87,8 +55,6 @@ create table if not exists blocages (
   check (bloqueur_id <> bloque_id)
 );
 
--- Les signalements se lisent depuis le tableau de bord Supabase : à cette
--- échelle, une page d'administration serait disproportionnée.
 create table if not exists signalements (
   id           bigint generated always as identity primary key,
   signaleur_id uuid not null references auth.users on delete cascade,
@@ -98,12 +64,6 @@ create table if not exists signalements (
   cree_le      timestamptz not null default now()
 );
 
--- L'état d'une conversation pour un membre : où il s'est arrêté de lire, et
--- ce qu'il a rangé ou effacé. Une conversation appartient à deux personnes,
--- donc tout ce qui est ici ne vaut que pour l'une d'elles : archiver ou
--- supprimer ne touche jamais la liste de l'autre. Il ne peut pas en aller
--- autrement, sinon n'importe qui pourrait effacer d'un compte les messages
--- qu'il vient d'y envoyer, et le signalement ne servirait plus à rien.
 create table if not exists lectures (
   utilisateur_id     uuid not null references auth.users on delete cascade,
   conversation_id    uuid not null references conversations on delete cascade,
@@ -111,24 +71,8 @@ create table if not exists lectures (
   primary key (utilisateur_id, conversation_id)
 );
 
--- Archivage et suppression marchent pareil : on retient le numéro du dernier
--- message au moment du geste. Tout ce qui arrive après passe outre : une
--- discussion rangée ressort quand on t'écrit à nouveau, plutôt que de faire
--- disparaître un message sans prévenir.
---
---   archivee_apres : null = pas archivée.
---   effacee_jusqua : null = jamais effacée. Sinon les messages jusqu'à ce
---                    numéro ne me sont plus montrés, et la discussion quitte
---                    ma liste tant que rien de plus récent n'arrive.
 alter table lectures add column if not exists archivee_apres bigint;
 alter table lectures add column if not exists effacee_jusqua bigint;
-
--- ==========================================================================
--- Règles d'accès
---
--- Supabase expose la base directement au navigateur : sans ces règles,
--- n'importe qui pourrait lire et modifier les données de tout le monde.
--- ==========================================================================
 
 alter table profils       enable row level security;
 alter table cartes        enable row level security;
@@ -138,11 +82,6 @@ alter table blocages      enable row level security;
 alter table signalements  enable row level security;
 alter table lectures      enable row level security;
 
--- Un blocage doit produire ses effets pour les deux personnes, or chacun ne
--- voit que les blocages qu'il a posés. Cette fonction, exécutée avec les
--- droits de son propriétaire, répond seulement « oui » ou « non » : elle ne
--- révèle donc jamais qui a bloqué qui. Elle est définie avant les règles qui
--- s'en servent.
 create or replace function est_bloque(a uuid, b uuid)
 returns boolean
 language sql
@@ -156,12 +95,6 @@ as $$
        or (bloqueur_id = b and bloque_id = a)
   );
 $$;
-
--- --- profils --------------------------------------------------------------
--- Le seuil d'âge est porté par ces règles plutôt que par une contrainte de
--- table, car une contrainte ne peut pas consulter la date du jour. Le poser
--- ici plutôt que dans le seul formulaire est essentiel : une vérification
--- côté navigateur se contourne en quelques secondes.
 
 drop policy if exists "profils lisibles par les membres" on profils;
 create policy "profils lisibles par les membres"
@@ -186,18 +119,8 @@ create policy "chacun modifie son profil"
     and ne_le <= current_date - interval '15 years'
   );
 
--- Une règle « row level » filtre des lignes, jamais des colonnes : tant que la
--- table entière est lisible, n'importe quel membre peut demander la date de
--- naissance ou les coordonnées de tous les autres. On restreint donc la
--- lecture aux seules colonnes qui ont vocation à être vues : le pseudo, le
--- moyen de contact et le département. La commune, le code postal, la date de
--- naissance et le point géographique ne sortent plus de la base ; chacun
--- relit les siens par la fonction mon_profil(), et la distance entre deux
--- membres est calculée par la base, qui n'en renvoie que le résultat.
 revoke select on profils from anon, authenticated;
 grant  select (id, pseudo, contact, departement, cree_le) on profils to authenticated;
-
--- --- cartes ---------------------------------------------------------------
 
 drop policy if exists "chacun gère ses cartes" on cartes;
 create policy "chacun gère ses cartes"
@@ -205,15 +128,10 @@ create policy "chacun gère ses cartes"
   using (auth.uid() = utilisateur_id)
   with check (auth.uid() = utilisateur_id);
 
--- Chacun voit ce que les autres proposent ou recherchent, sans quoi aucune
--- mise en relation ne serait possible. Le reste d'une collection (ce qu'on
--- possède sans le proposer) reste privé.
 drop policy if exists "cartes proposées ou recherchées visibles" on cartes;
 create policy "cartes proposées ou recherchées visibles"
   on cartes for select to authenticated
   using (recherchee or echangeable);
-
--- --- conversations et messages --------------------------------------------
 
 drop policy if exists "mes conversations" on conversations;
 create policy "mes conversations"
@@ -225,10 +143,6 @@ create policy "ouvrir une conversation"
   on conversations for insert to authenticated
   with check (auth.uid() in (membre_a, membre_b));
 
--- La limite de suppression est posée ici plutôt que dans l'affichage : un
--- message effacé ne doit pas simplement être caché à l'écran, il ne doit plus
--- sortir de la base. Tout ce qui lit des messages en hérite sans y penser :
--- l'aperçu des conversations, le compte des non-lus, le fil lui-même.
 drop policy if exists "lire mes messages" on messages;
 create policy "lire mes messages"
   on messages for select to authenticated
@@ -244,8 +158,6 @@ create policy "lire mes messages"
     ), 0)
   );
 
--- On n'écrit que sous son propre nom, dans une conversation dont on fait
--- partie, et à condition qu'aucun blocage ne sépare les deux membres.
 drop policy if exists "écrire dans mes conversations" on messages;
 create policy "écrire dans mes conversations"
   on messages for insert to authenticated
@@ -255,8 +167,6 @@ create policy "écrire dans mes conversations"
       and auth.uid() in (c.membre_a, c.membre_b)
       and not est_bloque(c.membre_a, c.membre_b)
   ));
-
--- --- blocages, signalements, lectures -------------------------------------
 
 drop policy if exists "je gère mes blocages" on blocages;
 create policy "je gère mes blocages"
@@ -280,16 +190,6 @@ create policy "je gère mes lectures"
   using (auth.uid() = utilisateur_id)
   with check (auth.uid() = utilisateur_id);
 
--- ==========================================================================
--- Fonctions
---
--- Chacune est supprimée avant d'être recréée : PostgreSQL refuse de
--- remplacer une fonction dont les colonnes renvoyées changent, ce qui
--- se produit à chaque fois que le script évolue.
--- ==========================================================================
-
--- Mon propre profil, colonnes privées comprises. Nécessaire depuis que la
--- lecture directe de la table est limitée aux colonnes publiques.
 drop function if exists mon_profil();
 create function mon_profil()
 returns table (
@@ -313,17 +213,6 @@ as $$
   where p.id = auth.uid();
 $$;
 
--- Distance à vol d'oiseau entre deux membres, en kilomètres entiers, ou null
--- si l'un des deux n'a pas renseigné sa zone.
---
--- Comme est_bloque(), la fonction s'exécute avec les droits de son
--- propriétaire pour atteindre des colonnes que l'appelant ne peut pas lire,
--- et ne renvoie qu'un nombre : jamais les coordonnées elles-mêmes. Comme ces
--- coordonnées sont celles du centre d'une commune, le plus précis qu'on
--- puisse déduire d'une distance reste la commune, jamais un domicile.
---
--- Le calcul est la formule de haversine : la Terre étant ronde, une simple
--- soustraction de latitudes donnerait un résultat faux.
 drop function if exists distance_km(uuid, uuid);
 create function distance_km(a uuid, b uuid)
 returns integer
@@ -346,14 +235,6 @@ as $$
     and pb.latitude is not null and pb.longitude is not null;
 $$;
 
--- Croise ma collection avec celle des autres membres. Le calcul est fait par
--- la base plutôt que par le navigateur : elle seule a toutes les données, et
--- cela évite d'envoyer des milliers d'identifiants de cartes sur le réseau.
--- Un membre bloqué disparaît des correspondances, dans les deux sens.
---
--- Cette version liste tout le monde. supabase/echanges-limites.sql la
--- remplace par celle qui ne retient que trois propositions par carte : si
--- ce fichier-ci est relancé, relancer celui-là juste après.
 drop function if exists echanges_possibles();
 drop function if exists echanges_possibles(integer);
 create function echanges_possibles(distance_max integer default null)
@@ -406,13 +287,9 @@ as $$
   where p.id <> auth.uid()
     and (d.cartes is not null or r.cartes is not null)
     and not est_bloque(auth.uid(), p.id)
-    -- Sans filtre, tout le monde reste visible, y compris ceux qui n'ont pas
-    -- renseigné de zone. Avec un filtre, une distance inconnue ne peut pas
-    -- être déclarée « proche » : ces membres sortent de la liste.
     and (distance_max is null or distance_km(auth.uid(), p.id) <= distance_max);
 $$;
 
--- Retrouve la conversation avec un membre, ou l'ouvre si elle n'existe pas.
 drop function if exists ouvrir_conversation(uuid);
 create function ouvrir_conversation(autre uuid)
 returns uuid
@@ -434,9 +311,6 @@ begin
 end;
 $$;
 
--- Les conversations, avec de quoi dresser un aperçu : qui est en face, le
--- dernier message échangé, et ce qui reste à lire. Une conversation avec un
--- membre bloqué n'y figure plus.
 drop function if exists mes_conversations();
 create function mes_conversations()
 returns table (
@@ -458,22 +332,16 @@ as $$
     m.texte,
     m.envoye_le,
     coalesce(nl.nombre, 0)::integer,
-    -- Archivée tant que rien n'est arrivé depuis le rangement.
     l.archivee_apres is not null and coalesce(m.id, 0) <= l.archivee_apres
   from conversations c
   join profils p
     on p.id = case when c.membre_a = auth.uid() then c.membre_b else c.membre_a end
   left join lectures l
     on l.conversation_id = c.id and l.utilisateur_id = auth.uid()
-  -- Les messages effacés sont déjà écartés par la règle de lecture : ces
-  -- deux sous-requêtes ne voient donc que ce qui me reste.
   left join lateral (
     select id, texte, envoye_le
     from messages
     where conversation_id = c.id
-    -- Sur le numéro et non sur l'heure : deux messages de la même seconde
-    -- s'ordonneraient au hasard, et l'aperçu montrerait parfois l'avant-
-    -- dernier message.
     order by id desc
     limit 1
   ) m on true
@@ -486,14 +354,10 @@ as $$
   ) nl on true
   where auth.uid() in (c.membre_a, c.membre_b)
     and not est_bloque(c.membre_a, c.membre_b)
-    -- Une conversation supprimée ne revient que si on m'écrit à nouveau.
     and (l.effacee_jusqua is null or m.id is not null)
   order by coalesce(m.envoye_le, c.cree_le) desc;
 $$;
 
--- Le dernier message d'une conversation dont je fais partie, en tenant
--- compte de ce que j'ai déjà effacé : c'est le repère que posent les deux
--- gestes ci-dessous. Refuse une conversation qui n'est pas la mienne.
 drop function if exists borne_conversation(uuid);
 create function borne_conversation(conversation uuid)
 returns bigint
@@ -512,9 +376,6 @@ begin
   select coalesce(max(m.id), 0) into borne
   from messages m where m.conversation_id = conversation;
 
-  -- Ce que j'ai déjà effacé ne m'est plus visible ci-dessus : sans ce
-  -- rattrapage, un second geste ferait reculer la borne et ressusciterait
-  -- les messages précédemment effacés.
   return greatest(borne, coalesce((
     select l.effacee_jusqua from lectures l
     where l.conversation_id = conversation and l.utilisateur_id = auth.uid()
@@ -522,7 +383,6 @@ begin
 end;
 $$;
 
--- Ranger une conversation, ou la ressortir.
 drop function if exists archiver_conversation(uuid, boolean);
 create function archiver_conversation(conversation uuid, archiver boolean)
 returns void
@@ -538,8 +398,6 @@ begin
 end;
 $$;
 
--- Supprimer une conversation : pour moi seul. Les messages restent chez
--- l'autre membre : personne ne peut effacer ce qu'il a envoyé à quelqu'un.
 drop function if exists supprimer_conversation(uuid);
 create function supprimer_conversation(conversation uuid)
 returns void
@@ -551,17 +409,6 @@ begin
   insert into lectures (utilisateur_id, conversation_id, effacee_jusqua, dernier_message_lu, archivee_apres)
   values (auth.uid(), conversation, borne, borne, null)
   on conflict (utilisateur_id, conversation_id)
-  -- Deux règles dans le « do update set » ci-dessous, expliquées ici plutôt
-  -- qu'au milieu de l'instruction : « effacee_jusqua » ne recule jamais, ce
-  -- qui est effacé le reste ; et « dernier_message_lu » avance d'autant, pour
-  -- que ce qu'on vient d'effacer ne reste pas compté comme non lu.
-  --
-  -- Les commentaires sont sortis de l'instruction parce que l'éditeur SQL de
-  -- Supabase les retire avant d'analyser le script, et découpe alors
-  -- l'instruction au mauvais endroit : « syntax error at or near
-  -- effacee_jusqua ». Le SQL était correct (vérifié sur PostgreSQL 16) mais
-  -- un commentaire au milieu d'une instruction n'apporte pas assez pour
-  -- valoir ce piège.
   do update set
     effacee_jusqua = greatest(coalesce(lectures.effacee_jusqua, 0), excluded.effacee_jusqua),
     dernier_message_lu = greatest(lectures.dernier_message_lu, excluded.dernier_message_lu),
@@ -569,7 +416,6 @@ begin
 end;
 $$;
 
--- Le nombre total de messages non lus, pour la pastille de la navigation.
 drop function if exists total_non_lus();
 create function total_non_lus()
 returns integer
@@ -587,44 +433,8 @@ as $$
     and not est_bloque(c.membre_a, c.membre_b);
 $$;
 
--- ==========================================================================
--- Espace d'administration
---
--- Le catalogue vient de sources extérieures, puis d'un instantané figé dans
--- le dépôt. Quand une source se trompe : nom mal traduit, rareté fausse,
--- carte absente, visuel anglais : il faut pouvoir corriger sans attendre la
--- prochaine construction.
---
--- Une correction saisie ici prend effet immédiatement sur le site, puis la
--- construction nocturne l'absorbe dans les fichiers du dépôt. Elle devient
--- alors redondante et peut être supprimée : c'est le dépôt qui fait foi à
--- long terme, pas cette table.
--- ==========================================================================
-
--- Qui est administrateur. Ce drapeau ne se coche PAS depuis le site : il se
--- pose à la main dans l'éditeur SQL de Supabase.
---
--- ATTENTION : ce fichier seul ne suffit pas à empêcher un compte de se
--- promouvoir. La règle « chacun modifie son profil » filtre des lignes, pas
--- des colonnes, et Supabase accorde par défaut l'écriture de toutes les
--- colonnes. C'est supabase/securite-profils.sql qui ferme cette porte :
--- droits ramenés aux colonnes utiles, et déclencheur sur « est_admin ».
---
---   update profils set est_admin = true where pseudo = 'TonPseudo';
---
 alter table profils add column if not exists est_admin boolean not null default false;
 
--- Cette colonne n'est PAS ajoutée à la liste des colonnes lisibles accordée
--- plus haut (« grant select (id, pseudo, …) on profils »). Personne ne peut
--- donc lire qui est administrateur, pas même l'intéressé : la page
--- d'administration passe par la fonction ci-dessous, qui ne répond que pour
--- le compte qui la pose. Une colonne ajoutée après un grant n'en hérite pas,
--- c'est ce qui rend l'omission efficace plutôt que décorative.
-
--- La fonction est appelée par les règles d'accès ci-dessous. Elle est
--- « security definer » parce qu'elle doit lire profils sans être soumise
--- elle-même aux règles de lecture de profils, sinon la règle s'appellerait
--- elle-même sans fin.
 create or replace function est_admin()
 returns boolean
 language sql
@@ -635,18 +445,6 @@ as $$
   select coalesce((select p.est_admin from profils p where p.id = auth.uid()), false);
 $$;
 
--- Une correction porte sur une carte, une extension, ou le seul visuel d'une
--- carte. « cible » est l'identifiant visé : « B3-001 » pour une carte,
--- « B5 » pour une extension.
---
--- La contrainte « unique » en fin de table dit qu'une seule correction vaut
--- par cible et par genre : ressaisir remplace, plutôt que d'empiler des
--- corrections contradictoires dont on ne saurait plus laquelle s'applique.
---
--- Le contenu vit dans « donnees », en JSON, plutôt que dans des colonnes
--- fixes : les champs corrigibles diffèrent d'un genre à l'autre, et ils
--- changeront. Une colonne par champ imposerait de modifier la base à chaque
--- évolution du formulaire.
 create table if not exists corrections (
   id           bigserial primary key,
   univers      text not null default 'pocket' check (univers in ('pocket', 'physique')),
@@ -661,18 +459,10 @@ create table if not exists corrections (
 
 alter table corrections enable row level security;
 
--- Lecture ouverte à tous, y compris aux visiteurs non connectés. Ce sont des
--- données de catalogue (un nom de carte, une rareté, un visuel) déjà
--- publiques par nature. La construction nocturne les lit aussi, sans compte.
 drop policy if exists "corrections lisibles par tous" on corrections;
 create policy "corrections lisibles par tous"
   on corrections for select to anon, authenticated using (true);
 
--- Écriture réservée à l'administrateur. C'est ICI que se joue le « moi seul » :
--- pas dans le fait que la page soit difficile à trouver. Un site statique
--- livre tout son code au navigateur, donc l'adresse de la page
--- d'administration est connue de quiconque la cherche ; ce qui protège, c'est
--- que la base refuse l'écriture à tout autre compte.
 drop policy if exists "seul l'administrateur ajoute une correction" on corrections;
 create policy "seul l'administrateur ajoute une correction"
   on corrections for insert to authenticated with check (est_admin());
@@ -685,9 +475,6 @@ drop policy if exists "seul l'administrateur supprime une correction" on correct
 create policy "seul l'administrateur supprime une correction"
   on corrections for delete to authenticated using (est_admin());
 
--- Les visuels téléversés depuis l'espace d'administration. Le contenant est
--- public en lecture : le site doit pouvoir afficher l'image aussitôt, et la
--- construction nocturne la télécharger sans compte.
 insert into storage.buckets (id, name, public)
 values ('corrections', 'corrections', true)
 on conflict (id) do nothing;
@@ -712,15 +499,5 @@ drop policy if exists "seul l'administrateur retire un visuel" on storage.object
 create policy "seul l'administrateur retire un visuel"
   on storage.objects for delete to authenticated
   using (bucket_id = 'corrections' and est_admin());
-
--- ==========================================================================
--- Rafraîchissement de la couche d'accès
---
--- Entre la base et le navigateur, Supabase intercale un service (PostgREST)
--- qui garde en mémoire la liste des tables et des fonctions. Tant qu'il ne
--- l'a pas relue, une fonction toute neuve lui reste inconnue et le site
--- répond « Could not find the function ». Ce signal la lui fait relire tout
--- de suite, plutôt que d'attendre ou de redémarrer le projet.
--- ==========================================================================
 
 notify pgrst, 'reload schema';

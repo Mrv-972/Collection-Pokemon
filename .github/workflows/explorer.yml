@@ -1,7 +1,3 @@
-# Ouvre une adresse et déballe ce qu'elle contient.
-#
-# Outil d'enquête, à lancer à la main depuis l'onglet Actions quand une page
-# ne livre pas ce qu'on y cherche. Il ne modifie rien.
 name: Explorer une page
 
 on:
@@ -36,10 +32,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      # Les paramètres passent par des variables d'environnement plutôt que
-      # dans la ligne de commande : une parenthèse ou une apostrophe dans un
-      # motif de recherche suffisait à casser la commande avant même que
-      # l'outil ne démarre.
       - run: |
           node outils/explorer.mjs \
             --url="$URL" \

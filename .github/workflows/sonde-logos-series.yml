@@ -1,8 +1,3 @@
-# Sonde ponctuelle : quelles séries ont un logo chez TCGdex ?
-#
-# Le bac à sable de développement n'atteint pas ce domaine ; un exécuteur
-# GitHub, si. On lance donc la sonde ici et on lit le journal. Rien n'est
-# écrit dans le dépôt.
 name: Sonde des logos de série
 
 on:
@@ -28,8 +23,6 @@ jobs:
         with:
           node-version: '22'
 
-      # L'instantané du dépôt ne porte pas encore les identifiants de série :
-      # on le reconstruit sur place, sans rien publier.
       - name: Reconstruire l'instantané
         run: node outils/instantane.mjs --tcgdex tcgdex --sortie /tmp/instantane
 

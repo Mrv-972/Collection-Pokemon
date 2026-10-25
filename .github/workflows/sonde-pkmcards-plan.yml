@@ -1,4 +1,3 @@
-# Repère par où PkmCards se laisse parcourir. Lecture seule, à la demande.
 name: Sonde plan PkmCards
 
 on:

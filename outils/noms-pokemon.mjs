@@ -1,21 +1,3 @@
-// L'origine du nom de chaque Pokémon, et ses anecdotes, d'après Poképédia.
-// ========================================================================
-//
-// Chaque fiche Pokémon de Poképédia, le wiki francophone, a une section
-// « Étymologies » (« Bulbizarre vient de bulbe et de bizarre… », puis
-// l'anglais, le japonais…) et une section « Anecdotes ». Cet outil lit les
-// fiches des 1 025 Pokémon, cinquante par requête, et en tire deux fichiers
-// pour l'onglet Communauté :
-//
-//   donnees/noms-pokemon.json      l'origine des noms (français, anglais, japonais)
-//   donnees/anecdotes-pokemon.json les anecdotes, pour « Le saviez-vous ? »
-//
-// Poképédia publie sous licence CC BY-NC-SA 3.0 : ces fichiers en héritent,
-// et le site cite la source à côté de chaque texte.
-//
-// Lancé chaque mois par .github/workflows/noms-pokemon.yml, ou à la main :
-//   node outils/noms-pokemon.mjs [--sortie donnees]
-
 import { readFile, writeFile } from 'node:fs/promises';
 import { sansTiretPartout } from './typographie.mjs';
 
@@ -28,13 +10,6 @@ const IDENTITE = {
 };
 const dormir = ms => new Promise(r => setTimeout(r, ms));
 const POKEDEX_FR = new Function((await readFile('pokedex-fr.js', 'utf8')) + '\nreturn POKEDEX_FR;')();
-
-// ------------------------------------------------- texte d'un wiki → texte --
-//
-// Le texte source d'une page de wiki est truffé de balises : liens
-// [[cible|texte]], modèles {{…}}, gras '''…''', notes <ref>…</ref>. On n'en
-// garde que le texte lu, et le gras : il montre la partie du mot reprise
-// dans le nom (« '''bulb'''e »), noté **…**.
 
 function modele(contenu){
   const parties = contenu.split('|').map(s => s.trim());
@@ -49,13 +24,6 @@ function lien(contenu){
   return cible.replace(/^:?(wp|w|en|ja)?:?/i, '').replace(/#.*/, '');
 }
 
-// Le gras et l'italique se basculent par des suites d'apostrophes : deux
-// pour l'italique, trois pour le gras, cinq pour les deux. Le français
-// complique l'affaire : « d'''Archeus'' » est une apostrophe suivie
-// d'italique, pas du gras. On applique la règle même du logiciel des wikis
-// (MediaWiki, doQuotes) : quand gras et italique restent tous deux
-// orphelins sur une ligne, un « gras » collé à un mot d'une lettre redevient
-// apostrophe + italique.
 function apostrophes(ligne){
   const t = ligne.split(/(''+)/);
   let italiques = 0, gras = 0;
@@ -106,12 +74,8 @@ function texteBrut(wiki){
   return t;
 }
 
-// Un texte encore encombré de balises n'est pas montré : mieux vaut rien
-// qu'un charabia.
 const propre = t => t && t.length >= 12 && !/\{\{|\}\}|\[\[|\]\]|\|/.test(t);
 
-// La section d'une page : de son titre jusqu'au titre suivant de même
-// niveau ou plus haut.
 function section(wiki, motif, niveau){
   const titre = new RegExp(`^={${niveau}}\\s*(?:${motif})\\s*={${niveau}}\\s*$`, 'mi');
   const m = titre.exec(wiki);
@@ -136,7 +100,6 @@ function etymologies(wiki){
       for(const cle of derniere) if(!res[cle] && propre(texte)) res[cle] = texte;
       continue;
     }
-    // Une sous-puce complète la ligne précédente (formes, variantes).
     const sous = /^\*\*+\s*(.+)$/.exec(ligne);
     if(sous) for(const cle of derniere) if(res[cle]){
       const texte = texteBrut(sous[1]);
@@ -149,9 +112,6 @@ function etymologies(wiki){
 function anecdotes(wiki){
   const bloc = section(wiki, 'Anecdotes?', 2);
   if(!bloc) return [];
-  // Une anecdote qui passe par des modèles ({{Génération|1}}…) perdrait son
-  // sens une fois ceux-ci retirés (« la 1 » pour « la première
-  // génération ») : on ne garde que les anecdotes écrites en toutes lettres.
   const sansNotes = l => l.replace(/<ref[^>]*\/>/gi, '').replace(/<ref[^>]*>[\s\S]*?<\/ref>/gi, '');
   return bloc.split('\n')
     .filter(l => /^\*(?!\*)/.test(l) && !/\{\{/.test(sansNotes(l)))
@@ -159,8 +119,6 @@ function anecdotes(wiki){
     .filter(t => propre(t) && t.length >= 40 && t.length <= 420)
     .slice(0, 4);
 }
-
-// ------------------------------------------------------------ lecture ----
 
 async function lirePages(titres){
   const url = API + '?' + new URLSearchParams({
@@ -226,7 +184,6 @@ for(const n of [1, 25, 143, 1025]){
 if(manquants.length) console.log(`\nà revoir (${manquants.length}) :\n  ${manquants.join('\n  ')}`);
 if(renvois.length) console.log(`\nnoms écrits autrement sur Poképédia (${renvois.length}) :\n  ${renvois.join('\n  ')}`);
 if(avecModeles.length) console.log(`\nétymologies passées par des modèles (${avecModeles.length}), à relire :\n  ${avecModeles.slice(0, 60).join('\n  ')}`);
-// Moins de neuf sur dix : la page a changé de forme, on ne publie pas.
 if(avecFr < POKEDEX_FR.length * 0.9){
   console.error('Trop peu d\'étymologies trouvées : fichiers non publiés.');
   process.exit(1);

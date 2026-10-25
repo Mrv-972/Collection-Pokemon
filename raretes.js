@@ -1,14 +1,3 @@
-// Icônes de rareté, partagées par les pages qui montrent des cartes.
-//
-// Pokémon TCG Pocket dit la rareté d'une carte en symboles : des losanges,
-// des étoiles, une couronne, et le jeu en publie les dessins. Ils valent
-// mieux que les caractères typographiques qui les approchaient.
-//
-// Cette table a été sortie de cards.js le jour où la page des missions en a
-// eu besoin : deux copies auraient fini par diverger. Les quarante raretés
-// du jeu physique, elles, n'ont pas d'icône et restent dans cards.js avec
-// leurs symboles typographiques.
-
 const ICONES_RARETE = {
   'Un Diamant':               ['losange', 1],
   'Deux Diamants':            ['losange', 2],
@@ -22,10 +11,6 @@ const ICONES_RARETE = {
   'Chromatique deux étoiles': ['chromatique', 2],
 };
 
-// Les raretés de Pocket, de la plus courante à la plus rare. Une seule liste
-// pour tout le site : le filtre des pages de cartes la suit, les missions
-// secrètes aussi. Les chromatiques se placent avant les trois étoiles, qui
-// sortent moins souvent des boosters.
 const ORDRE_RARETES_POCKET = [
   'Un Diamant', 'Deux Diamants', 'Trois Diamants', 'Quatre Diamants',
   'Une Étoile', 'Deux Étoiles', 'Chromatique', 'Chromatique deux étoiles',
@@ -38,13 +23,9 @@ function rarityIcon(rarity){
     const [nom, nombre] = icone;
     return `<img class="icone-rarete" src="images/raretes/${nom}.png" alt="" aria-hidden="true" loading="lazy">`.repeat(nombre);
   }
-  // Hors Pocket, cards.js sait rendre un symbole ; à défaut, le nom de la
-  // rareté en toutes lettres vaut mieux qu'un vide.
   return typeof raritySymbol === 'function' ? raritySymbol(rarity) : (rarity ?? '');
 }
 
-// Les pages sans grille de cartes n'ont pas la règle de style qui dimensionne
-// ces icônes : elle voyage avec elles.
 const STYLE_RARETES = `
   .icone-rarete{height:1.05em;width:auto;vertical-align:-.16em;display:inline-block}
   .icone-rarete + .icone-rarete{margin-left:1px}

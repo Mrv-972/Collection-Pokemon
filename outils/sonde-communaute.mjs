@@ -1,11 +1,3 @@
-// Sonde : d'où tirer les explications de noms et les actualités ?
-// ===============================================================
-//
-// Lancée à la main (.github/workflows/sonde-communaute.yml). Elle ne publie
-// rien : elle affiche dans le journal ce que Poképédia et les sites
-// d'actualités répondent, pour écrire ensuite les vrais outils sur du
-// concret plutôt que sur des suppositions.
-
 const IDENTITE = {
   'User-Agent': 'PokeClasseur/1.0 (communaute ; github.com/Mrv-972/Collection-Pokemon ; mrv972.contact@gmail.com)',
   'Accept-Language': 'fr-FR,fr;q=0.9',

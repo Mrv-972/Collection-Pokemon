@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
 <title>Diagnostic - PokéClasseur</title>
 <style>
   :root{--ink:#15171B;--ink-soft:#20232A;--gold:#C9A227;--accent-clair:#E3C766;
@@ -36,16 +36,14 @@
   <pre id="sortie">…</pre>
 </div>
 
-<script src="sets.js?v=2026-10-25-zimk"></script>
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="catalogue.js?v=2026-10-25-zimk"></script>
+<script src="sets.js?v=2026-10-25-hgmz"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="catalogue.js?v=2026-10-25-hgmz"></script>
 <script>
 const sortie = document.getElementById('sortie');
 let lignes = [];
 const dire = (t = '') => { lignes.push(t); sortie.textContent = lignes.join('\n'); };
 
-// On mesure la « francité » d'une liste de noms en la confrontant au Pokédex
-// français : c'est le seul juge fiable, et il ne dépend d'aucune source.
 let pokedex = null;
 async function chargerPokedex(){
   if(pokedex) return pokedex;
@@ -125,11 +123,7 @@ async function rapport(universVoulu){
   dire();
 
   dire('--- Les visuels des cartes -------------------------------------');
-  // Je ne peux pas joindre l'hébergeur d'images depuis mon environnement :
-  // c'est donc ton navigateur qui dit lesquels existent vraiment.
   const echantillon = [];
-  // Un échantillon pris aux deux bouts : les plus anciennes, censées avoir
-  // leur visuel français, et les plus récentes, qui n'en ont nulle part.
   const miennes = extensions.filter(e => appartientAUnivers(e.id));
   const aSonder = [...miennes.slice(0, 3), ...miennes.slice(-3)];
   for(const ext of aSonder){
@@ -159,9 +153,6 @@ async function rapport(universVoulu){
   try{ for(let i = 0; i < sessionStorage.length; i++) cles.push(sessionStorage.key(i)); }catch(err){}
   dire(cles.length ? '  session : ' + cles.join(', ') : '  session : vide');
 
-  // Distinguer « le serveur n'a pas publié » de « ton navigateur garde
-  // l'ancien fichier » : on redemande catalogue.js en contournant le cache
-  // et on regarde s'il porte le repère de version.
   let surLeServeur = null;
   try{
     const r = await fetch('catalogue.js?' + Date.now(), { cache: 'no-store' });

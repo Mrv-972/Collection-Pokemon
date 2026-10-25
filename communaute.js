@@ -1,37 +1,26 @@
-// Communauté : profils publics, badges, avis, signalements.
-// =========================================================
-//
-// Chargé après compte.js par les pages qui montrent d'autres membres
-// (profil, échanges, discussions). Tout ce qui se calcule : badges,
-// nombre d'avis, droit de donner un avis : l'est par la base
-// (supabase/communaute.sql) : le navigateur affiche, il ne décide pas.
-
-// L'ordre est celui de l'affichage : du plus accessible au plus rare, par
-// famille. Ceux de la collection viennent de badges_de (communaute.sql),
-// ceux de la communauté de badges_communaute (espace-communaute.sql).
 const FAMILLES_BADGES = [
   { cle: 'collection', nom: 'Collection et échanges' },
   { cle: 'communaute', nom: 'Communauté' },
 ];
 const BADGES = [
-  { cle: 'premiere-carte',         famille: 'collection', icone: '🌱', nom: 'Premiers pas',          texte: 'A marqué sa première carte obtenue.' },
-  { cle: 'cent-cartes',            famille: 'collection', icone: '📒', nom: 'Cent cartes',           texte: 'Possède au moins 100 cartes.' },
-  { cle: 'cinq-cents-cartes',      famille: 'collection', icone: '📚', nom: 'Cinq cents cartes',     texte: 'Possède au moins 500 cartes.' },
-  { cle: 'mille-cartes',           famille: 'collection', icone: '🏛️', nom: 'Mille cartes',          texte: 'Possède au moins 1 000 cartes.' },
-  { cle: 'extension-complete',     famille: 'collection', icone: '🏆', nom: 'Extension complète',    texte: 'A réuni toutes les cartes d\'une extension.' },
-  { cle: 'cinq-extensions',        famille: 'collection', icone: '👑', nom: 'Cinq extensions',       texte: 'A complété cinq extensions.' },
-  { cle: 'genereux',               famille: 'collection', icone: '🎁', nom: 'Généreux',              texte: 'Propose au moins 20 cartes à l\'échange.' },
-  { cle: 'premier-echange',        famille: 'collection', icone: '🤝', nom: 'Premier échange',       texte: 'A reçu un premier avis positif après un échange.' },
-  { cle: 'echangeur-de-confiance', famille: 'collection', icone: '⭐', nom: 'Échangeur de confiance', texte: 'Au moins 5 avis positifs, et quatre fois plus de positifs que de négatifs.' },
-  { cle: 'un-an',                  famille: 'collection', icone: '🎂', nom: 'Un an parmi nous',      texte: 'Inscrit depuis plus d\'un an.' },
-  { cle: 'pionnier',               famille: 'collection', icone: '🚀', nom: 'Pionnier',              texte: 'Parmi les cent premiers inscrits.' },
-  { cle: 'premier-message',        famille: 'communaute', icone: '✍️', nom: 'Premier message',       texte: 'A publié son premier message dans la Communauté.' },
-  { cle: 'bonne-reponse',          famille: 'communaute', icone: '✅', nom: 'Bonne réponse',         texte: 'Une de ses réponses a été choisie comme la meilleure.' },
-  { cle: 'serviable',              famille: 'communaute', icone: '🧭', nom: 'Serviable',             texte: 'A répondu aux questions de 10 membres.' },
-  { cle: 'idee-populaire',         famille: 'communaute', icone: '🔥', nom: 'Idée populaire',        texte: 'Une de ses idées a été soutenue par au moins 10 membres.' },
-  { cle: 'idee-retenue',           famille: 'communaute', icone: '🛠️', nom: 'Idée retenue',          texte: 'Une de ses idées est prévue ou réalisée sur le site.' },
-  { cle: 'expert',                 famille: 'communaute', icone: '🎓', nom: 'Expert',                texte: 'Cinq de ses réponses ont été choisies comme les meilleures.' },
-  { cle: 'pilier-du-forum',        famille: 'communaute', icone: '🏅', nom: 'Pilier du forum',       texte: 'A publié au moins 50 messages dans la Communauté.' },
+  { cle: 'premiere-carte',         famille: 'collection', nom: 'Premiers pas',          texte: 'A marqué sa première carte obtenue.' },
+  { cle: 'cent-cartes',            famille: 'collection', nom: 'Cent cartes',           texte: 'Possède au moins 100 cartes.' },
+  { cle: 'cinq-cents-cartes',      famille: 'collection', nom: 'Cinq cents cartes',     texte: 'Possède au moins 500 cartes.' },
+  { cle: 'mille-cartes',           famille: 'collection', nom: 'Mille cartes',          texte: 'Possède au moins 1 000 cartes.' },
+  { cle: 'extension-complete',     famille: 'collection', nom: 'Extension complète',    texte: 'A réuni toutes les cartes d\'une extension.' },
+  { cle: 'cinq-extensions',        famille: 'collection', nom: 'Cinq extensions',       texte: 'A complété cinq extensions.' },
+  { cle: 'genereux',               famille: 'collection', nom: 'Généreux',              texte: 'Propose au moins 20 cartes à l\'échange.' },
+  { cle: 'premier-echange',        famille: 'collection', nom: 'Premier échange',       texte: 'A reçu un premier avis positif après un échange.' },
+  { cle: 'echangeur-de-confiance', famille: 'collection', nom: 'Échangeur de confiance', texte: 'Au moins 5 avis positifs, et quatre fois plus de positifs que de négatifs.' },
+  { cle: 'un-an',                  famille: 'collection', nom: 'Un an parmi nous',      texte: 'Inscrit depuis plus d\'un an.' },
+  { cle: 'pionnier',               famille: 'collection', nom: 'Pionnier',              texte: 'Parmi les cent premiers inscrits.' },
+  { cle: 'premier-message',        famille: 'communaute', nom: 'Premier message',       texte: 'A publié son premier message dans la Communauté.' },
+  { cle: 'bonne-reponse',          famille: 'communaute', nom: 'Bonne réponse',         texte: 'Une de ses réponses a été choisie comme la meilleure.' },
+  { cle: 'serviable',              famille: 'communaute', nom: 'Serviable',             texte: 'A répondu aux questions de 10 membres.' },
+  { cle: 'idee-populaire',         famille: 'communaute', nom: 'Idée populaire',        texte: 'Une de ses idées a été soutenue par au moins 10 membres.' },
+  { cle: 'idee-retenue',           famille: 'communaute', nom: 'Idée retenue',          texte: 'Une de ses idées est prévue ou réalisée sur le site.' },
+  { cle: 'expert',                 famille: 'communaute', nom: 'Expert',                texte: 'Cinq de ses réponses ont été choisies comme les meilleures.' },
+  { cle: 'pilier-du-forum',        famille: 'communaute', nom: 'Pilier du forum',       texte: 'A publié au moins 50 messages dans la Communauté.' },
 ];
 
 const lienProfil = id => `profil.html?membre=${encodeURIComponent(id)}`;
@@ -39,8 +28,6 @@ const lienProfil = id => `profil.html?membre=${encodeURIComponent(id)}`;
 const echapperCommun = v => String(v ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-// Une fonction absente de la base (script pas encore exécuté) répond par
-// ces codes : la page le dit, plutôt qu'une erreur technique.
 const fonctionAbsente = err => ['PGRST202', '42883', 'PGRST204', '42P01', 'PGRST205'].includes(err?.code);
 
 async function appeler(fonction, args){
@@ -51,8 +38,6 @@ async function appeler(fonction, args){
 }
 
 async function profilPublic(id){ return (await appeler('profil_public', { membre: id }))?.[0] ?? null; }
-// Les deux familles de badges d'un coup. Celle de la communauté manque tant
-// que supabase/espace-communaute.sql n'a pas été relancé : on s'en passe.
 async function badgesDe(id){
   const [collection, communaute] = await Promise.all([
     appeler('badges_de', { membre: id }),
@@ -78,7 +63,6 @@ async function donnerAvis(id, note, commentaire){
     commentaire: commentaire?.trim() || null,
   });
   if(error){
-    // La règle de la base : un avis suppose d'avoir échangé des messages.
     if(error.code === '42501') throw new Error("Tu pourras donner un avis après avoir échangé des messages avec ce membre.");
     throw error;
   }
@@ -90,7 +74,6 @@ async function retirerAvis(id){
   if(error) throw error;
 }
 
-// Le résumé des avis de plusieurs membres d'un coup, pour les listes.
 async function resumesAvis(ids){
   const resumes = new Map();
   const uniques = [...new Set(ids)].filter(Boolean);
@@ -104,41 +87,29 @@ async function resumesAvis(ids){
       r[a.note === 'positif' ? 'positifs' : 'negatifs']++;
       resumes.set(a.destinataire_id, r);
     }
-  }catch{ /* pas d'avis affichés */ }
+  }catch{ }
   return resumes;
 }
 
 function resumeAvisHtml(r){
   if(!r || (!r.positifs && !r.negatifs)) return '';
-  return `<span class="resume-avis" title="Avis reçus après des échanges">👍 ${r.positifs}${r.negatifs ? ` · 👎 ${r.negatifs}` : ''}</span>`;
+  return `<span class="resume-avis" title="Avis reçus après des échanges">${pictogramme('pouce')} ${r.positifs}${r.negatifs ? ` · ${pictogramme('pouce-bas')} ${r.negatifs}` : ''}</span>`;
 }
 
 async function signalerContenu({ membreId, objet, motif, messageId = null, sujetId = null, reponseId = null }){
   const db = await clientSupabase();
   const ligne = { signaleur_id: membre.id, signale_id: membreId, objet, message_id: messageId, motif: motif.trim() };
-  // Un sujet ou une réponse de l'onglet Communauté : la base en retrouve
-  // elle-même l'auteur (supabase/espace-communaute.sql).
   if(sujetId) ligne.sujet_id = sujetId;
   if(reponseId) ligne.reponse_id = reponseId;
   const { error } = await db.from('signalements').insert(ligne);
   if(error) throw error;
 }
 
-// --------------------------------------------------- vitrine d'un profil --
-//
-// Chiffres, badges et avis reçus : ce que les autres voient d'un membre.
-// Affichée sur le profil d'un membre (profil.html) et, pour soi, dans
-// « Mon profil » (connexion.html).
-
 const FORMAT_JOUR_AVIS = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
 
-// « complet » : tous les badges, ceux qui restent à gagner en gris : de
-// quoi donner envie. Sinon, seulement ceux obtenus, comme les voient les
-// autres.
 function badgesHtml(obtenus, complet){
   const montres = complet ? BADGES : BADGES.filter(b => obtenus.has(b.cle));
   if(!montres.length) return '<p class="vide-doux">Pas encore de badge.</p>';
-  // Rangés par famille ; une famille sans badge à montrer n'a pas de titre.
   return FAMILLES_BADGES.map(f => {
     const dans = montres.filter(b => b.famille === f.cle);
     if(!dans.length) return '';
@@ -148,7 +119,7 @@ function badgesHtml(obtenus, complet){
       <div class="badges">${dans.map(b => `
         <div class="badge-collection ${obtenus.has(b.cle) ? '' : 'verrouille'}"
              ${obtenus.has(b.cle) ? '' : 'aria-label="Badge à obtenir"'}>
-          <span class="icone" aria-hidden="true">${b.icone}</span>
+          ${badgeArene('badge-' + b.cle, obtenus.has(b.cle), { taille: 46 })}
           <span><b>${b.nom}</b><small>${b.texte}</small></span>
         </div>`).join('')}</div>`;
   }).join('');
@@ -164,7 +135,7 @@ function avisHtml(liste, moi){
       <div style="flex:1;min-width:0">
         <div class="tete-avis">
           <a class="lien-profil" href="${lienProfil(a.auteur_id)}"><b class="nom-lien">${echapperCommun(a.pseudo)}</b></a>
-          <span>${a.note === 'positif' ? '👍 Bien passé' : '👎 Mal passé'}</span>
+          <span>${a.note === 'positif' ? `${pictogramme('pouce')} Bien passé` : `${pictogramme('pouce-bas')} Mal passé`}</span>
           <span class="date">${FORMAT_JOUR_AVIS.format(new Date(a.maj_le))}</span>
           ${a.auteur_id !== membre?.id ? `<button type="button" class="signaler-avis" data-avis="${i}">Signaler</button>` : ''}
         </div>
@@ -179,8 +150,8 @@ function vitrineHtml(p, obtenus, avis, { moi = false, complet = false } = {}){
     <section class="chiffres" aria-label="En chiffres">
       <div class="chiffre"><b>${p.nb_proposees}</b><span>${n(p.nb_proposees, 'carte proposée', 'cartes proposées')} à l'échange</span></div>
       <div class="chiffre"><b>${p.nb_recherchees}</b><span>${n(p.nb_recherchees, 'carte recherchée', 'cartes recherchées')}</span></div>
-      <div class="chiffre"><b>${p.avis_positifs}</b><span>👍 ${n(p.avis_positifs, 'avis positif', 'avis positifs')}</span></div>
-      <div class="chiffre"><b>${p.avis_negatifs}</b><span>👎 ${n(p.avis_negatifs, 'avis négatif', 'avis négatifs')}</span></div>
+      <div class="chiffre"><b>${p.avis_positifs}</b><span>${pictogramme('pouce')} ${n(p.avis_positifs, 'avis positif', 'avis positifs')}</span></div>
+      <div class="chiffre"><b>${p.avis_negatifs}</b><span>${pictogramme('pouce-bas')} ${n(p.avis_negatifs, 'avis négatif', 'avis négatifs')}</span></div>
     </section>
 
     <section class="bloc-profil" aria-labelledby="titre-badges">
@@ -195,7 +166,6 @@ function vitrineHtml(p, obtenus, avis, { moi = false, complet = false } = {}){
     </section>`;
 }
 
-// Le bouton « Signaler » de chaque avis.
 function brancherVitrine(zone, p, avis){
   zone.querySelectorAll('.signaler-avis').forEach(b => b.addEventListener('click', async () => {
     const a = avis[Number(b.dataset.avis)];
@@ -203,17 +173,11 @@ function brancherVitrine(zone, p, avis){
     if(!reponse) return;
     try{
       await signalerContenu({ membreId: a.auteur_id, objet: 'avis',
-        motif: `Avis laissé à ${p.pseudo} : « ${a.commentaire ?? (a.note === 'positif' ? '👍' : '👎')} » : ${reponse.motif}` });
+        motif: `Avis laissé à ${p.pseudo} : « ${a.commentaire ?? (a.note === 'positif' ? 'avis positif' : 'avis négatif')} » : ${reponse.motif}` });
       annoncer("Signalement envoyé. Merci : l'administrateur va l'examiner.");
     }catch(err){ annoncer(`Le signalement n'est pas parti : ${err.message}`, 'ko'); }
   }));
 }
-
-// --------------------------------------------------------- fenêtres ------
-//
-// Une fenêtre au-dessus de la page, fermée par Échap, par le bouton
-// Annuler ou par un clic à côté. « remplir » reçoit la boîte et renvoie la
-// fonction qui lit la réponse (null tant qu'elle n'est pas valable).
 
 function ouvrirFenetre({ titre, corps, action, remplir, danger = false, extra = '' }){
   poserStyleCommunaute();
@@ -249,7 +213,6 @@ function ouvrirFenetre({ titre, corps, action, remplir, danger = false, extra = 
   });
 }
 
-// Un avis : pouce levé ou baissé, et un mot facultatif.
 function demanderAvis(pseudo, actuel = null){
   return ouvrirFenetre({
     titre: actuel ? `Modifier ton avis sur ${pseudo}` : `Ton avis sur ${pseudo}`,
@@ -259,9 +222,9 @@ function demanderAvis(pseudo, actuel = null){
       <p>Comment s'est passé votre échange ? Ton avis sera visible des autres membres sur son profil.</p>
       <div class="choix-note" role="radiogroup" aria-label="Ton avis">
         <label><input type="radio" name="note" value="positif" ${actuel?.note === 'positif' ? 'checked' : ''}>
-          <span>👍 Bien passé</span></label>
+          <span>${pictogramme('pouce')} Bien passé</span></label>
         <label><input type="radio" name="note" value="negatif" ${actuel?.note === 'negatif' ? 'checked' : ''}>
-          <span>👎 Mal passé</span></label>
+          <span>${pictogramme('pouce-bas')} Mal passé</span></label>
       </div>
       <label class="libelle" for="commentaire-avis">Un mot pour les autres membres <small>(facultatif)</small></label>
       <textarea id="commentaire-avis" maxlength="280" rows="3"
@@ -281,7 +244,6 @@ function demanderAvis(pseudo, actuel = null){
   });
 }
 
-// Un signalement : ce qui pose problème, et pourquoi.
 function demanderSignalement(pseudo, { photo = false, objet = null } = {}){
   const choix = objet ? [] : [
     ['profil', 'Son comportement (arnaque, harcèlement, insultes…)'],
@@ -316,7 +278,6 @@ function demanderSignalement(pseudo, { photo = false, objet = null } = {}){
   });
 }
 
-// Une courte annonce en bas de l'écran, qui s'efface d'elle-même.
 function annoncer(texte, type = 'ok'){
   poserStyleCommunaute();
   const a = Object.assign(document.createElement('div'), { className: `annonce-communaute ${type}`, textContent: texte });
@@ -341,11 +302,9 @@ const STYLE_COMMUNAUTE = `
   .famille-badges small{font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px}
   .badge-collection{display:flex;gap:11px;align-items:flex-start;padding:13px;border-radius:12px;
     border:1px solid rgba(var(--gold-rgb,201,162,39),0.35);background:rgba(var(--gold-rgb,201,162,39),0.08)}
-  .badge-collection .icone{font-size:26px;line-height:1;flex:none}
   .badge-collection b{display:block;font-size:13.5px;font-weight:600}
   .badge-collection small{display:block;font-size:11.5px;line-height:1.45;color:var(--text-on-ink-dim,#9B9E9C);margin-top:2px}
   .badge-collection.verrouille{border-color:rgba(var(--trait-rgb,237,234,224),0.10);background:transparent}
-  .badge-collection.verrouille .icone{filter:grayscale(1);opacity:.4}
   .badge-collection.verrouille b{color:var(--text-on-ink-dim,#9B9E9C)}
   .liste-avis{list-style:none;margin:12px 0 0;padding:0}
   .un-avis{display:flex;gap:12px;padding:14px 0;border-top:1px solid rgba(var(--trait-rgb,237,234,224),0.08)}
@@ -411,6 +370,4 @@ function poserStyleCommunaute(){
     { id: 'style-communaute', textContent: STYLE_COMMUNAUTE }));
 }
 
-// Posés dès le chargement : les noms cliquables et le résumé des avis des
-// listes (échanges, discussions) en ont besoin aussi.
 poserStyleCommunaute();

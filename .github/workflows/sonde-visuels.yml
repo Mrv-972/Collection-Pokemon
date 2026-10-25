@@ -1,12 +1,3 @@
-# Cherche où récupérer les visuels français qui manquent encore.
-#
-# Cette action ne modifie rien : elle interroge les sources listées dans
-# outils/sources-visuels.json et affiche un rapport. C'est volontaire : une
-# source n'est allumée qu'à la main, après lecture du rapport.
-#
-# Elle existe parce qu'un serveur d'action, contrairement au navigateur qui
-# affiche le site, peut aller lire n'importe quel site : c'est le seul endroit
-# d'où cette question peut être posée.
 name: Sonder les visuels français
 
 on:
@@ -22,7 +13,6 @@ on:
         required: false
         default: false
 
-# Aucune écriture : la sonde ne publie pas.
 permissions:
   contents: read
 

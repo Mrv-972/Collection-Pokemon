@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>Conditions d'utilisation - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,17 +70,6 @@
 
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -97,7 +86,6 @@
     .search-row input{min-height:44px}
   }
 
-  /* ------------------------------------------------ pages légales ------- */
   .legal{max-width:74ch;padding-bottom:60px}
   .legal h2{font-size:22px;margin:38px 0 12px;padding-top:22px;
             border-top:1px solid rgba(var(--trait-rgb),0.08);}
@@ -152,7 +140,6 @@
   </nav>
 
   <div class="page-head">
-    <div class="kicker">Les règles du jeu</div>
     <h1>Conditions d'utilisation</h1>
     <p>Ce que le site propose, ce qu'on attend de toi en l'utilisant, et ce dont il ne répond pas.</p>
   </div>
@@ -296,14 +283,14 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="legal.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
-<script src="sets.js?v=2026-10-25-zimk"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="legal.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
+<script src="sets.js?v=2026-10-25-hgmz"></script>
 <script>
 initCompte().then(afficherEtatCompte);
 </script>

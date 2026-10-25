@@ -1,35 +1,6 @@
-// Pied de page, commun à toutes les pages.
-//
-// Il y en avait neuf, écrits à la main, qui avaient divergé : plusieurs
-// annonçaient encore des « cartes fournies en direct par l'API TCGdex »,
-// ce qui n'est plus vrai depuis que les 3863 visuels et le catalogue vivent
-// dans le dépôt. Un texte recopié dans neuf fichiers vieillit mal ; celui-ci
-// vit à un seul endroit.
-//
-// Chaque page peut ajouter sa précision propre : « tes tags sont enregistrés
-// dans ce navigateur », « les discussions ne sont lisibles que par leurs deux
-// participants » : en la posant sur son <footer> :
-//
-//     <footer data-note="…"></footer>
-
-// ---------------------------------------------------------- Soutien -----
-//
-// Un bouton pour qui veut aider à faire vivre le site. Pour l'allumer, colle
-// ici l'adresse de ta page de dons :
-//
-//   Ko-fi           https://ko-fi.com/tonpseudo
-//   Buy Me a Coffee https://buymeacoffee.com/tonpseudo
-//   Tipeee          https://fr.tipeee.com/tonprojet
-//   Liberapay       https://liberapay.com/tonpseudo
-//   GitHub Sponsors https://github.com/sponsors/Mrv-972
-//
-// Tant que « adresse » reste vide, RIEN ne s'affiche : mieux vaut pas de
-// bouton du tout qu'un bouton qui mène nulle part.
 const SOUTIEN = {
   adresse: 'https://ko-fi.com/mrv972',
   libelle: 'Soutenir le site',
-  // Une phrase pour dire à quoi sert l'argent. Les gens donnent plus
-  // volontiers quand ils savent ce qu'ils paient.
   phrase: "PokéClasseur est gratuit et le restera. Un coup de pouce aide à couvrir l'hébergement.",
 };
 
@@ -51,9 +22,6 @@ const PIED_LIENS = [
     ['Mon profil', 'connexion.html'],
     ['Paramètres', 'parametres.html'],
   ]],
-  // Les trois pages que tout site accessible au public doit tenir à
-  // disposition. Elles se rejoignent depuis n'importe où, ce qui est
-  // précisément ce qu'on attend d'elles.
   ['Le site', [
     ['Nous écrire', 'contact.html'],
     ['Mentions légales', 'mentions-legales.html'],
@@ -97,7 +65,6 @@ const STYLE_PIED = `
   }
 `;
 
-// Le bouton ne s'affiche que si une adresse a été renseignée plus haut.
 function boutonSoutien(){
   if(!SOUTIEN.adresse) return '';
   const coeur = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9A5.4 5.4 0 0 1 12 6.5 5.4 5.4 0 0 1 21.6 12c-2.1 4.4-9.6 9-9.6 9z"/></svg>';
@@ -116,7 +83,6 @@ function poserPied(){
   document.head.appendChild(Object.assign(document.createElement('style'),
     { textContent: STYLE_PIED }));
 
-  // La précision propre à la page, si elle en a une.
   const note = pied.dataset.note ? `<p class="pied-note">${pied.dataset.note}</p>` : '';
 
   pied.innerHTML = `
@@ -165,38 +131,24 @@ if(document.readyState === 'loading'){
   poserPied();
 }
 
-// ------------------------------------------------- Bulle de soutien -----
-//
-// Le bouton du pied de page ne se voit que si on descend jusqu'en bas. Cette
-// petite bulle, elle, se pose dans le coin en bas à droite et reste visible.
-//
-// Trois règles de politesse, parce qu'une bulle qui insiste fait fuir :
-//   - elle attend cinq secondes avant d'apparaître, le temps qu'on lise ;
-//   - la croix la referme, et on ne la revoit pas avant un mois ;
-//   - qui a cliqué sur le lien de dons ne la revoit pas avant trois mois.
-//
-// Le coin bas-droite est choisi exprès : le bandeau des univers occupe la
-// gauche, et la vue zoom (z-index 70) passe par-dessus la bulle (55).
 const BULLE = {
   actif: true,
   delaiAvantAffichage: 5000,
-  silenceApresFermeture: 30,   // en jours
-  silenceApresClic: 90,        // en jours
+  silenceApresFermeture: 30,
+  silenceApresClic: 90,
   titre: 'Un coup de pouce ?',
   pagesExclues: [],
 };
 
 const CLE_BULLE = 'pokeclasseur-bulle-soutien';
 
-// localStorage n'est pas toujours accessible (navigation privée stricte,
-// cookies bloqués). Une bulle qui plante la page serait pire que pas de bulle.
 function lireSilence(){
   try{ return Number(localStorage.getItem(CLE_BULLE)) || 0; }
   catch{ return 0; }
 }
 function poserSilence(jours){
   try{ localStorage.setItem(CLE_BULLE, String(Date.now() + jours * 86400000)); }
-  catch{ /* tant pis, la bulle reviendra */ }
+  catch{ }
 }
 
 const STYLE_BULLE = `
@@ -266,14 +218,12 @@ function poserBulleSoutien(){
     bulle.classList.remove('visible');
     setTimeout(() => bulle.remove(), 300);
   });
-  // Qui a cliqué a fait son geste : on le laisse tranquille bien plus longtemps.
   bulle.querySelector('.lien').addEventListener('click', () => {
     poserSilence(BULLE.silenceApresClic);
   });
 
   document.body.appendChild(bulle);
   setTimeout(() => {
-    // requestAnimationFrame pour que la transition parte bien de l'état initial.
     requestAnimationFrame(() => bulle.classList.add('visible'));
   }, BULLE.delaiAvantAffichage);
 }

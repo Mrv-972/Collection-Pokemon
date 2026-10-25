@@ -1,18 +1,3 @@
-// Relever l'arborescence de PkmCards : par où entre-t-on dans le catalogue ?
-// ==========================================================================
-//
-// Mesuré jusqu'ici, pour ne pas le repayer :
-//   - /cards/liste-cartes-francaises : 34 cartes, AUCUN paginateur, aucune
-//     requête de données (seul Analytics parle). C'est une vitrine.
-//   - /series : n'annonce que 30 séries alors qu'il en existe 240 et plus.
-//   - pas de plan de site ; pas de pagination par adresse ; pas d'API.
-//
-// Reste à savoir comment EUX mènent au catalogue entier. Cette sonde relève
-// les liens internes de leurs pages d'entrée, groupés par forme, et teste
-// si /series se pagine. Elle ne télécharge que du texte.
-//
-//   node outils/sonde-pkmcards-arbre.mjs
-
 const RACINE = 'https://www.pkmcards.fr';
 const IDENTITE = {
   'User-Agent': 'PokeClasseur/1.0 (reperage ; ' +
@@ -31,14 +16,12 @@ async function lire(adresse){
 const liensDe = corps =>
   [...new Set([...(corps.matchAll(/href=["'](\/[^"'#?]{1,120})["']/g))].map(m => m[1]))];
 
-// La forme d'un lien : /series/xxx -> /series/*, pour voir les familles.
 const forme = l => {
   const bouts = l.split('/').filter(Boolean);
   if(!bouts.length) return '/';
   return '/' + bouts[0] + (bouts.length > 1 ? '/*' : '');
 };
 
-// --- 1. les pages d'entrée ------------------------------------------------
 for(const entree of ['/', '/series', '/cards', '/sets', '/extensions']){
   await dormir(1200);
   const r = await lire(`${RACINE}${entree}`);
@@ -53,7 +36,6 @@ for(const entree of ['/', '/series', '/cards', '/sets', '/extensions']){
   }
 }
 
-// --- 2. /series se pagine-t-il ? -----------------------------------------
 console.log('\n=============== /series paginé ? ===============');
 const base = `${RACINE}/series`;
 const ref = await lire(base);
@@ -68,9 +50,6 @@ for(const forme2 of ['?page=2', '?p=2', '/page/2', '?tout=1', '?all=1', '?limit=
   console.log(`  ${forme2.padEnd(12)} code ${String(r.code).padEnd(4)} ${String(s.length).padStart(4)} séries  ${pareil ? 'IDENTIQUE' : '>>> DIFFÉRENT <<<'}`);
 }
 
-// --- 3. une recherche ? ---------------------------------------------------
-// Si l'on peut interroger par code d'extension, nos 53 extensions muettes
-// se traitent une par une, sans avoir à parcourir tout le site.
 console.log('\n=============== recherche ===============');
 for(const forme3 of ['/search?q=pikachu', '/cards?q=pikachu', '/recherche?q=pikachu',
                      '/search?query=pikachu']){

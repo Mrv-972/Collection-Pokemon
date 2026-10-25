@@ -1,41 +1,3 @@
-// Remplissage accéléré : remplir son classeur sans passer carte par carte.
-//
-// Ajouter toute sa collection fait peur au nouvel arrivant : des centaines
-// de cartes, trois petits boutons sous chacune. La page ne montre qu'un
-// bouton, « Remplissage accéléré », qui ouvre une fenêtre à quatre encarts :
-//   · « Marquer d'un coup les N cartes » : pose ou retire un marquage sur les
-//     cartes affichées, filtres compris ;
-//   · « Depuis une vidéo du jeu » (page d'une extension Pocket) : la vidéo
-//     de l'écran Collection est lue par lecture-video.js, un message de
-//     validation montre le compteur du jeu à côté du résultat, et « Valider »
-//     met la collection à jour d'un coup ;
-//   · « Saisie rapide » : un toucher sur l'image d'une carte la coche (ou la
-//     décoche), au lieu de l'agrandir. On choisit ce que le toucher marque :
-//     obtenue, recherchée ou échangeable. Une pastille, en bas de l'écran,
-//     rappelle que le mode est actif et permet d'en sortir ;
-//   · « Tout marquer d'un coup, sauf… » : toutes les cartes de la page
-//     reçoivent le marquage choisi, puis la saisie rapide s'active pour le
-//     retirer aux cartes qui font exception ;
-//   · « Par Pokémon / numéro » : une liste de noms ou de numéros
-//     (« Pikachu, Dracaufeu, 1-50, 52 »). Les cartes trouvées s'affichent en
-//     vignettes : on touche celles à marquer.
-//
-// Les deux derniers se rattrapent par « Annuler ».
-//
-// La page fournit ses cartes et sa façon de se redessiner :
-//   installerSaisieRapide({
-//     toutes,      // () => toutes les cartes de la page
-//     affichees,   // () => celles que les filtres laissent voir
-//     rafraichir,  // () => redessine la grille
-//     ensemble,    // « de l'extension », « de cette page »
-//     sousTitre,   // carte => ce qui la distingue sous son nom (« #94 »)
-//     video,       // true : propose la lecture d'une vidéo (une extension)
-//   })
-//
-// Tout le fichier vit dans sa propre enveloppe : ses noms ne peuvent pas
-// écraser ceux des autres scripts. catalogue.js a déjà un normaliserNom() et
-// un cartesDuNom(), et un nom repris ici les remplaçait sur toute la page.
-// Seul installerSaisieRapide() en sort.
 (() => {
 
 const MEMOIRE_SAISIE = 'pokeclasseur-saisie-rapide';
@@ -43,24 +5,20 @@ const MEMOIRE_SAISIE = 'pokeclasseur-saisie-rapide';
 let saisieActive = false;
 let saisieTag = 'obt';
 let toutTag = 'obt';
-let saisiePage = null;   // { toutes, rafraichir }
+let saisiePage = null;
 
 function lireMemoireSaisie(){
   try{
     const m = JSON.parse(sessionStorage.getItem(MEMOIRE_SAISIE) || 'null');
     if(m && TAGS.includes(m.tag)){ saisieActive = !!m.active; saisieTag = m.tag; }
-  }catch(err){ /* mémoire indisponible : on démarre en mode normal */ }
+  }catch(err){ }
 }
 
-// Retenu le temps de la visite : passer à l'extension suivante ne doit pas
-// obliger à tout réactiver.
 function ecrireMemoireSaisie(){
   try{ sessionStorage.setItem(MEMOIRE_SAISIE, JSON.stringify({ active: saisieActive, tag: saisieTag })); }
-  catch(err){ /* sans mémoire, le mode tient jusqu'au changement de page */ }
+  catch(err){ }
 }
 
-// Les styles voyagent avec le script : chaque page qui l'accueille n'a qu'à
-// lui donner un emplacement.
 const STYLE_REMPLISSAGE = `
   .saisie-row{padding-bottom:28px;}
   .remplissage-btn{font-size:14px;font-weight:500;line-height:1.2;padding:10px 18px;border-radius:5px;cursor:pointer;border:1px solid rgba(var(--gold-rgb),0.55);background:rgba(var(--gold-rgb),0.12);color:var(--accent-clair);font-family:inherit;transition:.12s;}
@@ -94,8 +52,6 @@ const STYLE_REMPLISSAGE = `
   .groupe-tete span{color:var(--text-on-ink-dim)}
   .groupe-tete button{background:none;border:none;color:var(--accent-clair);font:inherit;cursor:pointer;padding:2px;text-decoration:underline;text-underline-offset:3px;}
   .groupe.rien{font-size:12.5px;color:var(--alerte);}
-  /* Les vignettes départagent des cartes de même nom (les quatre
-     Pikachu-ex) : seule l'illustration les distingue vraiment. */
   .vignettes{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;max-height:300px;overflow-y:auto;padding:2px;}
   .vignette{position:relative;display:flex;flex-direction:column;gap:4px;padding:4px;border-radius:7px;border:2px solid transparent;background:none;cursor:pointer;font:inherit;color:var(--text-on-ink);text-align:center;-webkit-tap-highlight-color:transparent;}
   .vignette img{width:100%;aspect-ratio:2.5/3.5;object-fit:contain;border-radius:4px;opacity:.4;filter:grayscale(.7);transition:opacity .12s,filter .12s;}
@@ -123,18 +79,15 @@ const STYLE_REMPLISSAGE = `
   .video-boutons{display:flex;gap:10px;flex-wrap:wrap;}
   .lien-video{background:none;border:none;color:var(--accent-clair);font:inherit;cursor:pointer;padding:2px;text-decoration:underline;text-underline-offset:3px;align-self:flex-start;}
   .resultat button,.pastille-saisie button{background:none;border:none;color:var(--accent-clair);font:inherit;font-weight:600;cursor:pointer;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;}
-  /* En saisie rapide, l'image d'une carte devient un bouton : celles qui
-     n'ont pas encore le marquage choisi s'estompent, celles qui l'ont
-     portent son symbole dans un coin. */
   body.saisie-rapide #content .card-img-wrap,
   body.saisie-rapide #content .card-img-wrap img{cursor:pointer}
   body.saisie-rapide[data-saisie-tag="obt"] .card-tile:not(:has(.tag-toggle.obt.active)) .card-img-wrap img,
   body.saisie-rapide[data-saisie-tag="rech"] .card-tile:not(:has(.tag-toggle.rech.active)) .card-img-wrap img,
   body.saisie-rapide[data-saisie-tag="ech"] .card-tile:not(:has(.tag-toggle.ech.active)) .card-img-wrap img{filter:grayscale(1);opacity:.45}
-  body.saisie-rapide .card-img-wrap::after{position:absolute;top:6px;right:6px;font-size:17px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));pointer-events:none}
-  body.saisie-rapide[data-saisie-tag="obt"] .card-tile:has(.tag-toggle.obt.active) .card-img-wrap::after{content:'✅'}
-  body.saisie-rapide[data-saisie-tag="rech"] .card-tile:has(.tag-toggle.rech.active) .card-img-wrap::after{content:'❤️'}
-  body.saisie-rapide[data-saisie-tag="ech"] .card-tile:has(.tag-toggle.ech.active) .card-img-wrap::after{content:'🔁'}
+  body.saisie-rapide .card-img-wrap::after{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:center/16px no-repeat;box-shadow:0 1px 3px rgba(0,0,0,.45);pointer-events:none}
+  body.saisie-rapide[data-saisie-tag="obt"] .card-tile:has(.tag-toggle.obt.active) .card-img-wrap::after{content:'';background-color:var(--marque-obt);background-image:${pictogrammeEnImage('obt', '#FFFFFF')}}
+  body.saisie-rapide[data-saisie-tag="rech"] .card-tile:has(.tag-toggle.rech.active) .card-img-wrap::after{content:'';background-color:var(--marque-rech);background-image:${pictogrammeEnImage('rech', '#FFFFFF')}}
+  body.saisie-rapide[data-saisie-tag="ech"] .card-tile:has(.tag-toggle.ech.active) .card-img-wrap::after{content:'';background-color:var(--marque-ech);background-image:${pictogrammeEnImage('ech', '#16213E')}}
   .pastille-saisie{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:49;display:flex;align-items:center;gap:14px;width:max-content;max-width:calc(100vw - 32px);background:var(--ink-soft);border:1px solid rgba(var(--gold-rgb),0.55);border-radius:999px;padding:9px 12px 9px 18px;font-size:13.5px;color:var(--text-on-ink);box-shadow:0 8px 28px rgba(0,0,0,.35);}
   .pastille-saisie[hidden]{display:none}
   body.saisie-rapide .bandeau-saisie{bottom:84px}
@@ -163,10 +116,6 @@ function poserStyleRemplissage(){
 const pluriel = (n, mot) => `${n} ${mot}${n > 1 ? 's' : ''}`;
 const LIBELLE_POSE = { obt: 'obtenue', rech: 'recherchée', ech: 'échangeable' };
 
-// --- la liste : des noms et des numéros ----------------------------------------
-// Un numéro de carte est fait d'un préfixe éventuel et d'un nombre : « 52 »,
-// « TG05 », « SWSH001 ». Deux numéros se comparent par leur préfixe, puis par
-// la valeur du nombre : « 7 », « 07 » et « 007 » désignent la même carte.
 function decouperNumero(texte){
   const m = String(texte).trim().match(/^([A-Za-z]*)0*(\d+)$/);
   return m ? { prefixe: m[1].toUpperCase(), nombre: Number(m[2]) } : null;
@@ -181,7 +130,6 @@ function cartesDuNumero(cartes, texte){
   });
 }
 
-// « 1-50 », « 1 à 50 », « TG01-TG10 » : les deux bornes partagent leur préfixe.
 function cartesDeLaPlage(cartes, debut, fin){
   const a = decouperNumero(debut), b = decouperNumero(fin);
   if(!a || !b || a.prefixe !== b.prefixe) return [];
@@ -192,17 +140,11 @@ function cartesDeLaPlage(cartes, debut, fin){
   });
 }
 
-// Majuscules, accents, tirets et points ne comptent pas : « pikachu ex »
-// trouve « Pikachu-ex », « ho oh » trouve « Ho-Oh ».
 function normaliserNom(texte){
   return String(texte).normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[\s\-–'’.]+/g, ' ').trim();
 }
 
-// Un nom désigne les cartes où il figure comme mot entier : « Mew » trouve
-// « Mew » et « Mew-ex », pas « Mewtwo » ; « Dracaufeu » trouve aussi
-// « Méga-Dracaufeu Y ex ». Faute de mieux, un morceau de nom (« pika »)
-// suffit.
 function cartesDuNom(cartes, texte){
   const voulu = normaliserNom(texte);
   if(!voulu) return [];
@@ -213,10 +155,6 @@ function cartesDuNom(cartes, texte){
 const MOTIF_PLAGE = /^([A-Za-z]*\d+)\s*(?:-|–|à)\s*([A-Za-z]*\d+)$/;
 const MOTIF_NUMERO = /^[A-Za-z]*\d+$/;
 
-// Les virgules, points-virgules et retours à la ligne séparent les éléments.
-// Des numéros peuvent aussi n'être séparés que par des espaces (« 52 60 70 »).
-// Ce qui ne donne rien comme numéro est cherché comme nom : « Porygon2 » a
-// l'allure d'un numéro, mais aucune carte ne porte ce numéro-là.
 function lireListe(cartes, texte){
   const elements = [];
   for(const brut of String(texte).split(/[,;\n]+/)){
@@ -224,8 +162,6 @@ function lireListe(cartes, texte){
     if(!element) continue;
     const plage = element.match(MOTIF_PLAGE);
     const mots = element.split(/\s+/);
-    // « precis » : un numéro ou une plage désignent exactement ce qu'on veut ;
-    // un nom peut en désigner plusieurs, parmi lesquelles on choisira.
     if(plage){
       elements.push({ texte: element, precis: true, plage: true, cartes: cartesDeLaPlage(cartes, plage[1], plage[2]) });
     }else if(mots.length > 1 && mots.every(m => MOTIF_NUMERO.test(m))
@@ -243,9 +179,6 @@ function lireListe(cartes, texte){
   return { elements, cartes: [...uniques.values()] };
 }
 
-// --- marquer un lot, et pouvoir revenir en arrière ---------------------------
-// Pose (sans basculer) un tag sur un lot de cartes. Renvoie de quoi annuler :
-// l'état de chaque carte avant le changement.
 function poserTag(cartes, tag){
   const lot = cartesDuLot(cartes, tag).filter(c => !tagState[c.id]?.[tag]);
   const avant = lot.map(c => [c.id, { ...(tagState[c.id] || emptyTagState()) }]);
@@ -290,14 +223,13 @@ function bandeauSaisie(message, annulation){
   minuteurBandeauSaisie = setTimeout(() => { bandeau.hidden = true; }, 9000);
 }
 
-// --- le bouton et la fenêtre ---------------------------------------------------
 function boutonsDeTag(classe, libelles){
-  return TAGS.map(t => `<button type="button" class="${classe}" data-tag="${t}">${TAG_META[t].emoji} ${libelles[t]}</button>`).join('');
+  return TAGS.map(t => `<button type="button" class="${classe}" data-tag="${t}">${pictogramme(t)}${libelles[t]}</button>`).join('');
 }
 
 function construireSaisieRapide(zone){
   zone.innerHTML = `
-    <button type="button" class="remplissage-btn" id="remplissage-ouvrir" aria-haspopup="dialog">⚡ Remplissage accéléré</button>
+    <button type="button" class="remplissage-btn" id="remplissage-ouvrir" aria-haspopup="dialog">${pictogramme('eclair')}Remplissage accéléré</button>
     <dialog class="remplissage" id="remplissage" aria-labelledby="remplissage-titre">
       <div class="remplissage-corps">
       <div class="remplissage-tete">
@@ -307,7 +239,7 @@ function construireSaisieRapide(zone){
       <p class="remplissage-intro">${saisiePage.video ? 'Cinq' : 'Quatre'} façons de remplir ton classeur sans passer carte par carte.</p>
 
       <section class="encart" aria-labelledby="encart-lot">
-        <h3 id="encart-lot">📚 Marquer d'un coup <span id="remplissage-lot-nombre"></span></h3>
+        <h3 id="encart-lot">${pictogramme('pile')} Marquer d'un coup <span id="remplissage-lot-nombre"></span></h3>
         <p>Pose un marquage sur toutes les cartes affichées, en tenant compte de tes filtres. Si elles le portent déjà toutes, il leur est retiré.</p>
         <div class="encart-choix" role="group" aria-label="Marquer les cartes affichées">
           ${boutonsDeTag('lot-tag', { obt: 'Obtenues', rech: 'Recherchées', ech: 'Échangeables' })}
@@ -316,7 +248,7 @@ function construireSaisieRapide(zone){
 
       ${saisiePage.video ? `
       <section class="encart" aria-labelledby="encart-video">
-        <h3 id="encart-video">🎬 Depuis une vidéo du jeu</h3>
+        <h3 id="encart-video">${pictogramme('video')} Depuis une vidéo du jeu</h3>
         <p>Dans Pokémon TCG Pocket, ouvre ta Collection, active « Tout afficher » et place-toi sur le titre de cette extension. Lance l'enregistrement de l'écran de ton téléphone, fais défiler jusqu'à la dernière carte, puis choisis la vidéo ici.</p>
         <p class="encart-note">La vidéo est lue sur ton appareil : elle n'est envoyée nulle part.</p>
         <label class="encart-action" for="remplissage-video" id="remplissage-video-bouton">Choisir la vidéo</label>
@@ -325,7 +257,7 @@ function construireSaisieRapide(zone){
       </section>
 ` : ''}
       <section class="encart" aria-labelledby="encart-saisie">
-        <h3 id="encart-saisie">⚡ Saisie rapide</h3>
+        <h3 id="encart-saisie">${pictogramme('eclair')} Saisie rapide</h3>
         <p>Touche une carte pour la marquer, touche-la de nouveau pour la décocher : plus besoin des petits boutons sous chaque carte.</p>
         <div class="encart-choix" role="group" aria-label="Ce que marque un toucher">
           <span>Un toucher marque :</span>
@@ -335,7 +267,7 @@ function construireSaisieRapide(zone){
       </section>
 
       <section class="encart" aria-labelledby="encart-tout">
-        <h3 id="encart-tout">✅ Tout marquer d'un coup, sauf…</h3>
+        <h3 id="encart-tout">${pictogramme('tout')} Tout marquer d'un coup, sauf…</h3>
         <p>Toutes les cartes ${saisiePage.ensemble} reçoivent le marquage choisi. Ensuite, tu touches celles qui font exception pour le leur retirer.</p>
         <div class="encart-choix" role="group" aria-label="Le marquage à poser partout">
           <span>Tout marquer :</span>
@@ -345,7 +277,7 @@ function construireSaisieRapide(zone){
       </section>
 
       <section class="encart" aria-labelledby="encart-liste">
-        <h3 id="encart-liste"><label for="remplissage-liste">🔎 Par Pokémon / numéro</label></h3>
+        <h3 id="encart-liste"><label for="remplissage-liste">${pictogramme('loupe')} Par Pokémon / numéro</label></h3>
         <p>Tape des noms ou des numéros, séparés par des virgules, puis touche les cartes à marquer.</p>
         <input type="text" id="remplissage-liste" placeholder="ex. Pikachu, Dracaufeu, 1-50, 52"
                autocomplete="off" spellcheck="false" enterkeyhint="done">
@@ -377,29 +309,20 @@ function majSaisieRapide(){
     b.classList.toggle('on', b.dataset.tag === toutTag);
     b.setAttribute('aria-pressed', String(b.dataset.tag === toutTag));
   });
-  // Le décompte suit le marquage : en « échangeable », les cartes que Pocket
-  // interdit d'échanger ne seront pas touchées.
   const tout = document.getElementById('remplissage-tout');
   if(tout) tout.textContent = `Tout marquer « ${LIBELLE_POSE[toutTag]} » (${pluriel(cartesDuLot(saisiePage.toutes(), toutTag).length, 'carte')})`;
-  // Même formule que l'ancienne ligne de la page : « les 286 cartes », ou
-  // « les 12 cartes affichées » quand un filtre en cache une partie.
   const lotNombre = document.getElementById('remplissage-lot-nombre');
   if(lotNombre){
     const n = saisiePage.affichees().length;
     lotNombre.textContent = n === saisiePage.toutes().length ? `les ${pluriel(n, 'carte')}` : `les ${pluriel(n, 'carte')} ${n > 1 ? 'affichées' : 'affichée'}`;
   }
-  // Un marquage que toutes les cartes affichées portent déjà se retire : le
-  // bouton le dit avant qu'on clique.
   document.querySelectorAll('.lot-tag').forEach(b => {
     const lot = saisiePage.affichees();
     const retrait = leLotRetire(lot, b.dataset.tag);
     b.disabled = cartesDuLot(lot, b.dataset.tag).length === 0;
-    b.textContent = `${TAG_META[b.dataset.tag].emoji} ${retrait ? 'Retirer « ' + LIBELLE_POSE[b.dataset.tag] + ' »' : { obt: 'Obtenues', rech: 'Recherchées', ech: 'Échangeables' }[b.dataset.tag]}`;
+    b.innerHTML = `${pictogramme(b.dataset.tag)}${retrait ? 'Retirer « ' + LIBELLE_POSE[b.dataset.tag] + ' »' : { obt: 'Obtenues', rech: 'Recherchées', ech: 'Échangeables' }[b.dataset.tag]}`;
   });
 
-  // Le bouton du haut défile hors de vue : la pastille, elle, reste en bas
-  // de l'écran tant que le mode est actif, pour qu'on sache pourquoi un
-  // toucher n'agrandit plus la carte, et comment en sortir.
   let pastille = document.getElementById('pastille-saisie');
   if(saisieActive && !pastille){
     pastille = document.createElement('div');
@@ -413,7 +336,7 @@ function majSaisieRapide(){
   }
   if(pastille){
     pastille.hidden = !saisieActive;
-    pastille.innerHTML = `<span>⚡ Saisie rapide : un toucher marque ${TAG_META[saisieTag].emoji} ${TAG_META[saisieTag].label}</span>
+    pastille.innerHTML = `<span>${pictogramme('eclair')} Saisie rapide · un toucher marque ${pictogramme(saisieTag)} ${TAG_META[saisieTag].label}</span>
       <button type="button" data-terminer>Terminer</button>`;
   }
 }
@@ -436,9 +359,6 @@ function fermerRemplissage(){
   document.getElementById('remplissage').close();
 }
 
-// Refermer la fenêtre arrête une lecture en cours : sans quoi elle tournerait
-// pour rien, et son message de validation apparaîtrait sans personne pour le
-// lire.
 function quandLaFenetreSeFerme(){
   if(lectureEnCours){ lectureEnCours.abort(); lectureEnCours = null; }
   if(document.getElementById('video-etat')){
@@ -450,19 +370,12 @@ function quandLaFenetreSeFerme(){
   }
 }
 
-// --- la vidéo ---------------------------------------------------------------------
-// Les numéros de la vidéo sont ceux des cartes de l'extension : la case 52
-// est la carte #52.
 function cartesParNumero(){
   const parNumero = new Map();
   saisiePage.toutes().forEach(c => { const n = Number(c.localId); if(Number.isInteger(n)) parNumero.set(n, c); });
   return parNumero;
 }
 
-// Le compteur du jeu, avec ses trois familles : les diamants (« 311/402 »),
-// les étoiles et les chromatiques (l'étincelle). Les couronnes n'ont pas de
-// case à elles dans ce compteur : on les range avec les étoiles, à revoir le
-// jour où une vidéo montrera une couronne possédée.
 function compteurCommeLeJeu(possedees, parNumero){
   const famille = r => !r ? null : /Diamant/i.test(r) ? 'd' : /Chromatique/i.test(r) ? 's' : 'e';
   const total = { d: 0, e: 0, s: 0 }, vus = { d: 0, e: 0, s: 0 };
@@ -470,7 +383,7 @@ function compteurCommeLeJeu(possedees, parNumero){
   parNumero.forEach(c => { const f = famille(c.rarity); if(f) total[f]++; else sansRarete = true; });
   possedees.forEach(n => { const f = famille(parNumero.get(n)?.rarity); if(f) vus[f]++; });
   if(sansRarete) return `${pluriel(possedees.length, 'carte')} sur ${parNumero.size}`;
-  return `◆ ${vus.d}/${total.d} · ★ ${vus.e} · ✨ ${vus.s}`;
+  return `◆ ${vus.d}/${total.d} · ★ ${vus.e} · ✦ ${vus.s}`;
 }
 
 function plagesLisibles(ns){
@@ -484,8 +397,8 @@ function plagesLisibles(ns){
   return out.join(', ');
 }
 
-let lectureEnCours = null;   // AbortController de la lecture en cours
-let propositionVideo = null; // ce que « Valider » appliquera
+let lectureEnCours = null;
+let propositionVideo = null;
 
 function etatVideo(html){
   const etat = document.getElementById('video-etat');
@@ -536,8 +449,6 @@ async function lireLaVideo(fichier){
   }
 }
 
-// Le message de validation : le compteur du jeu, tel que la vidéo le montre,
-// à côté de ce que PokéClasseur a lu, et ce que « Valider » va changer.
 function proposerVideo(res, parNumero){
   const ajouts = [], retraits = [];
   res.possedees.forEach(n => { const c = parNumero.get(n); if(c && !tagState[c.id]?.obt) ajouts.push(c); });
@@ -587,9 +498,6 @@ function validerVideo(){
     () => restaurer(avant));
 }
 
-// La confirmation se pose au-dessus de la fenêtre (confirmation.js sait
-// se placer dans une fenêtre modale ouverte). La grille est relue une seule
-// fois : marquer un autre lot que celui annoncé serait une mauvaise surprise.
 async function marquerLeLot(tag){
   const lot = saisiePage.affichees();
   if(!(await confirmerMarquageGroupe(lot, tag))) return;
@@ -609,12 +517,6 @@ function toutSauf(){
     + 'Touche maintenant celles qui font exception.', () => restaurer(avant));
 }
 
-// Ce que la liste désigne en ce moment, et ce qu'on en retient. Une plage
-// est précise : ses cartes sont retenues d'emblée. Un nom peut en désigner
-// plusieurs (« Pikachu » : la carte simple et quatre Pikachu-ex), un numéro
-// aussi sur la page d'un Pokémon, où chaque extension a son « 94 » : rien
-// n'est retenu d'office, sauf s'il n'en trouve qu'une, et l'on touche les
-// vignettes pour choisir.
 let listeCourante = { elements: [], cartes: [] };
 const selection = new Set();
 const elementsConnus = new Set();
@@ -623,8 +525,6 @@ function majApercu(){
   const champ = document.getElementById('remplissage-liste');
   listeCourante = lireListe(saisiePage.toutes(), champ.value);
   const { elements, cartes } = listeCourante;
-  // Le choix par défaut ne s'applique qu'à un élément nouveau : continuer à
-  // taper ne doit pas défaire ce qu'on vient de choisir plus haut.
   const presents = new Set(elements.map(e => e.texte));
   [...elementsConnus].forEach(t => { if(!presents.has(t)) elementsConnus.delete(t); });
   for(const e of elements){
@@ -667,8 +567,6 @@ function dessinerApercu(){
   majSelection();
 }
 
-// Une sélection qui change ne redessine pas l'aperçu : les vignettes
-// gardent leur image et la liste ne saute pas sous le doigt.
 function majSelection(){
   const retenues = listeCourante.cartes.filter(c => selection.has(c.id)).length;
   document.querySelectorAll('.marquer-tag').forEach(b => { b.disabled = retenues === 0; });
@@ -711,9 +609,6 @@ function marquerLaListe(tag){
   majApercu();
 }
 
-// --- le toucher sur une carte ------------------------------------------------
-// Écouté en phase de capture, avant celui de cards.js qui agrandit la carte :
-// en saisie rapide, le toucher coche, et l'agrandissement n'a pas lieu.
 function toucherCarte(e){
   if(!saisieActive) return;
   const image = e.target.closest('#content .card-tile .card-img-wrap');
@@ -738,7 +633,6 @@ function installerSaisieRapide(page){
     sousTitre: c => `#${c.localId}`,
     ...page,
   };
-  // Seul l'écran Collection de Pokémon TCG Pocket sait se lire en vidéo.
   saisiePage.video = Boolean(page.video && typeof window.lireVideoCollection === 'function'
     && typeof estPocket === 'function' && estPocket());
   poserStyleRemplissage();
@@ -750,9 +644,6 @@ function installerSaisieRapide(page){
   const fenetre = document.getElementById('remplissage');
   document.getElementById('remplissage-ouvrir').addEventListener('click', ouvrirRemplissage);
   fenetre.querySelector('.remplissage-fermer').addEventListener('click', fermerRemplissage);
-  // Un clic sur le voile, autour de la fenêtre, la referme. Le contenu vit
-  // dans une enveloppe : un clic dans la fenêtre ne vise jamais la fenêtre
-  // elle-même.
   fenetre.addEventListener('click', (e) => { if(e.target === fenetre) fermerRemplissage(); });
   fenetre.addEventListener('close', quandLaFenetreSeFerme);
   document.getElementById('remplissage-video')?.addEventListener('change', (e) => {
@@ -811,7 +702,6 @@ function installerSaisieRapide(page){
 
   const champ = document.getElementById('remplissage-liste');
   champ.addEventListener('input', majApercu);
-  // Entrée marque « obtenue » : le geste le plus courant.
   champ.addEventListener('keydown', (e) => {
     if(e.key === 'Enter'){ e.preventDefault(); marquerLaListe('obt'); }
   });

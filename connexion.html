@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>Mon compte - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,11 +41,6 @@
   label{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:16px 0 6px;}
   input{width:100%;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   input:focus{outline:none;border-color:rgba(var(--gold-rgb),0.5)}
-  /* La case n'est jamais pré-cochée : un consentement pré-coché n'en est
-     pas un, et ne prouve rien. Les liens s'ouvrent dans un nouvel onglet
-     pour qu'on ne perde pas ce qu'on vient de saisir. */
-  /* Séparée du reste par un trait et par sa couleur : on ne tombe pas sur ce
-     bouton en visant « Enregistrer ». */
   .danger-zone{margin-top:40px;padding-top:24px;border-top:1px solid rgba(192,57,43,0.35)}
   .danger-zone h2{font-family:'Newsreader',serif;font-size:18px;font-weight:500;
                   color:var(--alerte);margin:0 0 8px;}
@@ -102,17 +97,6 @@
   .zone-msg.ok{color:var(--succes)}
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -157,18 +141,18 @@
   <footer data-note="Ton compte sert à retrouver ta collection sur tous tes appareils et à te mettre en relation avec d'autres collectionneurs."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="tags.js?v=2026-10-25-zimk"></script>
-<script src="localisation.js?v=2026-10-25-zimk"></script>
-<script src="confirmation.js?v=2026-10-25-zimk"></script>
-<script src="photo-profil.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
-<script src="messagerie.js?v=2026-10-25-zimk"></script>
-<script src="communaute.js?v=2026-10-25-zimk"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="tags.js?v=2026-10-25-hgmz"></script>
+<script src="localisation.js?v=2026-10-25-hgmz"></script>
+<script src="confirmation.js?v=2026-10-25-hgmz"></script>
+<script src="photo-profil.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
+<script src="messagerie.js?v=2026-10-25-hgmz"></script>
+<script src="communaute.js?v=2026-10-25-hgmz"></script>
 <script>
 let ongletActif = 'connexion';
 let motDePasseOublie = false;
@@ -185,18 +169,14 @@ function rendre(){
 
   if(CONFIG_MANQUANTE){
     panel.innerHTML = `
-      <div class="kicker">Compte</div>
       <h1>Base de données à configurer</h1>
       <p class="intro">Les comptes ont besoin d'une base en ligne. Renseigne l'adresse et la clé publique de ton projet Supabase dans le fichier <code>supabase-config.js</code>, puis recharge cette page.</p>
     `;
     return;
   }
 
-  // Arrivée depuis un lien de réinitialisation : la session ouverte ne sert
-  // qu'à cela, on ne montre donc rien d'autre.
   if(enRecuperation()){
     panel.innerHTML = `
-      <div class="kicker">Compte</div>
       <h1>Nouveau mot de passe</h1>
       <p class="intro">Choisis un nouveau mot de passe. Tu seras connecté dans la foulée.</p>
 
@@ -212,12 +192,9 @@ function rendre(){
     return;
   }
 
-  // Connecté mais sans profil : il reste à choisir un pseudo, ce qui arrive
-  // quand l'inscription est passée par une confirmation d'e-mail.
   if(profilAcreer()){
     const attendu = pseudoEnAttente() ?? {};
     panel.innerHTML = `
-      <div class="kicker">Compte</div>
       <h1>Choisis ton pseudo</h1>
       <p class="intro">Dernière étape : c'est le nom que verront les autres collectionneurs.</p>
 
@@ -244,7 +221,6 @@ function rendre(){
   panel.classList.toggle('panel-profil', estConnecte());
   if(estConnecte()){
     panel.innerHTML = `
-      <div class="kicker">Profil</div>
       <h1>Mon profil</h1>
       <div class="compte-actuel">
         <div class="pseudo">${profil?.pseudo ?? 'Membre'}</div>
@@ -299,7 +275,6 @@ function rendre(){
 
   if(motDePasseOublie){
     panel.innerHTML = `
-      <div class="kicker">Compte</div>
       <h1>Mot de passe oublié</h1>
       <p class="intro">Indique ton adresse e-mail : tu recevras un lien pour en choisir un nouveau.</p>
 
@@ -318,7 +293,6 @@ function rendre(){
 
   const inscription = ongletActif === 'inscription';
   panel.innerHTML = `
-    <div class="kicker">Compte</div>
     <h1>${inscription ? 'Créer un compte' : 'Se connecter'}</h1>
     <p class="intro">${inscription
       ? 'Ton classeur te suivra sur tous tes appareils, et les autres collectionneurs pourront te proposer des échanges.'
@@ -384,8 +358,6 @@ async function valider(){
     afficherMessage('Choisis un pseudo : c\'est ce que verront les autres collectionneurs.', 'err');
     return;
   }
-  // Sans accord, pas de compte : c'est la seule preuve qu'on ait que les
-  // conditions ont été portées à la connaissance du membre.
   if(inscription && !document.getElementById('accord').checked){
     afficherMessage("Il faut accepter les conditions d'utilisation et la politique de confidentialité pour créer un compte.", 'err');
     return;
@@ -410,8 +382,6 @@ async function valider(){
   }
 }
 
-// Les messages de Supabase sont en anglais et techniques : on traduit les cas
-// courants, et on garde le message d'origine pour les autres.
 function messageLisible(err){
   const texte = err?.message ?? String(err);
   if(/Invalid login credentials/i.test(texte)) return 'Adresse e-mail ou mot de passe incorrect.';
@@ -425,10 +395,6 @@ function messageLisible(err){
   return texte;
 }
 
-// Zone d'échange. Le membre choisit une commune ; le site n'en retient que le
-// point central, et n'en montre aux autres qu'un département et une distance
-// approximative. C'est dit noir sur blanc dans le formulaire : on ne demande
-// pas sa position à quelqu'un sans lui dire ce qui en sera fait.
 let communesTrouvees = [];
 
 function afficherZone(){
@@ -530,9 +496,6 @@ document.addEventListener('click', async (e) => {
   }
 });
 
-// Ce que les autres voient de toi (chiffres, badges, avis reçus), avec,
-// en plus, les badges qui restent à gagner. Tant que la base n'a pas reçu
-// supabase/communaute.sql, la page s'en passe sans rien dire.
 async function afficherVitrine(){
   const zone = document.getElementById('vitrine-profil');
   if(!zone || typeof vitrineHtml !== 'function') return;
@@ -546,8 +509,6 @@ async function afficherVitrine(){
   }
 }
 
-// Membres bloqués : la fenêtre de blocage annonce que c'est réversible, il
-// faut donc que ça le soit réellement.
 async function afficherBloques(){
   const zone = document.getElementById('bloques');
   if(!zone) return;
@@ -593,8 +554,6 @@ async function demanderLien(){
   bouton.textContent = 'Envoi…';
   try{
     await envoyerLienReinitialisation(email);
-    // On ne révèle pas si l'adresse correspond à un compte : ce serait dire à
-    // un inconnu qui est inscrit ici.
     afficherMessage("Si un compte existe avec cette adresse, un lien vient d'y être envoyé. Pense à regarder tes courriers indésirables.", 'ok');
   }catch(err){
     afficherMessage(messageLisible(err), 'err');
@@ -650,9 +609,6 @@ async function enregistrerProfil(){
   }
 }
 
-// Deux barrières avant l'irréversible : une fenêtre qui dit ce qui va
-// disparaître, puis son pseudo à recopier. Recopier son propre pseudo oblige
-// à lire, ce qu'un second « êtes-vous sûr ? » n'obtient plus de personne.
 async function supprimerCompte(){
   const pseudo = profil?.pseudo ?? '';
   const accord = await demanderConfirmation({

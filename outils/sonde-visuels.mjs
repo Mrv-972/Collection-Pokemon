@@ -1,23 +1,4 @@
 #!/usr/bin/env node
-//
-// Sonde de visuels français
-// =========================
-//
-// Elle ne publie rien et ne modifie rien. Elle pose une seule question, pour
-// chaque source listée dans sources-visuels.json :
-//
-//     « cette adresse répond-elle, et l'image qu'elle renvoie est-elle
-//       vraiment différente de la version anglaise qu'on a déjà ? »
-//
-// La deuxième moitié de la question est la plus importante. On s'est déjà
-// fait avoir une fois : un dépôt annonçait des visuels par langue, et servait
-// en réalité le même fichier anglais derrière neuf adresses différentes. Une
-// adresse qui répond « 200 OK » ne prouve donc rien du tout ; deux empreintes
-// identiques, si.
-//
-// À lancer depuis GitHub Actions (onglet Actions → « Sonder les visuels
-// français ») : c'est un serveur, il atteint tout Internet, contrairement au
-// navigateur qui affiche le site.
 
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -30,15 +11,11 @@ const args = Object.fromEntries(
 );
 
 const DONNEES = args.donnees ?? 'donnees';
-const ECHANTILLON = Number(args.echantillon ?? 3);   // cartes testées par extension
-const TOUTES = Boolean(args.toutes);                 // sonder aussi les sources déjà actives
+const ECHANTILLON = Number(args.echantillon ?? 3);
+const TOUTES = Boolean(args.toutes);
 
-// Le nom que la source d'origine donne aux extensions promotionnelles.
 const CODES_DISTANTS = { 'P-A': 'PROMO-A', 'P-B': 'PROMO-B' };
 
-// Beaucoup de sites refusent sèchement une requête sans identité. On se
-// présente donc, honnêtement : le nom du projet et son adresse, pour que
-// l'administrateur d'en face sache qui l'interroge et puisse nous écrire.
 const IDENTITE = {
   'User-Agent': 'PokeClasseur/1.0 (+https://github.com/Mrv-972/Collection-Pokemon)',
   'Accept-Language': 'fr-FR,fr;q=0.9',
@@ -58,10 +35,6 @@ async function corps(adresse){
   };
 }
 
-// Une image peut très bien différer de notre témoin tout en étant anglaise :
-// c'est le cas quand la source sert la MÊME illustration en petit format. Les
-// octets diffèrent, l'illustration non. Seule l'adresse le dit, et elle le
-// dit souvent : « B3_001_EN_SM.webp ».
 function marqueurDeLangue(adresse){
   const m = String(adresse).match(/[_\-\/](en|en_US|english|ja|jp|zh|ko|de|es|it|pt|fr|fr_FR|french)[_\-\.\/]/i);
   return m ? m[1].toLowerCase() : null;
@@ -77,16 +50,12 @@ function remplacer(gabarit, { set, numero }){
     .replaceAll('{NUM}', String(numero));
 }
 
-// --------------------------------------------------- ce qui nous manque ---
-
 async function extensionsAmputees(){
   const extensions = JSON.parse(await readFile(`${DONNEES}/pocket/extensions.json`, 'utf8'));
   const manquantes = [];
   for(const ext of extensions.filter(e => e.visuelsAnglais)){
     const cartes = JSON.parse(await readFile(`${DONNEES}/pocket/sets/${ext.id}.json`, 'utf8'));
     if(!cartes.length) continue;
-    // On prend des cartes réparties sur toute l'extension, pas les trois
-    // premières : une source peut très bien n'avoir traduit que le début.
     const pas = Math.max(1, Math.floor(cartes.length / ECHANTILLON));
     const echantillon = [];
     for(let i = 0; i < cartes.length && echantillon.length < ECHANTILLON; i += pas){
@@ -97,11 +66,6 @@ async function extensionsAmputees(){
   return manquantes;
 }
 
-// ------------------------------------------- les visuels anglais témoins ---
-//
-// Pour pouvoir dire « c'est la même image », il faut d'abord connaître
-// l'image anglaise. On la télécharge une fois par carte testée.
-
 async function temoins(manquantes){
   const par = new Map();
   for(const ext of manquantes){
@@ -110,13 +74,11 @@ async function temoins(manquantes){
       try{
         const r = await corps(adresse);
         if(r.empreinte) par.set(carte.id, r);
-      }catch(err){ /* pas de témoin : on le dira au moment de comparer */ }
+      }catch(err){ }
     }
   }
   return par;
 }
-
-// ------------------------------------------------------ les deux genres ---
 
 async function sonderMotif(candidat, ext, anglais){
   const lignes = [];
@@ -128,7 +90,6 @@ async function sonderMotif(candidat, ext, anglais){
 
     if(r.statut !== 200){ lignes.push({ carte: carte.id, verdict: `HTTP ${r.statut}` }); continue; }
     if(!/image\//.test(r.type)){
-      // Beaucoup de sites répondent 200 avec une page « introuvable ».
       lignes.push({ carte: carte.id, verdict: 'pas une image', detail: r.type });
       continue;
     }
@@ -167,17 +128,10 @@ async function sonderPage(candidat, ext, anglais){
   for(const m of texte.matchAll(motif)) trouvees.set(String(Number(m[1])), m[0]);
 
   if(!trouvees.size){
-    // Plutôt que de conclure « rien », on montre ce que la page contient
-    // vraiment : c'est ce qui permet de corriger le motif de recherche au
-    // lieu de le deviner une deuxième fois.
     const images = [...new Set(
       [...texte.matchAll(/https?:\/\/[^\s"'\\]+\.(?:webp|png|jpg|jpeg)/g)].map(m => m[0])
     )].slice(0, 8);
 
-    // Beaucoup de sites modernes ne mettent pas les images dans le HTML :
-    // ils livrent un bloc de données que le navigateur dessine ensuite. Ce
-    // bloc est une bien meilleure source qu'une page : autant regarder s'il
-    // est là avant de conclure que la piste est morte.
     const pistes = [];
     if(/__NEXT_DATA__/.test(texte))  pistes.push('bloc __NEXT_DATA__ présent (site Next.js)');
     if(/__NUXT__/.test(texte))       pistes.push('bloc __NUXT__ présent (site Nuxt)');
@@ -213,8 +167,6 @@ async function sonderPage(candidat, ext, anglais){
   }
   return lignes;
 }
-
-// ---------------------------------------------------------------- sonde ---
 
 async function principal(){
   const config = JSON.parse(await readFile('outils/sources-visuels.json', 'utf8'));

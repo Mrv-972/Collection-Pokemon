@@ -1,32 +1,3 @@
-// Carte par carte : le visuel s'affiche-t-il vraiment ?
-// =====================================================
-//
-// Cet outil remplace la sonde de couverture, qui se trompait. Elle
-// RECALCULAIT les adresses à tester au lieu de lire celles de l'instantané,
-// et n'en échantillonnait que huit par extension. Elle a ainsi déclaré
-// muettes le Set de Base, Jungle et Fossile, dont 93, 64 et 60 cartes
-// s'affichent parfaitement. Une erreur qui marche dans les deux sens : elle
-// a pu tout aussi bien déclarer saines des extensions qui ont des trous.
-//
-// Ici, aucun calcul d'adresse et aucun échantillon : on demande, pour
-// CHAQUE carte, si l'adresse que le site sert réellement répond. Une
-// requête d'en-tête, qui ne télécharge aucune image.
-//
-// L'ordre suit celui du site, pour que le verdict soit celui que voit un
-// visiteur :
-//   1. un fichier dans le dépôt ? alors rien à demander, c'est bon ;
-//   2. sinon l'adresse principale (`image`) répond-elle ?
-//   3. sinon le secours (`imageSecours`) ?
-//   4. sinon le visiteur voit un point d'interrogation.
-//
-// Le secours est compté PAR LANGUE. Les mélanger disait « cette extension
-// est complète » d'une série affichée en anglais, ce qui est précisément
-// ce que Mrv972 ne veut pas. Une carte servie en anglais n'est pas une
-// carte réglée : c'est une carte dont il reste à trouver le visuel
-// français.
-//
-//   node outils/verifier-visuels.mjs [--sortie donnees] [--largeur 16]
-
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 
@@ -36,9 +7,6 @@ const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
 
 const sortie = typeof args.sortie === 'string' ? args.sortie : null;
 const largeur = Number(args.largeur ?? 16);
-// Reprendre une vérification : on ne refait que les extensions qui avaient
-// des cartes indécises. Un indécis n'est pas une absence : c'est un hoquet
-// de réseau, et le compter comme manquant gonflerait le chiffre.
 const reprendre = typeof args.reprendre === 'string' ? args.reprendre : null;
 const DOSSIER = 'images/cards';
 const IDENTITE = { 'User-Agent': 'PokeClasseur/1.0 (verification des visuels)' };
@@ -46,8 +14,6 @@ const IDENTITE = { 'User-Agent': 'PokeClasseur/1.0 (verification des visuels)' }
 const aDejaUnFichier = id => ['.webp', '.png', '.jpg', '.jpeg']
   .some(ext => existsSync(`${DOSSIER}/${id}${ext}`));
 
-// Un échec de réseau n'est pas une absence : on réessaie avant de conclure,
-// sinon un hoquet passerait pour une carte manquante.
 async function repond(adresse){
   if(!/^https?:/.test(adresse ?? '')) return false;
   for(let essai = 0; essai < 3; essai++){
@@ -58,15 +24,11 @@ async function repond(adresse){
         continue;
       }
       if(r.ok) return true;
-      // Un serveur peut refuser l'en-tête seul et servir l'image : un
-      // navigateur, lui, demande l'image. Avant de conclure à une absence,
-      // on fait comme lui. Sinon la vérification compterait manquante une
-      // carte que le visiteur voit très bien.
       const g = await fetch(adresse, { method: 'GET', redirect: 'follow', headers: IDENTITE });
       await g.body?.cancel?.();
       return g.ok;
     }catch{
-      if(essai === 2) return null;   // indécis, et on le dira
+      if(essai === 2) return null;
       await new Promise(r2 => setTimeout(r2, 1200 * (essai + 1)));
     }
   }
@@ -85,13 +47,8 @@ async function parPaquets(taches, n, faire){
   return sortie;
 }
 
-// ------------------------------------------------- ce qu'on vérifie -------
 const extensions = JSON.parse(await readFile('donnees/physique/extensions.json', 'utf8'));
 
-// En reprise, on relit le verdict précédent pour savoir où chercher. Les
-// identifiants des indécises n'y figuraient pas au premier passage : on
-// reprend donc toutes les cartes des extensions concernées, ce qui est
-// large mais sûr, et le fichier les notera pour la prochaine fois.
 let aReprendre = null, precedent = null;
 if(reprendre){
   precedent = JSON.parse(await readFile(reprendre, 'utf8'));
@@ -112,35 +69,23 @@ for(const ext of extensions){
 }
 console.log(`${toutes.length} cartes physiques à vérifier, ${extensions.length} extensions.\n`);
 
-// La langue lue sur les images, quand elle l'a été.
 let langues = {};
 try{ langues = JSON.parse(await readFile('donnees/langue-visuels.json', 'utf8')).verdicts ?? {}; }catch{}
 const langueLue = adresse => !adresse ? undefined : langues[adresse]?.langue
   ?? langues[/[?&]class=/.test(adresse) ? adresse : `${adresse}${adresse.includes('?') ? '&' : '?'}class=md`]?.langue;
-// Et pour les fichiers copiés dans le dépôt, sous leur identifiant.
 const depotEnAnglais = id => langues[`depot:${id}`]?.langue === 'en';
 
 let faites = 0;
 const verdicts = await parPaquets(toutes, largeur, async carte => {
   let etat;
-  // Un fichier du dépôt lu en anglais n'est servi que faute de mieux :
-  // l'instantané le laisse quand un scan français existe, et la carte
-  // désigne alors une adresse distante : c'est elle qu'on vérifie.
   const servieDuDepot = aDejaUnFichier(carte.id) && (!depotEnAnglais(carte.id) || !/^https?:/.test(carte.image ?? ''));
   if(servieDuDepot) etat = depotEnAnglais(carte.id) ? 'secoursAnglais' : 'depot';
   else {
     const principal = await repond(carte.image);
-    // Même l'adresse française de TCGdex peut servir une image anglaise
-    // (Skyridge, vu sur planche) : quand son texte a été lu, la lecture
-    // tranche. La version lue est la haute définition de la même image.
     const principalLu = langueLue(carte.image) ?? langueLue(String(carte.image ?? '').replace('/low.webp', '/high.webp'));
     if(principal === true) etat = principalLu === 'en' ? 'secoursAnglais' : 'principal';
     else {
       const secours = await repond(carte.imageSecours);
-      // D'où vient ce secours ? PkmCards est français ; une adresse
-      // TCGdex portant « /en/ » est anglaise. Et quand le texte de l'image
-      // a été lu (outils/langue-visuels.mjs), c'est la lecture qui tranche :
-      // un site français peut servir le scan anglais d'une carte.
       if(secours === true)
         etat = /\/en\//.test(carte.imageSecours) || langueLue(carte.imageSecours) === 'en'
           ? 'secoursAnglais' : 'secoursFrancais';
@@ -153,7 +98,6 @@ const verdicts = await parPaquets(toutes, largeur, async carte => {
   return { ...carte, etat };
 });
 
-// ------------------------------------------------- le bilan ---------------
 const compte = { depot: 0, principal: 0, secoursFrancais: 0, secoursAnglais: 0,
                  manquant: 0, indecis: 0 };
 const parExtension = new Map();
@@ -167,10 +111,7 @@ for(const v of verdicts){
   const e = parExtension.get(v.extension);
   e.total++; e[v.etat]++;
   if(v.etat === 'manquant') e.cartesManquantes.push({ id: v.id, nom: v.name });
-  // Les noter : au premier passage je ne gardais que leur nombre, et une
-  // reprise ciblée devenait impossible.
   if(v.etat === 'indecis') e.cartesIndecises.push({ id: v.id, nom: v.name });
-  // Les noter : ce sont les prochaines à chercher en français.
   if(v.etat === 'secoursAnglais') e.cartesAnglaises.push({ id: v.id, nom: v.name });
 }
 
@@ -183,8 +124,6 @@ console.log(`SERVI EN ANGLAIS        : ${compte.secoursAnglais} (${pc(compte.sec
 console.log(`AUCUN VISUEL            : ${compte.manquant} (${pc(compte.manquant)})`);
 console.log(`indécis (réseau)        : ${compte.indecis} (${pc(compte.indecis)})`);
 
-// Ce qui n'est pas en français : les absentes ET les anglaises. C'est ce
-// total-là qui dit ce qu'il reste à faire.
 const pasEnFrancais = compteFinalProvisoire =>
   (compteFinalProvisoire.manquant ?? 0) + (compteFinalProvisoire.secoursAnglais ?? 0);
 console.log(`\nPAS EN FRANÇAIS         : ${pasEnFrancais(compte)}` +
@@ -212,8 +151,6 @@ if(troues.length > 30)
   console.log(`  … et ${troues.length - 30} autres, ` +
     `${troues.slice(30).reduce((s, [, e]) => s + e.manquant, 0)} cartes`);
 
-// En reprise, le verdict ne porte que sur quelques extensions : l'écrire
-// tel quel effacerait tout le reste. On le fusionne.
 let extensionsFinales = Object.fromEntries(parExtension);
 let compteFinal = compte;
 let totalFinal = toutes.length;
@@ -237,8 +174,6 @@ if(sortie){
   const fichier = `${sortie}/verification-visuels.json`;
   await writeFile(fichier, JSON.stringify({
     verifieLe: new Date().toISOString(),
-    // Pas d'échantillon : chaque carte a été demandée. C'est la différence
-    // avec la mesure précédente, et c'est elle qui rend ce fichier fiable.
     methode: "une requête d'en-tête par carte, sur l'adresse que le site sert",
     repriseDe: precedent ? precedent.verifieLe : null,
     total: totalFinal,

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>PokéClasseur, le classeur qui échange pour toi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,14 +30,10 @@
   body{margin:0;background:var(--ink);color:var(--text-on-ink);font-family:'IBM Plex Sans',sans-serif;line-height:1.5;}
   h1,h2,h3{font-family:'Newsreader',serif;font-weight:500;margin:0;}
   a{color:inherit}
-  /* La barre du haut se lit comme sur les autres pages : le lien du compte
-     y remplace un bouton, qui n'était pas souligné. La règle s'arrête à la
-     barre : ailleurs, un lien souligné se voit, et c'est ce qu'on veut. */
   nav a{text-decoration:none}
   .wrap{max-width:1080px;margin:0 auto;padding:0 32px;}
   @media(max-width:640px){.wrap{padding:0 20px}}
 
-  /* nav */
   nav{display:flex;align-items:center;justify-content:space-between;padding:28px 0;border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
   .brand{font-family:'Newsreader',serif;font-style:italic;font-size:22px;letter-spacing:0.3px;}
   .brand span{color:var(--gold)}
@@ -46,7 +42,6 @@
   .cta-btn{background:var(--teal);color:#EDF5F3;padding:10px 20px;border-radius:3px;font-size:14px;text-decoration:none;font-weight:500;}
   .cta-btn:hover{background:var(--teal-deep)}
 
-  /* hero */
   .hero{padding:88px 0 64px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:56px;align-items:center;}
   @media(max-width:860px){.hero{grid-template-columns:1fr;padding:56px 0}}
   .hero h1{font-size:52px;line-height:1.08;letter-spacing:-0.5px;}
@@ -55,7 +50,6 @@
   .hero-actions{display:flex;gap:16px;align-items:center;}
   .link-quiet{font-size:14px;color:var(--text-on-ink-dim);text-decoration:underline;text-underline-offset:3px;}
 
-  /* binder illustration */
   .binder{background:var(--paper);border-radius:6px;padding:22px;position:relative;box-shadow:0 24px 60px rgba(0,0,0,0.35);}
   .binder-tabs{position:absolute;left:-14px;top:24px;display:flex;flex-direction:column;gap:10px;}
   .tab{background:var(--teal-deep);color:#EDF5F3;font-size:11px;padding:5px 10px 5px 8px;border-radius:0 3px 3px 0;writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:0.5px;}
@@ -70,14 +64,12 @@
   .stamp.ech{background:rgba(31,111,99,0.1);color:var(--teal-deep);border:1px solid rgba(31,111,99,0.3)}
   .glyph{font-family:'Newsreader',serif;font-style:italic;color:#B7AD90;font-size:22px;}
 
-  /* sections */
   section{padding:72px 0;border-top:1px solid rgba(var(--trait-rgb),0.08);}
   .kicker{color:var(--gold);font-size:13px;font-weight:500;margin-bottom:10px;}
   .section-head{max-width:56ch;margin-bottom:44px;}
   .section-head h2{font-size:32px;}
   .section-head p{color:var(--text-on-ink-dim);margin-top:14px;font-size:16px;}
 
-  /* how it works : real sequence, numbered legitimately */
   .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;}
   @media(max-width:760px){.steps{grid-template-columns:1fr}}
   .step{border-left:1px solid rgba(var(--trait-rgb),0.15);padding-left:20px;}
@@ -85,7 +77,6 @@
   .step h3{font-size:18px;margin:10px 0 8px;}
   .step p{color:var(--text-on-ink-dim);font-size:14.5px;}
 
-  /* extensions grid */
   .ext-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;}
   @media(max-width:760px){.ext-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
   .ext-card{display:block;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:20px 18px;transition:border-color .15s;}
@@ -95,7 +86,6 @@
   .ext-card .bar{height:3px;background:rgba(var(--trait-rgb),0.08);border-radius:2px;margin-top:14px;overflow:hidden;}
   .ext-card .fill{height:100%;background:var(--teal);}
 
-  /* matching */
   .match-wrap{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;}
   @media(max-width:700px){.match-wrap{grid-template-columns:1fr}}
   .match-col{background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);border-radius:5px;padding:22px;}
@@ -110,17 +100,6 @@
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;display:flex;justify-content:space-between;}
   @media(max-width:640px){footer{flex-direction:column;gap:10px}}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -246,18 +225,15 @@
   <footer></footer>
 </div>
 
-<script src="sets.js?v=2026-10-25-zimk"></script>
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="catalogue.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
+<script src="sets.js?v=2026-10-25-hgmz"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="catalogue.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
 <script>
-// Les dernières extensions de l'univers courant, avec leurs vrais noms.
-// Les nommer en dur voulait dire les retaper à chaque sortie, et inventer
-// pour Pocket des noms que je ne pouvais pas vérifier.
 let derniereExtension = null;
 
 async function chargerVedettes(){
@@ -279,11 +255,9 @@ async function chargerVedettes(){
   }
 }
 
-// Charge de vraies cartes depuis l'API publique et gratuite TCGdex (images
-// hébergées par eux, pas par ce prototype : voir https://tcgdex.dev).
 async function loadHeroCards(){
   const slotsEl = document.getElementById('hero-slots');
-  const tags = ['rech', null, 'ech', null, 'ech', 'rech']; // démo de tagging
+  const tags = ['rech', null, 'ech', null, 'ech', 'rech'];
   const memoire = `pokeclasseur_hero_${universActuel().cle}`;
   const cached = sessionStorage.getItem(memoire);
   if(cached){ renderHeroCards(JSON.parse(cached), tags); return; }
@@ -293,7 +267,6 @@ async function loadHeroCards(){
     sessionStorage.setItem(memoire, JSON.stringify(cards));
     renderHeroCards(cards, tags);
   }catch(err){
-    // Si l'API est injoignable (ex: hors-ligne), on garde les emplacements vides plutôt que planter.
     console.warn('Impossible de charger les cartes depuis TCGdex', err);
   }
 }
@@ -308,8 +281,6 @@ function renderHeroCards(cards, tags){
     </div>`;
   }).join('');
 }
-// Les vedettes d'abord : c'est elles qui désignent l'extension dont on
-// tirera l'échantillon de cartes.
 chargerVedettes().then(loadHeroCards);
 
 initCompte().then(afficherEtatCompte);

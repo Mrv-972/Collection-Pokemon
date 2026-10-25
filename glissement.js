@@ -1,37 +1,14 @@
-// Passer d'une carte agrandie à l'autre en la faisant glisser du doigt.
-//
-// Sur un téléphone, on feuillette comme dans une galerie de photos : la
-// carte suit le doigt ; lâchée assez loin (ou d'un geste vif), elle part et
-// la suivante arrive du côté opposé ; sinon, elle revient en place. Au bout
-// de la série, elle résiste et revient : rien ne suit. Un geste vertical ou
-// un pincement à deux doigts (pour zoomer) ne change pas de carte. Le geste
-// marche aussi à la souris.
-//
-// Partagé par la vue agrandie des grilles de cartes (cards.js) et celle de
-// la page des missions : le même geste doit se comporter de la même façon
-// partout.
-
-// Un écran qu'on touche du doigt, sans souris pour survoler : l'aide d'une
-// vue agrandie y parle de glisser plutôt que de touches du clavier.
 function ecranTactile(){
   try{ return matchMedia('(hover: none) and (pointer: coarse)').matches; }catch(err){ return false; }
 }
 
-// zone      : l'élément qui reçoit le geste (le voile de la vue agrandie)
-// image     : la carte, qui suit le doigt
-// peutAller : pas (+1 ou -1) → la carte voisine existe-t-elle ?
-// changer   : pas → afficher la carte voisine
-// Renvoie { vientDeGlisser() } : vrai une fois, juste après un glissement,
-// pour que le clic qui le suit ne referme pas la vue.
 function brancherGlissement({ zone, image, peutAller, changer, ignorer = '.fleche' }){
-  const SEUIL = 60;                // pixels parcourus pour changer de carte
-  const VITESSE = 0.35;            // ou pixels par milliseconde, pour un geste vif
-  let geste = null;                // { id, x, y, dx, horizontal, traces }
+  const SEUIL = 60;
+  const VITESSE = 0.35;
+  let geste = null;
   let glisse = false;
   const doigts = new Set();
 
-  // Un glissement horizontal est pour nous ; le navigateur garde le
-  // pincement pour zoomer.
   zone.style.touchAction = 'pan-y pinch-zoom';
   image.draggable = false;
   image.style.userSelect = 'none';
@@ -49,7 +26,6 @@ function brancherGlissement({ zone, image, peutAller, changer, ignorer = '.flech
     placer(sortie, true);
     setTimeout(() => {
       changer(pas);
-      // La nouvelle carte entre du côté opposé.
       placer(-sortie * 0.6, false);
       void image.offsetWidth;
       placer(0, true);
@@ -58,7 +34,6 @@ function brancherGlissement({ zone, image, peutAller, changer, ignorer = '.flech
 
   zone.addEventListener('pointerdown', (e) => {
     doigts.add(e.pointerId);
-    // Deux doigts : c'est un pincement pour zoomer, pas un glissement.
     if(doigts.size > 1){ if(geste){ placer(0, true); geste = null; } return; }
     if(e.button > 0 || (ignorer && e.target.closest(ignorer))) return;
     geste = { id: e.pointerId, x: e.clientX, y: e.clientY, dx: 0, horizontal: null,
@@ -70,12 +45,10 @@ function brancherGlissement({ zone, image, peutAller, changer, ignorer = '.flech
     const dx = e.clientX - geste.x, dy = e.clientY - geste.y;
     if(geste.horizontal === null && Math.hypot(dx, dy) > 10){
       geste.horizontal = Math.abs(dx) > Math.abs(dy);
-      // Le geste est à nous : le doigt peut sortir de l'image sans le perdre.
       if(geste.horizontal) try{ zone.setPointerCapture(e.pointerId); }catch(err){}
     }
     if(!geste.horizontal) return;
     e.preventDefault();
-    // Les derniers instants du geste disent s'il était vif.
     const maintenant = performance.now();
     geste.traces.push({ x: e.clientX, t: maintenant });
     while(geste.traces.length > 2 && maintenant - geste.traces[0].t > 120) geste.traces.shift();

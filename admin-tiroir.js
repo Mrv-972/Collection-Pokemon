@@ -1,27 +1,3 @@
-// Le tiroir d'administration : corrections, comptes, photos, signalements.
-// ========================================================================
-//
-// Ces fonctions n'ont pas de place « en naviguant » : elles ne portent sur
-// aucune carte qu'on aurait sous les yeux. Elles vivaient dans l'ancienne
-// page d'administration ; elles s'ouvrent désormais dans un tiroir, depuis
-// la barre d'administration, sur n'importe quelle page.
-//
-// Ce fichier n'est chargé que pour l'administrateur, à la première
-// ouverture du tiroir. Il ne protège rien pour autant : chaque fonction de
-// la base qu'il appelle vérifie elle-même que l'appelant est administrateur.
-//
-// Le code est déménagé, pas réécrit : les garde-fous restent : le pseudo à
-// recopier avant de supprimer un compte, le motif écrit exigé avant de lire
-// une discussion, et la trace au journal que l'administrateur ne peut pas
-// effacer.
-//
-// Une chose a changé en route, et c'est une correction de sécurité :
-// l'ancienne page insérait tels quels le pseudo, l'e-mail et la ville des
-// membres. Un membre ayant choisi un pseudo contenant du code l'aurait fait
-// exécuter dans la session de l'administrateur à l'ouverture de la liste :
-// c'est-à-dire là où ce code aurait eu le plus de pouvoir. Toute valeur
-// venue d'un membre passe désormais par echapper().
-
 (() => {
 
 const VERSION = (document.currentScript?.src.match(/[?&]v=([^&]+)/) ?? [])[1] ?? '';
@@ -33,8 +9,6 @@ const echapper = v => String(v ?? '')
 let tiroir = null;
 let ongletActif = 'corrections';
 
-// La confirmation (supprimer un compte, motif de lecture) vit dans
-// confirmation.js, que toutes les pages ne chargent pas.
 let confirmationPrete = null;
 function preparerConfirmation(){
   if(typeof demanderConfirmation === 'function') return Promise.resolve();
@@ -55,8 +29,6 @@ function message(texte, type){
   m.textContent = texte;
 }
 
-// --------------------------------------------------------- le tiroir ----
-
 window.ouvrirTiroirAdmin = function(onglet = 'corrections'){
   poserStyle();
   ongletActif = onglet;
@@ -66,7 +38,6 @@ window.ouvrirTiroirAdmin = function(onglet = 'corrections'){
     tiroir.setAttribute('aria-label', 'Administration');
     document.body.appendChild(tiroir);
     tiroir.addEventListener('cancel', e => { e.preventDefault(); tiroir.close(); });
-    // Un clic sur le voile, hors du panneau, referme le tiroir.
     tiroir.addEventListener('click', e => { if(e.target === tiroir) tiroir.close(); });
   }
   dessiner();
@@ -109,13 +80,6 @@ function dessiner(){
   else if(ongletActif === 'signalements') afficherSignalements();
   else afficherListe();
 }
-
-// ------------------------------------------------ les photos de profil ---
-//
-// Une photo proposée attend dans un dépôt privé. La valider, c'est la
-// recopier dans le dépôt public, sous le dossier du membre, puis la
-// déclarer sienne : la base vérifie que l'adresse est bien celle de ce
-// dossier. La refuser, c'est la retirer, avec un motif que le membre lira.
 
 async function afficherPhotos(){
   const zone = tiroir.querySelector('#zone-photos');
@@ -191,7 +155,6 @@ async function validerPhoto(p){
   const { data: publique } = db.storage.from('avatars').getPublicUrl(chemin);
   const { error: e3 } = await db.rpc('valider_photo', { membre: p.id, adresse: publique.publicUrl });
   if(e3) throw e3;
-  // L'attente et l'éventuelle photo précédente n'ont plus d'objet.
   await db.storage.from('avatars-attente').remove([p.photo_en_attente]).catch(() => {});
   const ancienne = /\/avatars\/([^?]+)/.exec(p.photo_url ?? '');
   if(ancienne && decodeURIComponent(ancienne[1]) !== chemin)
@@ -204,12 +167,6 @@ async function refuserPhoto(p, motif){
   if(error) throw error;
   await db.storage.from('avatars-attente').remove([p.photo_en_attente]).catch(() => {});
 }
-
-// ------------------------------------------------------ signalements ---
-//
-// Ce que les membres signalent : un comportement, une photo, un pseudo, un
-// avis, un message. Classer un signalement le retire de la liste ; il reste
-// en base, consultable depuis le tableau de bord Supabase.
 
 const OBJETS_SIGNALES = {
   profil: 'Comportement', membre: 'Comportement', message: 'Message',
@@ -258,8 +215,6 @@ async function afficherSignalements(){
         const { error } = await db.rpc('traiter_signalement', { signalement: s.id });
         if(error) throw error;
       }, 'Signalement classé.');
-      // Supprimer le contenu signalé emporte le signalement avec lui (la base
-      // l'efface en cascade).
       const supprimer = bloc.querySelector('.supprimer-contenu');
       if(supprimer) supprimer.onclick = async () => {
         await preparerConfirmation();
@@ -316,8 +271,6 @@ async function traiterSignalement(bloc, action, reussite){
   }
 }
 
-// -------------------------------------------- les corrections en cours ---
-
 async function afficherListe(){
   const zone = tiroir.querySelector('#zone-liste');
   try{
@@ -358,18 +311,12 @@ async function afficherListe(){
   }
 }
 
-// --------------------------------------------------------- les comptes ---
-//
-// La liste vient de la base, par une fonction qui vérifie elle-même que
-// l'appelant est administrateur : masquer le tiroir ne protégerait rien.
-
 let comptesCharges = [];
 
 const jamais = '-';
 const dateCourte = d => d ? new Date(d).toLocaleDateString('fr-FR') : jamais;
 
 function ligneCompte(c){
-  // Pseudo, e-mail et ville sont choisis par le membre : echapper() partout.
   return `
     <tr data-id="${echapper(c.id)}">
       <td data-colonne="Pseudo">
@@ -440,10 +387,6 @@ async function afficherComptes(){
   };
 }
 
-// Supprimer le compte de quelqu'un d'autre ne se défait pas, et ne prévient
-// pas l'intéressé. On annonce donc ce qui disparaît, et on demande de
-// recopier le pseudo : de quoi rendre impossible la suppression du voisin
-// de ligne par un clic mal visé.
 async function supprimerLeCompte(id, bouton){
   const c = comptesCharges.find(x => x.id === id);
   if(!c) return;
@@ -477,16 +420,6 @@ async function supprimerLeCompte(id, bouton){
     message(`Suppression impossible : ${err.message}`, 'ko');
   }
 }
-
-// ------------------------------------------------- les discussions ------
-//
-// Les discussions appartiennent à leurs deux participants. Cet accès existe
-// pour répondre à un signalement, à une plainte ou à une réquisition :
-// pas pour lire par-dessus l'épaule des membres.
-//
-// Il est donc payant : un motif écrit est exigé, et chaque ouverture laisse
-// au journal une trace que l'administrateur ne peut pas effacer. La
-// politique de confidentialité annonce exactement cela.
 
 async function ouvrirLesDiscussions(idMembre){
   const c = comptesCharges.find(x => x.id === idMembre);
@@ -554,9 +487,6 @@ async function lireLaDiscussion(idConversation, idMembre){
         </div>`).join('') + '</div>' +
       `<button class="discret-admin" id="retour-discussions">Revenir aux discussions</button>`;
 
-    // Le texte d'un membre n'est jamais interprété comme du HTML : il se pose
-    // par textContent, sans quoi un message pourrait faire tourner du code
-    // dans la session d'administration, qui est la dernière où le vouloir.
     liste.querySelectorAll('.bulle .texte').forEach((el, i) => {
       el.textContent = (data ?? [])[i]?.texte ?? '';
     });
@@ -567,11 +497,6 @@ async function lireLaDiscussion(idConversation, idMembre){
   }
 }
 
-// Le motif se saisit dans une petite fenêtre. Dix caractères au moins : la
-// base refuse en dessous, autant le dire ici plutôt que de laisser partir
-// un appel voué à l'échec.
-// Par défaut, le motif d'ouverture d'une discussion ; le refus d'une photo
-// réutilise la même fenêtre avec ses propres mots.
 async function demanderMotif({
   titre = 'Pourquoi ouvrir cette discussion ?',
   texte = `Cet accès est réservé au traitement d'un signalement, d'une plainte ou
@@ -611,26 +536,18 @@ async function demanderMotif({
       resolve(reponse);
     }
     function auClavier(e){
-      // preventDefault, pas seulement stopPropagation : c'est l'action par
-      // défaut d'Échap qui referme une fenêtre modale.
       if(e.key === 'Escape'){ e.preventDefault(); e.stopPropagation(); fermer(null); }
       if(e.key === 'Enter' && !valider.disabled) fermer(champ.value.trim());
     }
     voile.querySelector('.annuler').onclick = () => fermer(null);
     valider.onclick = () => { if(!valider.disabled) fermer(champ.value.trim()); };
     voile.addEventListener('click', e => { if(e.target === voile) fermer(null); });
-    // En capture, pour passer avant le tiroir.
     document.addEventListener('keydown', auClavier, true);
 
-    // Dans le tiroir, pas dans le corps de la page : un <dialog> modal rend
-    // inerte tout ce qui est hors de lui, et la fenêtre du motif y serait
-    // inaccessible.
     tiroir.appendChild(voile);
     requestAnimationFrame(() => { voile.classList.add('vue'); champ.focus(); });
   });
 }
-
-// ------------------------------------------------------------- style ----
 
 function poserStyle(){
   if(document.getElementById('admin-tiroir-style')) return;

@@ -1,5 +1,3 @@
-# Sonde des sources de l'onglet Communauté : explications des noms de
-# Pokémon (Poképédia) et flux d'actualités. Lancée à la main ; ne publie rien.
 name: Sonde Communauté
 
 on:

@@ -1,35 +1,16 @@
-// Progression de collection : combien de cartes d'une extension sont déjà
-// marquées « Obtenue », et la barre qui le montre d'un coup d'œil.
-//
-// Partagé par le catalogue des extensions (series.html) et la page d'une
-// extension (extension.html), pour que les deux comptent pareil.
-
 const CLE_TAGS_PROGRESSION = 'pokeclasseur_tags';
 
-// Les pages qui chargent tags.js tiennent déjà les marquages en mémoire, et
-// à jour : on les relit chez elles plutôt que dans le stockage, qui pourrait
-// avoir une case de retard. Les autres pages : le catalogue, qui ne marque
-// rien : lisent directement le navigateur.
 function marquages(){
   if(typeof tagState === 'object' && tagState) return tagState;
   try{ return JSON.parse(localStorage.getItem(CLE_TAGS_PROGRESSION)) || {}; }
   catch{ return {}; }
 }
 
-// Le nombre de cartes annoncé par la source. « official » exclut les cartes
-// secrètes, « total » les compte ; on prend le premier disponible, comme le
-// reste du site. Une extension dont personne n'annonce le compte n'aura pas
-// de barre : mieux vaut rien qu'une fraction sur un dénominateur inventé.
 function totalDeLExtension(ext){
   const n = ext?.cardCount?.official ?? ext?.cardCount?.total ?? null;
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-// Un identifiant de carte s'écrit « <extension>-<numéro> » : « swsh8-123 »,
-// « A1-045 ». Compter par préfixe suffirait presque, mais « 30th » est le
-// préfixe de « 30th-c » : les cartes de la seconde tomberaient dans la
-// première. On attribue donc chaque carte à l'extension dont le nom est le
-// plus long parmi celles qui collent : la seule qui puisse être la bonne.
 function compterObtenuesParExtension(identifiants){
   const connus = [...identifiants].sort((a, b) => b.length - a.length);
   const compte = new Map(connus.map(id => [id, 0]));
@@ -41,8 +22,6 @@ function compterObtenuesParExtension(identifiants){
   return compte;
 }
 
-// Quand la page tient la vraie liste des cartes, on compte dessus : c'est
-// exact, sans avoir à deviner à quelle extension appartient un identifiant.
 function progressionDesCartes(cartes){
   const tags = marquages();
   const obtenues = cartes.filter(c => tags[c.id]?.obt).length;
@@ -80,8 +59,6 @@ function poserStyleProgression(){
   document.head.appendChild(style);
 }
 
-// « large » pour l'en-tête d'une extension, où la barre porte la page ;
-// discrète sur une vignette du catalogue, où elle en accompagne vingt.
 function barreProgression({ obtenues, total }, { large = false } = {}){
   if(!total) return '';
   poserStyleProgression();
@@ -96,34 +73,19 @@ function barreProgression({ obtenues, total }, { large = false } = {}){
     </div>`;
 }
 
-// ------------------------------------------- cartes obtenues ou non ------
-//
-// Une carte qu'on n'a pas encore s'affiche en noir et blanc. Le classeur se
-// lit alors d'un coup d'œil : ce qui reste en couleur est ce qu'on possède.
-
 function estObtenue(idCarte){
   return Boolean(marquages()[idCarte]?.obt);
 }
 
 const CLASSE_NON_OBTENUE = 'non-obtenue';
 
-// Griser ou non, c'est au lecteur de choisir : certains veulent voir d'un
-// coup d'œil ce qui leur manque, d'autres veulent regarder les cartes.
-// Le choix est retenu sur l'appareil et vaut pour tout le site ; pour un
-// membre connecté, il l'est aussi sur son compte (compte.js).
 const CLE_GRISAILLE = 'pokeclasseur-griser-manquantes';
 
 function grisailleActive(){
   try{ return localStorage.getItem(CLE_GRISAILLE) !== 'non'; }
-  catch{ return true; }   // mémoire refusée : on garde le comportement d'origine
+  catch{ return true; }
 }
 
-// La règle est portée par un attribut du document plutôt que par chaque
-// image : basculer ne demande alors aucun redessin, la page change de
-// couleur d'un coup.
-//
-// La transition évite le clignotement quand on coche : la couleur revient en
-// fondu plutôt que d'un coup.
 const STYLE_NON_OBTENUE = `
   img.${CLASSE_NON_OBTENUE}{transition:filter .2s,opacity .2s}
   html[data-griser="oui"] img.${CLASSE_NON_OBTENUE}{filter:grayscale(1);opacity:.78}
@@ -145,9 +107,6 @@ function poserStyleNonObtenue(){
   document.head.appendChild(style);
 }
 
-// L'interrupteur, posé dans la barre d'outils des pages qui montrent des
-// cartes. Une seule écriture pour les trois pages concernées : sans cela,
-// le libellé et la mémoire auraient divergé au premier remaniement.
 const STYLE_INTERRUPTEUR = `
   .bouton-grisaille{font-family:inherit;font-size:13px;padding:7px 13px;border-radius:5px;
     cursor:pointer;color:var(--text-on-ink-dim);background:transparent;
@@ -184,14 +143,12 @@ function poserInterrupteurGrisaille(conteneur){
 
   bouton.addEventListener('click', () => {
     try{ localStorage.setItem(CLE_GRISAILLE, grisailleActive() ? 'non' : 'oui'); }
-    catch{ /* mémoire refusée : le choix ne durera pas, mais la page suit */ }
+    catch{ }
     appliquerLaGrisaille();
     rafraichir();
-    // Pour un membre connecté, le choix suit aussi le compte (Paramètres).
     if(typeof enregistrerAffichage === 'function')
       enregistrerAffichage({ pref_griser: grisailleActive() }).catch(() => {});
   });
-  // Le compte, chargé après coup, peut apporter un autre choix.
   document.addEventListener('pokeclasseur:grisaille', () => { appliquerLaGrisaille(); rafraichir(); });
 
   rafraichir();

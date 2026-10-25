@@ -1,20 +1,3 @@
-// Mon calcul d'adresse est-il faux, ou l'image n'existe-t-elle pas ?
-// =================================================================
-//
-// La construction fabrique l'adresse d'un visuel par calcul :
-//     https://assets.tcgdex.net/<langue>/<série>/<extension>/<numéro>/low.webp
-// Quand elle répond 404 dans les deux langues, deux explications tiennent,
-// et elles n'appellent pas du tout le même remède :
-//
-//   - le fichier n'existe pas          → il faut une autre source ;
-//   - mon adresse est fausse           → il suffit de la corriger.
-//
-// L'API de TCGdex, elle, connaît la vraie adresse de chaque carte : elle la
-// publie dans le champ « image ». On la lui demande et on compare. Rien
-// n'est modifié ; on lit le journal.
-//
-//   node outils/sonde-adresses-tcgdex.mjs --instantane donnees
-
 import { readFile } from 'node:fs/promises';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
@@ -23,7 +6,6 @@ const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
 const dossier = args.instantane ?? 'donnees';
 const IDENTITE = { 'User-Agent': 'PokeClasseur (sonde des adresses)' };
 
-// Les extensions dont la sonde précédente n'a rien tiré, dans aucune langue.
 const MUETTES = `miscp bog ex5.5 tk-ex-latia tk-ex-latio exu tk-ex-m tk-ex-p tk-dp-l
 tk-dp-m tk-hs-g tk-hs-r 2011bw tk-bw-e tk-bw-z 2012bw 2013bw xya tk-xy-n tk-xy-sy
 2014xy tk-xy-b tk-xy-w tk-xy-latia tk-xy-latio 2015xy tk-xy-p tk-xy-su 2016xy
@@ -59,7 +41,7 @@ for(const setId of MUETTES){
   try{
     nous = JSON.parse(await readFile(
       `${dossier}/physique/sets/${encodeURIComponent(setId)}.json`, 'utf8'));
-  }catch{ /* pas de fichier */ }
+  }catch{ }
   if(!nous.length){ verdicts['extension inconnue'].push(`${setId} (aucune carte chez nous)`); continue; }
 
   const carte = nous[0];
@@ -70,8 +52,6 @@ for(const setId of MUETTES){
     continue;
   }
 
-  // L'API livre l'adresse sans extension de fichier : on la complète comme
-  // le fait le site.
   const sienne = fiche.image ? `${fiche.image}/low.webp` : null;
   const notre = carte.image;
   const memeAdresse = sienne === notre;

@@ -1,7 +1,3 @@
-# Mesure le manque de visuels du TCG physique.
-#
-# Le bac à sable de développement n'atteint pas le serveur d'images ; un
-# exécuteur GitHub, si. Rien n'est écrit dans le dépôt : on lit le journal.
 name: Sonde des visuels physiques
 
 on:

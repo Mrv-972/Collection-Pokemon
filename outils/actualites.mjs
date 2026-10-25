@@ -1,18 +1,3 @@
-// Les dernières actualités Pokémon, pour l'onglet Communauté.
-// ===========================================================
-//
-// Les sites Pokémon francophones ne publient pas de flux d'actualités
-// lisible par un programme (sonde du 11 octobre 2026). Google Actualités, si :
-// on lui demande les articles récents sur quelques sujets, et l'on prend en
-// plus, dans les flux généralistes de jeuxvideo.com et Dexerto, ceux qui
-// parlent de Pokémon. Seuls le titre, la source, la date et le lien sont
-// gardés : la page renvoie vers l'article, elle ne le recopie pas.
-//
-// Lancé deux fois par jour par .github/workflows/actualites.yml :
-//   node outils/actualites.mjs [--sortie donnees]
-// Il vérifie au passage que les sites conseillés (donnees/sites-pokemon.json)
-// répondent toujours.
-
 import { readFile, writeFile } from 'node:fs/promises';
 import { sansTiretPartout } from './typographie.mjs';
 
@@ -31,10 +16,6 @@ const FLUX = [
   { url: 'https://www.dexerto.fr/feed/', source: 'Dexerto', sujet: 'pokemon' },
 ];
 const SUJET_POKEMON = /pok[ée]mon|\bjcc\b|\btcg\b/i;
-// Google Actualités ramasse tout ce qui contient « Pokémon », faits divers
-// et chroniques financières compris. La page s'adresse à des
-// collectionneurs, souvent jeunes : on ne garde que les sites de jeux
-// vidéo, de Pokémon ou de culture geek, et l'on écarte les faits divers.
 const SOURCES_SURES = /pok[ée]|nintendo|jeuxvideo|\bjv\b|game|gaming|dexerto|millenium|numerama|frandroid|geek|\bign\b|actugaming|clubic|01net|presse-citron|phonandroid|tom.?s guide|melty|konbini|esport|jeumobi|player ?one|gamekult|journal du gamer/i;
 const FAITS_DIVERS = /fétichi|agress|viol|pédo|condamn|tribunal|procès|garde à vue|interpell|police|gendarm|meurtr|mort[s ]|décès|cambriol|escroqu|drogue|suicide|sexuel|enquête|prison|plainte|victime|vol de|volé/i;
 const JOURS = 14, MAXIMUM = 60;
@@ -48,12 +29,9 @@ function lire(xml, flux){
   return [...xml.matchAll(/<item[\s>][\s\S]*?<\/item>/gi)].map(([bloc]) => {
     let titre = balise(bloc, 'title') ?? '';
     const source = flux.source ?? balise(bloc, 'source') ?? 'Actualité';
-    // Google ajoute « - Source » à la fin du titre : la source a sa place à part.
     if(!flux.source && titre.endsWith(` - ${source}`)) titre = titre.slice(0, -(source.length + 3));
     return { titre: titre.replace(/<[^>]+>/g, '').trim(), lien: balise(bloc, 'link'), source,
              date: new Date(balise(bloc, 'pubDate') ?? 0).toISOString(), sujet: flux.sujet };
-  // Le titre lui-même doit parler de Pokémon : Google retient aussi des
-  // articles qui ne le citent qu'en passant.
   }).filter(a => a.titre && /^https?:\/\//.test(a.lien ?? '') && SUJET_POKEMON.test(a.titre)
     && (flux.source || SOURCES_SURES.test(a.source)) && !FAITS_DIVERS.test(a.titre));
 }
@@ -70,8 +48,6 @@ for(const flux of FLUX){
   }catch(err){ console.warn(`échec ${flux.url} : ${err.message}`); }
 }
 
-// Au plus huit articles par site : un site très prolifique (les guides
-// Pokémon GO de Dexerto…) ne doit pas occuper toute la liste.
 const PAR_SOURCE = 8;
 const limite = Date.now() - JOURS * 86400000;
 const parSource = new Map();

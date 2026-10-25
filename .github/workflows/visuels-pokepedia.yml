@@ -1,12 +1,3 @@
-# Relève l'index de Poképédia, puis copie les visuels manquants dans le dépôt.
-#
-# Le relevé ne touche que du texte. La copie télécharge des images, les
-# réduit, et les dépose dans images/cards : où l'instantané les ramasse
-# tout seul au passage suivant.
-#
-# Licence CC BY-NC-SA 3.0 : le crédit est affiché dans le pied de page du
-# site, et l'usage doit rester non commercial. L'outil écrit la liste de ce
-# qu'il a pris, pour que ce crédit soit justifiable.
 name: Visuels Poképédia
 
 on:
@@ -36,8 +27,6 @@ jobs:
       - name: Relever l'index
         run: node outils/moissonner-pokepedia.mjs --sortie donnees
 
-      # sharp réduit les 2 Mo de PNG en vignette WebP. Sans lui, 1 600
-      # fichiers pèseraient 3 Go dans le dépôt.
       - name: Installer sharp
         if: ${{ !inputs.essai }}
         run: |

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>Missions secrètes - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,17 +70,6 @@
 
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -97,17 +86,12 @@
     .search-row input{min-height:44px}
   }
 
-  /* ---------------------------------------------------- Missions -------- */
   .serie-bloc{margin:0 0 26px}
   .serie-tete{display:flex;align-items:baseline;gap:12px;margin:0 0 12px;
               padding-bottom:9px;border-bottom:1px solid rgba(var(--trait-rgb),0.08);}
   .serie-tete h2{font-size:20px}
   .serie-tete .compte{font-size:13px;color:var(--text-on-ink-dim)}
 
-  /* Une extension par ligne, repliée. Cent cinq missions déroulées d'un coup
-     ne se lisent pas : on ouvre celle qu'on joue. */
-  /* Une seule commande sur cette page : de quoi la poser sans bâtir une
-     barre d'outils entière. */
   #barre-missions{margin:0 0 18px}
   .ext-bloc{border:1px solid rgba(var(--trait-rgb),0.08);border-radius:6px;
             background:var(--ink-soft);margin-bottom:8px;overflow:hidden;}
@@ -121,7 +105,6 @@
   .ext-tete h3{font-size:17px;font-family:'Newsreader',serif;font-weight:500;
                flex:1;min-width:140px;}
   .ext-tete .compte{font-size:12.5px;color:var(--text-on-ink-dim)}
-  /* Le chevron dit dans quel sens ça va s'ouvrir, sans texte à traduire. */
   .ext-tete .chevron{flex-shrink:0;width:11px;height:11px;margin-left:2px;
                      border-right:2px solid var(--text-on-ink-dim);
                      border-bottom:2px solid var(--text-on-ink-dim);
@@ -143,17 +126,12 @@
   .mission.faite h3{text-decoration:line-through}
   .mission-coche{flex-shrink:0;width:22px;height:22px;margin-top:1px;accent-color:var(--gold);cursor:pointer}
   .mission .condition{font-size:13px;color:var(--text-on-ink-dim);margin:9px 0 0;line-height:1.5}
-  /* Une mission qui réunit des cartes de plusieurs extensions le dit tout
-     de suite : on ne les trouvera pas toutes dans le même booster. */
   .note-bloc{font-size:13.5px;color:var(--text-on-ink-dim);line-height:1.55;margin:4px 0 14px;max-width:70ch}
   .mission .multi-ext{display:inline-block;margin:8px 0 0;padding:3px 9px;border-radius:999px;font-size:12px;
     color:var(--text-on-ink);background:rgba(var(--gold-rgb),0.14);border:1px solid rgba(var(--gold-rgb),0.45)}
   .mission .cartes{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 0;padding:0;list-style:none}
   .mission .cartes li{font-size:12.5px;padding:3px 9px;border-radius:4px;
                       background:rgba(var(--trait-rgb),0.06);color:var(--text-on-ink);}
-  /* Les missions qui réclament une liste de cartes la montrent en vignettes.
-     Celles qui demandent de compléter toute l'extension n'ont pas de liste :
-     elles restent une phrase, et c'est très bien ainsi. */
   .mission .visuels{display:flex;flex-wrap:wrap;gap:9px;margin:11px 0 0;padding:0;list-style:none}
   .mission .visuels li{width:78px}
   .mission .visuels img.carte{width:78px;border-radius:5px;display:block;
@@ -176,8 +154,6 @@
   .mission .doute{font-size:12.5px;line-height:1.5;margin:10px 0 0;padding:8px 11px;border-radius:4px;
                   background:rgba(224,136,98,0.10);border:1px solid rgba(224,136,98,0.3);color:#E0A88C;}
 
-  /* Agrandissement d'une carte. Le bandeau des univers monte à 60 : on passe
-     au-dessus, sans quoi la flèche de gauche disparaîtrait derrière lui. */
   .zoom-carte{position:fixed;inset:0;z-index:70;background:rgba(10,11,13,0.88);
               display:flex;align-items:center;justify-content:center;gap:14px;
               flex-direction:column;padding:28px;cursor:zoom-out;
@@ -185,8 +161,6 @@
   .zoom-carte.vue{opacity:1}
   .zoom-carte > img{max-width:min(440px,100%);max-height:78vh;border-radius:12px;
                     box-shadow:0 24px 70px rgba(0,0,0,0.6);cursor:default;
-                    /* Agrandie, une carte se regarde en couleur même si sa
-                       vignette est grise : c'est l'illustration qu'on veut voir. */
                     filter:none;opacity:1;}
   .zoom-carte .legende{font-size:13.5px;color:var(--text-on-ink);text-align:center;line-height:1.6}
   .zoom-carte .legende .sous{display:block;margin-top:6px;font-size:11.5px;color:var(--text-on-ink-dim)}
@@ -243,7 +217,6 @@
   </nav>
 
   <div class="page-head">
-    <div class="kicker">TCG Pocket</div>
     <h1>Missions secrètes</h1>
     <p>Chaque extension cache des missions qui n'apparaissent dans le jeu
        qu'une fois accomplies. Les voici à l'avance, extension par extension,
@@ -259,63 +232,48 @@
   <footer data-note="Les coches sont enregistrées dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="catalogue.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
-<script src="progression.js?v=2026-10-25-zimk"></script>
-<script src="sets.js?v=2026-10-25-zimk"></script>
-<script src="raretes.js?v=2026-10-25-zimk"></script>
-<script src="glissement.js?v=2026-10-25-zimk"></script>
-<script src="missions.js?v=2026-10-25-zimk"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="catalogue.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
+<script src="progression.js?v=2026-10-25-hgmz"></script>
+<script src="sets.js?v=2026-10-25-hgmz"></script>
+<script src="raretes.js?v=2026-10-25-hgmz"></script>
+<script src="glissement.js?v=2026-10-25-hgmz"></script>
+<script src="missions.js?v=2026-10-25-hgmz"></script>
 <script>
-// Les missions secrètes n'existent que dans l'application mobile : du côté
-// du jeu de cartes physique, cette page n'a rien à raconter. Plutôt que de
-// masquer l'onglet et de laisser un lien mort dans un signet, on le dit.
 function rendreHorsSujet(){
   document.getElementById('contenu').innerHTML = `
     <p class="status-msg">Les missions secrètes n'existent que dans Pokémon TCG
     Pocket. Passe du côté Pocket par le bandeau de gauche pour les voir.</p>`;
 }
 
-// Le pied de page porte déjà la note propre à chaque page : on y ajoute la
-// provenance des missions, sans encombrer le haut de l'écran.
 function poserCreditDesSources(donnees){
   const pied = document.querySelector('footer');
   if(!pied) return;
   const liens = donnees.sources
-    .map(s => `<a href="${echapper(s.adresse)}" target="_blank" rel="noopener noreferrer">${echapper(s.nom)}</a>`)
-    .join(' et ');
-  const note = `Missions relevées dans ${liens} et recoupées à la main `
-    + `(relevé du ${echapper(donnees.maj)}) : le jeu ne les publie nulle part. `
-    + `Les coches sont enregistrées dans ce navigateur, sur cet appareil.`;
+    .map(s => `<a href="${echapper(s.adresse)}" target="_blank" rel="noopener noreferrer">${echapper(s.nom)}</a>`);
+  const enumeration = liens.length > 1 ? `${liens.slice(0, -1).join(', ')} et ${liens.at(-1)}` : liens.join('');
+  const jour = new Date(donnees.maj);
+  const date = Number.isNaN(jour.getTime()) ? echapper(donnees.maj)
+    : jour.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const note = `Missions relevées dans ${enumeration}, puis vérifiées à la main (relevé du ${date}). `
+    + `Le jeu ne les publie nulle part. Les coches sont enregistrées dans ce navigateur, sur cet appareil.`;
 
-  // Le fichier des missions arrive après coup : le pied de page est déjà
-  // construit, et changer son data-note ne le referait pas. On écrit donc
-  // dans la note posée, et on retombe sur l'attribut si elle n'existe pas
-  // encore : selon lequel des deux est prêt le premier.
   const posee = pied.querySelector('.pied-note');
   if(posee) posee.innerHTML = note;
   else pied.dataset.note = note;
 }
 
-// Deux cartes deux étoiles peuvent porter le même nom : la première est la
-// Full Art, la seconde celle au cadre arc-en-ciel. Le jeu ne les distingue
-// que par leur numéro ; on leur rend un nom lisible.
 function nomDeLaVersion(carte, cartes){
   if(carte.rarity !== 'Deux Étoiles') return null;
   const soeurs = cartes.filter(c => c.name === carte.name && c.rarity === 'Deux Étoiles');
   return soeurs.length > 1 && carte === soeurs[soeurs.length - 1] ? 'Arc-En-Ciel' : 'Full Art';
 }
 
-// « ★★ Arc-En-Ciel · Source Secrète · n° 87 » : la rareté en icônes du jeu,
-// puis où trouver la carte. Les guides parlent de « rainbow bordered art » ;
-// le jeu, lui, n'affiche que des étoiles.
-// Une carte qu'on n'a pas encore s'affiche en noir et blanc, ici comme dans
-// les grilles du catalogue.
 function classeObtention(carteId){
   return estObtenue(carteId) ? '' : CLASSE_NON_OBTENUE;
 }
@@ -329,15 +287,10 @@ function echapper(t){
   return String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
 }
 
-// Le nom lisible de chaque extension, pour les missions qui en réunissent
-// plusieurs.
 const nomsExtensions = new Map();
-// Le lot du fichier qui regroupe les missions entre plusieurs extensions.
 const LOT_PLUSIEURS = 'plusieurs';
 const extensionDeLaCarte = id => String(id).replace(/-\d+$/, '');
 
-// Les extensions dont une mission réclame des cartes : celles que le
-// fichier nomme, sinon celles des identifiants donnés, sinon la sienne.
 function extensionsDeLaMission(idExt, mission){
   const ids = (mission.ids ?? []).filter(Boolean).map(extensionDeLaCarte);
   const toutes = [...(mission.extensions ?? []), ...ids];
@@ -361,9 +314,6 @@ function blocMission(idExt, mission, faites){
       ${mission.condition ? `<p class="condition">${echapper(mission.condition)}</p>` : ''}
       ${mission.cartes?.length
         ? `<ul class="cartes">${mission.cartes.map((c, i) => {
-             // Quand deux cartes d'une extension portent le même nom ET la même
-             // rareté, aucun libellé ne peut les départager : le fichier donne
-             // alors l'identifiant exact, et il fait autorité.
              const id = mission.ids?.[i];
              return `<li${id ? ` data-id="${echapper(id)}"` : ''}>${echapper(c)}</li>`;
            }).join('')}</ul>`
@@ -375,9 +325,6 @@ function blocMission(idExt, mission, faites){
     </div>`;
 }
 
-// Le catalogue range les extensions de l'application en grandes séries : A,
-// B, et la page des extensions les présente ainsi. Les missions suivent le
-// même découpage, pour qu'on s'y retrouve d'une page à l'autre.
 function parSerie(extensions){
   const groupes = new Map();
   for(const e of extensions){
@@ -388,13 +335,7 @@ function parSerie(extensions){
   return [...groupes];
 }
 
-// <details> plutôt qu'un dépliage écrit à la main : le clavier l'ouvre déjà,
-// les lecteurs d'écran l'annoncent déjà, et la recherche du navigateur
-// (Ctrl+F) y trouve le texte replié.
 function blocExtension(ext, faites, ouverte){
-  // Un bloc qui n'est pas une extension garde, pour ses coches, la clé du
-  // lot dont viennent ses missions : elles survivent à un changement de
-  // rangement.
   const cle = ext.cle ?? ext.id;
   const total = ext.missions.length;
   const accomplies = ext.missions.filter(m => faites.has(cleMission(cle, m.nom))).length;
@@ -415,8 +356,6 @@ function blocExtension(ext, faites, ouverte){
     </details>`;
 }
 
-// La barre d'une extension se refait seule quand on coche : refaire toute la
-// page ferait sauter le défilement au premier clic.
 function rafraichirBarre(bloc){
   const missions = [...bloc.querySelectorAll('.mission')];
   const faites = missions.filter(m => m.classList.contains('faite')).length;
@@ -427,8 +366,6 @@ function rafraichirBarre(bloc){
 
 async function construire(){
   const contenu = document.getElementById('contenu');
-  // Cette page n'a pas de grille de cartes : la règle qui dimensionne les
-  // icônes de rareté arrive donc avec elles.
   document.head.appendChild(Object.assign(document.createElement('style'),
     { textContent: STYLE_RARETES }));
   poserStyleNonObtenue();
@@ -447,9 +384,6 @@ async function construire(){
     return;
   }
 
-  // Le fichier des missions ne porte que des identifiants d'extension : le
-  // nom affiché et le logo viennent du catalogue, pour qu'ils restent les
-  // mêmes partout sur le site.
   const parId = new Map(extensionsConnues.map(e => [e.id, e]));
   for(const e of extensionsConnues) nomsExtensions.set(e.id, e.name);
   const serieDe = id => parId.get(id)?.serieNom ?? guessSeriesName(id);
@@ -460,13 +394,8 @@ async function construire(){
       nom: parId.get(e.id)?.name ?? e.id,
       serieNom: serieDe(e.id),
     }))
-    .reverse();   // les plus récentes d'abord, comme le catalogue
+    .reverse();
 
-  // Les missions qui réunissent plusieurs extensions se rangent d'après
-  // leurs cartes : toutes d'une même série, elles ouvrent la section de
-  // cette série (« Multi-Extensions - Série B ») ; de plusieurs séries,
-  // elles vont dans « Multi-Séries ».
-  // Une mission ajoutée au fichier trouve ainsi sa place toute seule.
   const lot = donnees.extensions.find(e => e.id === LOT_PLUSIEURS);
   const parSerieCommune = new Map(), multiSeries = [];
   for(const mission of lot?.missions ?? []){
@@ -503,14 +432,10 @@ async function construire(){
     .filter(e => !donnees.extensions.some(x => x.id === e.id))
     .map(e => e.name);
 
-  // Les guides ont fait le travail de relevé : le crédit descend dans le pied
-  // de page plutôt que de tenir un encadré en haut de l'écran.
   poserCreditDesSources(donnees);
 
   contenu.innerHTML = `
     ${parSerie(extensions).map(([serie, liste]) => {
-      // Une section ne compte que ses vraies extensions ; « Multi-Séries »,
-      // qui n'en a pas, compte ses collections.
       const vraies = liste.filter(e => !e.virtuel).length;
       const collections = liste.reduce((n, e) => n + e.missions.length, 0);
       const compte = vraies
@@ -530,11 +455,6 @@ async function construire(){
       mission secrète, soit aucun guide ne les a encore décrites.</p>` : ''}`;
 }
 
-// Les visuels ne sont cherchés qu'à l'ouverture d'une extension, et une
-// seule fois : charger les cartes des dix-huit extensions au chargement de
-// la page ferait attendre pour des images que personne ne regarde encore.
-// La promesse est gardée, pas seulement son résultat : deux blocs ouverts en
-// même temps ne demandent pas deux fois la même extension.
 const cartesParExtension = new Map();
 
 async function cartesDe(idExt){
@@ -546,8 +466,6 @@ async function poserLesVisuels(bloc){
   if(bloc.dataset.visuels) return;
   bloc.dataset.visuels = 'en cours';
 
-  // Les cartes de toutes les extensions que réclament les missions du bloc :
-  // la sienne, et celles des missions qui en réunissent plusieurs.
   const missions = [...bloc.querySelectorAll('.mission')];
   const voulues = new Set(nomsExtensions.has(bloc.dataset.ext) ? [bloc.dataset.ext] : []);
   for(const m of missions) for(const id of (m.dataset.extensions || '').split(',').filter(Boolean)) voulues.add(id);
@@ -557,7 +475,6 @@ async function poserLesVisuels(bloc){
     catch(err){ console.warn(`Cartes de ${id} indisponibles`, err); }
   }));
   if(!cartesPar.size){
-    // Sans les cartes, les noms restent : la mission se lit quand même.
     bloc.dataset.visuels = 'échec';
     return;
   }
@@ -576,8 +493,6 @@ async function poserLesVisuels(bloc){
       id ? ((cartesPar.get(extensionDeLaCarte(id)) ?? []).find(c => c.id === id) ?? null) : trouverLaCarte(nom, condition, parmi),
     ]);
 
-    // Tout ou rien : une mission à moitié illustrée se lit plus mal que la
-    // même en toutes lettres.
     if(!trouvees.some(([, c]) => c)) return;
 
     liste.innerHTML = trouvees.map(([nom, carte]) => {
@@ -598,15 +513,12 @@ async function poserLesVisuels(bloc){
       </li>`;
     }).join('');
     liste.hidden = false;
-    // Les noms sont maintenant sous les vignettes : la liste de texte ferait double emploi.
     mission.querySelector('.cartes')?.remove();
   });
 
   bloc.dataset.visuels = 'fait';
 }
 
-// Ce qu'on avait ouvert se retrouve ouvert au retour : on revient souvent
-// sur la même extension, celle qu'on est en train de jouer.
 document.getElementById('contenu').addEventListener('toggle', (e) => {
   const bloc = e.target.closest('.ext-bloc');
   if(!bloc) return;
@@ -614,11 +526,8 @@ document.getElementById('contenu').addEventListener('toggle', (e) => {
   if(bloc.open) ouvertes.add(bloc.dataset.ext); else ouvertes.delete(bloc.dataset.ext);
   enregistrerExtensionsOuvertes(ouvertes);
   if(bloc.open) poserLesVisuels(bloc);
-}, true);   // <details> n'émet pas d'événement qui remonte : on l'attrape à la descente
+}, true);
 
-// Agrandir une carte. On défile à l'intérieur de la mission cliquée, pas de
-// la page entière : ce sont les cartes d'une même mission qu'on veut
-// comparer, et une mission en réclame parfois vingt-quatre.
 function agrandirLaCarte(vignette){
   const soeurs = [...vignette.closest('.visuels').querySelectorAll('img.carte')];
   let position = soeurs.indexOf(vignette);
@@ -644,8 +553,6 @@ function agrandirLaCarte(vignette){
     const source = soeurs[position];
     image.src = source.currentSrc || source.src;
     image.alt = source.alt;
-    // Le nom de la carte, puis sa rareté et son extension : de quoi la
-    // retrouver dans le jeu sans connaître le vocabulaire des guides.
     titre.innerHTML = `<b>${echapper(source.alt)}</b><br>${source.dataset.fiche ?? ''}`;
     avant.disabled = position === 0;
     apres.disabled = position === soeurs.length - 1;
@@ -665,8 +572,6 @@ function agrandirLaCarte(vignette){
 
   avant.addEventListener('click', e => { e.stopPropagation(); afficher(position - 1); });
   apres.addEventListener('click', e => { e.stopPropagation(); afficher(position + 1); });
-  // Sur un téléphone, on passe d'une carte à l'autre en la faisant glisser
-  // (glissement.js), comme dans les grilles du catalogue.
   const glissement = typeof brancherGlissement === 'function'
     ? brancherGlissement({
         zone: voile, image,
@@ -674,8 +579,6 @@ function agrandirLaCarte(vignette){
         changer: pas => afficher(position + pas),
       })
     : null;
-  // Cliquer à côté referme ; cliquer sur la carte elle-même, non, ni le
-  // clic qui termine un glissement.
   image.addEventListener('click', e => e.stopPropagation());
   voile.addEventListener('click', () => { if(!glissement?.vientDeGlisser()) fermer(); });
   document.addEventListener('keydown', auClavier);
@@ -703,8 +606,6 @@ document.getElementById('contenu').addEventListener('change', (e) => {
 });
 
 construire().then(() => {
-  // Une extension rouverte depuis la dernière visite n'émet pas d'événement
-  // d'ouverture : elle naît ouverte. On lui pose ses visuels à la main.
   document.querySelectorAll('.ext-bloc[open]').forEach(poserLesVisuels);
 });
 initCompte().then(afficherEtatCompte);

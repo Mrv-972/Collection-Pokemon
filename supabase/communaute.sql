@@ -1,20 +1,7 @@
--- Communauté : profil public, badges, avis, signalements, liste de souhaits
--- partageable, réglages d'affichage.
--- ==========================================================================
---
--- Prérequis : schema.sql, administration.sql, rgpd.sql, securite-profils.sql
--- et profil-photo-parametres.sql déjà exécutés. Ce script peut être relancé
--- sans dommage.
 
--- --- 1. nouveaux réglages du membre -----------------------------------------
 alter table profils add column if not exists pref_vignettes   text    not null default 'normale';
 alter table profils add column if not exists pref_contraste   boolean not null default false;
--- Vide tant que le membre n'a rien choisi : la grisaille existait avant,
--- réglée sur l'appareil, et ce choix-là ne doit pas être écrasé.
 alter table profils add column if not exists pref_griser      boolean;
--- Le lien de la liste de souhaits : un jeton tiré au hasard par le
--- navigateur. Sans jeton, la liste n'est pas partagée ; en changer révoque
--- l'ancien lien.
 alter table profils add column if not exists souhaits_jeton   text;
 
 alter table profils drop constraint if exists pref_vignettes_valeurs;
@@ -28,8 +15,6 @@ create unique index if not exists profils_souhaits_jeton on profils (souhaits_je
 grant update (pref_vignettes, pref_contraste, pref_griser, souhaits_jeton)
   on profils to authenticated;
 
--- mon_profil(), avec ces réglages. Mêmes colonnes qu'avant, plus les
--- nouvelles : le site lit les champs par leur nom.
 drop function if exists mon_profil();
 create function mon_profil()
 returns table (
@@ -56,8 +41,6 @@ as $$
 $$;
 grant execute on function mon_profil() to authenticated;
 
--- Une première version de ce script préparait des notifications par e-mail,
--- abandonnées depuis. Le relancer retire ce qu'elle avait créé.
 drop function if exists emails_a_envoyer();
 drop function if exists marquer_email_envoye(uuid, text, integer);
 alter table profils drop column if exists pref_notif_email,
@@ -65,11 +48,6 @@ alter table profils drop column if exists pref_notif_email,
                     drop column if exists dernier_email_echanges_le,
                     drop column if exists echanges_annonces;
 
--- --- 2. avis après un échange -------------------------------------------------
--- Un avis par membre et par partenaire, modifiable. Seul celui qui a
--- réellement discuté avec l'autre (un message envoyé de chaque côté) peut
--- en donner un : sans cette règle, n'importe qui pourrait noter n'importe
--- qui.
 create table if not exists avis (
   auteur_id       uuid not null references auth.users on delete cascade,
   destinataire_id uuid not null references auth.users on delete cascade,
@@ -120,7 +98,6 @@ begin new.maj_le := now(); return new; end; $$;
 drop trigger if exists avis_maj_le on avis;
 create trigger avis_maj_le before update on avis for each row execute function avis_maj_le();
 
--- Les avis reçus par un membre, avec qui les a donnés.
 drop function if exists avis_recus(uuid);
 create function avis_recus(membre uuid)
 returns table (auteur_id uuid, pseudo text, avatar text, photo_url text,
@@ -138,19 +115,13 @@ as $$
 $$;
 grant execute on function avis_recus(uuid) to authenticated;
 
--- --- 3. signalements : profil, photo, avis -----------------------------------
--- La table existait pour les messages. Elle dit maintenant ce qui est
--- signalé, et l'administrateur peut la lire et la traiter depuis le site.
 alter table signalements add column if not exists objet text not null default 'membre';
 alter table signalements add column if not exists traite_le timestamptz;
 alter table signalements drop constraint if exists signalements_objet_valeurs;
 alter table signalements add  constraint signalements_objet_valeurs
   check (objet in ('membre', 'message', 'profil', 'photo', 'pseudo', 'avis', 'sujet', 'reponse'));
--- Le membre écrit son signalement, pas la date de son traitement.
 revoke insert on signalements from anon, authenticated;
 grant  insert (signaleur_id, signale_id, message_id, motif, objet) on signalements to authenticated;
--- Le « revoke » ci-dessus retire aussi les droits qu'espace-communaute.sql
--- accorde pour signaler un sujet ou une réponse : on les rend.
 do $$
 begin
   if exists (select 1 from information_schema.columns
@@ -160,8 +131,6 @@ begin
 end;
 $$;
 
--- espace-communaute.sql en installe une version plus complète (les sujets et
--- réponses signalés) : relancer ce script-ci ne doit pas la remplacer.
 do $$
 begin
   if to_regclass('public.sujets') is null then
@@ -176,9 +145,6 @@ security definer
 stable
 set search_path = public
 as $f$
-  -- Le message signalé est montré tel quel : son destinataire l'a déjà lu
-  -- et le soumet lui-même à l'administrateur. Le reste de la discussion
-  -- ne s'ouvre que par le tiroir des comptes, motif consigné au journal.
   select s.id, s.objet, s.motif, s.cree_le, a.pseudo, s.signale_id, b.pseudo, b.photo_url, m.texte
   from signalements s
   left join profils a on a.id = s.signaleur_id
@@ -207,7 +173,6 @@ end;
 $$;
 grant execute on function traiter_signalement(bigint) to authenticated;
 
--- Retirer la photo d'un membre après un signalement fondé.
 drop function if exists retirer_photo_de(uuid, text);
 create function retirer_photo_de(membre uuid, motif text)
 returns void
@@ -224,13 +189,6 @@ end;
 $$;
 grant execute on function retirer_photo_de(uuid, text) to authenticated;
 
--- --- 4. badges -------------------------------------------------------------------
--- Le nombre de cartes de chaque extension. Sans lui, la base ne saurait pas
--- dire qu'une extension est complète. La construction nocturne le résume
--- dans donnees/totaux-extensions.json, et le navigateur de l'administrateur
--- le recopie ici, au plus une fois par jour (admin-site.js), par
--- enregistrer_totaux() : personne d'autre ne peut l'écrire, sans quoi un
--- membre se déclarerait une extension complète en abaissant son total.
 create table if not exists extensions_totaux (
   id     text primary key,
   total  integer not null check (total > 0),
@@ -267,10 +225,6 @@ end;
 $$;
 grant execute on function enregistrer_totaux(jsonb) to authenticated;
 
--- Les badges d'un membre, calculés par la base à partir de faits qu'elle
--- tient elle-même : rien ne se déclare, donc rien ne se triche. Seul le
--- badge est renvoyé, jamais la liste des cartes possédées, qui reste
--- privée.
 drop function if exists badges_de(uuid);
 create function badges_de(membre uuid)
 returns table (badge text)
@@ -316,11 +270,6 @@ as $$
 $$;
 grant execute on function badges_de(uuid) to authenticated;
 
--- --- 5. profil public ---------------------------------------------------------
--- Ce qu'un membre connecté peut voir d'un autre : rien de plus que ce que
--- le site montrait déjà ailleurs (pseudo, image, département), des
--- nombres, et l'ancienneté. Ni la commune, ni la date de naissance, ni la
--- collection possédée.
 drop function if exists profil_public(uuid);
 create function profil_public(membre uuid)
 returns table (id uuid, pseudo text, avatar text, photo_url text, departement text,
@@ -342,14 +291,6 @@ as $$
 $$;
 grant execute on function profil_public(uuid) to authenticated;
 
--- --- 6. liste de souhaits partageable -----------------------------------------
--- Lisible sans compte, par quiconque a le lien : c'est le but : l'envoyer
--- sur Discord ou à un ami. Elle ne montre que ce que le membre a choisi de
--- partager (cartes recherchées et échangeables), et rien du tout sans le
--- bon jeton.
--- L'identifiant du membre n'est donné qu'à un visiteur connecté, pour
--- lui proposer d'écrire ou de voir le profil ; un visiteur anonyme n'en a
--- pas l'usage.
 drop function if exists liste_souhaits(text);
 create function liste_souhaits(jeton text)
 returns table (membre uuid, pseudo text, avatar text, photo_url text, carte_id text, genre text)
@@ -364,7 +305,6 @@ as $$
   join cartes c on c.utilisateur_id = p.id and (c.recherchee or c.echangeable)
   where jeton is not null and length(jeton) >= 20 and p.souhaits_jeton = jeton
   union all
-  -- Une liste partagée mais vide renvoie quand même son auteur.
   select case when auth.uid() is not null then p.id end, p.pseudo, p.avatar, p.photo_url, null, null
   from profils p
   where jeton is not null and length(jeton) >= 20 and p.souhaits_jeton = jeton;
@@ -373,9 +313,6 @@ grant execute on function liste_souhaits(text) to anon, authenticated;
 
 notify pgrst, 'reload schema';
 
--- --- vérification ------------------------------------------------------------
--- En dernier, seule commande affichée par l'éditeur SQL. Attendu :
--- true, true, true, false.
 select has_column_privilege('authenticated', 'profils', 'pref_vignettes', 'UPDATE')         as peut_regler_vignettes,
        has_table_privilege('authenticated', 'avis', 'INSERT')                               as peut_donner_un_avis,
        to_regprocedure('emails_a_envoyer()') is null                                        as envoi_emails_retire,

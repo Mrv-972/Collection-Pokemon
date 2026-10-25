@@ -1,24 +1,13 @@
-// L'écran des classeurs : ce qu'on voit et ce qu'on manipule.
-//
-// La logique (formats, pages, déplacements) vit dans classeurs.js et ne
-// touche jamais au document. Ce fichier-ci ne fait que l'afficher et
-// enregistrer ce qui change.
-
 let classeurs = [];
-let dossiers = [];               // les dossiers, y compris les vides
-let creationDeDossier = false;   // le champ « nouveau dossier » est-il ouvert ?
-// Deux écrans : l'étagère, où l'on voit la couverture de chaque classeur, et
-// le classeur ouvert, où l'on range les cartes.
-let vue = 'etagere';             // 'etagere' ou 'classeur'
+let dossiers = [];
+let creationDeDossier = false;
+let vue = 'etagere';
 let idActif = null;
 let pageActive = 0;
-let faceActive = 'recto';        // 'recto' ou 'verso'
+let faceActive = 'recto';
 let cartesDuTiroir = [];
 let extensionChoisie = '';
 let extensionsPhysiques = [];
-// Le catalogue livre les extensions de la plus ancienne à la plus récente ;
-// la liste déroulante les montre dans l'autre sens. On garde donc l'ordre
-// d'origine à part, pour ranger les cartes d'un Pokémon dans le temps.
 let rangDeLExtension = new Map();
 
 const contenu = () => document.getElementById('contenu');
@@ -28,8 +17,6 @@ function echapper(t){
   return String(t).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
 }
 
-// Toute modification passe par ici : on change, on enregistre, on redessine.
-// Un seul chemin, donc aucun moyen d'oublier l'enregistrement.
 function modifier(transformation){
   const avant = actif();
   if(!avant) return;
@@ -41,10 +28,6 @@ function modifier(transformation){
   dessiner();
 }
 
-// ------------------------------------------------------------ le rendu ---
-
-// La couverture telle qu'on la voit sur l'étagère : la tranche à gauche,
-// comme un classeur posé de face sur une étagère.
 function couvertureDuClasseur(c){
   const couv = couvertureDe(c);
   const fond = couv.genre === 'image'
@@ -74,8 +57,6 @@ const tuileNeuve = () => `
     <span class="detail-tuile">Partir d'une page vide</span>
   </button>`;
 
-// Ce qu'on avait replié le reste au retour. On garde les dossiers FERMÉS,
-// pas les ouverts : un dossier tout neuf doit s'ouvrir, pas se cacher.
 const CLE_REPLIES = 'pokeclasseur-dossiers-replies';
 
 function dossiersReplies(){
@@ -85,7 +66,7 @@ function dossiersReplies(){
 
 function enregistrerLesReplies(noms){
   try{ localStorage.setItem(CLE_REPLIES, JSON.stringify([...noms])); }
-  catch{ /* mémoire refusée : on s'en passe */ }
+  catch{ }
 }
 
 function barreDesDossiers({ avecClasseur = false } = {}){
@@ -105,16 +86,11 @@ function barreDesDossiers({ avecClasseur = false } = {}){
 function etagere(){
   const groupes = classeursParDossier(classeurs, dossiers);
 
-  // Tant qu'aucun dossier n'existe, une seule grille suffit : un titre
-  // « Sans dossier » tout seul ne dirait rien à personne.
   if(groupes.every(g => g.sansDossier)){
     return barreDesDossiers() + `<div class="etagere">${
       (groupes[0]?.classeurs ?? []).map(tuileDuClasseur).join('')}${tuileNeuve()}</div>`;
   }
 
-  // <details> plutôt qu'un dépliage écrit à la main : le clavier l'ouvre
-  // déjà, les lecteurs d'écran l'annoncent, et Ctrl+F y trouve le texte
-  // replié. C'est aussi ce qui sert aux missions secrètes.
   const replies = dossiersReplies();
   const corps = groupes.map(g => `
     <details class="dossier-bloc" data-dossier="${echapper(g.nom)}"
@@ -138,7 +114,6 @@ function etagere(){
   return barreDesDossiers({ avecClasseur: true }) + corps;
 }
 
-// Le bandeau du classeur ouvert : de quoi revenir à l'étagère.
 function retourEtagere(){
   return `
     <div class="fil-classeurs">
@@ -232,8 +207,6 @@ function reglagesDuClasseur(c){
     </div>`;
 }
 
-// Ce qu'on met dans une case : une carte du catalogue, ou une image
-// importée. Les deux se rangent pareil, seul le contenu diffère.
 function contenuDeLaCase(c, valeur){
   if(!valeur) return null;
   if(valeur === DOS_DE_CARTE){
@@ -314,9 +287,6 @@ function pageDuClasseur(c){
     </div>`;
 }
 
-// Deux façons de chercher une carte. Par extension, quand on range une
-// extension. Par Pokémon, quand on veut réunir tous ses Pikachu sur une
-// page, et là, passer les extensions une à une serait intenable.
 let modeTiroir = 'extension';
 let pokemonChoisi = null;
 
@@ -356,10 +326,6 @@ function tiroirDesCartes(){
     </div>`;
 }
 
-// Ouvrir un classeur est une étape dans l'historique du navigateur : le
-// bouton « page précédente » ramène alors à l'étagère, comme partout
-// ailleurs sur le site. On compte ce qu'on a empilé pour savoir, au retour,
-// s'il y a une étape à défaire ou s'il faut simplement changer d'écran.
 let etapesEmpilees = 0;
 
 function ouvrirLeClasseur(id, { empiler = true } = {}){
@@ -375,7 +341,6 @@ function ouvrirLeClasseur(id, { empiler = true } = {}){
 }
 
 function revenirALEtagere(){
-  // Une étape empilée ici : on la défait, pour que l'historique reste juste.
   if(etapesEmpilees > 0){ history.back(); return; }
   vue = 'etagere';
   history.replaceState({ vue: 'etagere' }, '', location.pathname + location.search);
@@ -385,9 +350,6 @@ function revenirALEtagere(){
 const classeurDeLAdresse = () =>
   decodeURIComponent((location.hash.match(/^#classeur=(.+)$/) ?? [])[1] ?? '');
 
-// Le bouton « page précédente » du navigateur, et « page suivante » aussi.
-// L'état empilé dit d'ordinaire où aller ; à défaut : une adresse saisie à
-// la main, un saut d'ancre : c'est l'adresse qui tranche.
 window.addEventListener('popstate', e => {
   etapesEmpilees = Math.max(0, etapesEmpilees - 1);
   const id = e.state?.vue === 'classeur' ? e.state.id : classeurDeLAdresse();
@@ -405,16 +367,12 @@ function appliquerLaCouleur(classeur){
 }
 
 function dessiner(){
-  // Les classeurs appartiennent au TCG physique, qui n'est pas encore
-  // ouvert aux membres.
   if(typeof physiqueAccessible === 'function' && !physiqueAccessible()){
     contenu().innerHTML = blocAVenir();
     return;
   }
   const c = actif();
   appliquerLaCouleur(c);
-  // Un classeur supprimé ailleurs, ou un identifiant retenu qui ne
-  // correspond plus à rien : on retombe sur l'étagère plutôt que sur rien.
   if(vue === 'classeur' && !c) vue = 'etagere';
 
   if(vue === 'etagere'){
@@ -430,14 +388,6 @@ function dessiner(){
   if(vue === 'classeur' && actif()) dessinerLeTiroir();
 }
 
-// Un visuel qui ne vient pas laisserait une case d'apparence vide, alors
-// qu'une carte s'y trouve. On tente l'adresse de secours, puis on écrit le
-// nom : mieux vaut un nom qu'un trou.
-//
-// L'image est masquée, jamais retirée. Remplacer le nœud en cours de
-// glisser-déposer annulait le déplacement : le navigateur abandonne un
-// glisser dont la source a changé sous lui. Le nom s'affiche donc par le
-// style, sur la case, sans toucher à l'arbre du document.
 function visuelDeSecours(img){
   const secours = img.dataset.secours;
   if(secours){
@@ -449,8 +399,6 @@ function visuelDeSecours(img){
   const boite = img.closest('.case, [data-poser]');
   if(boite) boite.dataset.nom = img.alt;
 }
-
-// ----------------------------------------------------------- les gestes ---
 
 function brancherLesGestes(){
   const zone = contenu();
@@ -481,8 +429,6 @@ function brancherLesGestes(){
   const creer = () => {
     const nom = champDossier.value.trim();
     if(!nom){ messageFugace('Donne un nom à ce dossier.'); return; }
-    // Deux dossiers du même nom seraient impossibles à distinguer sur
-    // l'étagère : on renvoie sur celui qui existe déjà.
     if(tousLesDossiers(classeurs, dossiers).some(d =>
         d.localeCompare(nom, 'fr', { sensitivity: 'base' }) === 0)){
       messageFugace('Ce dossier existe déjà.');
@@ -509,8 +455,6 @@ function brancherLesGestes(){
     b.addEventListener('click', e => {
       e.preventDefault();
       e.stopPropagation();
-      // Le bouton n'apparaît que sur un dossier vide : il n'y a rien à
-      // perdre, donc rien à confirmer.
       dossiers = dossiers.filter(d => d !== b.dataset.retirerDossier);
       enregistrerLesDossiers(dossiers);
       const replies = dossiersReplies();
@@ -520,7 +464,6 @@ function brancherLesGestes(){
     });
   });
 
-  // <details> n'émet pas d'événement qui remonte : on l'attrape à la descente.
   zone.addEventListener('toggle', e => {
     const bloc = e.target.closest?.('.dossier-bloc');
     if(!bloc) return;
@@ -532,9 +475,6 @@ function brancherLesGestes(){
 
   zone.querySelector('#retour-etagere')?.addEventListener('click', revenirALEtagere);
 
-  // Le nom se retient à chaque frappe, sans bouton « Enregistrer » : c'est un
-  // champ de texte, pas un formulaire. Redessiner à chaque lettre ferait
-  // perdre le curseur, donc on met à jour la donnée sans redessiner.
   zone.querySelector('#nom-classeur')?.addEventListener('input', e => {
     const c = actif();
     if(!c) return;
@@ -558,19 +498,14 @@ function brancherLesGestes(){
     dessiner();
   }));
 
-  // Le « + » n'est qu'une façade : c'est le sélecteur natif du navigateur
-  // qui s'ouvre, celui que le membre connaît déjà de son système.
   const libre = zone.querySelector('#couleur-libre');
   zone.querySelector('[data-couleur-libre]')?.addEventListener('click', () => libre?.click());
   libre?.addEventListener('input', () => {
     modifier(c => ({ ...c, couleur: libre.value }));
-    // Redessiner fermerait le sélecteur : on ne repeint que les pages tant
-    // que le membre fait glisser sa souris dedans.
     appliquerLaCouleur(actif());
   });
   libre?.addEventListener('change', () => dessiner());
 
-  // La couverture : une des teintes, une couleur précise, ou une photo.
   zone.querySelectorAll('[data-couv]').forEach(b => b.addEventListener('click', () => {
     modifier(c => oublierLesImagesInutiles({ ...c, couverture: b.dataset.couv }));
     dessiner();
@@ -598,8 +533,6 @@ function brancherLesGestes(){
 
   zone.querySelector('#supprimer-classeur')?.addEventListener('click', supprimerLeClasseur);
 
-  // Une carte prise reste prise d'une page à l'autre : c'est justement
-  // ainsi qu'on la déplace vers une autre page.
   zone.querySelector('#page-avant')?.addEventListener('click', () => allerALaPage(pageActive - 1, -1));
   zone.querySelector('#page-apres')?.addEventListener('click', () => allerALaPage(pageActive + 1, 1));
   zone.querySelector('#voir-le-livre')?.addEventListener('click', ouvrirLeLivre);
@@ -631,8 +564,6 @@ function brancherLesGestes(){
     e.stopPropagation();
     const index = Number(b.dataset.retirer);
     if(faceActive === 'verso'){
-      // Au verso, vider veut dire « plus rien du tout », et non « revenir au
-      // dos automatique », sinon la case se remplirait à nouveau aussitôt.
       modifier(c => oublierLesImagesInutiles(poserAuVerso(c, pageActive, index, VERSO_VIDE)));
       return;
     }
@@ -643,7 +574,6 @@ function brancherLesGestes(){
     });
   }));
 
-  // La case visée est redessinée comme les autres : on lui remet sa marque.
   if(caseVisee && caseVisee.page === pageActive
      && (caseVisee.face ?? 'recto') === faceActive){
     zone.querySelector(`.case[data-case="${caseVisee.case}"]`)?.classList.add('visee');
@@ -653,26 +583,13 @@ function brancherLesGestes(){
   brancherLeTiroir(zone);
 }
 
-// Déplacer une carte, par trois chemins qui mènent au même échange :
-//   - le glisser-déposer, à la souris ;
-//   - un clic sur la case de départ, puis sur celle d'arrivée ;
-//   - la touche Entrée, deux fois, pour qui navigue au clavier.
-//
-// Le deuxième n'est pas un doublon du premier : le glisser-déposer du web
-// n'existe pas sur un écran tactile. Sans lui, ranger son classeur depuis un
-// téléphone serait impossible.
 let caseChoisie = null;
 
-// La case vide qu'on vient de désigner : la prochaine carte choisie dans le
-// tiroir s'y posera. Sans cela, il fallait poser la carte à la suite puis la
-// déplacer : deux gestes pour un.
 let caseVisee = null;
 
 function choisirOuEchanger(index, el){
   const c = actif();
   if(caseChoisie === null){
-    // Une case vide ne se déplace pas : elle se désigne, pour y poser une
-    // carte ensuite.
     if(!c.pages[pageActive][index]){
       viserLaCase(index, el);
       return;
@@ -710,12 +627,9 @@ function brancherLeGlisser(zone){
       try{
         const depart = JSON.parse(e.dataTransfer.getData('text/plain'));
         modifier(c => echangerDeuxCases(c, depart, { page: pageActive, case: index }));
-      }catch(err){ /* déposé depuis ailleurs : on ignore */ }
+      }catch(err){ }
     });
 
-    // Au clic (donc aussi au doigt) et à la touche Entrée. Au verso, le
-    // clic ouvre le choix du contenu plutôt que de déplacer : on n'y range
-    // pas une collection, on y compose une face.
     const agir = () => (faceActive === 'verso'
       ? choisirLeContenuDuVerso(index)
       : choisirOuEchanger(index, el));
@@ -745,7 +659,6 @@ async function supprimerLeClasseur(){
   idActif = null;
   pageActive = 0;
   vue = 'etagere';
-  // Le classeur n'existe plus : son étape d'historique ne doit plus y mener.
   history.replaceState({ vue: 'etagere' }, '', location.pathname + location.search);
   dessiner();
 }
@@ -769,8 +682,6 @@ async function retirerLaPage(){
   dessiner();
 }
 
-// Désigner une case vide, puis choisir sa carte dans le tiroir. Recliquer
-// dessus annule.
 function viserLaCase(index, el){
   const dejaVisee = caseVisee && caseVisee.page === pageActive && caseVisee.case === index;
   contenu().querySelectorAll('.case.visee').forEach(x => x.classList.remove('visee'));
@@ -782,14 +693,10 @@ function viserLaCase(index, el){
   caseVisee = { page: pageActive, case: index, face: 'recto' };
   el.classList.add('visee');
   messageFugace('Case choisie. Prends une carte ci-dessous pour l\'y poser.');
-  // Le tiroir est plus bas : on l'amène sous les yeux plutôt que de laisser
-  // chercher où cliquer ensuite.
   document.getElementById('choix-extension')?.scrollIntoView({
     behavior: mouvementReduit() ? 'auto' : 'smooth', block: 'center' });
 }
 
-// Poser une carte : dans la case visée si l'on en a désigné une, à la suite
-// sinon.
 function poserLaCarte(carteId){
   const cible = caseVisee;
   caseVisee = null;
@@ -799,8 +706,6 @@ function poserLaCarte(carteId){
     return;
   }
   modifier(c => {
-    // La page visée a pu disparaître entre-temps : on retombe alors sur le
-    // comportement ordinaire plutôt que d'écrire à côté.
     if(!c.pages[cible.page]) return poserALaSuite(c, carteId);
     if(cible.face === 'verso') return poserAuVerso(c, cible.page, cible.case, carteId);
     const pages = c.pages.map(p => [...p]);
@@ -812,15 +717,7 @@ function poserLaCarte(carteId){
     : `Carte posée en case ${cible.case + 1} de la page ${cible.page + 1}.`);
 }
 
-// ---------------------------------------------------- importer une image ---
-//
-// Une photo de téléphone pèse trois ou quatre méga-octets, là où la mémoire
-// d'un navigateur en offre cinq pour tout le site. On réduit donc l'image
-// avant de l'enregistrer : 500 px de large suffisent pour une case qui en
-// fait 220, et le WebP ramène le poids à quelques dizaines de kilo-octets.
 const LARGEUR_IMAGE_IMPORTEE = 500;
-// Une couverture s'affiche plus grande qu'une pochette : elle mérite un peu
-// plus de définition, sans pour autant remplir la mémoire.
 const LARGEUR_COUVERTURE = 700;
 
 function reduireLImage(fichier, largeurMax = LARGEUR_IMAGE_IMPORTEE){
@@ -839,7 +736,6 @@ function reduireLImage(fichier, largeurMax = LARGEUR_IMAGE_IMPORTEE){
         const ctx = toile.getContext('2d');
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, largeur, hauteur);
-        // Le WebP n'existe pas partout : on retombe sur le JPEG, qui oui.
         const donnees = toile.toDataURL('image/webp', 0.86);
         resoudre(donnees.startsWith('data:image/webp')
           ? donnees : toile.toDataURL('image/jpeg', 0.86));
@@ -867,8 +763,6 @@ async function importerUneImage(fichier){
 
   const cible = caseVisee;
   caseVisee = null;
-  // On garde de quoi revenir en arrière : si l'enregistrement échoue faute
-  // de place, le classeur doit rester tel qu'il était.
   const avant = actif();
   modifier(c => {
     const { cle, classeur } = ajouterUneImage(c, donnees);
@@ -881,9 +775,6 @@ async function importerUneImage(fichier){
     return poserALaSuite(classeur, cle);
   });
 
-  // Une image de plus peut faire déborder la mémoire du navigateur. Si rien
-  // n'a pu être écrit, on remet le classeur d'avant plutôt que de laisser
-  // croire que l'image est enregistrée.
   if(!enregistrerLesClasseurs(classeurs)){
     classeurs = classeurs.map(x => (x.id === avant.id ? avant : x));
     enregistrerLesClasseurs(classeurs);
@@ -912,8 +803,6 @@ async function importerLaCouverture(fichier){
   const avant = actif();
   modifier(c => {
     const { cle, classeur } = ajouterUneImage(c, donnees);
-    // L'ancienne photo de couverture n'a plus d'emploi : on la laisse
-    // partir au ménage plutôt que d'empiler les images dans la mémoire.
     return oublierLesImagesInutiles({ ...classeur, couverture: cle });
   });
   if(!enregistrerLesClasseurs(classeurs)){
@@ -926,14 +815,8 @@ async function importerLaCouverture(fichier){
   messageFugace('Couverture changée.');
 }
 
-// ------------------------------------------------------------ le tiroir ---
-//
-// Les cartes déjà posées dans un classeur doivent pouvoir s'afficher même
-// quand leur extension n'est pas ouverte dans le tiroir : on retient donc
-// ce qu'on a lu, extension par extension.
-
-const cartesLues = new Map();          // id d'extension → cartes
-const carteParId = new Map();          // id de carte    → carte
+const cartesLues = new Map();
+const carteParId = new Map();
 
 const carteConnue = id => carteParId.get(id) ?? null;
 
@@ -941,9 +824,6 @@ function retenirLesCartes(cartes){
   cartes.forEach(c => carteParId.set(c.id, c));
 }
 
-// Une carte posée dans un classeur appartient forcément à une extension :
-// son identifiant commence par celui de l'extension. On lit celles dont on a
-// besoin, et elles seules.
 async function chargerLesExtensionsUtiles(){
   const c = actif();
   if(!c) return;
@@ -962,8 +842,6 @@ async function chargerLesExtensionsUtiles(){
   }
 }
 
-// « 30th-c-001 » appartient à « 30th-c », pas à « 30th » : on prend le nom
-// d'extension le plus long qui colle, comme ailleurs sur le site.
 function extensionDeLaCarte(carteId){
   const connus = extensionsPhysiques.map(e => e.id).sort((a, b) => b.length - a.length);
   return connus.find(id => String(carteId).startsWith(id + '-')) ?? null;
@@ -1009,8 +887,6 @@ function brancherLeTiroir(zone){
   const fichier = zone.querySelector('#fichier-image');
   fichier?.addEventListener('change', async e => {
     await importerUneImage(e.target.files?.[0]);
-    // Le champ se vide : sans cela, réimporter le même fichier ne
-    // déclencherait rien, le navigateur n'y voyant aucun changement.
     e.target.value = '';
   });
 }
@@ -1025,9 +901,6 @@ function dessinerLeTiroir(){
   const seulementObtenues = document.getElementById('seulement-obtenues')?.checked;
 
   let liste = cartesDuTiroir;
-  // Par extension, on cherche une carte dans une extension : le filtre porte
-  // sur son nom et son numéro. Par Pokémon, toutes les cartes portent le même
-  // nom : le filtre porte alors sur l'extension, seule chose qui les sépare.
   if(q){
     liste = modeTiroir === 'extension'
       ? liste.filter(c => c.name.toLowerCase().includes(q) || (c.localId ?? '').includes(q))
@@ -1074,8 +947,6 @@ function dessinerLeTiroir(){
   }));
 }
 
-// Un mot qui s'affiche puis s'efface : de quoi accuser réception d'un geste
-// sans immobiliser l'écran.
 function messageFugace(texte){
   let boite = document.getElementById('message-fugace');
   if(!boite){
@@ -1094,12 +965,7 @@ function messageFugace(texte){
   boite._t = setTimeout(() => { boite.style.opacity = '0'; }, 2600);
 }
 
-// ---------------------------------------------------------- le démarrage ---
-
 async function demarrer(){
-  // Le TCG physique fermé aux membres : conseiller de « passer du côté
-  // physique » les enverrait vers une porte fermée. On dit plutôt qu'il
-  // arrive bientôt.
   if(typeof physiqueAccessible === 'function' && !physiqueAccessible()){
     contenu().innerHTML = blocAVenir();
     return;
@@ -1113,8 +979,6 @@ async function demarrer(){
 
   classeurs = lireLesClasseurs();
   dossiers = lireLesDossiers();
-  // Seule l'adresse ouvre un classeur : arriver sur « Mes classeurs » montre
-  // l'étagère, et c'est elle que retrouve le bouton « page précédente ».
   const retenu = classeurDeLAdresse();
   if(retenu && classeurs.some(c => c.id === retenu)){
     idActif = retenu;
@@ -1141,12 +1005,6 @@ async function demarrer(){
 demarrer();
 initCompte().then(afficherEtatCompte);
 
-// ------------------------------------------------- feuilleter les pages ---
-//
-// Un classeur se feuillette : on ne va pas chercher un bouton à chaque page.
-// Trois gestes mènent à la page suivante : la flèche du clavier, le doigt
-// qui balaie, et les boutons, qui restent pour qui préfère viser.
-
 function allerALaPage(numero, sens){
   const c = actif();
   if(!c) return false;
@@ -1154,7 +1012,6 @@ function allerALaPage(numero, sens){
   if(voulu === pageActive) return false;
   pageActive = voulu;
   dessiner();
-  // Le mouvement dit dans quel sens on a tourné, comme une page qui bascule.
   const page = contenu().querySelector('.page-classeur');
   if(page && !mouvementReduit()){
     page.animate(
@@ -1168,9 +1025,6 @@ function allerALaPage(numero, sens){
 const mouvementReduit = () =>
   window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
-// Le balayage au doigt. On exige un mouvement franc et surtout plus
-// horizontal que vertical : sans cela, un simple défilement de la page
-// tournerait un feuillet au passage.
 function brancherLeBalayage(element, surGauche, surDroite){
   let depart = null;
   element.addEventListener('touchstart', e => {
@@ -1188,35 +1042,18 @@ function brancherLeBalayage(element, surGauche, surDroite){
   }, { passive: true });
 }
 
-// Les flèches du clavier ne doivent pas tourner la page pendant qu'on écrit
-// le nom du classeur ou qu'on filtre les cartes.
 function saisieEnCours(){
   const el = document.activeElement;
   return el && (el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.tagName === 'TEXTAREA');
 }
 
 document.addEventListener('keydown', e => {
-  if(livreOuvert()) return;                       // la vue livre a ses propres touches
+  if(livreOuvert()) return;
   if(saisieEnCours() || !actif()) return;
   if(e.key === 'ArrowLeft')  allerALaPage(pageActive - 1, -1);
   if(e.key === 'ArrowRight') allerALaPage(pageActive + 1, 1);
 });
 
-// ------------------------------------------------------- la vue « livre » ---
-//
-// Le classeur ouvert à plat : deux pages en vis-à-vis, comme on le regarde
-// vraiment. C'est là qu'on juge un rangement : une page seule ne dit pas ce
-// que donne la double page, et c'est pourtant ce qu'on a sous les yeux quand
-// on ouvre le classeur.
-//
-// On y regarde, on n'y touche pas : les cases n'y sont ni déplaçables ni
-// supprimables. La vue sert à décider, l'édition à faire.
-
-// Le numéro de la page montrée à droite. Dans un classeur, tout se passe à
-// droite : la première feuille s'ouvre de ce côté, et la page de gauche ne
-// montre que le dos des cartes de la feuille précédente, puisqu'une pochette
-// ne se remplit que d'un côté. On avance donc d'une page à la fois, en vue
-// double comme sur un écran étroit.
 let pageLivre = 0;
 
 const livreOuvert = () => Boolean(document.getElementById('livre'));
@@ -1232,17 +1069,9 @@ function caseDeLecture(c, valeur){
 
 function grilleDePage(c, page, numero, { dos = false } = {}){
   const f = FORMATS[c.format];
-  // Une page de C colonnes sur L lignes de cartes 2,5 × 3,5 a ce rapport-là.
-  // Posé sur la page elle-même, il lui donne sa forme quelle que soit la
-  // place disponible, et les deux pages restent identiques.
   const rapport = (f.colonnes * 2.5) / (f.lignes * 3.5);
-  // Le verso est une face à part entière : son contenu, dos automatique
-  // compris, est déjà calculé par versoDeLaPage. Il ne reste qu'à l'afficher.
   const cases = page.map(valeur => caseDeLecture(c, valeur)).join('');
 
-  // Un feuillet opaque n'a de pochettes que d'un côté : son dos est une
-  // feuille lisse, de la couleur du classeur. On ne dessine donc la grille
-  // que si le membre y a lui-même rangé quelque chose.
   const feuilleLisse = dos && !estTransparent(c) && page.every(v => !v);
 
   return `
@@ -1256,8 +1085,6 @@ function grilleDePage(c, page, numero, { dos = false } = {}){
     </div>`;
 }
 
-// La page de gauche du tout premier feuillet : l'intérieur de la couverture,
-// où il n'y a jamais rien.
 const couvertureInterieure = () =>
   '<div class="page-livre couverture" aria-hidden="true"></div>';
 
@@ -1297,8 +1124,6 @@ function tournerLeFeuillet(sens){
   dessinerLeLivre();
 }
 
-// Le symbole du partage : un nœud relié à deux autres. Dessiné ici plutôt
-// qu'emprunté à une police d'icônes, qui ne se chargerait pas toujours.
 const ICONE_PARTAGE = `
   <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
        stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1309,11 +1134,6 @@ const ICONE_PARTAGE = `
     <line x1="8.3" y1="13.2" x2="15.7" y2="17.8"></line>
   </svg>`;
 
-// Fabriquer l'image prend un instant : chaque carte est chargée puis
-// peinte. Le bouton le dit, plutôt que de laisser croire à un clic perdu.
-// La page en cours d'abord : c'est immédiat. La fenêtre propose ensuite
-// d'ajouter les autres, ce qui évite de faire attendre qui ne veut qu'une
-// page : vingt pages, c'est cent quatre-vingts visuels à charger.
 async function partagerDepuisLeClasseur(pages, bouton){
   const c = actif();
   if(!c) return;
@@ -1342,8 +1162,6 @@ async function partagerLaPageCourante(e){
   const c = actif();
   if(!c) return;
   const bouton = e.currentTarget;
-  // Un classeur d'une seule page ne laisse pas le choix : on ne pose pas
-  // une question dont la réponse est déjà écrite.
   if(c.pages.length <= 1) return partagerDepuisLeClasseur([0], bouton);
   const etendue = await demanderLEtendue(c);
   if(!etendue) return;
@@ -1383,8 +1201,6 @@ function ouvrirLeLivre(){
   livre.querySelector('.feuillet.avant').addEventListener('click', () => tournerLeFeuillet(-1));
   livre.querySelector('.feuillet.apres').addEventListener('click', () => tournerLeFeuillet(1));
   brancherLeBalayage(livre, () => tournerLeFeuillet(-1), () => tournerLeFeuillet(1));
-  // Pivoter son téléphone change le nombre de pages qui tiennent : la vue
-  // s'y refait, plutôt que de rester dans l'état de l'orientation d'avant.
   window.addEventListener('resize', dessinerLeLivre);
   document.addEventListener('keydown', auClavierDuLivre);
   livre.querySelector('.fermer').focus();
@@ -1402,18 +1218,9 @@ function fermerLeLivre(){
   window.removeEventListener('resize', dessinerLeLivre);
   document.getElementById('livre')?.remove();
   document.body.style.overflow = '';
-  // On repart de la page qu'on regardait : fermer la vue ne doit pas faire
-  // perdre l'endroit où l'on en était.
   pageActive = Math.min(pageLivre, (actif()?.pages.length ?? 1) - 1);
   dessiner();
 }
-
-// ------------------------------------------- chercher par Pokémon --------
-//
-// Réunir tous ses Pikachu sur une page demandait jusqu'ici d'ouvrir les
-// extensions une par une, en espérant s'en souvenir. Le site sait déjà
-// retrouver toutes les cartes d'un Pokémon, quelle que soit son extension :
-// c'est ce savoir-là qu'on amène dans le tiroir.
 
 const MAX_SUGGESTIONS = 10;
 
@@ -1448,7 +1255,6 @@ function brancherLaRecherchePokemon(zone){
   };
 
   champ.addEventListener('input', proposer);
-  // Entrée prend la première proposition : on tape un nom, on valide.
   champ.addEventListener('keydown', e => {
     if(e.key !== 'Enter') return;
     e.preventDefault();
@@ -1470,13 +1276,9 @@ async function choisirLePokemon(dexId){
     ${echapper(pokemonChoisi.name)} dans toutes les extensions…</p>`;
   try{
     const cartes = await cartesDuPokemon(dexId);
-    // Une carte d'un Pokémon existe des deux côtés du site : on ne garde
-    // que celles du jeu physique, seul univers où un classeur a un sens.
     cartesDuTiroir = cartes
       .filter(c => appartientAUnivers(extensionDeLaCarte(c.id) ?? ''))
       .sort((a, b) => {
-        // De la plus ancienne extension à la plus récente, puis par numéro :
-        // un Pikachu se cherche dans l'ordre où il est sorti.
         const ra = rangDeLExtension.get(extensionDeLaCarte(a.id)) ?? Infinity;
         const rb = rangDeLExtension.get(extensionDeLaCarte(b.id)) ?? Infinity;
         if(ra !== rb) return ra - rb;
@@ -1490,19 +1292,6 @@ async function choisirLePokemon(dexId){
   }
   dessinerLeTiroir();
 }
-
-// --------------------------------------- choisir ce qu'on met au verso ---
-//
-// Trois façons de remplir une pochette de verso, et une pour la vider :
-//
-//   - le dos d'une carte, ce qu'on voit d'ordinaire en retournant la feuille ;
-//   - une carte à l'endroit, pour qui veut la voir des deux côtés ;
-//   - une image importée ;
-//   - rien du tout.
-//
-// Ce choix n'existe qu'au verso. Au recto, une pochette se remplit d'une
-// carte ou d'une image, et poser la question à chaque clic alourdirait le
-// geste le plus fréquent du site.
 
 function choisirLeContenuDuVerso(index){
   const c = actif();
@@ -1521,11 +1310,11 @@ function choisirLeContenuDuVerso(index){
           <span>Le dos d'une carte</span>
         </button>
         <button data-choix="carte">
-          <span class="pictogramme">▧</span>
+          <span class="pictogramme">${pictogramme('carte')}</span>
           <span>Une carte</span>
         </button>
         <button data-choix="image">
-          <span class="pictogramme">🖼</span>
+          <span class="pictogramme">${pictogramme('image')}</span>
           <span>Une image</span>
         </button>
       </div>
@@ -1556,7 +1345,6 @@ function choisirLeContenuDuVerso(index){
       modifier(x => oublierLesImagesInutiles(poserAuVerso(x, pageActive, index, VERSO_VIDE)));
       return;
     }
-    // Carte ou image : la case est désignée, et le tiroir prend la suite.
     caseVisee = { page: pageActive, case: index, face: 'verso' };
     if(choix === 'image'){
       document.getElementById('fichier-image')?.click();

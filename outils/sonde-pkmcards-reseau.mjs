@@ -1,18 +1,3 @@
-// Écouter ce que demande le paginateur de PkmCards.
-// =================================================
-//
-// Ce qu'on sait déjà, mesuré : leur page « liste des cartes françaises »
-// livre 30 cartes rendues par le serveur, et ignore toutes les formes de
-// pagination par adresse (?page=, ?p=, ?offset=, /page/2). Pas de plan de
-// site, pas de Next.js, pas d'appel /api/ visible dans le code livré.
-// Mais le mot « pagination » y est : le reste se demande en JavaScript.
-//
-// Alors on ouvre la page dans un vrai navigateur et on note TOUTES les
-// requêtes qu'elle émet pendant qu'on descend et qu'on clique. Le but
-// n'est pas de récolter ici : c'est d'apprendre l'adresse à appeler.
-//
-//   node outils/sonde-pkmcards-reseau.mjs
-
 import { chromium } from 'playwright';
 
 const RACINE = 'https://www.pkmcards.fr';
@@ -27,8 +12,6 @@ const contexte = await nav.newContext({
 });
 const page = await contexte.newPage();
 
-// On n'a pas besoin des images pour comprendre la mécanique, et les
-// refuser allège d'autant leur serveur.
 await contexte.route('**/*', route => {
   const t = route.request().resourceType();
   if(t === 'image' || t === 'media' || t === 'font') return route.abort();
@@ -50,7 +33,6 @@ await page.goto(`${RACINE}/cards/liste-cartes-francaises`,
   { waitUntil: 'networkidle', timeout: 60000 });
 console.log(`cartes visibles au départ : ${await compterCartes()}`);
 
-// --- Quoi, dans la page, ressemble à un paginateur ? ----------------------
 console.log('\n=============== commandes de pagination ===============');
 const commandes = await page.evaluate(() =>
   [...document.querySelectorAll('button, a, [role=button]')]
@@ -58,8 +40,6 @@ const commandes = await page.evaluate(() =>
       balise: e.tagName.toLowerCase(),
       texte: (e.textContent ?? '').trim().slice(0, 40),
       href: e.getAttribute('href'),
-      // Les attributs sont souvent le seul indice du cadre utilisé
-      // (wire:click pour Livewire, @click pour Alpine, hx-get pour htmx).
       attributs: [...e.attributes].map(a => a.name)
         .filter(n => /^(wire|x|hx|data|@|:)/.test(n)),
     }))
@@ -68,7 +48,6 @@ const commandes = await page.evaluate(() =>
     .slice(0, 30));
 for(const c of commandes) console.log('  ' + JSON.stringify(c));
 
-// --- Descendre, puis cliquer ---------------------------------------------
 console.log('\n=============== on descend ===============');
 let avant = await compterCartes();
 for(let i = 0; i < 5; i++){
@@ -92,7 +71,6 @@ for(const mot of ['Suivant', 'Next', 'Charger', 'Voir plus', '2']){
   }catch(err){ console.log(`  « ${mot} » : ${err.message.split('\n')[0]}`); }
 }
 
-// --- Ce qu'elle a demandé ------------------------------------------------
 console.log('\n=============== requêtes émises ===============');
 if(!demandes.length) console.log('  aucune : tout le contenu arrive avec la page.');
 for(const d of demandes.slice(0, 25)){

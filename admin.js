@@ -1,25 +1,5 @@
-// Les outils d'écriture de l'administration.
-//
-// Il n'y a plus de page d'administration : l'administrateur modifie le
-// catalogue en naviguant sur le site (admin-site.js), et retrouve comptes
-// et corrections dans un tiroir (admin-tiroir.js). Ce fichier-ci ne fait
-// que parler à la base : savoir si l'on est administrateur, déposer une
-// image, enregistrer ou retirer une correction. Tout passe par la table
-// « corrections », dont l'écriture est réservée à l'administrateur par les
-// règles de la base.
-//
-// Ce fichier ne protège rien. Il masque des boutons à qui n'est pas
-// administrateur, ce qui rend la page compréhensible, mais un site statique
-// livre tout son code au navigateur, donc quiconque le veut peut appeler ces
-// fonctions. La seule protection réelle est dans supabase/schema.sql : la
-// base refuse l'écriture à tout compte dont le profil ne porte pas le
-// drapeau « est_admin ». Si ce fichier disparaissait entièrement, rien ne
-// serait moins sûr.
-
 let dbAdmin = null;
 let jeSuisAdmin = false;
-// Plusieurs éléments d'une même page posent la même question. On la garde
-// en mémoire pour n'interroger la base qu'une fois.
 let verificationEnCours = null;
 
 async function clientAdmin(){
@@ -29,8 +9,6 @@ async function clientAdmin(){
   return dbAdmin;
 }
 
-// La colonne « est_admin » n'est lisible par personne ; la base répond par
-// cette fonction, et seulement pour le compte qui la pose.
 function verifierAdmin(){
   return (verificationEnCours ??= demanderSiAdmin());
 }
@@ -50,8 +28,6 @@ async function demanderSiAdmin(){
   }
 }
 
-// ------------------------------------------------------------- écriture --
-
 const MAX_OCTETS_VISUEL = 5 * 1024 * 1024;
 const TYPES_VISUEL = ['image/webp', 'image/png', 'image/jpeg'];
 
@@ -65,8 +41,6 @@ async function televerserVisuel(cible, fichier){
 
   const db = await clientAdmin();
   const extension = fichier.type.split('/')[1].replace('jpeg', 'jpg');
-  // L'horodatage force une adresse neuve : sans lui, le navigateur
-  // continuerait d'afficher l'image précédente, gardée en cache.
   const chemin = `${cible}-${Date.now()}.${extension}`;
   const { error } = await db.storage.from('corrections').upload(chemin, fichier, {
     contentType: fichier.type,
@@ -81,8 +55,6 @@ async function enregistrerCorrection({ univers, genre, cible, donnees = {}, imag
   const ligne = { univers, genre, cible, donnees };
   if(image_chemin) ligne.image_chemin = image_chemin;
 
-  // « upsert » plutôt qu'insertion : ressaisir une correction remplace la
-  // précédente au lieu d'échouer sur le doublon.
   const { error } = await db.from('corrections')
     .upsert(ligne, { onConflict: 'univers,genre,cible' });
   if(error) throw error;
@@ -103,11 +75,6 @@ async function supprimerCorrection(id){
   if(error) throw error;
 }
 
-// Une correction absorbée par la construction nocturne s'applique désormais
-// sur une donnée déjà identique : elle ne change plus rien et peut être
-// retirée. On le vérifie en comparant avec l'instantané publié, plutôt qu'en
-// se fiant à une date : la construction peut échouer, et une correction
-// qu'on croirait absorbée disparaîtrait alors de l'écran.
 async function correctionAbsorbee(c){
   try{
     if(c.genre === 'extension'){

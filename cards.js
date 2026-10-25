@@ -1,6 +1,3 @@
-// Outils communs aux pages qui affichent une grille de cartes (page d'une
-// extension, page d'un Pokémon) : accès à l'API TCGdex, raretés et images.
-
 async function fetchJson(url, retries = 1){
   const res = await fetch(url);
   const text = await res.text();
@@ -14,17 +11,11 @@ async function fetchJson(url, retries = 1){
   return JSON.parse(text);
 }
 
-// Symboles imprimés sur les cartes, associés aux raretés telles que TCGdex
-// les nomme en français. Les raretés récentes (Illustration rare, Hyper
-// rare...) n'ont pas de symbole unique standardisé : on leur attribue le
-// nombre d'étoiles le plus proche de l'usage courant chez les collectionneurs.
 const RARITY_SYMBOLS = {
-  // Pokémon TCG Pocket : des losanges, des étoiles, une couronne.
   'Un Diamant': '◆', 'Deux Diamants': '◆◆', 'Trois Diamants': '◆◆◆',
   'Quatre Diamants': '◆◆◆◆', 'Une Étoile': '★', 'Deux Étoiles': '★★',
   'Trois Étoiles': '★★★', 'Couronne': '♛',
   'Chromatique': '✦', 'Chromatique deux étoiles': '✦✦',
-  // Jeu physique.
   'Sans Rareté': '',
   'Commune': '●',
   'Peu Commune': '◆',
@@ -68,23 +59,6 @@ function raritySymbol(rarity){
   return '✦';
 }
 
-// Les vraies icônes du jeu, pour les vignettes.
-//
-// « raritySymbol » ci-dessus reste en caractères typographiques : il sert
-// aussi à remplir le menu déroulant des filtres, et un <option> ne peut pas
-// contenir d'image. Les deux cohabitent donc, chacun là où il fonctionne.
-//
-// Le jeu répète le même symbole : trois losanges pour « Trois Diamants ».
-// On fait pareil, plutôt que d'avoir un fichier par combinaison.
-// Les icônes de rareté vivent dans raretes.js, que la page des missions
-// partage avec les grilles de cartes.
-
-// Ordre d'affichage dans le filtre : du plus commun au plus rare.
-//
-// Pocket suit sa propre liste (raretes.js). Classées par symbole, ses
-// raretés se mélangeaient : « Deux Diamants » (◆◆) n'avait pas de rang et
-// tombait en fin de liste, après les étoiles. Le jeu physique, lui, garde
-// le classement par symbole.
 const SYMBOL_RANK = { '': 0, '●': 1, '◆': 2, '★': 3, '★★': 4, '★★★': 5, '★★★★': 6, '✦': 7 };
 function rarityRank(rarity){
   const rangPocket = typeof ORDRE_RARETES_POCKET !== 'undefined' ? ORDRE_RARETES_POCKET.indexOf(rarity) : -1;
@@ -102,12 +76,6 @@ function populateRarityFilter(cards){
   select.value = previous;
 }
 
-// TCGdex ne renvoie pas la rareté dans une liste de cartes. On interroge donc
-// l'API rareté par rareté ("parmi ces cartes, lesquelles sont communes ?")
-// pour recomposer l'information. L'ordre part des raretés les plus répandues,
-// ce qui permet de s'arrêter dès que chaque carte a trouvé la sienne.
-// Les raretés de l'application (losanges, étoiles, couronne) ne sont pas
-// sondées : leur source les fournit avec la carte.
 const RARITIES_TO_PROBE = [
   'Commune', 'Peu Commune', 'Rare', 'Rare Holo', 'Holo Rare', 'Double rare',
   'Ultra Rare', 'Illustration rare', 'Illustration spéciale rare', 'Hyper rare',
@@ -118,19 +86,13 @@ const RARITIES_TO_PROBE = [
   'Collection Classique', 'HIGH-TECH rare', 'Méga Hyper Rare',
 ];
 
-// `scopeQuery` restreint la recherche au même ensemble que la grille affichée
-// (par exemple "set.id=eq:base1" ou "dexId=eq:25"). Renvoie { [cardId]: rareté }.
 async function probeRarities(scopeQuery, cacheKey, cards){
   const cached = sessionStorage.getItem(cacheKey);
   if(cached) return JSON.parse(cached);
 
   const byCardId = {};
-  // La recherche peut renvoyer des cartes absentes de la grille (celles de
-  // Pokémon TCG Pocket, par exemple) : on ne compte que celles affichées,
-  // sinon on s'arrêterait avant d'avoir la rareté de toutes.
   const wanted = new Set(cards.map(c => c.id));
   let remaining = wanted.size;
-  // Par lots, pour ne pas saturer le navigateur ni l'API.
   for(let i = 0; i < RARITIES_TO_PROBE.length && remaining > 0; i += 5){
     const batch = RARITIES_TO_PROBE.slice(i, i + 5);
     const results = await Promise.all(batch.map(async rarity => {
@@ -141,9 +103,6 @@ async function probeRarities(scopeQuery, cacheKey, cards){
         return { rarity, cards: [] };
       }
     }));
-    // Garde-fou : si une rareté "correspond" à toutes les cartes, c'est que
-    // le filtre n'a pas été appliqué par l'API. Mieux vaut aucune rareté
-    // qu'une rareté fausse sur toutes les cartes.
     if(results.some(r => r.cards.length === cards.length && cards.length > 12)){
       console.warn("Le filtre par rareté n'est pas appliqué par l'API : raretés ignorées.");
       return null;
@@ -159,16 +118,10 @@ async function probeRarities(scopeQuery, cacheKey, cards){
   return byCardId;
 }
 
-// Quand TCGdex n'a pas le visuel français d'une carte, on retombe sur une
-// image ajoutée à la main dans le dépôt (images/cards/<id de la carte>.png),
-// puis sur un point d'interrogation.
 function cardImgFallback(img){
   const fallback = img.dataset.fallback;
   if(fallback){
     img.removeAttribute('data-fallback');
-    // Le secours a parfois sa propre haute définition (Pokécardex : 444 px
-    // contre 214) : le zoom doit la prendre, plutôt que d'agrandir la
-    // vignette ou d'attendre une haute définition qui n'existe pas.
     if(img.dataset.fallbackHaute){
       img.dataset.haute = img.dataset.fallbackHaute;
       img.removeAttribute('data-fallback-haute');
@@ -179,22 +132,12 @@ function cardImgFallback(img){
   img.replaceWith(Object.assign(document.createElement('span'), { className: 'glyph', textContent: '?', title: 'Image non disponible' }));
 }
 
-// Vignette d'une carte. `subtitle` remplace le numéro quand la grille mélange
-// plusieurs extensions (page d'un Pokémon), où le seul numéro ne dit rien.
-// Une carte qu'on n'a pas encore s'affiche en noir et blanc. La règle vit
-// dans progression.js, avec le reste de ce qui touche à la collection ; si
-// ce fichier n'est pas chargé, la grille reste simplement en couleur.
 function classeObtention(carteId){
   return typeof estObtenue === 'function' && !estObtenue(carteId) ? CLASSE_NON_OBTENUE : '';
 }
 
-// Une valeur posée dans un attribut HTML : un nom contenant un guillemet
-// (« Ho-Oh "brillant" ») fermerait l'attribut et casserait la vignette.
 const attrCarte = v => String(v ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
-// Les cartes sans visuel français portent un bandeau qui dit pourquoi
-// (classement : outils/sans-edition-francaise.mjs). La vue agrandie en
-// donne l'explication complète.
 const LANGUE_CARTE = {
   'sans-edition':   { bandeau: 'N\'existe pas en français', classe: '',
     explication: 'Cette carte n\'existe pas en français : le visuel est celui de la version anglaise.' },
@@ -204,10 +147,6 @@ const LANGUE_CARTE = {
 const langueDeLaCarte = c => c.sansEditionFr ? 'sans-edition' : c.visuelAnglais ? 'visuel-anglais' : null;
 
 function cardTile(c, subtitle){
-  // Les données de la carte voyagent avec sa vignette. L'environnement
-  // d'administration s'en sert pour préremplir sa fenêtre de modification
-  // sans qu'on ait à taper un identifiant. Rien de secret : tout cela est
-  // déjà affiché sur la vignette.
   const langue = langueDeLaCarte(c);
   const attrLangue = langue ? ` data-langue="${langue}"` : '';
   const bandeau = langue
@@ -231,22 +170,12 @@ function cardTile(c, subtitle){
   `;
 }
 
-// La cote n'est affichée que si elle a déjà été récupérée, c'est-à-dire
-// après un tri par valeur. Sinon la ligne est absente, plutôt que d'occuper
-// une place vide.
 function coteVignette(carteId){
-  // Une carte de l'application n'a pas de marché : rien à afficher, et
-  // surtout rien à aller chercher.
   if(typeof estPocket === 'function' && estPocket()) return '';
   if(typeof prixConnu !== 'function') return '';
   const prix = prixConnu(carteId);
   return prix ? `<div class="card-cote">≈ ${prixLisible(prix)}</div>` : '';
 }
-
-// --- Tri d'une grille ------------------------------------------------------
-// Le tri par valeur suppose de connaître le prix de chaque carte, soit une
-// requête par carte. On ne le paie donc qu'à la demande explicite du membre,
-// et une seule fois par extension et par visite.
 
 let triCritere = 'numero';
 let triCroissant = true;
@@ -257,8 +186,6 @@ function trierCartes(cartes){
     triees.sort((a, b) => {
       const pa = prixConnu(a.id)?.montant;
       const pb = prixConnu(b.id)?.montant;
-      // Une carte sans cote n'est pas une carte à zéro euro : elle va au
-      // bout, quel que soit le sens du tri.
       if(pa == null && pb == null) return 0;
       if(pa == null) return 1;
       if(pb == null) return -1;
@@ -273,17 +200,12 @@ function trierCartes(cartes){
   return triees;
 }
 
-// Branche les deux contrôles de tri d'une page sur son propre rafraîchissement.
-// `cartesAtrier` fournit les cartes concernées au moment du chargement des
-// cotes ; `rafraichir` redessine la grille.
 function installerTri(cartesAtrier, rafraichir){
   const choix = document.getElementById('tri');
   const sens = document.getElementById('tri-sens');
   const etat = document.getElementById('tri-etat');
   if(!choix || !sens) return;
 
-  // Trier par valeur n'a de sens que là où les cartes en ont une : dans
-  // l'application, l'option est retirée plutôt que laissée sans effet.
   if(typeof estPocket === 'function' && estPocket()){
     choix.querySelector('option[value="valeur"]')?.remove();
     if(triCritere === 'valeur'){ triCritere = 'numero'; choix.value = 'numero'; }
@@ -319,19 +241,10 @@ function installerTri(cartesAtrier, rafraichir){
   majSens();
 }
 
-// L'identifiant d'une carte est "<id de l'extension>-<numéro>", et un id
-// d'extension peut lui-même contenir des tirets (tk-ex-latia) : on découpe
-// donc au dernier.
 function setIdOfCard(cardId){
   return cardId.slice(0, cardId.lastIndexOf('-'));
 }
 
-// --- Agrandissement d'une carte au clic -----------------------------------
-// Le composant est autonome (styles compris) pour que les deux grilles en
-// bénéficient sans dupliquer de CSS dans chaque page.
-
-// La règle du noir et blanc vient de progression.js, quand la page le charge,
-// et l'interrupteur qui l'allume ou l'éteint se pose dans la barre d'outils.
 if(typeof poserStyleNonObtenue === 'function') poserStyleNonObtenue();
 if(typeof poserInterrupteurGrisaille === 'function'){
   const poser = () => poserInterrupteurGrisaille(document.querySelector('.toolbar'));
@@ -341,18 +254,12 @@ if(typeof poserInterrupteurGrisaille === 'function'){
 
 document.head.appendChild(Object.assign(document.createElement('style'), { textContent: `
   .card-img-wrap img{cursor:zoom-in}
-  /* Le bandeau de langue, en bas de l'image : lisible sans masquer la
-     carte, et transparent aux clics pour que le zoom reste accessible. */
   .bandeau-langue{position:absolute;left:0;right:0;bottom:0;z-index:2;pointer-events:none;
     padding:4px 6px 5px;text-align:center;font:600 10.5px/1.25 'IBM Plex Sans',sans-serif;letter-spacing:.2px;
     color:#15171A;background:rgba(227,199,102,0.95);box-shadow:0 -1px 0 rgba(0,0,0,0.25)}
   .bandeau-langue-visuel{background:rgba(185,188,185,0.95)}
   .card-zoom .note-langue{display:block;margin:0 auto 6px;max-width:420px;font-size:12.5px;color:#E3C766}
-  /* Une carte agrandie se regarde en couleur, meme si sa vignette est grise. */
   .card-zoom img{filter:none !important;opacity:1 !important}
-  /* Au-dessus du rail des univers (z-index 60) : une vue agrandie doit
-     couvrir la page entière. Sans cela, le rail passait devant et masquait
-     la flèche de gauche. */
   .card-zoom{position:fixed;inset:0;z-index:70;background:rgba(10,11,13,0.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:28px;cursor:zoom-out;opacity:0;transition:opacity .15s;
 }
   .card-zoom.shown{opacity:1}
@@ -366,14 +273,11 @@ document.head.appendChild(Object.assign(document.createElement('style'), { textC
     background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
     color:#EDEAE0;border-radius:50%;font:22px/1 'IBM Plex Sans',sans-serif;
     padding:0;transition:background .12s,opacity .12s;
-    /* Au-dessus de la carte, même quand elle glisse sous le doigt. */
     z-index:2;}
   .card-zoom .fleche:hover{background:rgba(255,255,255,.18)}
   .card-zoom .fleche[disabled]{opacity:.22;cursor:default}
   .card-zoom .fleche.avant{left:16px}
   .card-zoom .fleche.apres{right:16px}
-  /* Sur un écran étroit, les flèches descendent sous l'image plutôt que de
-     mordre dessus. */
   @media(max-width:620px){
     .card-zoom .fleche{top:auto;bottom:18px;transform:none;width:46px;height:46px}
     .card-zoom .fleche.avant{left:22px}
@@ -382,9 +286,6 @@ document.head.appendChild(Object.assign(document.createElement('style'), { textC
 `}));
 
 function openCardZoom(img){
-  // Les vignettes affichées à l'instant, dans l'ordre de la grille : c'est
-  // sur celles-là qu'on défile, filtres compris. Se fier au catalogue entier
-  // ferait défiler des cartes que l'écran ne montre pas.
   const vignettes = [...document.querySelectorAll('.card-grid img[data-card-id]')];
   let position = Math.max(0, vignettes.indexOf(img));
 
@@ -405,9 +306,6 @@ function openCardZoom(img){
   const avant    = overlay.querySelector('.fleche.avant');
   const apres    = overlay.querySelector('.fleche.apres');
 
-  // Chaque affichage reçoit son propre jeton. Une cote ou une haute
-  // définition qui arrive après qu'on a changé de carte est alors ignorée,
-  // au lieu de s'écrire par-dessus la suivante.
   let jeton = 0;
 
   function afficher(indice){
@@ -425,10 +323,6 @@ function openCardZoom(img){
 
     decrire(source, monJeton);
 
-    // La vignette est déjà en cache : on l'affiche tout de suite, puis on la
-    // remplace par la haute définition dès qu'elle est prête. Celle-ci
-    // voyage avec la vignette : toutes les sources ne la nomment pas en
-    // remplaçant « low » par « high » dans l'adresse.
     const grande = source.dataset.haute
       || (vignette.includes('/low.webp') ? vignette.replace('/low.webp', '/high.webp') : vignette);
     if(grande !== vignette){
@@ -438,11 +332,6 @@ function openCardZoom(img){
     }
   }
 
-  // Ce qu'on écrit sous l'image. Dans Pocket, les cartes sont virtuelles :
-  // elles n'ont pas de cote et n'en auront jamais, donc annoncer « pas de
-  // cote connue » serait laisser croire à une information manquante. On y
-  // met l'extension et le numéro, qui eux manquent vraiment quand la grille
-  // mélange plusieurs extensions.
   async function decrire(source, monJeton){
     const carteId = source.dataset.cardId;
     if(!carteId) return;
@@ -459,7 +348,7 @@ function openCardZoom(img){
           extension = fiche.name ?? setId;
           total = fiche.cardCount?.official ?? fiche.cardCount?.total ?? null;
         }
-      }catch(err){ /* le nom court fera l'affaire */ }
+      }catch(err){ }
       if(monJeton !== jeton) return;
       elValeur.innerHTML =
         `<small>${echapperTexte(extension)} · n° ${numero}${total ? ` / ${total}` : ''}</small>`;
@@ -481,8 +370,6 @@ function openCardZoom(img){
     if(cible >= 0 && cible < vignettes.length) afficher(cible);
   };
 
-  // Sur un téléphone, on passe d'une carte à l'autre en la faisant glisser
-  // (glissement.js) ; sans ce fichier, les flèches restent.
   const glissement = typeof brancherGlissement === 'function'
     ? brancherGlissement({
         zone: overlay, image: elImage,
@@ -504,8 +391,6 @@ function openCardZoom(img){
     if(e.key === 'ArrowRight'){ e.preventDefault(); aller(1); }
   };
 
-  // Le fond ferme la vue ; les flèches, elles, doivent pouvoir être
-  // cliquées sans la refermer aussitôt.
   overlay.addEventListener('click', (e) => {
     if(glissement?.vientDeGlisser()) return;
     const fleche = e.target.closest('.fleche');
@@ -531,13 +416,6 @@ document.addEventListener('click', (e) => {
 });
 
 
-// Message bref, affiché au bas de l'écran puis effacé.
-//
-// Il sert aux explications qu'un survol de souris donnerait, mais qu'un
-// téléphone ne peut pas montrer : par exemple pourquoi une carte ne peut pas
-// être marquée « échangeable ». Les styles sont posés ici plutôt que dans la
-// feuille de chaque page : le message doit pouvoir apparaître partout sans
-// qu'on ait à se souvenir d'ajouter du CSS.
 let messageFugaceElement = null;
 let messageFugaceMinuteur = null;
 

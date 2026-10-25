@@ -1,9 +1,3 @@
-# Reconstruit chaque jour l'instantané des données que le site sert lui-même.
-#
-# Le site ne dépend donc plus d'une API au moment où un visiteur ouvre une
-# page : il dépend d'elle une fois par jour, ici, où un échec est visible et
-# sans conséquence pour les visiteurs : l'instantané de la veille reste en
-# place.
 name: Instantané des cartes
 
 on:
@@ -21,8 +15,6 @@ jobs:
       - name: Récupérer le site
         uses: actions/checkout@v4
 
-      # Seul le dossier « data » nous intéresse : le dépôt entier pèse le
-      # double, images de développement comprises.
       - name: Récupérer les données de TCGdex
         run: |
           git clone --depth 1 --filter=blob:none --no-checkout \
@@ -39,8 +31,6 @@ jobs:
       - name: Construire l'instantané
         run: node outils/instantane.mjs --tcgdex tcgdex --sortie donnees
 
-      # Le nombre de cartes de chaque extension, pour le badge « Extension
-      # complète » : la base le reçoit du navigateur de l'administrateur.
       - name: Résumer le nombre de cartes par extension
         run: node outils/totaux-extensions.mjs --sortie donnees
 
@@ -49,8 +39,6 @@ jobs:
           rm -rf tcgdex
           git config user.name  "Instantané des cartes"
           git config user.email "actions@users.noreply.github.com"
-          # « git add » d'abord : sans lui, une extension toute neuve, donc
-          # un fichier que git ne suit pas encore, passerait inaperçue.
           git add donnees images/cards images/sets
           if git diff --cached --quiet; then
             echo "Rien de nouveau : aucun dépôt."

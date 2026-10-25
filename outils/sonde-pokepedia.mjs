@@ -1,37 +1,8 @@
-// Poképédia : ses visuels de cartes sont-ils énumérables, et utilisables ?
-// ========================================================================
-//
-// Les deux autres pistes sont closes : Bulbapedia et Cardmarket répondent
-// 403 à tout, robots.txt compris. Poképédia, elle, nous laisse entrer :
-// son robots.txt ne bloque que ses pages techniques, et nomme ses
-// fichiers selon une convention régulière, vue sur une vraie page :
-//
-//     Fichier:Carte Set de Base 4.png      (Dracaufeu, Set de Base n° 4)
-//     Fichier:Carte Jungle 60.png          (Pikachu, Jungle n° 60)
-//
-// « Carte <série> <numéro> ». Si la convention tient, leurs visuels
-// s'énumèrent par « allimages », l'interface officielle de MediaWiki, qui
-// donne l'adresse exacte de chaque fichier. Pas une adresse devinée : une
-// adresse déclarée. C'est ce qui a manqué quatre fois cette nuit.
-//
-// Cette sonde vérifie, dans l'ordre :
-//   1. que « allimages » répond et pagine ;
-//   2. quelles séries apparaissent, et sous quels noms (les leurs ne sont
-//      pas forcément les nôtres) ;
-//   3. que le serveur d'images autorise l'affichage chez nous (CORS),
-//      sans quoi le partage d'un classeur casserait ;
-//   4. combien de nos extensions manquantes leurs noms recouvrent.
-//
-//   node outils/sonde-pokepedia.mjs [--pages 4]
-
 import { readFile } from 'node:fs/promises';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
   a.startsWith('--') ? [a.slice(2), (t[i+1] && !t[i+1].startsWith('--')) ? t[i+1] : true] : []
 ).filter(x => x.length));
-// 0 veut dire « toutes ». Avec PkmCards, une valeur vide avait été
-// remplacée par le défaut du formulaire, et la passe « complète » s'était
-// arrêtée à trois pages.
 const combien = Number(args.pages ?? 0) || Infinity;
 
 const API = 'https://www.pokepedia.fr/api.php';
@@ -49,10 +20,6 @@ async function interroger(parametres){
   return r.json();
 }
 
-// --- 0. sous quelle licence ? -------------------------------------------
-// À régler avant d'utiliser une seule image : un wiki publie sous une
-// licence qui demande presque toujours d'en citer la source. Mieux vaut le
-// savoir maintenant que devoir tout retirer plus tard.
 console.log('=============== licence ===============');
 {
   const d = await interroger({ action: 'query', meta: 'siteinfo', siprop: 'rightsinfo|general' });
@@ -63,9 +30,7 @@ console.log('=============== licence ===============');
 }
 await dormir(1000);
 
-// --- 1 et 2. énumérer, et voir les noms de série -------------------------
 console.log('=============== énumération des visuels ===============');
-// « Carte » suivi d'une espace : le préfixe commun vu sur leurs pages.
 let suite = null, total = 0, lu = 0;
 const parSerie = new Map();
 const exemples = [];
@@ -79,23 +44,12 @@ for(let i = 0; i < combien; i++){
   const images = d.query?.allimages ?? [];
   total += images.length;
   lu++;
-  // Les noms bruts, d'abord : la première passe n'en reconnaissait aucun
-  // sur 3 000 fichiers, et c'était mon motif qui était trop strict, pas
-  // les données qui manquaient. On regarde avant de supposer.
   if(i === 0){
     console.log('\n  noms bruts, les 15 premiers :');
     for(const img of images.slice(0, 15)) console.log(`    ${img.name}`);
     console.log('');
   }
   for(const img of images){
-    // « Carte Set de Base 4.png » -> série « Set de Base », numéro « 4 ».
-    // On exige un numéro final : sans lui, ce n'est pas une carte mais une
-    // image d'habillage, et la compter gonflerait le bilan pour rien.
-    // Deux pièges, tous deux vus dans les noms bruts plutôt que supposés :
-    // le séparateur est un tiret BAS, pas une espace : la page affiche
-    // « Carte Set de Base 4 » mais le fichier s'appelle
-    // « Carte_Set_de_Base_4.png », et un numéro de carte n'est pas
-    // forcément un nombre : « H1 » (Aquapolis), « TG01 » (galeries).
     const m = /^Carte_(.+)_([A-Za-z]{0,3}[0-9]+[a-z]?)\.(png|jpe?g|webp|gif)$/i.exec(img.name);
     if(!m) continue;
     const serie = m[1].replace(/_/g, ' ');
@@ -118,7 +72,6 @@ for(const [serie, x] of [...parSerie].sort((a,b) => b[1].n - a[1].n).slice(0, 25
 console.log('\nexemples d’adresses :');
 for(const e of exemples) console.log(`  ${e.name}\n      ${e.url}`);
 
-// --- 3. le serveur autorise-t-il l'affichage chez nous ? ----------------
 console.log('\n=============== affichage chez nous (CORS) ===============');
 if(exemples.length){
   const r = await fetch(exemples[0].url, { headers: IDENTITE, method: 'GET' });
@@ -132,16 +85,12 @@ if(exemples.length){
       "     cette image échouerait. L'affichage simple, lui, marcherait.");
 }
 
-// --- 4. ce que leurs noms recouvrent de nos manques ---------------------
 console.log('\n=============== recoupement avec nos manques ===============');
 try{
   const bilan = JSON.parse(await readFile('donnees/bilan-visuels.json', 'utf8'));
   const aplatir = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '');
   const leurs = new Map([...parSerie].map(([s, x]) => [aplatir(s), { nom: s, n: x.n }]));
-  // Les deux listes se recoupent : une extension muette est aussi une
-  // extension à trous, et les additionner comptait certaines deux fois.
-  // On déduplique par identifiant, en gardant le plus grand manque.
   const parId = new Map();
   for(const m of [...bilan.aTrousSansSource,
                   ...bilan.muettes.restantes.map(m => ({ ...m, manqueEstime: m.cartes }))]){
@@ -172,8 +121,6 @@ if(typeof args.sortie === 'string'){
   await writeFile(fichier, JSON.stringify({
     releveLe: new Date().toISOString(),
     pagesLues: lu,
-    // Si l'énumération n'est pas allée au bout, le dire : un relevé
-    // partiel pris pour complet ferait conclure à tort qu'une série manque.
     complet: !suite,
     fichiersVus: total,
     series: Object.fromEntries([...parSerie].map(([nom, x]) => [nom, x.n])),

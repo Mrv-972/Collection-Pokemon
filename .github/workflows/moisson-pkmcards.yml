@@ -1,7 +1,3 @@
-# Relève les visuels français chez PkmCards, par son paginateur /cards/<numéro>.
-#
-# À la demande seulement : rien n'est branché sur la construction nocturne
-# tant que la question de l'autorisation n'est pas réglée.
 name: Moisson PkmCards
 
 on:
@@ -37,8 +33,6 @@ jobs:
             --pages "${{ inputs.pages }}" \
             ${{ inputs.essai && '--essai' || '' }}
 
-      # Un filet : si le dépôt refuse encore, le relevé reste
-      # téléchargeable depuis l'exécution plutôt que perdu avec l'exécuteur.
       - name: Garder le relevé en pièce jointe
         if: ${{ !inputs.essai }}
         uses: actions/upload-artifact@v4

@@ -1,6 +1,3 @@
-# Lit les pages qui décrivent les missions secrètes récentes et en dépose le
-# texte dans donnees/missions-pages.json, pour relecture. Lancée à la main ;
-# le fichier est un brouillon de travail, retiré une fois les missions saisies.
 name: Sonde des missions secrètes
 
 on:

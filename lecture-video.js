@@ -1,46 +1,11 @@
-// Lecture d'une vidéo de l'écran Collection de Pokémon TCG Pocket.
-//
-// Le joueur filme son écran pendant qu'il fait défiler une extension, avec
-// l'option « Tout afficher » du jeu : chaque carte qui lui manque y apparaît
-// comme une case vide qui porte son numéro. Inutile donc de reconnaître les
-// illustrations : il suffit de savoir, case par case, s'il y a une carte ou
-// non, et quel numéro occupe cette case.
-//
-// Tout se passe dans le navigateur : la vidéo n'est envoyée nulle part.
-//
-//   1. Étalonnage, sur une trentaine d'images réparties dans la vidéo : la
-//      fenêtre où le contenu défile (le reste de l'écran est immobile), les
-//      cinq colonnes de la grille, la hauteur d'une rangée.
-//
-// Les images s'obtiennent en jouant la vidéo, pas en sautant d'un instant à
-// l'autre : une vidéo de téléphone n'a d'image complète que toutes les
-// quelques secondes, et chaque saut obligerait à tout reconstruire depuis la
-// précédente. La vidéo est donc jouée deux fois, sans le son : vite pour
-// l'étalonnage, puis à la vitesse que l'appareil peut suivre pour la lecture.
-//   2. Ancrage : la première image montre le cadre de l'extension (son logo,
-//      son compteur) ; la rangée qui le suit porte les cartes 1 à 5.
-//   3. Lecture, image après image : on suit le défilement d'une image à
-//      l'autre, on recale la grille sur les cartes, et chaque case reçoit une
-//      mesure. Une case vide est presque unie ; une carte, même très pâle,
-//      ne l'est jamais (écart-type de la luminosité : moins de 8 contre plus
-//      de 26 sur la vidéo d'essai).
-//   4. Contrôle de la fin : après la dernière carte vient le cadre de
-//      l'extension suivante, ou rien. Une rangée de cartes à cet endroit
-//      signale une vidéo qui ne montre pas cette extension.
-//
-// Le résultat se compare d'un coup d'œil au compteur du jeu : on renvoie
-// l'image du cadre de l'extension tel que la vidéo le montre.
-//
-// Seul lireVideoCollection() sort de l'enveloppe.
 (() => {
 
-const LARGEUR = 360;            // largeur de travail, en pixels
-const IMAGES_PAR_SECONDE = 24;   // quand il faut sauter d'instant en instant
-const SEUIL_CARTE = 16;         // écart-type au-delà duquel une case porte une carte
+const LARGEUR = 360;
+const IMAGES_PAR_SECONDE = 24;
+const SEUIL_CARTE = 16;
 
 class ErreurLecture extends Error {}
 
-// --- les images de la vidéo ------------------------------------------------------
 function attendre(cible, evenement, delai, message){
   return new Promise((resoudre, rejeter) => {
     const minuteur = setTimeout(() => { nettoyer(); rejeter(new ErreurLecture(message)); }, delai);
@@ -64,8 +29,6 @@ async function ouvrirVideo(fichier){
   const toile = document.createElement('canvas');
   toile.width = W; toile.height = H;
   const ctx = toile.getContext('2d', { willReadFrequently: true });
-  // L'image affichée en ce moment, en luminosité et en « carte » (couleur
-  // franche ou zone sombre : ce que n'a jamais une case vide).
   function convertir(){
     ctx.drawImage(video, 0, 0, W, H);
     const d = ctx.getImageData(0, 0, W, H).data;
@@ -90,13 +53,6 @@ async function ouvrirVideo(fichier){
   return { video, W, H, duree: video.duration, convertir, aller, toile, fermer };
 }
 
-// Parcourt la vidéo de debut à fin en appelant surImage(t, image) pour chaque
-// image traitée. surImage travaille sans attendre : la vidéo continue de
-// jouer pendant ce temps, et les images qu'on n'a pas eu le temps de traiter
-// sont sautées. En « adaptatif », la vitesse de lecture baisse dès que les
-// images traitées s'espacent trop, et remonte quand l'appareil suit.
-// Sans requestVideoFrameCallback (vieux navigateurs), on saute d'instant en
-// instant : plus lent, mais toujours juste.
 async function parcourir(v, { debut, fin, vitesse = 1, adaptatif = false, pas = 1 / IMAGES_PAR_SECONDE, signal, surImage }){
   const { video } = v;
   if(typeof video.requestVideoFrameCallback !== 'function'){
@@ -117,8 +73,6 @@ async function parcourir(v, { debut, fin, vitesse = 1, adaptatif = false, pas = 
       clearInterval(veille);
       erreur ? rejeter(erreur) : resoudre();
     };
-    // Une vidéo bloquée (onglet en arrière-plan, décodeur saturé) ne doit
-    // pas laisser la lecture tourner sans fin.
     let derniereImage = performance.now();
     const veille = setInterval(() => {
       if(signal?.aborted) terminer(new ErreurLecture('Lecture annulée.'));
@@ -146,16 +100,13 @@ async function parcourir(v, { debut, fin, vitesse = 1, adaptatif = false, pas = 
     };
     video.addEventListener('ended', () => terminer(), { once: true });
     video.requestVideoFrameCallback(etape);
-    // Tous les navigateurs n'acceptent pas les grandes vitesses : on se
-    // replie sur ce qu'ils savent faire.
     for(const essai of [vitesse, 2, 1]){
-      try{ video.playbackRate = Math.min(essai, vitesse); break; }catch(err){ /* vitesse refusée */ }
+      try{ video.playbackRate = Math.min(essai, vitesse); break; }catch(err){ }
     }
     video.play().catch(() => terminer(new ErreurLecture('Ce navigateur refuse de lire la vidéo.')));
   });
 }
 
-// --- petits calculs ----------------------------------------------------------------
 function ecartType(tab, W, x0, x1, y0, y1){
   let s = 0, s2 = 0, n = 0;
   for(let y = y0; y < y1; y++) for(let x = x0; x < x1; x++){ const v = tab[y * W + x]; s += v; s2 += v * v; n++; }
@@ -170,7 +121,6 @@ function moyenne(tab, W, x0, x1, y0, y1){
 }
 const mediane = v => { const t = [...v].sort((a, b) => a - b); const m = t.length >> 1; return t.length % 2 ? t[m] : (t[m - 1] + t[m]) / 2; };
 
-// La plus longue plage d'indices où le test est vrai.
 function plusLonguePlage(n, test){
   let best = [0, 0], debut = -1;
   for(let i = 0; i <= n; i++){
@@ -180,7 +130,6 @@ function plusLonguePlage(n, test){
   return best;
 }
 
-// --- l'analyse ------------------------------------------------------------------------
 async function lireVideoCollection(fichier, { total, surProgression = () => {}, signal } = {}){
   const v = await ouvrirVideo(fichier);
   try{
@@ -196,7 +145,6 @@ async function analyser(v, N, surProgression, signal){
   const fin = Math.max(0, duree - 1 / IMAGES_PAR_SECONDE);
   const ecran = 'Je ne reconnais pas l\'écran Collection du jeu dans cette vidéo.';
 
-  // 1. Étalonnage, pendant une lecture rapide
   const NB_VISE = 30;
   const etalons = [];
   let prochain = 0;
@@ -214,14 +162,12 @@ async function analyser(v, N, surProgression, signal){
     const m = somme[p] / NB_ETALON;
     tstd[p] = Math.sqrt(Math.max(0, somme2[p] / NB_ETALON - m * m));
   }
-  // La fenêtre : les lignes où le contenu bouge d'une image à l'autre.
   const xa = Math.round(W * 0.05), xb = Math.round(W * 0.95);
   const py = new Float32Array(H);
   for(let y = 0; y < H; y++) py[y] = moyenne(tstd, W, xa, xb, y, y + 1);
   const pyMax = Math.max(...py);
   const [YH, YB] = plusLonguePlage(H, y => py[y] > 0.35 * pyMax);
   if(YB - YH < H * 0.3) throw new ErreurLecture(ecran);
-  // Les colonnes : là où des cartes passent ; les interstices restent unis.
   const px = new Float32Array(W);
   for(const im of etalons) for(let x = 0; x < W; x++) px[x] += moyenne(im.carte, W, x, x + 1, YH, YB) / NB_ETALON;
   const pxMax = Math.max(...px);
@@ -247,7 +193,6 @@ async function analyser(v, N, surProgression, signal){
     }
     return p;
   }
-  // La hauteur d'une rangée : autocorrélation des bords horizontaux.
   const scores = new Map();
   for(const im of etalons){
     const p = profilCarte(im.carte);
@@ -274,7 +219,6 @@ async function analyser(v, N, surProgression, signal){
   const HC = P - (pasX - largeur) * 1.35;
   etalons.length = 0;
 
-  // Phase de la grille dans une image : où commencent les rangées.
   function phase(carte){
     const p = profilCarte(carte);
     let m = 0; for(const x of p) m += x; m /= L;
@@ -296,8 +240,6 @@ async function analyser(v, N, surProgression, signal){
     }
     return { phi: best.phi, force: best.val / L };
   }
-  // Le cadre d'une extension : un logo au milieu, qui déborde sur les
-  // interstices du centre, et des côtés presque unis.
   function estEntete(lum, y0, y1){
     y0 = Math.round(Math.max(y0, YH)); y1 = Math.round(Math.min(y1, YB));
     if(y1 - y0 < HC * 0.5) return false;
@@ -306,7 +248,6 @@ async function analyser(v, N, surProgression, signal){
     return Math.max(...gaps) > 40 && Math.max(...cotes) < 20;
   }
 
-  // 2 et 3. Ancrage puis lecture, au fil d'une seule lecture de la vidéo.
   function profilSuivi(lum){
     const p = new Float32Array(L * 5);
     for(let y = 0; y < L; y++) for(let c = 0; c < 5; c++){
@@ -315,8 +256,6 @@ async function analyser(v, N, surProgression, signal){
     }
     return p;
   }
-  // q est p remonté de d pixels : q[y] ressemble à p[y + d]. Une ligne sur
-  // deux suffit à départager les décalages.
   function ecarts(p, q, lo, hi){
     const res = new Map();
     for(let d = lo; d <= hi; d++){
@@ -330,7 +269,7 @@ async function analyser(v, N, surProgression, signal){
   }
   const R = Math.ceil(N / 5);
   const mesures = new Map();
-  const finVue = [];          // la bande qui suit la dernière rangée, quand elle est visible
+  const finVue = [];
   let haut1 = null, imageEnTete = null;
   let cumul = 0, vitesse = 0, delta = 0, prec = null, tPrec = null;
   const LIMITE_ANCRAGE = Math.min(1.5, fin);
@@ -345,9 +284,6 @@ async function analyser(v, N, surProgression, signal){
           if(estEntete(im.lum, haut - P, haut) && !estEntete(im.lum, haut, haut + HC)){ haut1 = haut; break; }
         }
         if(haut1 === null) return;
-        // L'image du cadre, pour la comparer au résultat. Elle est prise dans
-        // la vidéo elle-même, à sa pleine résolution : les chiffres du
-        // compteur y sont plus nets que dans la copie réduite de l'analyse.
         const echelle = v.video.videoWidth / W;
         const yCadre = Math.max(YH, Math.round(haut1 - 1.3 * P));
         const hCadre = Math.max(1, Math.round(haut1 - 0.06 * P - yCadre));
@@ -366,9 +302,6 @@ async function analyser(v, N, surProgression, signal){
         const minima = [...e.keys()].filter(d => e.get(d) <= (e.get(d - 1) ?? Infinity) && e.get(d) <= (e.get(d + 1) ?? Infinity));
         if(minima.length){
           const meilleur = minima.reduce((a, b) => (e.get(b) < e.get(a) ? b : a));
-          // Une rangée de cases vides ressemble à la suivante : entre deux
-          // décalages presque aussi bons, on garde celui qui prolonge le
-          // mouvement.
           const proches = minima.filter(d => e.get(d) <= e.get(meilleur) * 1.15 + 0.3);
           const d = proches.reduce((a, b) => (Math.abs(b - prevu) < Math.abs(a - prevu) ? b : a));
           vitesse = d / dt; cumul += d;
@@ -403,14 +336,12 @@ async function analyser(v, N, surProgression, signal){
     throw new ErreurLecture('Le début de la vidéo doit montrer le titre de l\'extension et son compteur, juste au-dessus des premières cartes.');
   }
 
-  // 4. Résultat et contrôle de la fin
   const possedees = [], vides = [], nonVues = [];
   for(let n = 1; n <= N; n++){
     const m = mesures.get(n);
     if(!m || m.length < 2){ nonVues.push(n); continue; }
     (mediane(m) > SEUIL_CARTE ? possedees : vides).push(n);
   }
-  // Les emplacements après la dernière carte, sur sa rangée, sont du fond nu.
   let finCoherente = true;
   for(let n = N + 1; n <= R * 5; n++){
     const m = mesures.get(n);

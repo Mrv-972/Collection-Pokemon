@@ -1,49 +1,26 @@
-// L'onglet Communauté.
-// ====================
-//
-// Une seule page (communaute.html), plusieurs rubriques, choisies par
-// l'adresse (« ?r=questions », « ?sujet=12 ») pour que chaque vue se
-// partage par un lien :
-//
-//   accueil        un aperçu de tout le reste ;
-//   questions      questions et réponses entre membres ;
-//   ameliorations  les idées pour le site, que les membres soutiennent et
-//                  dont l'administrateur suit l'avancement ;
-//   forums         des discussions libres, rangées par catégorie ;
-//   savoir         « Le saviez-vous ? » ;
-//   noms           l'origine du nom de chaque Pokémon ;
-//   actualites     les dernières actualités Pokémon, et les sites à suivre.
-//
-// Les trois premières vivent dans la base (supabase/espace-communaute.sql) :
-// tout le monde lit, les membres écrivent. Les trois dernières sont des
-// fichiers du site (donnees/…), tenus à jour par des tâches automatiques.
-//
-// Rien de ce qu'un membre écrit n'est inséré tel quel dans la page : tout
-// passe par echapperCommun() (communaute.js).
-
 (() => {
 
 const RUBRIQUES = [
-  { cle: 'accueil',       nom: 'Accueil',          icone: '🏠' },
-  { cle: 'questions',     nom: 'Questions',        icone: '❓' },
-  { cle: 'ameliorations', nom: 'Améliorations',    icone: '💡' },
-  { cle: 'forums',        nom: 'Forums',           icone: '💬' },
-  { cle: 'savoir',        nom: 'Le saviez-vous ?', icone: '✨' },
-  { cle: 'noms',          nom: 'Noms des Pokémon', icone: '🔤' },
-  { cle: 'actualites',    nom: 'Actualités',       icone: '📰' },
+  { cle: 'accueil',       nom: 'Accueil',          icone: 'maison' },
+  { cle: 'questions',     nom: 'Questions',        icone: 'question' },
+  { cle: 'ameliorations', nom: 'Améliorations',    icone: 'ampoule' },
+  { cle: 'forums',        nom: 'Forums',           icone: 'bulle' },
+  { cle: 'savoir',        nom: 'Le saviez-vous ?', icone: 'etincelle' },
+  { cle: 'noms',          nom: 'Noms des Pokémon', icone: 'lettres' },
+  { cle: 'actualites',    nom: 'Actualités',       icone: 'journal' },
 ];
 
 const ESPACES = {
   questions: {
     espace: 'question', titre: 'Questions / Réponses', mot: 'question', nouveau: 'Poser une question',
     intro: "Une carte que tu n'arrives pas à identifier, une règle de TCG Pocket, une question sur le site ? Pose-la : les autres membres y répondent, et tu choisis la réponse qui t'a aidé.",
-    vote: '🙋 Moi aussi', aideVote: 'Tu te poses la même question',
+    vote: 'Moi aussi', iconeVote: 'plus', aideVote: 'Tu te poses la même question',
     aideCorps: "Donne le plus de détails possible : le nom de la carte, l'extension, ce que tu as déjà essayé…",
   },
   ameliorations: {
     espace: 'amelioration', titre: 'Idées d\'amélioration', mot: 'idée', nouveau: 'Proposer une idée',
     intro: "Une fonctionnalité qui te manque, quelque chose à améliorer sur le site ? Propose-la, et soutiens les idées des autres : les plus soutenues passent en premier.",
-    vote: '👍 Je soutiens', aideVote: 'Tu aimerais voir cette idée sur le site',
+    vote: 'Je soutiens', iconeVote: 'pouce', aideVote: 'Tu aimerais voir cette idée sur le site',
     aideCorps: "Une idée par proposition. Explique ce que tu voudrais pouvoir faire, et pourquoi.",
   },
   forums: {
@@ -54,12 +31,12 @@ const ESPACES = {
 };
 
 const CATEGORIES = [
-  { cle: 'general',    icone: '💬', nom: 'Discussion générale',  texte: 'Tout ce qui touche à Pokémon et au site.' },
-  { cle: 'pocket',     icone: '📱', nom: 'TCG Pocket',           texte: 'Decks, boosters, missions et événements de l\'application.' },
-  { cle: 'physique',   icone: '🃏', nom: 'Cartes physiques',     texte: 'Extensions, raretés, conservation, gradation.' },
-  { cle: 'echanges',   icone: '🤝', nom: 'Échanges et conseils', texte: 'Bien échanger, estimer une carte, éviter les arnaques.' },
-  { cle: 'collection', icone: '🏆', nom: 'Montre ta collection', texte: 'Tes plus belles pièces, tes classeurs, tes objectifs.' },
-  { cle: 'detente',    icone: '🎮', nom: 'Détente',              texte: 'Présentations, jeux vidéo, dessin animé, hors-sujet.' },
+  { cle: 'general',    icone: 'bulle', nom: 'Discussion générale',  texte: 'Tout ce qui touche à Pokémon et au site.' },
+  { cle: 'pocket',     icone: 'telephone', nom: 'TCG Pocket',           texte: 'Decks, boosters, missions et événements de l\'application.' },
+  { cle: 'physique',   icone: 'carte', nom: 'Cartes physiques',     texte: 'Extensions, raretés, conservation, gradation.' },
+  { cle: 'echanges',   icone: 'ech', nom: 'Échanges et conseils', texte: 'Bien échanger, estimer une carte, éviter les arnaques.' },
+  { cle: 'collection', icone: 'trophee', nom: 'Montre ta collection', texte: 'Tes plus belles pièces, tes classeurs, tes objectifs.' },
+  { cle: 'detente',    icone: 'manette', nom: 'Détente',              texte: 'Présentations, jeux vidéo, dessin animé, hors-sujet.' },
 ];
 const categorie = cle => CATEGORIES.find(c => c.cle === cle);
 
@@ -77,17 +54,13 @@ const artwork = n => `https://raw.githubusercontent.com/PokeAPI/sprites/master/s
 const zone = document.getElementById('communaute');
 const esc = v => echapperCommun(v);
 let jeSuisAdmin = false;
-// Les sujets que le membre suit (ouverts par lui, ou auxquels il a répondu)
-// et qui ont reçu des réponses depuis sa dernière visite.
 let suivis = new Map();
 async function chargerSuivis(){
   if(!estConnecte()){ suivis = new Map(); return; }
   try{ suivis = new Map((await rpc('sujets_suivis') ?? []).map(x => [x.sujet_id, x])); }
   catch{ suivis = new Map(); }
 }
-let tour = 0;            // chaque affichage a son numéro : une réponse tardive d'un affichage abandonné est ignorée
-
-// ------------------------------------------------------------- adresse --
+let tour = 0;
 
 const parametres = () => Object.fromEntries(new URLSearchParams(location.search));
 
@@ -107,7 +80,6 @@ function aller(href, { remplacer = false } = {}){
   window.scrollTo({ top: 0 });
 }
 
-// Les liens internes changent de vue sans recharger la page.
 zone.addEventListener('click', e => {
   const a = e.target.closest('a[data-interne]');
   if(!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) return;
@@ -116,11 +88,7 @@ zone.addEventListener('click', e => {
 });
 window.addEventListener('popstate', afficher);
 
-// ------------------------------------------------------------ outils ----
-
 function texteRiche(t){
-  // Échappé d'abord ; les adresses deviennent ensuite des liens, ouverts
-  // ailleurs et marqués comme venant d'un membre (« ugc »).
   return esc(t).replace(/https?:\/\/[^\s<]+/g, url => {
     const fin = (url.match(/[.,;:!?)\]]+$/) ?? [''])[0];
     const propre = url.slice(0, url.length - fin.length);
@@ -179,8 +147,6 @@ const exigerMembre = action => {
   return false;
 };
 
-// ------------------------------------------------------- squelette ------
-
 async function afficher(){
   const p = parametres();
   const rubrique = p.sujet ? (p.depuis ?? 'accueil') : (RUBRIQUES.some(r => r.cle === p.r) ? p.r : 'accueil');
@@ -205,12 +171,10 @@ function poserSquelette(){
   zone.innerHTML = `
     <nav class="sous-onglets" aria-label="Rubriques de la communauté">
       ${RUBRIQUES.map(r => `<a href="${lien(r.cle === 'accueil' ? {} : { r: r.cle })}" data-interne data-rubrique="${r.cle}">
-        <span aria-hidden="true">${r.icone}</span>${r.nom}</a>`).join('')}
+        ${pictogramme(r.icone)}${r.nom}</a>`).join('')}
     </nav>
     <div id="vue"></div>`;
 }
-
-// ------------------------------------------------------- les listes -----
 
 function ligneSujet(s, { categorieVisible = false } = {}){
   const resolue = s.espace === 'question' && s.resolue;
@@ -223,12 +187,12 @@ function ligneSujet(s, { categorieVisible = false } = {}){
       ${compteur}
       <div class="corps-ligne">
         <a class="titre-sujet" href="${lien({ sujet: s.id, depuis: parametres().r ?? 'accueil' })}" data-interne>
-          ${s.epingle ? '<span class="pastille-epingle" title="Épinglé">📌</span>' : ''}${esc(s.titre)}</a>
+          ${s.epingle ? `<span class="pastille-epingle" title="Épinglé">${pictogramme('epingle')}</span>` : ''}${esc(s.titre)}</a>
         <span class="etiquettes">
           ${resolue ? '<span class="etiquette resolue">✓ Résolue</span>' : ''}
           ${s.statut ? `<span class="etiquette statut ${STATUTS[s.statut]?.classe}">${STATUTS[s.statut]?.nom}</span>` : ''}
-          ${s.verrouille ? '<span class="etiquette" title="Verrouillé">🔒</span>' : ''}
-          ${cat ? `<span class="etiquette">${cat.icone} ${cat.nom}</span>` : ''}
+          ${s.verrouille ? `<span class="etiquette" title="Verrouillé">${pictogramme('cadenas')}</span>` : ''}
+          ${cat ? `<span class="etiquette">${pictogramme(cat.icone)} ${cat.nom}</span>` : ''}
           ${suivis.get(s.id)?.non_lues ? `<span class="etiquette nouveau">● ${nb(suivis.get(s.id).non_lues, 'nouvelle réponse', 'nouvelles réponses')}</span>` : ''}
         </span>
         <p class="extrait">${esc(s.extrait)}${s.extrait?.length >= 220 ? '…' : ''}</p>
@@ -259,8 +223,8 @@ async function afficherListe(vue, encore, rubrique, p){
     <div class="suite" id="suite"></div>`;
   document.getElementById('nouveau-sujet').onclick = () => nouveauSujet(def);
   await remplirListe({ espace: def.espace, tri, filtre: p.filtre || null, encore, vide: rubrique === 'questions'
-    ? 'Aucune question pour l\'instant. Lance-toi : la première est souvent la plus attendue !'
-    : 'Aucune idée pour l\'instant. Propose la première !' });
+    ? 'Aucune question pour l\'instant.'
+    : 'Aucune idée pour l\'instant.' });
 }
 
 async function remplirListe({ espace, categorie: cat = null, tri = 'activite', filtre = null, encore, vide, categorieVisible = false }){
@@ -293,7 +257,7 @@ async function afficherForums(vue, encore, rubrique, p){
       </header>
       <div class="categories" id="categories">${CATEGORIES.map(c => `
         <a class="categorie" href="${lien({ r: 'forums', categorie: c.cle })}" data-interne data-cat="${c.cle}">
-          <span class="icone" aria-hidden="true">${c.icone}</span>
+          <span class="icone">${pictogramme(c.icone)}</span>
           <span><b>${c.nom}</b><small>${c.texte}</small><em class="compte"></em></span>
         </a>`).join('')}</div>
       <h2 class="sous-titre">Discussions récentes</h2>
@@ -308,23 +272,21 @@ async function afficherForums(vue, encore, rubrique, p){
       }
     }).catch(() => {});
     await remplirListe({ espace: 'forum', encore, categorieVisible: true,
-      vide: 'Aucune discussion pour l\'instant. Ouvre le premier sujet !' });
+      vide: 'Aucune discussion pour l\'instant.' });
     return;
   }
   vue.innerHTML = `
     <a class="retour" href="${lien({ r: 'forums' })}" data-interne>← Tous les forums</a>
     <header class="tete-rubrique">
-      <div><h1><span aria-hidden="true">${cat.icone}</span> ${cat.nom}</h1><p>${cat.texte}</p></div>
+      <div><h1>${pictogramme(cat.icone)} ${cat.nom}</h1><p>${cat.texte}</p></div>
       <button type="button" class="bouton-principal" id="nouveau-sujet">${def.nouveau}</button>
     </header>
     <ul class="liste-sujets" id="liste-sujets"><li class="etat">Chargement…</li></ul>
     <div class="suite" id="suite"></div>`;
   document.getElementById('nouveau-sujet').onclick = () => nouveauSujet(def, cat.cle);
   await remplirListe({ espace: 'forum', categorie: cat.cle, encore,
-    vide: 'Aucun sujet dans cette catégorie pour l\'instant. Ouvre le premier !' });
+    vide: 'Aucun sujet dans cette catégorie pour l\'instant.' });
 }
-
-// ------------------------------------------------- écrire un sujet ------
 
 function nouveauSujet(def, categorieChoisie = null){
   if(!exigerMembre(`publier dans la communauté`)) return;
@@ -337,7 +299,7 @@ function nouveauSujet(def, categorieChoisie = null){
       ${def.espace === 'forum' ? `
         <label class="libelle" for="categorie-sujet">Catégorie</label>
         <select id="categorie-sujet" class="champ">${CATEGORIES.map(c =>
-          `<option value="${c.cle}" ${c.cle === (categorieChoisie ?? 'general') ? 'selected' : ''}>${c.icone} ${c.nom}</option>`).join('')}</select>` : ''}
+          `<option value="${c.cle}" ${c.cle === (categorieChoisie ?? 'general') ? 'selected' : ''}>${c.nom}</option>`).join('')}</select>` : ''}
       <label class="libelle" for="corps-sujet">Message</label>
       <textarea id="corps-sujet" maxlength="5000" rows="7" placeholder="${esc(def.aideCorps)}"></textarea>
       <p class="compteur-texte">Sois courtois : les messages sont visibles de tous, et peuvent être signalés.</p>`,
@@ -356,13 +318,11 @@ function nouveauSujet(def, categorieChoisie = null){
         .insert({ espace: def.espace, categorie: def.espace === 'forum' ? r.categorie : null, titre: r.titre, corps: r.corps })
         .select('id').single();
       if(error) throw error;
-      annoncer('C\'est publié !');
+      annoncer('Publié.');
       aller(lien({ sujet: data.id, depuis: parametres().r ?? 'accueil' }));
     }catch(err){ annoncer(err.message, 'ko'); }
   });
 }
-
-// ------------------------------------------------------- un fil ---------
 
 async function afficherFil(vue, id, encore){
   let fil;
@@ -381,7 +341,6 @@ async function afficherFil(vue, id, encore){
   const cat = categorie(s.categorie);
   document.title = `${s.titre} - Communauté - PokéClasseur`;
 
-  // La meilleure réponse remonte en tête, juste sous la question.
   const ordonnees = s.reponse_acceptee
     ? [...reponses.filter(r => r.id === s.reponse_acceptee), ...reponses.filter(r => r.id !== s.reponse_acceptee)]
     : reponses;
@@ -392,11 +351,11 @@ async function afficherFil(vue, id, encore){
     <article class="sujet-complet" id="sujet">
       <header>
         <div class="etiquettes">
-          <span class="etiquette espace">${cat ? `${cat.icone} ${cat.nom}` : s.espace === 'question' ? '❓ Question' : '💡 Idée'}</span>
+          <span class="etiquette espace">${cat ? `${pictogramme(cat.icone)} ${cat.nom}` : s.espace === 'question' ? `${pictogramme('question')} Question` : `${pictogramme('ampoule')} Idée`}</span>
           ${s.statut ? `<span class="etiquette statut ${STATUTS[s.statut]?.classe}">${STATUTS[s.statut]?.nom}</span>` : ''}
           ${s.reponse_acceptee ? '<span class="etiquette resolue">✓ Résolue</span>' : ''}
-          ${s.epingle ? '<span class="etiquette">📌 Épinglé</span>' : ''}
-          ${s.verrouille ? '<span class="etiquette">🔒 Verrouillé</span>' : ''}
+          ${s.epingle ? `<span class="etiquette">${pictogramme('epingle')} Épinglé</span>` : ''}
+          ${s.verrouille ? `<span class="etiquette">${pictogramme('cadenas')} Verrouillé</span>` : ''}
         </div>
         <h1 id="titre-fil">${esc(s.titre)}</h1>
         <div class="meta">${auteur(s, 28)} · ${depuis(s.cree_le)}${s.modifie_le ? ' · modifié' : ''}</div>
@@ -404,7 +363,7 @@ async function afficherFil(vue, id, encore){
       <div class="texte" id="texte-sujet">${texteRiche(s.corps)}</div>
       <div class="actions-message">
         ${def.vote ? `<button type="button" class="vote ${s.a_vote ? 'actif' : ''}" id="vote" aria-pressed="${s.a_vote}" title="${def.aideVote}">
-          ${def.vote} <b>${s.nb_votes}</b></button>` : ''}
+          ${pictogramme(def.iconeVote)} ${def.vote} <b>${s.nb_votes}</b></button>` : ''}
         ${moi && !s.verrouille ? '<button type="button" class="petit" id="modifier-sujet">Modifier</button>' : ''}
         ${moi || jeSuisAdmin ? '<button type="button" class="petit danger" id="supprimer-sujet">Supprimer</button>' : ''}
         ${!moi && estConnecte() ? '<button type="button" class="petit leger" id="signaler-sujet">Signaler</button>' : ''}
@@ -426,7 +385,7 @@ async function afficherFil(vue, id, encore){
     </section>
 
     <section class="repondre" id="repondre">
-      ${s.verrouille ? '<p class="etat">🔒 Ce sujet est verrouillé : il ne reçoit plus de réponse.</p>'
+      ${s.verrouille ? `<p class="etat">${pictogramme('cadenas')} Ce sujet est verrouillé, il ne reçoit plus de réponse.</p>`
         : !estConnecte() ? `<p class="etat"><a href="connexion.html">Connecte-toi</a> pour répondre.</p>`
         : `<label class="libelle" for="texte-reponse">Ta réponse</label>
            <textarea id="texte-reponse" maxlength="5000" rows="5" placeholder="Écris ta réponse…"></textarea>
@@ -437,9 +396,6 @@ async function afficherFil(vue, id, encore){
   marquerLu(vue, s);
 }
 
-// Ouvrir un sujet suivi le marque comme lu : les réponses arrivées depuis la
-// dernière visite sont signalées « Nouveau », et la pastille de l'onglet se
-// met à jour.
 async function marquerLu(vue, s){
   if(!estConnecte()) return;
   let avant;
@@ -572,7 +528,6 @@ function brancherFil(vue, s, reponses, def){
   }
 }
 
-// Modifier un message sur place : le texte devient un champ.
 function modifierEnPlace({ conteneur, titre = null, corps, enregistrer, recharger }){
   const texte = conteneur.querySelector('.texte');
   const actions = conteneur.querySelector('.actions-message');
@@ -596,21 +551,19 @@ function modifierEnPlace({ conteneur, titre = null, corps, enregistrer, recharge
   };
 }
 
-// ------------------------------------------------------- accueil --------
-
 async function afficherAccueil(vue, encore){
   vue.innerHTML = `
     <section class="bienvenue">
       <h1>La communauté PokéClasseur</h1>
       <p>Pose tes questions, propose tes idées pour le site, discute avec d'autres collectionneurs, et découvre
          l'origine du nom de chaque Pokémon.</p>
-      <p class="badges-annonce">🏅 Participer rapporte des badges (Bonne réponse, Idée retenue, Expert…),
+      <p class="badges-annonce">Participer rapporte des badges (Bonne réponse, Idée retenue, Expert…),
          affichés sur ton profil.${estConnecte() ? ' <a href="connexion.html">Voir mes badges →</a>' : ''}</p>
       ${estConnecte() ? '' : '<a class="bouton-principal" href="connexion.html">Rejoindre la communauté</a>'}
     </section>
     ${suivis.size ? `
     <section class="nouvelles-reponses" aria-labelledby="titre-nouvelles">
-      <h2 id="titre-nouvelles">🔔 Nouvelles réponses à tes sujets</h2>
+      <h2 id="titre-nouvelles">Nouvelles réponses à tes sujets</h2>
       <ul class="liste-mini">${[...suivis.values()].slice(0, 8).map(x => `
         <li><a href="${lien({ sujet: x.sujet_id })}" data-interne>${esc(x.titre)}</a>
           <small><span class="etiquette nouveau">${nb(x.non_lues, 'nouvelle réponse', 'nouvelles réponses')}</span>
@@ -620,20 +573,20 @@ async function afficherAccueil(vue, encore){
     <div class="accueil-grille">
       ${['questions', 'ameliorations', 'forums'].map(r => `
         <section class="bloc-accueil">
-          <h2><a href="${lien({ r })}" data-interne>${RUBRIQUES.find(x => x.cle === r).icone} ${
+          <h2><a href="${lien({ r })}" data-interne>${pictogramme(RUBRIQUES.find(x => x.cle === r).icone)} ${
             r === 'questions' ? 'Dernières questions' : r === 'ameliorations' ? 'Idées les plus soutenues' : 'Discussions récentes'}</a></h2>
           <ul class="liste-mini" id="mini-${r}"><li class="etat">Chargement…</li></ul>
           <a class="voir-tout" href="${lien({ r })}" data-interne>${
             r === 'questions' ? 'Toutes les questions' : r === 'ameliorations' ? 'Toutes les idées' : 'Tous les forums'} →</a>
         </section>`).join('')}
       <section class="bloc-accueil">
-        <h2><a href="${lien({ r: 'actualites' })}" data-interne>📰 Actualités</a></h2>
+        <h2><a href="${lien({ r: 'actualites' })}" data-interne>${pictogramme('journal')} Actualités</a></h2>
         <ul class="liste-mini" id="mini-actualites"><li class="etat">Chargement…</li></ul>
         <a class="voir-tout" href="${lien({ r: 'actualites' })}" data-interne>Toutes les actualités →</a>
       </section>
     </div>
     <a class="raccourci-noms" href="${lien({ r: 'noms' })}" data-interne>
-      <span aria-hidden="true">🔤</span><span><b>D'où vient le nom des Pokémon ?</b>
+      ${pictogramme('lettres')}<span><b>D'où vient le nom des Pokémon ?</b>
       <small>Bulbizarre, Ronflex, Pikachu… l'origine des noms de tous les Pokémon, en français et ailleurs.</small></span><span aria-hidden="true">→</span></a>`;
 
   anecdoteDuJour().then(a => { if(encore()) document.getElementById('savoir-du-jour').innerHTML = carteAnecdote(a, { duJour: true, lienPlus: true }); });
@@ -645,8 +598,8 @@ async function afficherAccueil(vue, encore){
       if(!encore()) return;
       ul.innerHTML = lignes.length ? lignes.map(s => `
         <li><a href="${lien({ sujet: s.id, depuis: r })}" data-interne>${esc(s.titre)}</a>
-          <small>${s.espace === 'amelioration' ? `👍 ${s.nb_votes}` : `💬 ${s.nb_reponses}`}${s.resolue ? ' · ✓ résolue' : ''} · ${depuis(s.activite_le)}</small></li>`).join('')
-        : '<li class="etat vide">Rien pour l\'instant : à toi de lancer le mouvement !</li>';
+          <small>${s.espace === 'amelioration' ? `${pictogramme('pouce')} ${s.nb_votes}` : `${pictogramme('bulle')} ${s.nb_reponses}`}${s.resolue ? ' · ✓ résolue' : ''} · ${depuis(s.activite_le)}</small></li>`).join('')
+        : '<li class="etat vide">Rien pour l\'instant.</li>';
     }catch(err){ if(encore()) ul.innerHTML = `<li>${erreurHtml(err)}</li>`; }
   };
   remplirMini('questions', { p_espace: 'question' });
@@ -662,13 +615,11 @@ async function afficherAccueil(vue, encore){
     : '<li class="etat vide">Les actualités arrivent bientôt.</li>';
 }
 
-// ------------------------------------------------ le saviez-vous --------
-
 const THEMES = {
-  cartes:    { nom: 'Le jeu de cartes', icone: '🃏' },
-  pocket:    { nom: 'TCG Pocket',       icone: '📱' },
-  pokemon:   { nom: 'L\'univers Pokémon', icone: '⭐' },
-  pokepedia: { nom: 'Les Pokémon',      icone: '🔍' },
+  cartes:    { nom: 'Le jeu de cartes', icone: 'carte' },
+  pocket:    { nom: 'TCG Pocket',       icone: 'telephone' },
+  pokemon:   { nom: 'L\'univers Pokémon', icone: 'etoile' },
+  pokepedia: { nom: 'Les Pokémon',      icone: 'loupe' },
 };
 
 let reserve = null;
@@ -682,7 +633,6 @@ async function anecdotes(){
   return reserve;
 }
 
-// Le même jour donne la même anecdote, pour tout le monde.
 async function anecdoteDuJour(){
   const toutes = await anecdotes();
   if(!toutes.length) return null;
@@ -700,9 +650,9 @@ function carteAnecdote(a, { duJour = false, lienPlus = false } = {}){
   return `
     <aside class="anecdote ${duJour ? 'du-jour' : ''}">
       ${a.n ? `<img class="illustration" src="${artwork(a.n)}" alt="" loading="lazy" onerror="this.remove()">`
-            : `<span class="illustration icone" aria-hidden="true">${theme.icone}</span>`}
+            : `<span class="illustration icone">${pictogramme(theme.icone)}</span>`}
       <div>
-        <p class="sur-titre">✨ ${duJour ? 'Le saviez-vous ? L\'anecdote du jour' : 'Le saviez-vous ?'}${a.nom ? ` · ${esc(a.nom)}` : ''}</p>
+        <p class="sur-titre">${duJour ? 'Le saviez-vous ? L\'anecdote du jour' : 'Le saviez-vous ?'}${a.nom ? ` · ${esc(a.nom)}` : ''}</p>
         <p class="texte-anecdote">${gras(a.texte)}</p>
         ${a.page ? `<p class="source">Source : <a href="${pageWiki(a.page)}" target="_blank" rel="noopener">Poképédia</a>, licence CC BY-NC-SA 3.0</p>` : ''}
         ${lienPlus ? `<a class="voir-tout" href="${lien({ r: 'savoir' })}" data-interne>D'autres anecdotes →</a>` : ''}
@@ -722,17 +672,15 @@ async function afficherSavoir(vue, encore, rubrique, p){
       <p>${nb(toutes.length, 'anecdote', 'anecdotes')} sur le jeu de cartes, TCG Pocket et les Pokémon. Une nouvelle chaque jour sur l'accueil de la communauté.</p></div></header>
     <div id="anecdote-principale">${carteAnecdote(theme ? hasard() : await anecdoteDuJour(), { duJour: !theme })}</div>
     <div class="barre-filtres">
-      <div class="chips">${[['', 'Toutes'], ...Object.entries(THEMES).map(([k, t]) => [k, `${t.icone} ${t.nom}`])].map(([k, n]) =>
+      <div class="chips">${[['', 'Toutes'], ...Object.entries(THEMES).map(([k, t]) => [k, t.nom])].map(([k, n]) =>
         `<a class="chip ${k === theme ? 'on' : ''}" href="${lien({ r: 'savoir', theme: k })}" data-interne>${n}</a>`).join('')}</div>
-      <button type="button" class="bouton-principal" id="autre-anecdote">🎲 Une autre anecdote</button>
+      <button type="button" class="bouton-principal" id="autre-anecdote">Une autre anecdote</button>
     </div>
     <div class="grille-anecdotes" id="grille-anecdotes"></div>
     <div class="suite"><button type="button" class="bouton-discret" id="encore-anecdotes">D'autres anecdotes</button></div>`;
   document.getElementById('autre-anecdote').onclick = () => {
     document.getElementById('anecdote-principale').innerHTML = carteAnecdote(hasard());
   };
-  // Les anecdotes du site d'abord, dans l'ordre ; celles de Poképédia,
-  // trop nombreuses pour tout montrer, tirées au hasard.
   const maison = choix.filter(a => a.theme !== 'pokepedia');
   const wiki = choix.filter(a => a.theme === 'pokepedia').sort(() => Math.random() - 0.5);
   const file = [...maison, ...wiki];
@@ -746,8 +694,6 @@ async function afficherSavoir(vue, encore, rubrique, p){
   document.getElementById('encore-anecdotes').onclick = plus;
   plus();
 }
-
-// --------------------------------------------------- noms des Pokémon ---
 
 const plat = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
@@ -815,8 +761,6 @@ async function afficherNoms(vue, encore, rubrique, p){
   champ.addEventListener('input', () => {
     clearTimeout(attente);
     attente = setTimeout(() => {
-      // Entre-temps, le visiteur a pu changer de vue : la recherche en
-      // attente ne doit pas réécrire l'adresse ni la page suivante.
       if(!encore()) return;
       history.replaceState({}, '', lien({ r: 'noms', gen: gen || '', q: champ.value.trim() }));
       filtrer();
@@ -826,9 +770,7 @@ async function afficherNoms(vue, encore, rubrique, p){
   filtrer();
 }
 
-// --------------------------------------------------------- actualités ---
-
-const SUJETS_ACTUS = { '': 'Tout', pocket: '📱 TCG Pocket', cartes: '🃏 Cartes', pokemon: '⭐ Pokémon' };
+const SUJETS_ACTUS = { '': 'Tout', pocket: 'TCG Pocket', cartes: 'Cartes', pokemon: 'Pokémon' };
 
 async function afficherActualites(vue, encore, rubrique, p){
   const [actus, sites] = await Promise.all([lireFichier('actualites.json'), lireFichier('sites-pokemon.json')]);
@@ -850,8 +792,6 @@ async function afficherActualites(vue, encore, rubrique, p){
     <div class="grille-sites">${(sites ?? []).map(s => `
       <a class="site" href="${esc(s.url)}" target="_blank" rel="noopener"><b>${esc(s.nom)} ↗</b><small>${esc(s.texte)}</small></a>`).join('')}</div>`;
 }
-
-// ------------------------------------------------------------ départ ----
 
 (async () => {
   poserSquelette();

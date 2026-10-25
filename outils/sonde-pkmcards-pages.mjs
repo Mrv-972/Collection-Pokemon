@@ -1,19 +1,3 @@
-// /cards/<numéro> est-il le paginateur de PkmCards ?
-// ==================================================
-//
-// Dans leur page /cards, deux liens détonnaient parmi les adresses de
-// cartes : /cards/4 et /cards/576. Ce ne sont pas des cartes : ce sont
-// très probablement des numéros de page, et 576 la dernière. Si c'est
-// vrai, voilà la porte du catalogue entier, et elle était dans la page
-// depuis le début.
-//
-// Cette sonde le vérifie plutôt que de le supposer : elle lit quelques
-// pages réparties du début à la fin et regarde quels codes d'extension
-// y apparaissent. Les dernières pages doivent porter les extensions les
-// plus anciennes : c'est ce qui dirait si nos extensions muettes y sont.
-//
-//   node outils/sonde-pkmcards-pages.mjs
-
 const RACINE = 'https://www.pkmcards.fr';
 const IDENTITE = {
   'User-Agent': 'PokeClasseur/1.0 (reperage ; ' +
@@ -27,7 +11,6 @@ const lire = async a => {
   catch(e){ return { code: 'réseau', corps: '', finale: a, err: e.message }; }
 };
 
-// Leurs adresses de carte : /cards/<code>-<langue>-<numéro>-<nom>
 const CARTES = /\/cards\/([a-z0-9.]+)-(fr|en|jp)-([0-9a-z]+)-/gi;
 
 async function page(n){
@@ -39,7 +22,6 @@ async function page(n){
     const cle = `${m[1].toLowerCase()}/${m[2].toLowerCase()}`;
     codes[cle] = (codes[cle] ?? 0) + 1;
   }
-  // Un détour vers /cards voudrait dire que ce numéro n'est pas une page.
   const attendu = n === null ? '/cards' : `/cards/${n}`;
   return {
     code: r.code,
@@ -51,8 +33,6 @@ async function page(n){
 }
 
 console.log('=============== /cards/<numéro> ===============');
-// Réparties : le début, le milieu, la fin. Si la fin porte du « base1 »
-// ou du « neo », la piste est bonne pour nos extensions anciennes.
 for(const n of [null, 1, 2, 4, 100, 300, 500, 576, 577]){
   await dormir(1500);
   const r = await page(n);

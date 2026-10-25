@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>Paramètres - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,11 +39,6 @@
   label{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:16px 0 6px;}
   input{width:100%;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   input:focus{outline:none;border-color:rgba(var(--gold-rgb),0.5)}
-  /* La case n'est jamais pré-cochée : un consentement pré-coché n'en est
-     pas un, et ne prouve rien. Les liens s'ouvrent dans un nouvel onglet
-     pour qu'on ne perde pas ce qu'on vient de saisir. */
-  /* Séparée du reste par un trait et par sa couleur : on ne tombe pas sur ce
-     bouton en visant « Enregistrer ». */
   .danger-zone{margin-top:40px;padding-top:24px;border-top:1px solid rgba(192,57,43,0.35)}
   .danger-zone h2{font-family:'Newsreader',serif;font-size:18px;font-weight:500;
                   color:var(--alerte);margin:0 0 8px;}
@@ -99,17 +94,6 @@
   .zone-msg.ok{color:var(--succes)}
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -209,7 +193,6 @@
   </nav>
 
   <div class="reglages">
-    <div class="kicker">Préférences</div>
     <h1>Paramètres</h1>
     <p class="intro" id="intro-reglages">Ces réglages valent pour cet appareil.</p>
 
@@ -287,14 +270,13 @@
   <footer data-note="Ton compte sert à retrouver ta collection sur tous tes appareils et à te mettre en relation avec d'autres collectionneurs."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
 <script>
-// --- Apparence --------------------------------------------------------
 function marquerTheme(){
   const choix = themeChoisi();
   document.querySelectorAll('[data-theme-choix]').forEach(b =>
@@ -308,7 +290,6 @@ document.querySelectorAll('[data-theme-choix]').forEach(b => b.addEventListener(
   catch(err){ console.warn('Thème non enregistré sur le compte', err); }
 }));
 
-// --- Notifications ----------------------------------------------------
 const interrupteur = document.getElementById('notif-messages');
 const etatNotif = document.getElementById('etat-notif');
 const essai = document.getElementById('essai-notif');
@@ -337,7 +318,7 @@ interrupteur.addEventListener('click', async () => {
   const voulu = interrupteur.getAttribute('aria-checked') !== 'true'
     || ('Notification' in window && Notification.permission === 'default');
   if(voulu && 'Notification' in window && Notification.permission === 'default'){
-    try{ await Notification.requestPermission(); }catch(err){ /* refus silencieux de certains navigateurs */ }
+    try{ await Notification.requestPermission(); }catch(err){ }
   }
   try{ await enregistrerNotifications(voulu); }
   catch(err){ return dire(`Le réglage n'a pas pu être enregistré : ${err.message}`, 'err'); }
@@ -351,7 +332,6 @@ essai.addEventListener('click', () => {
   }catch(err){ dire("Ce navigateur n'a pas pu afficher la notification.", 'err'); }
 });
 
-// --- Affichage des cartes ------------------------------------------
 const boutonGriser = document.getElementById('reglage-griser');
 const boutonContraste = document.getElementById('reglage-contraste');
 const griserActif = () => { try{ return localStorage.getItem(CLE_GRISER) !== 'non'; }catch{ return true; } };
@@ -385,10 +365,6 @@ boutonGriser.addEventListener('click', () => {
   garderSurLeCompte({ pref_griser: voulu });
 });
 
-// --- Liste de souhaits partageable ----------------------------------
-//
-// Le lien porte un jeton tiré au hasard, impossible à deviner. En changer
-// rend l'ancien lien muet ; l'effacer arrête le partage.
 const zonePartage = document.getElementById('zone-partage');
 
 function nouveauJeton(){
@@ -444,11 +420,11 @@ function afficherPartage(message = ''){
   document.addEventListener('pokeclasseur:theme', marquerTheme);
   await initCompte();
   afficherEtatCompte();
-  marquerTheme();   // le thème du compte a pu remplacer celui de l'appareil
+  marquerTheme();
   if(estConnecte()) document.getElementById('intro-reglages').textContent =
     'Ces réglages suivent ton compte : tu les retrouveras sur tous tes appareils.';
   afficherNotifications();
-  marquerAffichage();   // le compte a pu apporter ses propres réglages
+  marquerAffichage();
   afficherPartage();
   if(location.hash === '#partage') document.getElementById('partage').scrollIntoView();
 })();

@@ -1,23 +1,3 @@
-// Quelles sources françaises pourrait-on utiliser, et en a-t-on le droit ?
-// =======================================================================
-//
-// Le besoin : des visuels de cartes EN FRANÇAIS pour les quelque 1 400
-// cartes dont ni TCGdex ni pokemon-tcg-data n'ont rien.
-//
-// Cette sonde ne récolte aucune image. Elle pose, pour chaque candidat,
-// les trois questions à régler AVANT d'écrire la moindre ligne de récolte :
-//
-//   1. le site répond-il, et sous quelle forme (page, API) ?
-//   2. son robots.txt autorise-t-il un programme à le parcourir ?
-//   3. publie-t-il sous une licence qui permette la réutilisation ?
-//
-// La deuxième question n'est pas une formalité. Un site de communauté qui
-// a scanné ses cartes lui-même n'est pas un jeu de données ouvert : lui
-// prendre son travail sans regarder ce qu'il autorise serait malhonnête,
-// et se verrait.
-//
-//   node outils/sonde-sources-francaises.mjs
-
 const IDENTITE = { 'User-Agent': 'PokeClasseur (reconnaissance, github.com/Mrv-972/Collection-Pokemon)' };
 
 const CANDIDATS = [
@@ -47,8 +27,6 @@ async function lire(adresse, { texte = false } = {}){
   }
 }
 
-// Ce que le robots.txt dit à un programme comme le nôtre. On lit la section
-// « User-agent: * », la seule qui nous concerne.
 function lireRobots(texte){
   if(!texte) return { interdits: [], brut: '' };
   const lignes = texte.split('\n').map(l => l.trim());
@@ -91,8 +69,6 @@ for(const c of CANDIDATS){
       console.log(`     ${r.corps.slice(0, 220).replace(/\s+/g, ' ')}`);
       continue;
     }
-    // Quelles adresses d'image la page porte-t-elle ? C'est ce qui dit si
-    // les visuels se devinent ou s'il faut lire chaque page.
     const images = [...new Set((r.corps.match(/https?:\/\/[^"'\s)]+\.(?:png|jpe?g|webp)/gi) ?? []))];
     const interessantes = images.filter(a => !/logo|icon|favicon|sprite|avatar|banner/i.test(a));
     console.log(`     ${images.length} adresses d'image, dont ${interessantes.length} qui ressemblent à des cartes`);

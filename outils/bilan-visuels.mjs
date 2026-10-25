@@ -1,22 +1,3 @@
-// Que manque-t-il encore, et qui peut le combler ?
-// ================================================
-//
-// Trois mesures existent séparément, et aucune ne répond seule :
-//   - donnees/couverture-visuels.json   ce qui manque, et où ;
-//   - donnees/appariement-pkmcards.json ce que PkmCards couvre, chez nous ;
-//   - donnees/physique/                 la taille réelle de chaque extension.
-//
-// Ce bilan les croise pour répondre à la seule question qui compte :
-// des cartes aujourd'hui sans visuel français, combien une source donnée
-// en comble réellement ? Une extension « couverte » dont les visuels
-// marchent déjà n'apporte rien, et il serait facile de s'en féliciter.
-//
-// Les chiffres sont des ESTIMATIONS : la couverture est mesurée sur un
-// échantillon de cartes par extension, pas sur toutes. Le fichier le dit,
-// et ce bilan le répète plutôt que de laisser croire à un comptage exact.
-//
-//   node outils/bilan-visuels.mjs [--sortie donnees]
-
 import { readFile, writeFile } from 'node:fs/promises';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, t) =>
@@ -38,13 +19,10 @@ const taille = id => tailles.get(id) ?? 0;
 const infoDe = id => extensions.find(e => e.id === id) ?? {};
 const an = id => String(infoDe(id).dateSortie ?? '?').slice(0, 4);
 
-// Ce que PkmCards couvre, exprimé avec NOS identifiants. Les douteux sont
-// écartés : un appariement incertain gonflerait le bilan sans rien combler.
 const pkmcards = new Map();
 for(const a of Object.values(appariement.apparies))
   pkmcards.set(a.notre, (pkmcards.get(a.notre) ?? 0) + a.cartesRelevees);
 
-// --- les extensions muettes : rien, dans aucune langue -------------------
 const muettes = couverture.extensionsMuettes.map(m => ({
   id: m.id, nom: infoDe(m.id).name ?? m.id, an: an(m.id),
   cartes: taille(m.id), chezPkmcards: pkmcards.get(m.id) ?? 0,
@@ -53,9 +31,6 @@ const muettesCombles = muettes.filter(m => m.chezPkmcards);
 const muettesRestantes = muettes.filter(m => !m.chezPkmcards)
   .sort((a, b) => b.cartes - a.cartes);
 
-// --- les extensions à trous : du français manque, partiellement ----------
-// On rapporte la part sondée sans français à la taille réelle : c'est une
-// règle de trois, pas un comptage.
 const trous = couverture.extensionsATrous.map(t => {
   const part = (t.sondees - t.frOk) / t.sondees;
   return {
@@ -72,7 +47,6 @@ const comblableTotal = comblable.reduce((s, t) => s + t.manqueEstime, 0);
 const restant = trous.filter(t => !t.chezPkmcards)
   .sort((a, b) => b.manqueEstime - a.manqueEstime);
 
-// ------------------------------------------------------------- dire ------
 const pc = (a, b) => b ? `${(100*a/b).toFixed(0)} %` : '-';
 
 console.log('=============== extensions muettes ===============');
@@ -101,7 +75,6 @@ if(sortie){
   const fichier = `${sortie}/bilan-visuels.json`;
   await writeFile(fichier, JSON.stringify({
     bilanLe: new Date().toISOString(),
-    // D'où viennent les chiffres, pour qu'on puisse les refaire.
     mesureDu: couverture.mesureLe,
     cartesSondeesParExtension: couverture.cartesSondeesParExtension,
     appariementDu: appariement.apparieLe,

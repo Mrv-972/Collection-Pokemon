@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>Pokémon - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,8 +41,6 @@
   .page-head .sprite img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;}
   .page-head h1{font-size:30px;}
   .page-head .meta{color:var(--text-on-ink-dim);font-size:14px;margin-top:6px;}
-  /* Une carte Dresseur ou Énergie n'a pas de sprite : sa vignette la plus
-     récente en tient lieu. */
   .page-head .sprite.vignette{width:60px;height:84px;border-radius:4px;overflow:hidden}
   .page-head .sprite.vignette img{object-fit:cover;image-rendering:auto}
 
@@ -65,57 +63,31 @@
   .card-cote{font-size:11.5px;color:var(--accent-clair);margin-top:-3px;}
 
 
-  /* Cinq cartes par ligne, comme l'application TCG Pocket : retrouver une
-     carte au même endroit d'une grille à l'autre compte plus que d'en voir
-     une de plus. */
   .card-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;padding-bottom:60px;}
   @media(max-width:960px){.card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-  /* Trois colonnes sur téléphone. L'écart entre cartes se resserre pour leur
-     rendre la largeur perdue : les trois boutons de tag tiennent alors dans
-     le pouce, ce qui est le geste principal du site. */
   @media(max-width:720px){
     .card-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
   }
-  /* En dessous de 360 px, trois colonnes ramèneraient la carte à 95 px et
-     ses boutons à 28 px : on repasse à deux, quitte à voir moins de cartes
-     à la fois. */
   @media(max-width:360px){.card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
   .card-tile{display:flex;flex-direction:column;gap:8px;height:100%;}
-  /* flex:none empêche la boîte d'être comprimée par un nom sur trois
-     lignes ou par une ligne de cote ; margin-top:auto pousse les tags
-     en bas, pour qu'ils s'alignent d'une vignette à l'autre. */
   .card-img-wrap{flex:none;position:relative;aspect-ratio:2.5/3.5;border-radius:6px;overflow:hidden;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.08);display:flex;align-items:center;justify-content:center;}
-  /* La carte est montrée entière, jamais rognée. Les visuels fournis par
-     TCGdex n'ont pas tous exactement la même proportion : scans d'anciennes
-     séries, promos hors format, et « cover » les agrandissait jusqu'à
-     remplir la boîte, si bien qu'une carte sur deux paraissait plus grosse
-     que sa voisine. « contain » l'inscrit dans une boîte toujours identique,
-     à la plus grande taille qui la laisse entière. */
   .card-img-wrap img{width:100%;height:100%;object-fit:contain;}
   .card-img-wrap .glyph{font-family:'Newsreader',serif;font-style:italic;color:#5A5D63;font-size:44px;line-height:1;}
   .card-num{font-size:11px;color:var(--text-on-ink-dim);display:flex;justify-content:space-between;align-items:center;gap:6px;}
-  /* min-width:0 : sans lui, un élément flex refuse de descendre sous la
-     largeur de son texte, et les points de suspension ne servent à rien. */
   .card-num span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .rarity-symbol{color:var(--gold);letter-spacing:1px;flex-shrink:0;}
-  /* Les icônes suivent la taille du texte autour : une carte plus petite sur
-     téléphone garde des symboles proportionnés, sans règle supplémentaire. */
   .icone-rarete{height:1.05em;width:auto;vertical-align:-.16em;display:inline-block}
   .icone-rarete + .icone-rarete{margin-left:1px}
   .card-name{font-size:13px;font-weight:500;}
 
   .tag-row{margin-top:auto;display:flex;gap:5px;}
-  /* Les symboles sont des emojis : leur couleur ne se pilote pas en CSS.
-     L'état inactif est donc signalé en les désaturant. */
   .tag-toggle{flex:1;font-size:14px;line-height:1.2;padding:5px 0;border-radius:3px;text-align:center;cursor:pointer;border:1px solid rgba(var(--trait-rgb),0.14);background:transparent;font-family:inherit;transition:.12s;}
   .tag-toggle:not(.active){filter:grayscale(1);opacity:.45}
   .tag-toggle.obt.active{background:rgba(var(--gold-rgb),0.16);border-color:rgba(var(--gold-rgb),0.5)}
   .tag-toggle.rech.active{background:rgba(168,67,28,0.16);border-color:rgba(168,67,28,0.5)}
   .tag-toggle.ech.active{background:rgba(31,111,99,0.18);border-color:rgba(31,111,99,0.5)}
   .tag-toggle:hover{border-color:rgba(var(--trait-rgb),0.35);opacity:1}
-  /* Le bouton « échangeable » bloqué vit dans une enveloppe qui reçoit le
-     clic à sa place : elle doit donc reprendre la largeur qu'il occupait. */
   .ech-bloque{flex:1;display:flex;cursor:help}
   .ech-bloque .tag-toggle{flex:1;cursor:help}
   .tag-toggle.bloque,.tag-toggle.bloque:hover{opacity:.28;filter:grayscale(1);
@@ -129,17 +101,6 @@
   .status-msg.err{color:var(--alerte)}
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -188,10 +149,10 @@
   <div class="toolbar">
     <input type="text" id="filter-input" placeholder="Filtrer par nom de carte ou extension...">
     <select id="rarity-filter"><option value="">Toutes les raretés</option></select>
-    <button class="filter-btn obt" id="btn-obt">✅ Obtenues</button>
-    <button class="filter-btn manq" id="btn-manq">⬜ Manquantes</button>
-    <button class="filter-btn rech" id="btn-rech">❤️ Recherchées</button>
-    <button class="filter-btn ech" id="btn-ech">🔁 Échangeables</button>
+    <button class="filter-btn obt" id="btn-obt"><span class="ico-da ico-obt" aria-hidden="true"></span>Obtenues</button>
+    <button class="filter-btn manq" id="btn-manq"><span class="ico-da ico-manq" aria-hidden="true"></span>Manquantes</button>
+    <button class="filter-btn rech" id="btn-rech"><span class="ico-da ico-rech" aria-hidden="true"></span>Recherchées</button>
+    <button class="filter-btn ech" id="btn-ech"><span class="ico-da ico-ech" aria-hidden="true"></span>Échangeables</button>
     <span id="save-status" style="font-size:12px;color:var(--text-on-ink-dim);opacity:0;transition:opacity .3s;">Enregistré ✓</span>
   </div>
 
@@ -216,36 +177,29 @@
   <footer data-note="Sans compte, tes marquages restent dans ce navigateur, sur cet appareil."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="catalogue.js?v=2026-10-25-zimk"></script>
-<script src="pokedex-fr.js?v=2026-10-25-zimk"></script>
-<script src="sets.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="confirmation.js?v=2026-10-25-zimk"></script>
-<script src="tags.js?v=2026-10-25-zimk"></script>
-<script src="raretes.js?v=2026-10-25-zimk"></script>
-<script src="progression.js?v=2026-10-25-zimk"></script>
-<script src="glissement.js?v=2026-10-25-zimk"></script>
-<script src="cards.js?v=2026-10-25-zimk"></script>
-<script src="prix.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
-<script src="saisie-rapide.js?v=2026-10-25-zimk"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="catalogue.js?v=2026-10-25-hgmz"></script>
+<script src="pokedex-fr.js?v=2026-10-25-hgmz"></script>
+<script src="sets.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="confirmation.js?v=2026-10-25-hgmz"></script>
+<script src="tags.js?v=2026-10-25-hgmz"></script>
+<script src="raretes.js?v=2026-10-25-hgmz"></script>
+<script src="progression.js?v=2026-10-25-hgmz"></script>
+<script src="glissement.js?v=2026-10-25-hgmz"></script>
+<script src="cards.js?v=2026-10-25-hgmz"></script>
+<script src="prix.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
+<script src="saisie-rapide.js?v=2026-10-25-hgmz"></script>
 <script>
-// Toutes les cartes d'un Pokémon, toutes extensions confondues, à partir de
-// son numéro du Pokédex national passé dans l'URL (?dex=25), ou toutes les
-// cartes d'un même nom quand ce n'est pas un Pokémon : un Supporter, un
-// Objet, un Stade, une Énergie (?carte=poke-ball, la clé de son nom dans
-// l'instantané).
 const params = new URLSearchParams(window.location.search);
 const cleCarte = (params.get('carte') || '').trim();
-const dexId = Number(params.get('dex')) || 25; // Pikachu par défaut
-let ficheNom = null; // l'entrée de l'index des noms, en mode ?carte=
+const dexId = Number(params.get('dex')) || 25;
+let ficheNom = null;
 
-// Le genre d'une carte qui n'est pas un Pokémon, tel que l'affiche la page
-// « Par Pokémon / Dresseur » : il sert à l'en-tête et au lien de retour.
 const GENRES = {
   supporter: { libelle: 'Supporter', onglet: 'Supporters' },
   objet:     { libelle: 'Objet',     onglet: 'Objets' },
@@ -257,15 +211,12 @@ const GENRES = {
 const genreDe = f => f?.categorie === 'energie' ? 'energie' : (f?.famille || 'aclasser');
 
 let allCards = [];
-let activeFilter = null; // un des FILTERS, ou null
-let setNames = {}; // { [id d'extension]: nom lisible }
-let setOrder = {}; // { [id d'extension]: rang chronologique }
+let activeFilter = null;
+let setNames = {};
+let setOrder = {};
 
-// Filtres de la barre d'outils. "manq" n'est pas un tag : c'est l'absence
-// du tag "obt", donc rien à cocher sur les cartes.
 const FILTERS = ['obt', 'manq', 'rech', 'ech'];
 
-// Bornes officielles du Pokédex national pour chaque génération.
 const GENERATIONS = [
   { gen: 1, region: 'Kanto',  from: 1,   to: 151 },
   { gen: 2, region: 'Johto',  from: 152, to: 251 },
@@ -312,7 +263,6 @@ function renderHead(cardCount){
   if(cleCarte) return renderHeadNom(cardCount);
   const name = POKEDEX_FR[dexId - 1] || `Pokémon n°${dexId}`;
   const generation = generationOf(dexId);
-  // Le retour ramène à la génération de ce Pokémon, pas à la première.
   const retour = document.getElementById('retour');
   if(retour && generation && generation.gen > 1) retour.href = `pokemon.html?gen=${generation.gen}`;
   document.title = `${name} - PokéClasseur`;
@@ -333,9 +283,6 @@ function renderHead(cardCount){
   `;
 }
 
-// Les cartes venant de partout, leur numéro seul ne dit rien : on affiche le
-// nom de leur extension. Il se déduit de l'identifiant de la carte, croisé
-// avec le catalogue des extensions.
 async function loadSetNames(){
   let sets;
   try{
@@ -404,12 +351,8 @@ async function init(){
   renderHead(null);
   document.getElementById('content').innerHTML = `<div class="card-grid">${Array(12).fill('<div class="skeleton"></div>').join('')}</div>`;
 
-  // Avant le premier rendu, pour que les cartes s'affichent d'emblée avec
-  // leurs marques.
   loadTags();
 
-  // La collection en ligne arrive ensuite : elle ne doit pas retarder
-  // l'affichage des cartes.
   initCompte().then(async () => {
     afficherEtatCompte();
     if(!estConnecte()) return;
@@ -428,10 +371,7 @@ async function init(){
       loadSetNames(),
     ]);
     if(cleCarte) ficheNom = (index || []).find(e => e.cle === cleCarte) || null;
-    // La recherche par numéro de Pokédex ramène les cartes des deux jeux
-    // mêlées : on ne garde que celles de l'univers où l'on se trouve.
     const cards = allResults.filter(c => appartientAUnivers(setIdOfCard(c.id)));
-    // De la carte la plus récente à la plus ancienne.
     cards.sort((a, b) =>
       (setOrder[setIdOfCard(b.id)] ?? -1) - (setOrder[setIdOfCard(a.id)] ?? -1)
       || (a.localId || '').localeCompare(b.localId || '', undefined, { numeric: true }));
@@ -439,10 +379,6 @@ async function init(){
     renderHead(cards.length);
     populateRarityFilter(allCards);
     applyFilters();
-    // Toutes les sources ne livrent pas la rareté avec la carte : quand
-    // elle manque, on la sonde après coup, cartes déjà affichées.
-    // On ne sonde que si les cartes sont arrivées sans rareté :
-      // l'instantané la porte, certaines sources en direct non.
       if(!cleCarte && !allCards.some(c => c.rarity)){
       loadRarities().catch(err => console.warn('Impossible de charger les raretés', err));
     }
@@ -453,8 +389,6 @@ async function init(){
 }
 
 document.getElementById('content').addEventListener('click', (e) => {
-  // Un bouton désactivé n'émet pas de clic : c'est son enveloppe qui le
-  // reçoit, et qui porte la raison du refus.
   const bloque = e.target.closest('.ech-bloque');
   if(bloque){ messageFugace(bloque.dataset.raison); return; }
 
@@ -467,7 +401,6 @@ document.getElementById('content').addEventListener('click', (e) => {
 document.getElementById('filter-input').addEventListener('input', applyFilters);
 document.getElementById('rarity-filter').addEventListener('change', applyFilters);
 
-// Les filtres s'excluent : en activer un désactive les autres.
 FILTERS.forEach(filter => {
   document.getElementById(`btn-${filter}`).addEventListener('click', () => {
     activeFilter = activeFilter === filter ? null : filter;

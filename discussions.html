@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>Discussions - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -83,22 +83,9 @@
   .status-msg.err{color:var(--alerte)}
   .cta-btn{display:inline-block;margin-top:16px;background:var(--teal);color:#EDF5F3;padding:11px 20px;border-radius:3px;font-size:14px;font-weight:500;}
   .cta-btn:hover{background:var(--teal-deep)}
-  /* Un bouton dans un message d'état reste un bouton : la règle des liens
-     de ces messages (couleur d'accent, soulignés) ne doit pas le repeindre. */
   .status-msg a.cta-btn,a.cta-btn{color:#EDF5F3;text-decoration:none}
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -139,7 +126,6 @@
   </nav>
 
   <div class="page-head">
-    <div class="kicker">Messagerie</div>
     <h1>Mes discussions</h1>
   </div>
 
@@ -148,21 +134,21 @@
   <footer data-note="Les discussions ne sont lisibles que par leurs deux participants."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="tags.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
-<script src="messagerie.js?v=2026-10-25-zimk"></script>
-<script src="communaute.js?v=2026-10-25-zimk"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="tags.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
+<script src="messagerie.js?v=2026-10-25-hgmz"></script>
+<script src="communaute.js?v=2026-10-25-hgmz"></script>
 <script>
 const params = new URLSearchParams(window.location.search);
-const membreDemande = params.get('membre'); // conversation à ouvrir d'emblée
+const membreDemande = params.get('membre');
 
 let conversations = [];
-let conversationOuverte = null;  // { conversation_id, autre_id, pseudo }
+let conversationOuverte = null;
 let dernierMessageId = 0;
 let arreterSuivi = null;
 
@@ -178,9 +164,6 @@ function rendreSquelette(){
   `;
 }
 
-// Les trois vues de la liste. Une discussion archivée sort des « Actives »
-// mais y revient d'elle-même dès qu'on t'écrit : ranger ne doit jamais
-// revenir à manquer un message.
 const FILTRES = [
   { cle: 'actives',   libelle: 'Actives' },
   { cle: 'non_lues',  libelle: 'Non lues' },
@@ -203,7 +186,6 @@ function rendreFiltres(){
   if(!barre) return;
   barre.innerHTML = FILTRES.map(f => {
     const nombre = compterFiltre(f.cle);
-    // Inutile de proposer les archives à qui n'en a pas.
     if(f.cle === 'archivees' && nombre === 0 && filtreActif !== 'archivees') return '';
     const compte = f.cle === 'actives' || nombre === 0 ? '' : ` (${nombre})`;
     return `<button class="chip ${filtreActif === f.cle ? 'on' : ''}" data-filtre="${f.cle}">${f.libelle}${compte}</button>`;
@@ -268,7 +250,6 @@ function rendreFil(){
   preparerAvis();
   const saisie = document.getElementById('saisie');
   saisie.addEventListener('keydown', (e) => {
-    // Entrée envoie, Maj+Entrée passe à la ligne.
     if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); envoyer(); }
   });
   saisie.addEventListener('input', () => {
@@ -285,8 +266,6 @@ function ajouterMessages(messages){
   corps.insertAdjacentHTML('beforeend', messages.map(m => `
     <div class="bulle ${m.auteur_id === membre.id ? 'moi' : 'lui'}">${texteEchappe(m.texte)}<span class="heure">${heureLisible(m.envoye_le)}</span></div>
   `).join(''));
-  // On ne repositionne la vue que si le lecteur était déjà en bas : sinon
-  // il est en train de relire, et on ne lui arrache pas sa lecture.
   if(enBas || messages.some(m => m.auteur_id === membre.id)){
     corps.scrollTop = corps.scrollHeight;
   }
@@ -303,8 +282,6 @@ async function ouvrirFil(conversation){
   await noterCommeLu();
 }
 
-// Ouvrir un fil vaut lecture : on mémorise où on en est, ici et pour la
-// pastille de la navigation.
 async function noterCommeLu(){
   if(!conversationOuverte || !dernierMessageId) return;
   try{
@@ -344,8 +321,6 @@ async function archiver(){
   const aArchiver = !conv.archivee;
   try{
     await archiverConversation(conv.conversation_id, aArchiver);
-    // En la ressortant, on remet la vue sur les discussions actives, sinon
-    // elle disparaîtrait de l'écran au moment même où on la récupère.
     if(!aArchiver) filtreActif = 'actives';
     await rafraichirListe();
     const maj = conversations.find(c => c.conversation_id === conv.conversation_id);
@@ -360,8 +335,6 @@ async function archiver(){
 async function supprimer(){
   const conv = conversationOuverte;
   if(!conv) return;
-  // Le message dit exactement ce qui se passe : la moitié de la discussion
-  // appartient à quelqu'un d'autre, et elle ne s'efface pas.
   if(!confirm(
     `Supprimer la discussion avec ${conv.pseudo} ?\n\n`
     + `Elle quittera ta liste et tu n'en verras plus les messages.\n\n`
@@ -394,8 +367,6 @@ async function bloquer(){
   }
 }
 
-// Un avis se donne une fois que les deux ont écrit : la base le vérifie,
-// le bouton n'apparaît qu'à ce moment-là.
 async function preparerAvis(){
   const conv = conversationOuverte;
   const bouton = document.getElementById('btn-avis');
@@ -414,7 +385,7 @@ async function preparerAvis(){
         preparerAvis();
       }catch(err){ annoncer(err.message, 'ko'); }
     };
-  }catch{ /* base pas encore à jour : pas de bouton */ }
+  }catch{ }
 }
 
 async function signaler(){
@@ -430,11 +401,7 @@ async function signaler(){
 
 async function rafraichirListe(){
   conversations = await listerConversations();
-  // Les avatars arrivent après la liste : elle s'affiche d'abord avec les
-  // initiales, puis se redessine quand ils sont là.
   avatarsDe(conversations.map(c => c.autre_id)).then(() => { rendreListe(); if(conversationOuverte) rendreFil(); }).catch(() => {});
-  // La conversation ouverte est un objet de cette liste : sans cette reprise,
-  // son drapeau « archivée » resterait celui du chargement précédent.
   if(conversationOuverte){
     const maj = conversations.find(c => c.conversation_id === conversationOuverte.conversation_id);
     if(maj) conversationOuverte = maj;
@@ -443,14 +410,12 @@ async function rafraichirListe(){
   rendreListe();
 }
 
-// Va chercher ce qui est arrivé depuis le dernier message connu.
 async function rafraichir(){
   if(conversationOuverte){
     const nouveaux = await lireMessages(conversationOuverte.conversation_id, dernierMessageId);
     if(nouveaux.length){
       dernierMessageId = nouveaux[nouveaux.length - 1].id;
       ajouterMessages(nouveaux);
-      // Le fil est sous les yeux du lecteur : ces messages sont lus.
       if(document.visibilityState === 'visible') await noterCommeLu();
     }
   }
@@ -477,15 +442,11 @@ async function init(){
   try{
     await rafraichirListe();
 
-    // Arrivée depuis la page Échanges : on ouvre directement la discussion
-    // avec ce membre, en la créant si c'est la première fois.
     if(membreDemande){
       const idConv = await ouvrirConversation(membreDemande);
       await rafraichirListe();
       let conv = conversations.find(c => c.conversation_id === idConv);
       if(!conv){
-        // Discussion précédemment supprimée : on la rouvre pour écrire, sans
-        // faire réapparaître les messages effacés.
         conv = {
           conversation_id: idConv,
           autre_id: membreDemande,
@@ -494,7 +455,6 @@ async function init(){
           archivee: false,
         };
       }
-      // Rangée puis rouverte volontairement : on montre la vue où elle est.
       if(conv.archivee) filtreActif = 'archivees';
       rendreFiltres();
       await ouvrirFil(conv);
@@ -514,8 +474,6 @@ document.addEventListener('click', (e) => {
   const puce = e.target.closest('[data-filtre]');
   if(puce){
     filtreActif = puce.dataset.filtre;
-    // La discussion ouverte n'a plus sa place dans cette vue : on la ferme
-    // plutôt que de la laisser surlignée dans une liste où elle ne figure pas.
     if(conversationOuverte && !correspondAuFiltre(conversationOuverte, filtreActif)){
       conversationOuverte = null;
       rendreFil();

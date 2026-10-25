@@ -1,16 +1,3 @@
-// Planche de vignettes, pour REGARDER des visuels qu'on ne peut pas
-// atteindre d'ici.
-// ===================================================================
-//
-// Les serveurs d'images des cartes ne répondent qu'aux exécuteurs de
-// GitHub. Pour juger d'un rattachement à l'œil : la carte est-elle bien
-// en français ? est-ce bien la même illustration que la version
-// anglaise ?, l'outil assemble les visuels demandés en une seule image
-// et l'écrit dans le journal, en texte (base64), découpée en lignes
-// « PLANCHE <n> <morceau> ». Il suffit de recoller les morceaux.
-//
-//   node outils/planche-visuels.mjs "étiquette=adresse" "étiquette=adresse" …
-
 import sharp from 'sharp';
 
 const IDENTITE = {
@@ -22,8 +9,6 @@ const LARGEUR = 220, HAUTEUR = 307, PAR_LIGNE = 4, LEGENDE = 22;
 const demandes = process.argv.slice(2).flatMap(a => a.split(/\s+/)).filter(Boolean)
   .map(a => { const i = a.indexOf('='); return { etiquette: a.slice(0, i), adresse: a.slice(i + 1) }; });
 
-// « --brut » : chaque image telle quelle, en pleine résolution, pour
-// l'étudier ailleurs (régler une lecture de texte, par exemple).
 const brut = process.env.BRUT === '1';
 
 const cases = [];

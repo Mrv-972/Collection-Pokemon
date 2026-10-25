@@ -1,29 +1,9 @@
-// Pokécardex : trouver nos séries manquantes et la forme de leurs visuels.
-// =========================================================================
-//
-// Rectification d'une erreur à moi : je les croyais en « application
-// JavaScript » parce qu'une lecture simple ne rendait qu'une coquille de
-// 159 Ko sans un lien. C'était Cloudflare : la sonde au navigateur a
-// montré un « cdn-cgi/challenge-platform », donc une page de vérification
-// anti-robot, pas une coquille vide. Avec un vrai navigateur, elle passe.
-//
-// Ce qu'on sait désormais, mesuré : robots.txt autorise tout ; les pages
-// portent de vrais liens ; les images viennent de pokecardex.b-cdn.net et
-// ce CDN répond « access-control-allow-origin: * », donc on pourrait les
-// afficher sans les copier : contrairement à Poképédia.
-//
-// Reste à savoir : où sont listées les séries, comment on nomme les
-// nôtres chez eux, et à quoi ressemble l'adresse d'un visuel de carte.
-//
-//   node outils/sonde-pokecardex-series.mjs
-
 import { chromium } from 'playwright';
 
 const RACINE = 'https://www.pokecardex.com';
 const IDENTITE = 'PokeClasseur/1.0 (reperage de visuels francais ; ' +
                  'github.com/Mrv-972/Collection-Pokemon ; mrv972.contact@gmail.com)';
 
-// Nos trous, et ce qu'on espère retrouver chez eux.
 const CIBLES = [
   { id: 'swsh4.5sv',  nom: 'Destinées Radieuses Coffre Étincelant', manque: 96 },
   { id: 'sma',        nom: 'Destinées Occultes Coffre Étincelant',  manque: 94 },
@@ -38,7 +18,6 @@ const contexte = await nav.newContext({ userAgent: IDENTITE, locale: 'fr-FR',
                                         viewport: { width: 1400, height: 1000 } });
 const page = await contexte.newPage();
 
-// --- 1. la liste des séries ---------------------------------------------
 console.log('=============== /series ===============');
 await page.goto(`${RACINE}/series`, { waitUntil: 'networkidle', timeout: 60000 });
 await page.waitForTimeout(3000);
@@ -53,14 +32,11 @@ console.log(`${series.length} liens de série trouvés.`);
 for(const s of series.slice(0, 25)) console.log(`  ${s.href.padEnd(40)} ${s.texte}`);
 if(series.length > 25) console.log(`  … et ${series.length - 25} autres`);
 
-// --- 2. nos trous, cherchés dans cette liste -----------------------------
 const aplatir = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '')
   .toLowerCase().replace(/[^a-z0-9]+/g, '');
 console.log('\n=============== nos trous dans leur liste ===============');
 const trouves = [];
 for(const c of CIBLES){
-  // On cherche les mots marquants du nom plutôt que le nom entier : leurs
-  // intitulés ne sont pas forcément les nôtres au caractère près.
   const mots = c.nom.split(/[\s()]+/).filter(m => m.length > 4).map(aplatir);
   const candidat = series.find(s => {
     const t = aplatir(s.texte);
@@ -74,7 +50,6 @@ for(const c of CIBLES){
   if(candidat) trouves.push({ ...c, href: candidat.href });
 }
 
-// --- 3. à quoi ressemble une page de série, et ses visuels ? -------------
 console.log('\n=============== une page de série ===============');
 const essai = trouves[0] ?? { href: series[0]?.href, id: '(première de la liste)' };
 if(essai.href){
@@ -86,7 +61,6 @@ if(essai.href){
   });
   await page.goto(adresse, { waitUntil: 'networkidle', timeout: 60000 });
   await page.waitForTimeout(4000);
-  // Descendre : beaucoup de sites ne chargent leurs images qu'à l'approche.
   for(let i = 0; i < 4; i++){
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForTimeout(2000);

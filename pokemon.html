@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>Par Pokémon / Dresseur - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,8 +39,6 @@
   .toolbar input{flex:1;min-width:200px;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:12px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   .toolbar input::placeholder{color:var(--text-on-ink-dim)}
 
-  /* Le genre de carte d'abord (Pokémon, Supporters, Objets…), puis, pour
-     les Pokémon seulement, la génération. */
   .type-tabs{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:14px;}
   .type-tab{background:transparent;border:1px solid rgba(var(--trait-rgb),0.14);color:var(--text-on-ink-dim);padding:9px 16px;border-radius:999px;font-size:14px;cursor:pointer;font-family:inherit;transition:.12s;}
   .type-tab:hover{border-color:rgba(var(--trait-rgb),0.32);color:var(--text-on-ink)}
@@ -62,8 +60,6 @@
   .sous-titre{font-family:'Newsreader',serif;font-size:18px;margin:4px 0 14px;}
   #content .dex-grid:not(:last-child){padding-bottom:30px}
 
-  /* Une carte Dresseur ou Énergie se montre par sa vignette : elle n'a pas
-     de sprite comme un Pokémon. */
   .carte-nom .dex-sprite{width:100%;height:auto;aspect-ratio:2.5/3.5;max-width:110px;margin-bottom:6px;
     border-radius:4px;overflow:hidden;background:rgba(var(--trait-rgb),0.05);}
   .carte-nom .dex-sprite img{object-fit:cover;image-rendering:auto;}
@@ -83,17 +79,6 @@
   .status-msg{color:var(--text-on-ink-dim);font-size:14px;padding:20px 0;}
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -128,7 +113,6 @@
   </nav>
 
   <div class="page-head">
-    <div class="kicker">Pokédex et cartes Dresseur</div>
     <h1>Toutes les cartes d'un Pokémon, d'un Dresseur ou d'un Objet</h1>
     <p>Plutôt que de chercher extension par extension, pars de ce que montre la carte : un Pokémon, un Supporter, un Objet, un Outil, un Stade ou une Énergie. Choisis-en un pour voir toutes ses cartes, toutes extensions confondues.</p>
   </div>
@@ -146,16 +130,15 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
-<script src="pokedex-fr.js?v=2026-10-25-zimk"></script>
-<script src="catalogue.js?v=2026-10-25-zimk"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
+<script src="pokedex-fr.js?v=2026-10-25-hgmz"></script>
+<script src="catalogue.js?v=2026-10-25-hgmz"></script>
 <script>
-// Bornes officielles du Pokédex national pour chaque génération.
 const GENERATIONS = [
   { gen: 1, region: 'Kanto',  from: 1,   to: 151 },
   { gen: 2, region: 'Johto',  from: 152, to: 251 },
@@ -168,11 +151,6 @@ const GENERATIONS = [
   { gen: 9, region: 'Paldea', from: 906, to: 1025 },
 ];
 
-// Les genres de carte, dans l'ordre des onglets. Les Pokémon se parcourent
-// par génération ; les autres cartes, rangées par nom dans l'instantané
-// (donnees/<univers>/autres.json), par famille. Un onglet sans aucune carte
-// dans l'univers courant n'apparaît pas : il n'y a pas d'Énergie dans
-// l'application, par exemple.
 const TYPES = [
   { cle: 'pokemon',   libelle: 'Pokémon' },
   { cle: 'supporter', libelle: 'Supporters',
@@ -190,8 +168,6 @@ const TYPES = [
 ];
 const typeDe = entree => entree.categorie === 'energie' ? 'energie' : (entree.famille || 'aclasser');
 
-// L'onglet ouvert se retient dans l'adresse (?onglet=objet&gen=3) : en
-// revenant d'une page de cartes, on retrouve la liste où on l'avait laissée.
 const adresse = new URLSearchParams(window.location.search);
 let activeType = TYPES.some(t => t.cle === adresse.get('onglet')) ? adresse.get('onglet') : 'pokemon';
 let activeGen = GENERATIONS.some(g => g.gen === Number(adresse.get('gen'))) ? Number(adresse.get('gen')) : 1;
@@ -206,7 +182,6 @@ function retenirOnglet(){
 }
 
 const echapperNom = v => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-// « evoli » trouve Évoli, « poke ball » trouve Poké Ball.
 const sansAccents = v => String(v ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[’']/g, "'").toLowerCase();
 
 function spriteUrl(dexId){
@@ -225,8 +200,6 @@ function renderTabs(){
   const compte = {};
   for(const e of autres) compte[typeDe(e)] = (compte[typeDe(e)] ?? 0) + 1;
   const visibles = TYPES.filter(t => t.cle === 'pokemon' || compte[t.cle]);
-  // Avec un seul genre (pas encore de rangement), la rangée n'aurait rien à
-  // choisir : on ne l'affiche pas.
   document.getElementById('type-tabs').innerHTML = visibles.length < 2 ? '' : visibles.map(t => `
     <button class="type-tab ${t.cle === activeType ? 'on' : ''}" data-type="${t.cle}" role="tab"
             aria-selected="${t.cle === activeType}">${t.libelle}${t.cle === 'pokemon' ? '' : `<span class="nb">${compte[t.cle]}</span>`}</button>
@@ -249,8 +222,6 @@ function pokemonTile(p){
     </a>`;
 }
 
-// La vignette d'un nom de carte : son visuel le plus récent, et le nombre de
-// cartes qui portent ce nom.
 function carteTile(e, precision = ''){
   const secours = e.imageSecours && e.imageSecours !== e.image ? e.imageSecours : '';
   return `
@@ -300,7 +271,6 @@ function showType(cle){
   if(cle === 'pokemon') return showGeneration(activeGen);
   const type = TYPES.find(t => t.cle === cle);
   const liste = autres.filter(e => typeDe(e) === cle);
-  // Un onglet retenu dans l'adresse peut ne pas exister dans cet univers.
   if(!type || !liste.length) return showGeneration(activeGen);
   activeType = cle;
   renderTabs();
@@ -337,9 +307,6 @@ function showSearch(query){
     content.innerHTML = '<p class="status-msg">Aucun Pokémon ni aucune carte ne correspond à ta recherche.</p>';
     return;
   }
-  // Les deux familles de résultats ne se mélangent pas : un Pokémon et une
-  // carte Dresseur ne se présentent pas de la même façon.
-  // Le genre est précisé sur chaque vignette : « Supporter · 4 cartes ».
   const SINGULIERS = { supporter: 'Supporter', objet: 'Objet', outil: 'Outil', stade: 'Stade', energie: 'Énergie', aclasser: 'Dresseur' };
   const lesDeux = pokemon.length && cartes.length;
   content.innerHTML = [
@@ -370,8 +337,6 @@ document.getElementById('search-input').addEventListener('input', (e) => {
   else showType(activeType);
 });
 
-// Les Pokémon s'affichent tout de suite ; les autres cartes, dès que leur
-// index est arrivé.
 if(activeType === 'pokemon') showGeneration(activeGen);
 else{
   renderTabs();

@@ -1,17 +1,3 @@
-// Chercher par où PkmCards se laisse parcourir.
-// =============================================
-//
-// Leur page « liste des cartes françaises » renvoie les 30 mêmes cartes
-// quelle que soit la page demandée : c'est une vitrine, pas un catalogue.
-// Cette sonde regarde, sans rien télécharger d'autre que du texte :
-//
-//   1. robots.txt   : ce qu'ils autorisent, et où est leur plan de site ;
-//   2. le plan de site : la voie prévue pour les machines, si elle existe ;
-//   3. les formes de pagination courantes, pour voir si l'une répond ;
-//   4. les traces d'une interface de données (Next.js, API) dans leur page.
-//
-//   node outils/sonde-pkmcards-plan.mjs
-
 const RACINE = 'https://www.pkmcards.fr';
 const IDENTITE = {
   'User-Agent': 'PokeClasseur/1.0 (reperage ; ' +
@@ -28,14 +14,12 @@ async function lire(adresse){
   }catch(err){ return { code: 'réseau', corps: '', finale: adresse, type: '', err: err.message }; }
 }
 
-// --- 1. robots.txt --------------------------------------------------------
 console.log('=============== robots.txt ===============');
 const robots = await lire(`${RACINE}/robots.txt`);
 console.log(`code ${robots.code}`);
 console.log(robots.corps.slice(0, 1500));
 const plans = [...new Set([...(robots.corps.matchAll(/^\s*sitemap:\s*(\S+)/gim))].map(m => m[1]))];
 
-// --- 2. le plan de site ---------------------------------------------------
 console.log('\n=============== plan de site ===============');
 const candidats = plans.length ? plans : [`${RACINE}/sitemap.xml`, `${RACINE}/sitemap_index.xml`];
 for(const adresse of candidats){
@@ -43,7 +27,6 @@ for(const adresse of candidats){
   const r = await lire(adresse);
   const liens = [...new Set([...(r.corps.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi))].map(m => m[1]))];
   console.log(`\n${adresse}\n  code ${r.code} (${r.corps.length} octets) ${liens.length} adresses`);
-  // Un plan d'index renvoie vers d'autres plans ; on montre de quoi il parle.
   const parGenre = {};
   for(const l of liens){
     const genre = (l.replace(RACINE, '').match(/^\/[a-z0-9_-]*/i) ?? ['/'])[0];
@@ -55,7 +38,6 @@ for(const adresse of candidats){
   console.log('  exemples : ' + liens.slice(0, 4).join('\n             '));
 }
 
-// --- 3. les formes de pagination ------------------------------------------
 console.log('\n=============== pagination ===============');
 const base = `${RACINE}/cards/liste-cartes-francaises`;
 const reference = await lire(base);
@@ -74,7 +56,6 @@ for(const forme of ['?page=2', '?p=2', '/page/2', '?offset=30', '?skip=30', '?st
   console.log(`  ${forme.padEnd(12)} code ${String(r.code).padEnd(4)} ${String(e.n).padStart(3)} visuels  ${pareil ? 'IDENTIQUE' : '>>> DIFFÉRENT <<<'}`);
 }
 
-// --- 4. une interface de données ? ----------------------------------------
 console.log('\n=============== interface de données ===============');
 const c = reference.corps;
 const indices = {

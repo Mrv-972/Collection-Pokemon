@@ -1,25 +1,7 @@
-// La photo de profil, sur la page « Mon profil ».
-// ===============================================
-//
-// Deux façons d'avoir une image :
-//   - un Pokémon de la galerie : immédiat, visible de tous ;
-//   - une photo à soi : recadrée, réduite, contrôlée par un filtre
-//     automatique dans le navigateur, puis mise en attente. Elle ne sera
-//     visible des autres qu'une fois validée par l'administrateur.
-//
-// Le filtre (NSFWJS, vendor/nsfwjs) écarte l'essentiel des images
-// pornographiques ou suggestives avant même l'envoi. Il tourne chez le
-// visiteur et pourrait donc être contourné : c'est la validation qui fait
-// foi, et la base l'impose (supabase/profil-photo-parametres.sql).
+const COTE_PHOTO = 256;
 
-const COTE_PHOTO = 256;   // le profil s'affiche au plus en 96 px : 256 suffit, même sur écran dense
-
-// Seuils du filtre, volontairement sévères : le site accueille des membres
-// dès 15 ans. Une photo de plage refusée à tort a une solution simple :
-// en choisir une autre, ou un Pokémon ; une image pornographique acceptée
-// n'en a pas.
-const SEUIL_EXPLICITE = 0.2;    // « Porn » + « Hentai »
-const SEUIL_SUGGESTIVE = 0.45;  // « Sexy »
+const SEUIL_EXPLICITE = 0.2;
+const SEUIL_SUGGESTIVE = 0.45;
 
 let filtrePret = null;
 function chargerScript(src){
@@ -31,7 +13,6 @@ function chargerScript(src){
   });
 }
 
-// Le filtre pèse 6 Mo : chargé une fois, au premier besoin seulement.
 function chargerFiltre(){
   filtrePret ??= (async () => {
     await chargerScript('vendor/nsfwjs/model.min.js');
@@ -43,10 +24,6 @@ function chargerFiltre(){
   return filtrePret;
 }
 
-// Recadre au centre, réduit à 256 × 256 et réencode en WebP. Le
-// réencodage a un second mérite : il efface les métadonnées de la photo
-// d'origine : dont, souvent, la position GPS de l'endroit où elle a été
-// prise.
 async function preparerPhoto(fichier){
   if(!/^image\//.test(fichier.type)) throw new Error("Ce fichier n'est pas une image.");
   if(fichier.size > 15 * 1024 * 1024) throw new Error('Cette image est trop lourde (15 Mo au plus).');
@@ -76,7 +53,6 @@ const STYLE_PHOTO_PROFIL = `
   .photo-profil{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;margin:26px 0 8px;
     padding:20px;border-radius:12px;background:rgba(var(--trait-rgb),0.04);border:1px solid rgba(var(--trait-rgb),0.10)}
   .photo-profil .apercu{position:relative}
-  /* La photo elle-même ouvre la liste des Pokémon : un crayon le signale. */
   .photo-profil button.apercu{display:block;width:auto;min-height:0;margin:0;padding:0;border:0;border-radius:50%;
     background:none;cursor:pointer;color:inherit;font:inherit}
   .photo-profil button.apercu:hover .avatar-membre,.photo-profil button.apercu:focus-visible .avatar-membre{
@@ -90,8 +66,6 @@ const STYLE_PHOTO_PROFIL = `
   .photo-profil .etat.attente b{color:var(--accent-clair)}
   .photo-profil .etat.refus b{color:var(--alerte)}
   .photo-profil .actions{display:flex;flex-wrap:wrap;gap:8px}
-  /* La page du compte habille tous ses boutons (pleine largeur, marges) :
-     ceux de la photo reprennent leur taille de pastille. */
   .photo-profil .actions button,.photo-profil .actions label{font:inherit;font-size:13px;line-height:1.3;padding:8px 13px;border-radius:999px;cursor:pointer;
     border:1px solid rgba(var(--trait-rgb),0.18);background:transparent;color:var(--text-on-ink);
     width:auto;margin:0;min-height:0;white-space:nowrap}
@@ -103,8 +77,6 @@ const STYLE_PHOTO_PROFIL = `
   .photo-profil .travail{grid-column:1 / -1;font-size:13px;color:var(--text-on-ink-dim);margin:0}
   .photo-profil .travail.err{color:var(--alerte)}
   .galerie-avatars{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px;margin-top:4px}
-  /* Sans cette règle, « display:grid » l'emportait sur l'attribut hidden :
-     la liste restait ouverte en permanence. */
   .galerie-avatars[hidden]{display:none}
   .galerie-avatars button{width:auto;margin:0;min-height:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 6px;border-radius:10px;cursor:pointer;
     border:1px solid rgba(var(--trait-rgb),0.10);background:rgba(var(--trait-rgb),0.03);color:var(--text-on-ink-dim);font:inherit;font-size:10.5px}
@@ -122,8 +94,6 @@ function poserStylePhotoProfil(){
 
 const echapperTexteProfil = v => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
-// Dessine la section dans « conteneur ». « apresChangement » est appelé
-// quand l'image du membre a changé : la page redessine alors l'en-tête.
 async function afficherPhotoProfil(conteneur, apresChangement = () => {}){
   if(!conteneur) return;
   poserStylePhotoProfil();
@@ -141,8 +111,6 @@ async function afficherPhotoProfil(conteneur, apresChangement = () => {}){
   else if(statut === 'validee') etat = `<p class="etat">Ta photo est visible des autres membres.</p>`;
   else etat = `<p class="etat">${profil.avatar ? 'Ton Pokémon est visible des autres membres. Clique dessus pour en changer.' : 'Clique sur l\'image pour choisir un Pokémon, ou ajoute une photo de toi.'}</p>`;
 
-  // Une photo (validée ou en attente) ou un Pokémon : un seul bouton retire
-  // l'image, quelle qu'elle soit, et le membre retrouve son initiale.
   const aPhoto = !!(profil.photo_url || profil.photo_en_attente);
   const aUneImage = aPhoto || !!profil.avatar;
 
@@ -150,7 +118,7 @@ async function afficherPhotoProfil(conteneur, apresChangement = () => {}){
     <section class="photo-profil" aria-labelledby="titre-photo">
       <button type="button" class="apercu" id="apercu-photo" aria-controls="galerie-avatars" aria-expanded="false"
               title="Choisir un Pokémon" aria-label="Changer d'image : choisir un Pokémon">
-        <span id="image-photo">${avatarHtml(profil, 84)}</span><span class="crayon" aria-hidden="true">✏️</span></button>
+        <span id="image-photo">${avatarHtml(profil, 84)}</span><span class="crayon">${pictogramme('crayon')}</span></button>
       <div>
         <h2 id="titre-photo" style="font-size:20px">Photo de profil</h2>
         ${etat}
@@ -171,7 +139,6 @@ async function afficherPhotoProfil(conteneur, apresChangement = () => {}){
         prise de vue…) sont effacées avant l'envoi.</p>
     </section>`;
 
-  // Ma photo en attente : je suis le seul à pouvoir la voir.
   if(statut === 'en_attente'){
     lienPhotoEnAttente().then(lien => {
       if(lien) document.getElementById('image-photo').innerHTML =
@@ -187,7 +154,6 @@ async function afficherPhotoProfil(conteneur, apresChangement = () => {}){
   };
   const redessiner = async () => { await afficherPhotoProfil(conteneur, apresChangement); apresChangement(); };
 
-  // La liste des Pokémon s'ouvre d'un clic sur la photo ou sur le bouton.
   const galerie = document.getElementById('galerie-avatars');
   const ouvreurs = [document.getElementById('apercu-photo'), document.getElementById('btn-galerie')];
   const basculerGalerie = () => {
@@ -197,8 +163,6 @@ async function afficherPhotoProfil(conteneur, apresChangement = () => {}){
   };
   ouvreurs.forEach(b => b.addEventListener('click', basculerGalerie));
 
-  // Choisir un Pokémon, c'est en faire son image : une photo en place
-  // l'emporterait sinon à l'affichage, et le choix semblerait sans effet.
   galerie.addEventListener('click', async e => {
     const b = e.target.closest('[data-avatar]');
     if(!b) return;

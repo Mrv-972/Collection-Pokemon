@@ -1,11 +1,4 @@
 #!/usr/bin/env node
-//
-// Combien pèseraient les visuels qu'on n'a pas encore ?
-//
-// Les 1366 cartes récoltées chez le wiki pèsent 93 Ko pièce. Les 2497 autres
-// viennent de TCGdex, qui propose deux définitions par carte : « low » pour
-// les grilles, « high » pour le zoom. Copier les deux, ou une seule, ou
-// aucune, ne se décide pas au jugé : ça se pèse.
 
 import { readFile, readdir } from 'node:fs/promises';
 
@@ -26,10 +19,6 @@ async function poids(adresse){
   }catch(err){ return null; }
 }
 
-// Un fichier qui n'a pas pu être copié, c'est soit une adresse qui n'existe
-// pas, soit un serveur qui nous a bridés. Les deux se soignent très
-// différemment : la première demande une autre source, la seconde demande
-// juste de la patience. Le code de réponse tranche.
 async function statut(adresse){
   try{
     const r = await fetch(adresse, { method: 'HEAD', redirect: 'follow', headers: IDENTITE });
@@ -70,8 +59,6 @@ async function principal(){
 
   await diagnostiquerLesManquants(restantes);
 
-  // Un échantillon réparti sur tout le catalogue, pas les trente premières :
-  // les extensions récentes sont souvent plus lourdes que les anciennes.
   const pas = Math.max(1, Math.floor(restantes.length / 30));
   const echantillon = restantes.filter((_, i) => i % pas === 0).slice(0, 30);
 
@@ -93,7 +80,7 @@ async function principal(){
     console.log(`  les deux                + ${mo((moyenne(bas) + moyenne(hauts)) * restantes.length)}`);
   }
 
-  const dejaOctets = 124 * 1048576;   // les 1366 du wiki, mesurés
+  const dejaOctets = 124 * 1048576;
   console.log(`\nLe dossier pèse aujourd'hui ~${mo(dejaOctets)}. Il passerait à :`);
   console.log(`  affichage seul          ~${mo(dejaOctets + moyenne(bas) * restantes.length)}`);
   if(hauts.length) console.log(`  les deux                ~${mo(dejaOctets + (moyenne(bas) + moyenne(hauts)) * restantes.length)}`);

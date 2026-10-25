@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>Par extension - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,14 +48,10 @@
   .series-title::-webkit-details-marker{display:none}
   .series-title:hover{background:rgba(var(--trait-rgb),0.03)}
   .series-title h2{font-size:22px;}
-  /* Le logo de la série, à la place du titre quand il existe. Une hauteur
-     fixe : les logos vont du carré au bandeau très large, et sans elle la
-     rangée des titres sautait d'une série à l'autre. */
   .logo-serie{height:30px;max-width:170px;object-fit:contain;object-position:left center;
               flex-shrink:0;opacity:.92;}
 
   .series-title .count{font-size:13px;color:var(--text-on-ink-dim);}
-  /* Le chevron dit dans quel sens ça va s'ouvrir, sans texte à traduire. */
   .series-title .chevron{flex-shrink:0;width:10px;height:10px;margin-left:2px;
                          border-right:2px solid var(--text-on-ink-dim);
                          border-bottom:2px solid var(--text-on-ink-dim);
@@ -86,17 +82,6 @@
 
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -132,7 +117,6 @@
   </nav>
 
   <div class="page-head">
-    <div class="kicker" id="tete-kicker">Catalogue</div>
     <h1 id="tete-titre">Toutes les séries, toutes les extensions</h1>
     <p id="tete-intro"></p>
   </div>
@@ -151,20 +135,16 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="catalogue.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
-<script src="progression.js?v=2026-10-25-zimk"></script>
-<script src="sets.js?v=2026-10-25-zimk"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="catalogue.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
+<script src="progression.js?v=2026-10-25-hgmz"></script>
+<script src="sets.js?v=2026-10-25-hgmz"></script>
 <script>
-// Récupère la liste complète des extensions depuis l'API publique et gratuite
-// TCGdex (aucune clé requise), puis les regroupe par série (Écarlate et
-// Violet, Épée et Bouclier, etc.). Les logos affichés sont hébergés par
-// TCGdex, rien n'est stocké ici.
 let allSets = [];
 
 async function fetchJson(url, retries = 1){
@@ -180,16 +160,12 @@ async function fetchJson(url, retries = 1){
   return JSON.parse(text);
 }
 
-// La présentation dépend de l'univers : parler des grandes séries du jeu
-// physique n'a aucun sens devant le catalogue de l'application.
 const PRESENTATION = {
   physique: {
-    kicker: 'Catalogue · TCG physique',
     titre: 'Toutes les séries, toutes les extensions',
     intro: "Le jeu de cartes Pokémon est découpé en grandes séries (Écarlate et Violet, Épée et Bouclier, Soleil et Lune...), chacune contenant plusieurs extensions. Choisis une extension pour voir son classeur.",
   },
   pocket: {
-    kicker: 'Catalogue · TCG Pocket',
     titre: "Toutes les extensions de l'application",
     intro: "Pokémon TCG Pocket sort ses propres extensions, qui n'existent que dans l'application. Choisis-en une pour voir son classeur : tes cartes physiques restent rangées de l'autre côté.",
   },
@@ -197,7 +173,6 @@ const PRESENTATION = {
 
 function rendreTete(){
   const t = PRESENTATION[universActuel().cle];
-  document.getElementById('tete-kicker').textContent = t.kicker;
   document.getElementById('tete-titre').textContent = t.titre;
   document.getElementById('tete-intro').textContent = t.intro;
 }
@@ -208,17 +183,8 @@ async function loadSets(){
 
   try{
     const sets = await listerExtensions();
-    // Les logos posés depuis l'administration, lus une fois pour la page.
-    // Un échec ici ne doit pas priver le visiteur du catalogue : on se
-    // contente alors des logos déduits.
     try{ logosCorriges = await logosDeSeriesCorriges(); }catch(err){}
-    // Chaque univers son catalogue : les extensions de l'application mobile
-    // et celles du jeu de cartes physique ne se mélangent pas. Le filtre se
-    // fait ici, jamais dans le cache : celui-ci porte le catalogue entier,
-    // que trois autres pages relisent pour y trouver un nom d'extension.
     const duCote = sets.filter(s => appartientAUnivers(s.id));
-    // L'API renvoie les extensions de la plus ancienne à la plus récente ;
-    // on inverse pour afficher les plus récentes en premier.
     allSets = duCote.slice().reverse();
     renderSets(allSets);
   }catch(err){
@@ -227,11 +193,6 @@ async function loadSets(){
   }
 }
 
-// L'API range les sigles sous un segment "univ", mais les fichiers ne s'y
-// trouvent que pour les extensions les plus récentes : partout ailleurs ils
-// sont rangés par langue. On tente donc la version française, puis l'adresse
-// telle que fournie. Un sigle absent disparaît sans laisser de trou,
-// contrairement au logo qui, lui, est signalé.
 function symbolFallback(img){
   const fallback = img.dataset.fallback;
   if(fallback){
@@ -242,8 +203,6 @@ function symbolFallback(img){
   img.remove();
 }
 
-// Quand TCGdex n'a pas le logo français d'une extension, on retombe sur une
-// image ajoutée à la main dans le dépôt (images/sets/<id de l'extension>.png).
 function setLogoFallback(img){
   const fallback = img.dataset.fallback;
   if(fallback){
@@ -258,7 +217,6 @@ function groupBySeries(sets){
   const groups = {};
   const order = [];
   sets.forEach(s => {
-    // Le catalogue livre déjà chaque extension avec sa série.
     const seriesName = s.serieNom;
     if(!groups[seriesName]){ groups[seriesName] = []; order.push(seriesName); }
     groups[seriesName].push(s);
@@ -266,15 +224,6 @@ function groupBySeries(sets){
   return { groups, order };
 }
 
-// L'extension qui ouvre la série, celle dont le logo porte le nom de l'ère.
-//
-// La plus ancienne ne convient pas : les extensions de promotion sortent
-// d'ordinaire les premières et portent un logo de promotion : on aurait eu
-// « swshp » pour Épée et Bouclier. Le jeu nomme en revanche l'extension
-// fondatrice avec une régularité dont on peut se servir : des lettres puis
-// 1, éventuellement 01 : base1, xy1, swsh1, sv01, me01. À défaut, la plus
-// ancienne qui ne soit pas une promotion ; à défaut encore, la plus
-// ancienne, une extension sans date passant en dernier.
 function extensionFondatrice(setsDeLaSerie){
   const avecLogo = setsDeLaSerie.filter(s => s.logo);
   if(!avecLogo.length) return null;
@@ -285,12 +234,6 @@ function extensionFondatrice(setsDeLaSerie){
       ?? parDate[0];
 }
 
-// TCGdex n'héberge aucun logo de série : ses fiches de série n'en déclarent
-// pas, et une sonde lancée depuis un exécuteur GitHub, témoins à l'appui,
-// n'en a trouvé pour aucune des vingt. On montre donc le logo de l'extension
-// fondatrice, qui porte le nom de l'ère : « Écarlate et Violet », « Épée et
-// Bouclier », « Soleil et Lune ». Là où il manque, le titre reste seul,
-// sans image cassée : c'est le rôle de « onerror ».
 const cotePocket = () =>
   (typeof estPocket === 'function' && estPocket())
   || document.documentElement.dataset.univers === 'pocket';
@@ -311,8 +254,6 @@ function logoDeSerie(nomSerie, setsDeLaSerie){
                data-secours="images/sets/${fondatrice.id}.png">`;
 }
 
-// Un logo qui ne vient pas : on tente le miroir local, puis on renonce. Le
-// titre, resté dans le document, reprend alors sa place.
 function logoDeSerieAbsent(img){
   const secours = img.dataset.secours;
   if(secours){
@@ -323,7 +264,6 @@ function logoDeSerieAbsent(img){
   img.remove();
 }
 
-// Une recherche est-elle en cours ? Le rendu s'en sert pour tout ouvrir.
 let filtreEnCours = false;
 
 function renderSets(sets){
@@ -333,16 +273,12 @@ function renderSets(sets){
     return;
   }
   const { groups, order } = groupBySeries(sets);
-  // Une seule lecture des marquages pour toute la page : les recompter à
-  // chaque vignette relirait le stockage cent fois pour le même résultat.
   const obtenues = compterObtenuesParExtension(sets.map(s => s.id));
   const repliees = seriesRepliees();
   content.innerHTML = order.map(seriesName => {
     const setsInSeries = groups[seriesName];
     const cards = setsInSeries.map(s => {
       const year = s.releaseDate ? new Date(s.releaseDate).getFullYear() : '';
-      // Toutes les sources ne comptent pas les cartes d'une extension de
-      // promotion : mieux vaut ne rien annoncer qu'un point d'interrogation.
       const total = s.cardCount?.official ?? s.cardCount?.total ?? null;
       return `
       <a class="set-card" href="extension.html?set=${s.id}">
@@ -363,8 +299,6 @@ function renderSets(sets){
       </a>
     `;
     }).join('');
-    // Une recherche en cours ouvre tout : on ne cache pas un résultat
-    // derrière un bloc replié.
     const ouverte = filtreEnCours || !repliees.has(seriesName);
     return `
       <details class="series-block" data-serie="${seriesName.replace(/"/g, '&quot;')}"
@@ -382,9 +316,6 @@ function renderSets(sets){
   }).join('');
 }
 
-// Ce qu'on avait replié le reste au retour. On garde les séries FERMÉES, pas
-// les ouvertes : une série qui paraît doit s'afficher, pas se cacher. La clé
-// dépend de l'univers, les deux côtés n'ayant pas les mêmes séries.
 const CLE_SERIES_REPLIEES = () => 'pokeclasseur-series-repliees-' +
   (document.documentElement.dataset.univers || 'physique');
 
@@ -395,10 +326,9 @@ function seriesRepliees(){
 
 function enregistrerLesSeriesRepliees(noms){
   try{ localStorage.setItem(CLE_SERIES_REPLIEES(), JSON.stringify([...noms])); }
-  catch{ /* mémoire refusée : on s'en passe */ }
+  catch{ }
 }
 
-// <details> n'émet pas d'événement qui remonte : on l'attrape à la descente.
 document.getElementById('content').addEventListener('toggle', e => {
   const bloc = e.target.closest?.('.series-block');
   if(!bloc || filtreEnCours) return;

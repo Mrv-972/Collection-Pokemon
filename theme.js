@@ -1,19 +1,3 @@
-// Thème clair ou sombre, et réglages d'affichage.
-// ===============================================
-//
-// Chargé en tête de chaque page, AVANT ses styles : le thème est posé sur
-// <html> avant le premier affichage. Plus tard, la page aurait d'abord
-// paru sombre, puis viré au clair d'un coup : un éclair désagréable à
-// chaque changement de page.
-//
-// Trois choix : « auto » (celui de l'appareil), « clair », « sombre ». Le
-// choix est retenu sur l'appareil ; pour un membre connecté, il l'est aussi
-// sur son compte (compte.js), et le suit d'un appareil à l'autre.
-//
-// Le site a été dessiné en sombre : toutes ses couleurs sont des variables
-// (--ink, --text-on-ink…) que chaque page définit pour le sombre. Le mode
-// clair les redéfinit ici, d'un seul endroit, pour toutes les pages.
-
 const CLE_THEME = 'pokeclasseur-theme';
 const THEMES = ['auto', 'clair', 'sombre'];
 
@@ -29,7 +13,6 @@ const systemeSombre = () => {
   catch{ return true; }
 };
 
-// Le thème réellement affiché : « auto » se résout selon l'appareil.
 function themeAffiche(choix = themeChoisi()){
   if(choix === 'clair' || choix === 'sombre') return choix;
   return systemeSombre() ? 'sombre' : 'clair';
@@ -38,8 +21,6 @@ function themeAffiche(choix = themeChoisi()){
 function appliquerTheme(choix = themeChoisi()){
   const theme = themeAffiche(choix);
   document.documentElement.dataset.theme = theme;
-  // La barre des univers recopie la couleur du fond de la page
-  // (univers.js) : elle doit suivre un changement de thème.
   const rail = document.querySelector('.rail');
   if(rail && document.body) rail.style.setProperty('--fond-rail', getComputedStyle(document.body).backgroundColor);
   document.dispatchEvent(new CustomEvent('pokeclasseur:theme', { detail: { choix, theme } }));
@@ -48,14 +29,10 @@ function appliquerTheme(choix = themeChoisi()){
 
 function choisirTheme(choix){
   if(!THEMES.includes(choix)) return;
-  try{ localStorage.setItem(CLE_THEME, choix); }catch{ /* le choix vaudra pour cette page */ }
+  try{ localStorage.setItem(CLE_THEME, choix); }catch{ }
   appliquerTheme(choix);
 }
 
-// --- Affichage : taille des vignettes et contraste renforcé ------------
-//
-// Posés ici pour la même raison que le thème : avant le premier affichage,
-// sans quoi la grille de cartes se réarrangerait sous les yeux.
 const CLE_VIGNETTES = 'pokeclasseur-vignettes';
 const CLE_CONTRASTE = 'pokeclasseur-contraste';
 const TAILLES_VIGNETTES = ['compacte', 'normale', 'grande'];
@@ -80,21 +57,12 @@ function choisirAffichage({ vignettes, contraste } = {}){
   try{
     if(TAILLES_VIGNETTES.includes(vignettes)) localStorage.setItem(CLE_VIGNETTES, vignettes);
     if(typeof contraste === 'boolean') localStorage.setItem(CLE_CONTRASTE, contraste ? 'oui' : 'non');
-  }catch{ /* le choix vaudra pour cette page */ }
+  }catch{ }
   appliquerAffichage();
-  // Mémoire refusée : la page suit quand même le choix.
   if(TAILLES_VIGNETTES.includes(vignettes)) document.documentElement.dataset.vignettes = vignettes;
   if(typeof contraste === 'boolean') document.documentElement.dataset.contraste = contraste ? 'oui' : 'non';
 }
 
-// Les couleurs du mode clair. Un papier crème plutôt qu'un blanc pur : le
-// site évoque un classeur de cartes, et le blanc pur fatigue l'œil sur de
-// grandes surfaces. Les ors et les bleus sont assombris : ceux du mode
-// sombre, posés sur du clair, ne seraient plus lisibles.
-//
-// « --trait-rgb » sert aux bordures et aux fonds légers, écrits partout
-// « rgba(var(--trait-rgb), 0.08) » : un voile clair sur fond sombre, un
-// voile sombre sur fond clair.
 const STYLE_THEME = `
   :root{
     --trait-rgb:237,234,224;
@@ -132,8 +100,6 @@ const STYLE_THEME = `
   html[data-theme="clair"] img.glyph,
   html[data-theme="clair"] .glyph{color:#A3A6AB}
 
-  /* Taille des vignettes, sur les grilles de cartes. « normale » garde la
-     grille de chaque page telle quelle. */
   html[data-vignettes="compacte"] .card-grid{grid-template-columns:repeat(7,minmax(0,1fr));gap:10px}
   html[data-vignettes="grande"] .card-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
   @media(max-width:960px){
@@ -149,8 +115,6 @@ const STYLE_THEME = `
     html[data-vignettes="grande"] .card-grid{grid-template-columns:1fr}
   }
 
-  /* Contraste renforcé : textes secondaires plus nets, accents plus
-     appuyés, contour de sélection bien visible au clavier. */
   html[data-contraste="oui"]{
     --text-on-ink:#FFFFFF; --text-on-ink-dim:#D4D6D2;
     --accent-clair:#F4DF92; --trait-rgb:255,255,255;
@@ -172,22 +136,16 @@ const STYLE_THEME = `
   const style = document.createElement('style');
   style.id = 'style-theme';
   style.textContent = STYLE_THEME;
-  // En tête du <head> : les styles propres à chaque page viennent après et
-  // gardent la main pour le sombre ; le clair, plus précis
-  // (html[data-theme="clair"]), l'emporte sur leurs « :root ».
   document.head.prepend(style);
   appliquerTheme();
   appliquerAffichage();
 
-  // En « auto », suivre l'appareil s'il change en cours de visite (bascule
-  // automatique le soir, par exemple).
   try{
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
       if(themeChoisi() === 'auto') appliquerTheme('auto');
     });
-  }catch{ /* navigateur ancien : le thème restera celui du chargement */ }
+  }catch{ }
 
-  // Un autre onglet a changé le thème : celui-ci suit.
   window.addEventListener('storage', e => {
     if(e.key === CLE_THEME) appliquerTheme();
     if(e.key === CLE_VIGNETTES || e.key === CLE_CONTRASTE) appliquerAffichage();

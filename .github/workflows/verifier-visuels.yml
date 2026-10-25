@@ -1,9 +1,3 @@
-# Vérifie carte par carte si le visuel s'affiche, et dépose le verdict.
-#
-# Remplace la sonde de couverture, qui recalculait les adresses et
-# n'échantillonnait que huit cartes par extension : elle a déclaré muettes
-# des séries qui s'affichaient très bien. Ici : une requête d'en-tête par
-# carte, sur l'adresse que le site sert réellement. Aucune image téléchargée.
 name: Vérifier les visuels
 
 on:
@@ -37,9 +31,6 @@ jobs:
             --largeur "${{ inputs.largeur }}" \
             ${{ inputs.reprendre && '--reprendre donnees/verification-visuels.json' || '' }}
 
-      # Parmi les cartes sans visuel français : lesquelles n'existent pas en
-      # français (bandeau « N'existe pas en français »), lesquelles existent
-      # mais n'ont qu'une image anglaise chez nos sources.
       - name: Classer les cartes sans visuel français
         run: node outils/sans-edition-francaise.mjs --sortie donnees
 

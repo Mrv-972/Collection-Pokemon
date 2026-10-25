@@ -52,3 +52,23 @@ cesse de le signaler, on vérifie le nom et on l'ajoute à
   que les navigateurs ne servent pas une version périmée depuis leur cache.
 - Les suites de tests sont écrites avec Playwright et se lancent contre un
   serveur local (`python3 -m http.server 8731`).
+
+## Aucune trace d'IA
+
+Mrv972 ne veut pas qu'on puisse deviner que le site a été fait avec une IA.
+
+- Pas de commentaires explicatifs dans le code (JS, HTML, CSS, SQL, workflows) :
+  au plus une ligne courte quand un piège n'est pas évident à la lecture.
+- Pas d'émoji en guise d'icône : utiliser `pictogramme('nom')` (défini dans
+  `habillage.js`, dessins au trait) ou, dans le HTML statique,
+  `<span class="ico-da ico-nom" aria-hidden="true"></span>`.
+- Pas de surtitre au-dessus des titres de page, pas de points d'exclamation
+  enjoués dans les messages, pas de formules toutes faites.
+- Messages d'enregistrement (commits) courts et sobres, en français, sans
+  mention d'IA ni ligne « Co-Authored-By » ou « Claude-Session ».
+
+## Apparence
+
+La mise en page « Badges d'arène » (`habillage.js`) est celle du site.
+Couleurs des marquages : Obtenue en vert, Recherchée en rouge, Échangeable
+en jaune. La page d'accueil sera refaite plus tard.

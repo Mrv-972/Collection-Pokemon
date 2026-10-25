@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>Nous écrire - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -70,17 +70,6 @@
 
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -97,7 +86,6 @@
     .search-row input{min-height:44px}
   }
 
-  /* ------------------------------------------------ pages légales ------- */
   .legal{max-width:74ch;padding-bottom:60px}
   .legal h2{font-size:22px;margin:38px 0 12px;padding-top:22px;
             border-top:1px solid rgba(var(--trait-rgb),0.08);}
@@ -172,7 +160,6 @@
   </nav>
 
   <div class="page-head">
-    <div class="kicker">Contact</div>
     <h1>Nous écrire</h1>
     <p>Une question, une erreur repérée dans le catalogue, une idée pour améliorer le site, ou un membre à signaler : tout arrive à la même adresse.</p>
   </div>
@@ -214,9 +201,6 @@
     </div>
 
     <script>
-    // Les objets proposés. Chacun ouvre le logiciel de courrier avec l'objet
-    // déjà rempli : c'est peu de chose, mais un message dont l'objet dit de
-    // quoi il retourne se traite bien plus vite.
     const SUJETS = [
       ['Une idée pour le site',        "Suggestion d'amélioration",
        "Dis-moi ce qui te manque, ou ce qui te semble mal fichu."],
@@ -244,7 +228,6 @@
         </a>`).join('');
     }
 
-    // Copier l'adresse évite de la recopier à la main, et donc de se tromper.
     function installerLaCopie(){
       const bouton = document.getElementById('copier-adresse');
       const adresse = document.getElementById('adresse-copiable');
@@ -254,8 +237,6 @@
           await navigator.clipboard.writeText(adresse.textContent);
           bouton.textContent = 'Copiée ✓';
         }catch(err){
-          // Le presse-papiers peut être refusé : on sélectionne le texte, ce
-          // qui laisse au moins un Ctrl+C à portée.
           const selection = window.getSelection();
           const plage = document.createRange();
           plage.selectNodeContents(adresse);
@@ -267,7 +248,6 @@
       });
     }
 
-    // legal.js remplit l'adresse au chargement : on passe après lui.
     if(document.readyState === 'loading'){
       document.addEventListener('DOMContentLoaded', () => { poserLesSujets(); installerLaCopie(); });
     }else{
@@ -280,14 +260,14 @@
   <footer></footer>
 </div>
 
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="legal.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
-<script src="sets.js?v=2026-10-25-zimk"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="legal.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
+<script src="sets.js?v=2026-10-25-hgmz"></script>
 <script>
 initCompte().then(afficherEtatCompte);
 </script>

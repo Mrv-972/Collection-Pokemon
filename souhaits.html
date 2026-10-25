@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="theme.js?v=2026-10-25-zimk"></script>
-<script src="habillage.js?v=2026-10-25-zimk"></script>
+<script src="theme.js?v=2026-10-25-hgmz"></script>
+<script src="habillage.js?v=2026-10-25-hgmz"></script>
 <title>Liste de souhaits - PokéClasseur</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,11 +39,6 @@
   label{display:block;font-size:13px;color:var(--text-on-ink-dim);margin:16px 0 6px;}
   input{width:100%;background:var(--ink-soft);border:1px solid rgba(var(--trait-rgb),0.12);color:var(--text-on-ink);padding:11px 14px;border-radius:4px;font-size:14px;font-family:inherit;}
   input:focus{outline:none;border-color:rgba(var(--gold-rgb),0.5)}
-  /* La case n'est jamais pré-cochée : un consentement pré-coché n'en est
-     pas un, et ne prouve rien. Les liens s'ouvrent dans un nouvel onglet
-     pour qu'on ne perde pas ce qu'on vient de saisir. */
-  /* Séparée du reste par un trait et par sa couleur : on ne tombe pas sur ce
-     bouton en visant « Enregistrer ». */
   .danger-zone{margin-top:40px;padding-top:24px;border-top:1px solid rgba(192,57,43,0.35)}
   .danger-zone h2{font-family:'Newsreader',serif;font-size:18px;font-weight:500;
                   color:var(--alerte);margin:0 0 8px;}
@@ -99,17 +94,6 @@
   .zone-msg.ok{color:var(--succes)}
   footer{padding:44px 0;color:var(--text-on-ink-dim);font-size:13px;border-top:1px solid rgba(var(--trait-rgb),0.08);}
 
-  /* ========================= Téléphone =========================
-     Les liens de navigation passaient en display:none sous 720 px : depuis
-     un téléphone, on ne pouvait plus aller d'une section à l'autre du tout.
-     Ils descendent maintenant sur une deuxième ligne de la barre, toujours
-     visibles, et assez hauts pour être touchés sans viser. La règle de
-     débordement horizontal n'est là que pour les très petits écrans, où
-     quatre libellés ne tiennent plus côte à côte.
-
-     Le reste resserre des marges verticales taillées pour un grand écran,
-     et porte les commandes à une hauteur tactile confortable : en bas de
-     42 px, un doigt touche la voisine une fois sur trois. */
   @media(max-width:720px){
     nav{flex-wrap:wrap;padding:18px 0 0;}
     .navlinks{display:flex;order:3;width:100%;gap:4px;font-size:12.5px;
@@ -193,14 +177,14 @@
   <footer data-note="Cette page ne montre que ce que son auteur a choisi de partager : les cartes qu'il recherche et celles qu'il propose."></footer>
 </div>
 
-<script src="univers.js?v=2026-10-25-zimk"></script>
-<script src="sets.js?v=2026-10-25-zimk"></script>
-<script src="supabase-config.js?v=2026-10-25-zimk"></script>
-<script src="pied.js?v=2026-10-25-zimk"></script>
-<script src="admin.js?v=2026-10-25-zimk"></script>
-<script src="admin-site.js?v=2026-10-25-zimk"></script>
-<script src="compte.js?v=2026-10-25-zimk"></script>
-<script src="communaute.js?v=2026-10-25-zimk"></script>
+<script src="univers.js?v=2026-10-25-hgmz"></script>
+<script src="sets.js?v=2026-10-25-hgmz"></script>
+<script src="supabase-config.js?v=2026-10-25-hgmz"></script>
+<script src="pied.js?v=2026-10-25-hgmz"></script>
+<script src="admin.js?v=2026-10-25-hgmz"></script>
+<script src="admin-site.js?v=2026-10-25-hgmz"></script>
+<script src="compte.js?v=2026-10-25-hgmz"></script>
+<script src="communaute.js?v=2026-10-25-hgmz"></script>
 <script>
 const zone = document.getElementById('souhaits');
 const jeton = new URLSearchParams(location.search).get('j') ?? '';
@@ -210,8 +194,6 @@ function etat(html){ zone.innerHTML = `<p class="etat">${html}</p>`; }
 const extensionDe = id => String(id).replace(/-[^-]+$/, '');
 const universDe = setId => (typeof isPocketSet === 'function' && isPocketSet(setId)) ? 'pocket' : 'physique';
 
-// Nom, visuel et extension de chaque carte, lus dans les fichiers du site
-// - un fichier par extension concernée, pas un par carte.
 async function infosDesCartes(ids){
   const infos = {}, noms = {};
   const parExtension = {};
@@ -222,7 +204,7 @@ async function infosDesCartes(ids){
       try{
         const r = await fetch(`donnees/${universDe(setId)}/sets/${encodeURIComponent(setId)}.json`);
         if(r.ok) (await r.json()).forEach(c => { infos[c.id] = c; });
-      }catch{ /* la carte s'affichera sous son seul identifiant */ }
+      }catch{ }
     }),
     ...univers.map(async u => {
       try{
@@ -251,7 +233,6 @@ function vignette(id, { infos, noms }, accord){
     </div>`;
 }
 
-// Par extension, dans l'ordre du catalogue, puis par numéro.
 function trier(ids, { infos, noms }){
   const num = id => parseInt(infos[id]?.localId ?? '', 10);
   return ids.sort((a, b) =>
@@ -280,8 +261,6 @@ async function afficher(){
   const proposees = lignes.filter(l => l.genre === 'echangeable').map(l => l.carte_id);
   document.title = `Liste de souhaits de ${auteur.pseudo} - PokéClasseur`;
 
-  // Un visiteur connecté voit, en plus, ce qui colle avec sa propre
-  // collection : les cartes qu'il peut offrir, celles qu'il cherche.
   let mienne = {};
   const moi = estConnecte() && auteur.membre === membre.id;
   if(estConnecte() && !moi){ try{ mienne = await lireCollection(); }catch{} }
@@ -293,14 +272,13 @@ async function afficher(){
   const actions = auteur.membre && !moi ? `
       <div class="actions-liste">
         <a href="${lienProfil(auteur.membre)}">Voir son profil</a>
-        <a class="principal" href="discussions.html?membre=${encodeURIComponent(auteur.membre)}">💬 Lui écrire</a>
+        <a class="principal" href="discussions.html?membre=${encodeURIComponent(auteur.membre)}">${pictogramme('bulle')} Lui écrire</a>
       </div>` : moi ? `<div class="actions-liste"><a href="parametres.html#partage">Gérer le partage</a></div>` : '';
 
   zone.innerHTML = `
     <header class="tete-liste">
       ${avatarHtml(auteur, 84)}
       <div>
-        <div class="kicker">Liste de souhaits</div>
         <h1>${echapperCommun(auteur.pseudo)}</h1>
         <p class="resume">${nb(recherchees.length, 'carte recherchée', 'cartes recherchées')} · ${nb(proposees.length, 'carte proposée', 'cartes proposées')} à l'échange</p>
       </div>
@@ -312,7 +290,7 @@ async function afficher(){
       et tenir toi aussi ton classeur.</p>`}
 
     <section class="section-liste" aria-labelledby="titre-recherchees">
-      <h2 id="titre-recherchees">❤️ Recherchées</h2>
+      <h2 id="titre-recherchees">${pictogramme('rech')} Recherchées</h2>
       <p>Les cartes que ${echapperCommun(auteur.pseudo)} aimerait obtenir.</p>
       ${recherchees.length ? `<div class="grille-souhaits">${recherchees.map(id =>
         vignette(id, catalogue, mienne[id]?.ech ? 'Tu la proposes ✓' : '')).join('')}</div>`
@@ -320,7 +298,7 @@ async function afficher(){
     </section>
 
     <section class="section-liste" aria-labelledby="titre-proposees">
-      <h2 id="titre-proposees">🔁 À échanger</h2>
+      <h2 id="titre-proposees">${pictogramme('ech')} À échanger</h2>
       <p>Les cartes que ${echapperCommun(auteur.pseudo)} propose en échange.</p>
       ${proposees.length ? `<div class="grille-souhaits">${proposees.map(id =>
         vignette(id, catalogue, mienne[id]?.rech ? 'Tu la cherches ✓' : '')).join('')}</div>`

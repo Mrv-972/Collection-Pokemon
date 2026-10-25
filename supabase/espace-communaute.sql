@@ -1,29 +1,11 @@
--- L'onglet Communauté : questions / réponses, idées d'amélioration, forums.
--- ==========================================================================
---
--- Prérequis : schema.sql, administration.sql, rgpd.sql, securite-profils.sql,
--- profil-photo-parametres.sql et communaute.sql déjà exécutés. Ce script peut
--- être relancé sans dommage.
---
--- Trois espaces, une seule mécanique : un SUJET (une question, une idée, un
--- sujet de forum) et ses RÉPONSES. Tout le monde peut lire, même sans
--- compte : une communauté se découvre avant de s'y inscrire. Seul un membre
--- connecté écrit, et seulement en son nom.
---
--- Supprimer son compte efface aussi ce qu'on a publié ici (et donc les
--- réponses des autres sous ses propres sujets) : c'est la promesse de
--- rgpd.sql, « toutes ses données ».
 
--- --- 1. les tables ----------------------------------------------------------
 create table if not exists sujets (
   id               bigint generated always as identity primary key,
   espace           text not null check (espace in ('question', 'amelioration', 'forum')),
-  -- Un sujet de forum appartient à une catégorie ; les autres, non.
   categorie        text check (categorie in ('general', 'pocket', 'physique', 'echanges', 'collection', 'detente')),
   auteur_id        uuid not null default auth.uid() references auth.users on delete cascade,
   titre            text not null check (length(btrim(titre)) between 3 and 120),
   corps            text not null check (length(btrim(corps)) between 1 and 5000),
-  -- Le suivi d'une idée, que seul l'administrateur fait avancer.
   statut           text check (statut in ('proposee', 'etudiee', 'prevue', 'faite', 'refusee')),
   reponse_acceptee bigint,
   epingle          boolean not null default false,
@@ -54,8 +36,6 @@ alter table sujets drop constraint if exists sujets_reponse_acceptee_fk;
 alter table sujets add constraint sujets_reponse_acceptee_fk
   foreign key (reponse_acceptee) references reponses (id) on delete set null;
 
--- Un soutien par membre et par sujet : « moi aussi » sur une question,
--- « je soutiens » sur une idée.
 create table if not exists votes (
   sujet_id  bigint not null references sujets on delete cascade,
   membre_id uuid not null default auth.uid() references auth.users on delete cascade,
@@ -64,13 +44,10 @@ create table if not exists votes (
 );
 create index if not exists votes_par_membre on votes (membre_id);
 
--- --- 2. qui lit, qui écrit ----------------------------------------------------
 alter table sujets   enable row level security;
 alter table reponses enable row level security;
 alter table votes    enable row level security;
 
--- Supabase accorde tout, par défaut, sur les tables : on repart de rien et on
--- n'ouvre que le nécessaire, colonne par colonne pour l'écriture.
 revoke all on sujets, reponses, votes from anon, authenticated;
 grant select on sujets, reponses to anon, authenticated;
 grant insert (espace, categorie, titre, corps) on sujets to authenticated;
@@ -112,17 +89,6 @@ create policy "je soutiens" on votes for insert to authenticated with check (mem
 drop policy if exists "je retire mon soutien" on votes;
 create policy "je retire mon soutien" on votes for delete to authenticated using (membre_id = auth.uid());
 
--- --- 3. garde-fous à l'écriture -----------------------------------------------
--- Pour les seules écritures d'un membre (pas celles des fonctions de la base,
--- qui tiennent les compteurs) :
---   - il faut avoir terminé son inscription (un pseudo) ;
---   - pas de rafale : trois sujets par dizaine de minutes, huit réponses par
---     tranche de deux minutes, de quoi décourager un robot sans gêner
---     personne ;
---   - un sujet verrouillé ne reçoit plus de réponse.
--- Ces fonctions s'exécutent avec les droits de l'appelant (pas de
--- « security definer ») : c'est ce qui permet de reconnaître, par
--- current_user, l'écriture d'un membre.
 create or replace function communaute_avant_sujet()
 returns trigger
 language plpgsql
@@ -178,8 +144,6 @@ drop trigger if exists communaute_avant_reponse on reponses;
 create trigger communaute_avant_reponse before insert or update on reponses
   for each row execute function communaute_avant_reponse();
 
--- Les compteurs et la date de dernière activité, tenus par la base : un
--- membre ne peut pas les écrire, et ils restent justes.
 create or replace function communaute_compter_reponses()
 returns trigger
 language plpgsql
@@ -218,10 +182,6 @@ drop trigger if exists communaute_compter_votes on votes;
 create trigger communaute_compter_votes after insert or delete on votes
   for each row execute function communaute_compter_votes();
 
--- --- 4. lire : listes et fils ------------------------------------------------
--- Les fonctions joignent le pseudo et l'image de l'auteur : la table des
--- profils n'est lisible que des membres, or un visiteur doit pouvoir lire
--- la communauté. Rien d'autre du profil ne sort.
 drop function if exists liste_sujets(text, text, text, text, integer, integer);
 create function liste_sujets(p_espace text, p_categorie text default null, p_tri text default 'activite',
                              p_filtre text default null, p_limite integer default 30, p_decalage integer default 0)
@@ -262,7 +222,6 @@ as $$
 $$;
 grant execute on function liste_sujets(text, text, text, text, integer, integer) to anon, authenticated;
 
--- Un sujet et toutes ses réponses, d'un seul appel.
 drop function if exists fil_sujet(bigint);
 create function fil_sujet(p_sujet bigint)
 returns jsonb
@@ -286,8 +245,6 @@ as $$
 $$;
 grant execute on function fil_sujet(bigint) to anon, authenticated;
 
--- Les catégories du forum, avec leur nombre de sujets et leur dernière
--- activité.
 drop function if exists categories_forum();
 create function categories_forum()
 returns table (categorie text, nb_sujets integer, derniere_activite timestamptz)
@@ -302,9 +259,6 @@ as $$
 $$;
 grant execute on function categories_forum() to anon, authenticated;
 
--- --- 5. gestes particuliers ---------------------------------------------------
--- L'auteur d'une question désigne la réponse qui l'a aidé (ou retire ce
--- choix, avec null).
 drop function if exists accepter_reponse(bigint, bigint);
 create function accepter_reponse(p_sujet bigint, p_reponse bigint)
 returns void
@@ -324,8 +278,6 @@ end;
 $$;
 grant execute on function accepter_reponse(bigint, bigint) to authenticated;
 
--- L'administrateur épingle, verrouille, fait avancer une idée. Un argument
--- laissé à null ne change rien.
 drop function if exists moderer_sujet(bigint, boolean, boolean, text);
 create function moderer_sujet(p_sujet bigint, p_epingle boolean default null,
                               p_verrouille boolean default null, p_statut text default null)
@@ -345,7 +297,6 @@ end;
 $$;
 grant execute on function moderer_sujet(bigint, boolean, boolean, text) to authenticated;
 
--- --- 6. signaler un sujet ou une réponse ----------------------------------------
 alter table signalements add column if not exists sujet_id   bigint references sujets on delete cascade;
 alter table signalements add column if not exists reponse_id bigint references reponses on delete cascade;
 grant insert (sujet_id, reponse_id) on signalements to authenticated;
@@ -353,8 +304,6 @@ alter table signalements drop constraint if exists signalements_objet_valeurs;
 alter table signalements add  constraint signalements_objet_valeurs
   check (objet in ('membre', 'message', 'profil', 'photo', 'pseudo', 'avis', 'sujet', 'reponse'));
 
--- La personne signalée est l'auteur du contenu, quoi qu'envoie le
--- navigateur : un signalement ne peut pas viser quelqu'un d'autre.
 create or replace function signalement_auteur_du_contenu()
 returns trigger
 language plpgsql
@@ -376,7 +325,6 @@ drop trigger if exists signalement_auteur_du_contenu on signalements;
 create trigger signalement_auteur_du_contenu before insert on signalements
   for each row execute function signalement_auteur_du_contenu();
 
--- Le tiroir de l'administrateur montre, en plus, le contenu signalé.
 drop function if exists signalements_a_traiter();
 create function signalements_a_traiter()
 returns table (id bigint, objet text, motif text, cree_le timestamptz,
@@ -387,9 +335,6 @@ security definer
 stable
 set search_path = public
 as $$
-  -- Le message signalé est montré tel quel : son destinataire l'a déjà lu
-  -- et le soumet lui-même à l'administrateur. Le reste de la discussion
-  -- ne s'ouvre que par le tiroir des comptes, motif consigné au journal.
   select s.id, s.objet, s.motif, s.cree_le, a.pseudo, s.signale_id, b.pseudo, b.photo_url,
          coalesce(m.texte, r.corps, case when s.reponse_id is null then su.corps end),
          s.sujet_id, s.reponse_id, su.titre
@@ -404,11 +349,6 @@ as $$
 $$;
 grant execute on function signalements_a_traiter() to authenticated;
 
--- --- 7. les badges de la communauté --------------------------------------------
--- Calculés, comme ceux de la collection (communaute.sql, badges_de), à partir
--- de ce que la base sait elle-même. Ce qu'un membre fait pour lui-même ne
--- compte pas : répondre à ses propres questions, choisir sa propre réponse,
--- soutenir sa propre idée. Sans quoi ces badges s'obtiendraient seul.
 drop function if exists badges_communaute(uuid);
 create function badges_communaute(membre uuid)
 returns table (badge text)
@@ -446,12 +386,6 @@ as $$
 $$;
 grant execute on function badges_communaute(uuid) to authenticated;
 
--- --- 8. les nouvelles réponses ------------------------------------------------
--- Un membre suit les sujets qu'il a ouverts et ceux où il a répondu. Une
--- réponse y est « nouvelle » si elle vient d'un autre et qu'elle est arrivée
--- après sa dernière visite du sujet, ou après sa propre dernière réponse :
--- ce qui précède, il l'a forcément lu pour répondre. C'est ce que compte la
--- pastille de l'onglet Communauté.
 create table if not exists vues_sujets (
   membre_id            uuid not null references auth.users on delete cascade,
   sujet_id             bigint not null references sujets on delete cascade,
@@ -459,7 +393,6 @@ create table if not exists vues_sujets (
   primary key (membre_id, sujet_id)
 );
 alter table vues_sujets enable row level security;
--- Personne n'y écrit directement : seulement par marquer_sujet_lu().
 revoke all on vues_sujets from anon, authenticated;
 
 drop function if exists sujets_suivis();
@@ -504,9 +437,6 @@ as $$
 $$;
 grant execute on function reponses_non_lues() to authenticated;
 
--- Le membre ouvre un sujet qu'il suit : tout y est lu. La fonction renvoie
--- où il en était avant, pour que la page signale les réponses nouvelles ;
--- rien (null) pour un sujet qu'il ne suit pas.
 drop function if exists marquer_sujet_lu(bigint);
 create function marquer_sujet_lu(p_sujet bigint)
 returns bigint
@@ -536,9 +466,6 @@ grant execute on function marquer_sujet_lu(bigint) to authenticated;
 
 notify pgrst, 'reload schema';
 
--- --- vérification ------------------------------------------------------------
--- En dernier, seule commande affichée par l'éditeur SQL. Attendu :
--- true, true, false, false, true, true.
 select has_table_privilege('anon', 'sujets', 'SELECT')                          as visiteurs_lisent,
        has_column_privilege('authenticated', 'sujets', 'titre', 'INSERT')       as membres_publient,
        has_column_privilege('authenticated', 'sujets', 'epingle', 'UPDATE')     as membres_epinglent,

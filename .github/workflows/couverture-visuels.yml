@@ -1,9 +1,3 @@
-# Mesure, et DÉPOSE, la couverture des visuels du TCG physique.
-#
-# Le bac à sable de développement n'atteint pas le serveur d'images ; un
-# exécuteur GitHub, si. Contrairement à l'ancienne sonde, le résultat est
-# écrit dans le dépôt : c'est lui qui dit quelles extensions viser, et une
-# mesure qui ne vit que dans un journal finit par disparaître.
 name: Couverture des visuels
 
 on:
@@ -33,7 +27,6 @@ jobs:
             --par-extension "${{ inputs.par-extension }}" \
             --rapport donnees
 
-      # Un filet : si le dépôt refuse, la mesure reste téléchargeable.
       - name: Garder la mesure en pièce jointe
         uses: actions/upload-artifact@v4
         with:

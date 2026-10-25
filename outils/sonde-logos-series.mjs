@@ -1,16 +1,3 @@
-// Quelles séries ont un logo chez TCGdex ?
-//
-// Le bac à sable de développement n'atteint pas ce domaine : la sonde tourne
-// sur un exécuteur GitHub et on lit son journal.
-//
-// Une première version interrogeait en HEAD et concluait « aucune série n'a
-// de logo ». Son témoin (un visuel dont on sait qu'il existe) était absent
-// lui aussi : la sonde ne sondait rien. D'où cette version, qui demande en
-// GET, affiche le code de réponse, et se tait tant que ses témoins ne
-// répondent pas.
-//
-//   node outils/sonde-logos-series.mjs --instantane donnees
-
 import { readFile } from 'node:fs/promises';
 
 const args = process.argv.slice(2);
@@ -21,8 +8,6 @@ const valeur = nom => {
 const dossier = valeur('--instantane') ?? 'donnees';
 const IDENTITE = { 'User-Agent': 'PokeClasseur (sonde des logos de serie)' };
 
-// Un GET, pas un HEAD : tous les serveurs ne répondent pas au second. On
-// coupe la lecture dès les en-têtes, le corps ne nous intéresse pas.
 async function interroger(adresse){
   try{
     const r = await fetch(adresse, { headers: IDENTITE });
@@ -42,9 +27,6 @@ async function ligne(etiquette, adresse){
 
 const extensions = JSON.parse(await readFile(`${dossier}/physique/extensions.json`, 'utf8'));
 
-// --- Les témoins ---------------------------------------------------------
-// Des visuels d'extension, dont le site se sert tous les jours. S'ils ne
-// répondent pas, rien de ce qui suit n'a de valeur.
 console.log('Témoins : des visuels dont on sait qu\'ils existent :');
 const temoins = [
   ['logo base1  ', 'https://assets.tcgdex.net/fr/base/base1/logo.png'],
@@ -61,7 +43,6 @@ if(!unTemoinRepond){
   process.exit(1);
 }
 
-// --- Les séries ----------------------------------------------------------
 const series = new Map();
 for(const e of extensions){
   if(e.serieId && !series.has(e.serieId)) series.set(e.serieId, e.serieNom);
